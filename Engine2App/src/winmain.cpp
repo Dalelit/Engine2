@@ -63,6 +63,9 @@ std::function<void(Engine2::InputEvent&)> OnInputEventFunc = [](Engine2::InputEv
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	if (Engine2::DXImgui::WndProcHandler(hWnd, msg, wParam, lParam))
+		return 0;
+
 	switch (msg)
 	{
 		// window controls /////////////////////////

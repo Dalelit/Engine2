@@ -17,6 +17,9 @@ namespace Engine2
 
 		void ScreenSizeChanged();
 
+		ID3D11Device3* GetDevice() { return pDevice.Get(); }
+		ID3D11DeviceContext3* GetContext() { return pImmediateContext.Get(); }
+
 		void LogDebugInfo();
 
 	protected:

@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "Common.h"
 #include "Engine2.h"
 
 namespace Engine2
@@ -16,6 +17,8 @@ namespace Engine2
 	Engine::Engine(HWND hwnd) :
 		device(hwnd)
 	{
+		imgui.Initialise(hwnd, device);
+		imguiActive = true;
 	}
 
 	Engine::~Engine()
@@ -49,7 +52,7 @@ namespace Engine2
 		// render imgui
 		if (imguiActive)
 		{
-			//to do being
+			imgui.BeginFrame();
 
 			OnImgui(); // engine's own Imgui
 
@@ -58,7 +61,7 @@ namespace Engine2
 				layer->OnImgui();
 			}
 
-			//to do end
+			imgui.Draw();
 		}
 
 		// dx present
@@ -78,6 +81,11 @@ namespace Engine2
 
 	void Engine::OnImgui()
 	{
+		if (ImGui::Begin("Hello"))
+		{
+			ImGui::Text("Say something");
+			ImGui::End();
+		}
 	}
 
 	bool Engine::OnResize(WindowResizeEvent& event)

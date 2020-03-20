@@ -1,6 +1,7 @@
 #pragma once
 
 #include "DXDevice.h"
+#include "DXImgui.h"
 #include "Events.h"
 #include "Layer.h"
 
@@ -24,15 +25,16 @@ namespace Engine2 {
 		void OnInputEvent(InputEvent& event);
 		void OnImgui();
 
-		void ImguiActive(bool makeImguiActive = true) { imguiActive = makeImguiActive; }
+		void ImguiActive(bool isActive = true) { imguiActive = isActive; }
 
 	private:
 		static Engine* instance;
 
 		DXDevice device;
+		DXImgui imgui;
 		std::vector<Layer*> layers;
 		bool minimised = false;
-		bool imguiActive = true;
+		bool imguiActive = false;
 
 		bool OnResize(WindowResizeEvent& event);
 	};
