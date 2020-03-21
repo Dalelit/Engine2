@@ -4,15 +4,13 @@
 
 namespace Engine2
 {
-	Engine* Engine::instance = nullptr;
+	std::unique_ptr<Engine> Engine::instance = nullptr;
 
-	Engine* Engine::CreateEngine(HWND hwnd)
+	void Engine::CreateEngine(HWND hwnd)
 	{
 		E2_ASSERT(instance == nullptr, "Engine instance already exists");
 
-		instance = new Engine(hwnd);
-
-		return instance;
+		instance = std::make_unique<Engine>(hwnd);
 	}
 	Engine::Engine(HWND hwnd) :
 		device(hwnd)
@@ -138,7 +136,7 @@ namespace Engine2
 			float avg = 0.0f;
 			for (int i = 0; i < frameTimeCount; i++) avg += frameTimes[i];
 			avg /= frameTimeCount;
-			std::string msg = "Avg " + std::to_string(avg);
+			std::string msg = "Frame rate avg ms " + std::to_string(avg);
 			ImGui::PlotLines("", frameTimes, frameTimeCount, frameTimeCurrent, msg.c_str(), 0.0f, 30.0f, {0,40});
 			ImGui::End();
 		}

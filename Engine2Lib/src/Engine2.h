@@ -12,8 +12,8 @@ namespace Engine2 {
 	{
 	public:
 
-		static Engine* CreateEngine(HWND hwnd);
-		inline static Engine& Get() { return *instance; }
+		static void CreateEngine(HWND hwnd);
+		inline static Engine& Get() { return *instance.get(); }
 
 		Engine(HWND hwnd);
 		~Engine();
@@ -27,7 +27,7 @@ namespace Engine2 {
 		void ImguiActive(bool isActive = true) { imguiActive = isActive; }
 
 	private:
-		static Engine* instance;
+		static std::unique_ptr<Engine> instance;
 
 		DXDevice device;
 		DXImgui imgui;
