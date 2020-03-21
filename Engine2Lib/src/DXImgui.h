@@ -15,7 +15,7 @@ namespace Engine2
 		void Initialise(HWND hwnd, DXDevice& device);
 
 		void BeginFrame();
-		void Draw();
+		void EndFrame();
 
 		bool WantCaptureKeyboard();
 

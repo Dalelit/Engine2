@@ -1,11 +1,10 @@
 #pragma once
 
+#include "Common.h"
 #include "DXDevice.h"
 #include "DXImgui.h"
 #include "Events.h"
 #include "Layer.h"
-
-#define E2_ASSERT(x, msg) assert(x)
 
 namespace Engine2 {
 
@@ -36,7 +35,12 @@ namespace Engine2 {
 		bool minimised = false;
 		bool imguiActive = false;
 
+		// to do: temp
+		float frameTime = 0.0f;
+		clock_t frameLastTime;
+
 		bool OnResize(WindowResizeEvent& event);
+		void ImguiStatsWindow(bool* pOpen);
 	};
 
 }

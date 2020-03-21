@@ -45,7 +45,7 @@ namespace Engine2
 		ImGui::NewFrame();
 	}
 
-	void DXImgui::Draw()
+	void DXImgui::EndFrame()
 	{
 		ImGui::Render();
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

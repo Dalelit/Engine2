@@ -19,6 +19,8 @@ namespace Engine2
 	{
 		imgui.Initialise(hwnd, device);
 		imguiActive = true;
+
+		frameLastTime = clock();
 	}
 
 	Engine::~Engine()
@@ -61,11 +63,16 @@ namespace Engine2
 				layer->OnImgui();
 			}
 
-			imgui.Draw();
+			imgui.EndFrame();
 		}
 
 		// dx present
 		device.PresentFrame();
+
+		// to do: temp
+		clock_t currentTime = clock();
+		frameTime = (float)(currentTime - frameLastTime);
+		frameLastTime = currentTime;
 	}
 
 	void Engine::OnApplicationEvent(ApplicationEvent& event)
@@ -77,15 +84,6 @@ namespace Engine2
 
 	void Engine::OnInputEvent(InputEvent& event)
 	{
-	}
-
-	void Engine::OnImgui()
-	{
-		if (ImGui::Begin("Hello"))
-		{
-			ImGui::Text("Say something");
-			ImGui::End();
-		}
 	}
 
 	bool Engine::OnResize(WindowResizeEvent& event)
@@ -101,6 +99,41 @@ namespace Engine2
 		}
 
 		return true;
+	}
+
+	void Engine::OnImgui()
+	{
+		static bool demoOpen = true;
+		if (demoOpen) ImGui::ShowDemoWindow(&demoOpen);
+
+		static bool statsOpen = true;
+		if (statsOpen) ImguiStatsWindow(&statsOpen);
+
+		if (ImGui::Begin("Engine2", nullptr, ImGuiWindowFlags_MenuBar))
+		{
+			if (ImGui::BeginMenuBar())
+			{
+				if (ImGui::BeginMenu("Menu"))
+				{
+					ImGui::MenuItem("Demo window", NULL, &demoOpen);
+					ImGui::MenuItem("Stats overlay", NULL, &statsOpen);
+					ImGui::EndMenu();
+				}
+				ImGui::EndMenuBar();
+			}
+		}
+
+		ImGui::End();
+	}
+
+	void Engine::ImguiStatsWindow(bool* pOpen)
+	{
+		ImGui::SetNextWindowBgAlpha(0.35f); // Transparent background
+		if (ImGui::Begin("Stats", pOpen, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize))
+		{
+			ImGui::Text("Frame time: %.0f ms", frameTime);
+			ImGui::End();
+		}
 	}
 
 }
