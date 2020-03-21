@@ -36,8 +36,10 @@ namespace Engine2 {
 		bool imguiActive = false;
 
 		// to do: temp
-		float frameTime = 0.0f;
 		clock_t frameLastTime;
+		static constexpr unsigned int frameTimeCount = 60;
+		unsigned int frameTimeCurrent = 59;
+		float frameTimes[frameTimeCount] = {};
 
 		bool OnResize(WindowResizeEvent& event);
 		void ImguiStatsWindow(bool* pOpen);

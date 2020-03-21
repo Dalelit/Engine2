@@ -71,7 +71,8 @@ namespace Engine2
 
 		// to do: temp
 		clock_t currentTime = clock();
-		frameTime = (float)(currentTime - frameLastTime);
+		frameTimeCurrent++;  if (frameTimeCurrent >= frameTimeCount) frameTimeCurrent = 0;
+		frameTimes[frameTimeCurrent] = (float)(currentTime - frameLastTime);
 		frameLastTime = currentTime;
 	}
 
@@ -103,7 +104,7 @@ namespace Engine2
 
 	void Engine::OnImgui()
 	{
-		static bool demoOpen = true;
+		static bool demoOpen = false;
 		if (demoOpen) ImGui::ShowDemoWindow(&demoOpen);
 
 		static bool statsOpen = true;
@@ -115,8 +116,8 @@ namespace Engine2
 			{
 				if (ImGui::BeginMenu("Menu"))
 				{
-					ImGui::MenuItem("Demo window", NULL, &demoOpen);
-					ImGui::MenuItem("Stats overlay", NULL, &statsOpen);
+					ImGui::MenuItem("Demo window", nullptr, &demoOpen);
+					ImGui::MenuItem("Stats overlay", nullptr, &statsOpen);
 					ImGui::EndMenu();
 				}
 				ImGui::EndMenuBar();
@@ -129,11 +130,20 @@ namespace Engine2
 	void Engine::ImguiStatsWindow(bool* pOpen)
 	{
 		ImGui::SetNextWindowBgAlpha(0.35f); // Transparent background
+		ImVec4 bg = ImGui::GetStyleColorVec4(ImGuiCol_FrameBg); // store the current background color
+		ImGui::GetStyle().Colors[ImGuiCol_FrameBg] = { 0,0,0,0 }; // set background to transparent
+
 		if (ImGui::Begin("Stats", pOpen, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize))
 		{
-			ImGui::Text("Frame time: %.0f ms", frameTime);
+			float avg = 0.0f;
+			for (int i = 0; i < frameTimeCount; i++) avg += frameTimes[i];
+			avg /= frameTimeCount;
+			std::string msg = "Avg " + std::to_string(avg);
+			ImGui::PlotLines("", frameTimes, frameTimeCount, frameTimeCurrent, msg.c_str(), 0.0f, 30.0f, {0,40});
 			ImGui::End();
 		}
+
+		ImGui::GetStyle().Colors[ImGuiCol_FrameBg] = bg; // recover the background color
 	}
 
 }
