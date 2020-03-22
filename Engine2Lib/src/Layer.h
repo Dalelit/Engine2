@@ -1,5 +1,6 @@
 #pragma once
 #include "pch.h"
+#include "Common.h"
 #include "Events.h"
 
 namespace Engine2
@@ -20,7 +21,11 @@ namespace Engine2
 		virtual void OnRender() {}
 		virtual void OnInputEvent(InputEvent& event) {}
 		virtual void OnApplicationEvent(ApplicationEvent& event) {}
-		virtual void OnImgui() {}
+		virtual void OnImgui() {}; // override this as the imgui window content for the layer
+
+		// called from the engine
+		void ImguiWindow() { if (imguiOpen) { ImGui::Begin(name.c_str(), &imguiOpen); OnImgui(); ImGui::End(); } }
+		bool imguiOpen = true;
 
 	protected:
 		std::string name;

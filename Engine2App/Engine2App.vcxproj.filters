@@ -9,4 +9,8 @@
     <ClInclude Include="src\pch.h" />
     <ClInclude Include="src\Playground.h" />
   </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Assets\Shaders\VSTest.hlsl" />
+    <FxCompile Include="Assets\Shaders\PSTest.hlsl" />
+  </ItemGroup>
 </Project>

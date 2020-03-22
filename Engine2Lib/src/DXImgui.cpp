@@ -28,7 +28,7 @@ namespace Engine2
 
 		// Setup Platform/Renderer bindings
 		ImGui_ImplWin32_Init(hwnd);
-		ImGui_ImplDX11_Init(device.GetDevice(), device.GetContext());
+		ImGui_ImplDX11_Init(&device.GetDevice(), &device.GetContext());
 	}
 
 	DXImgui::~DXImgui()

@@ -154,7 +154,11 @@
     <ClInclude Include="src\Events.h" />
     <ClInclude Include="src\DXDevice.h" />
     <ClInclude Include="src\Engine2.h" />
+    <ClInclude Include="src\Material.h" />
+    <ClInclude Include="src\Mesh.h" />
+    <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\pch.h" />
+    <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\submodules\imgui\imconfig.h" />
     <ClInclude Include="src\submodules\imgui\imgui.h" />
     <ClInclude Include="src\submodules\imgui\imgui_impl_dx11.h" />
@@ -166,14 +170,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\DXImgui.cpp" />
-    <ClCompile Include="src\Layer.cpp" />
     <ClCompile Include="src\Events.cpp" />
     <ClCompile Include="src\DXDevice.cpp" />
     <ClCompile Include="src\Engine2.cpp" />
+    <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\submodules\imgui\imgui.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>

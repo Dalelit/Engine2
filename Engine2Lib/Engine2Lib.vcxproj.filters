@@ -16,13 +16,16 @@
     <ClInclude Include="src\submodules\imgui\imstb_truetype.h" />
     <ClInclude Include="src\DXImgui.h" />
     <ClInclude Include="src\Common.h" />
+    <ClInclude Include="src\Mesh.h" />
+    <ClInclude Include="src\Model.h" />
+    <ClInclude Include="src\Material.h" />
+    <ClInclude Include="src\Shader.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\pch.cpp" />
     <ClCompile Include="src\DXDevice.cpp" />
     <ClCompile Include="src\Engine2.cpp" />
     <ClCompile Include="src\Events.cpp" />
-    <ClCompile Include="src\Layer.cpp" />
     <ClCompile Include="src\submodules\imgui\imgui.cpp" />
     <ClCompile Include="src\submodules\imgui\imgui_demo.cpp" />
     <ClCompile Include="src\submodules\imgui\imgui_draw.cpp" />
@@ -30,5 +33,7 @@
     <ClCompile Include="src\submodules\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="src\submodules\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\DXImgui.cpp" />
+    <ClCompile Include="src\Shader.cpp" />
+    <ClCompile Include="src\Model.cpp" />
   </ItemGroup>
 </Project>

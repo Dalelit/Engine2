@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Engine2.h"
+#include "Playground.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -121,6 +122,8 @@ int WINAPI WinMain(
 
 	OnApplicationEventFunc = [](Engine2::ApplicationEvent& event) { Engine2::Engine::Get().OnApplicationEvent(event); };
 	OnInputEventFunc = [](Engine2::InputEvent& event) { Engine2::Engine::Get().OnInputEvent(event); };
+
+	Engine2::Engine::Get().AttachLayer(new Playground());
 
 	clock_t lastTime = clock();
 

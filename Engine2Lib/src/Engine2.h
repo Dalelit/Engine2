@@ -14,11 +14,16 @@ namespace Engine2 {
 
 		static void CreateEngine(HWND hwnd);
 		inline static Engine& Get() { return *instance.get(); }
+		inline static ID3D11Device3& GetDevice() { return instance->device.GetDevice(); }
+		inline static ID3D11DeviceContext3& GetContext() { return instance->device.GetContext(); }
 
 		Engine(HWND hwnd);
 		~Engine();
 
 		void DoFrame(float deltaTime);
+
+		// Engine will own the layer and delete at the end.
+		void AttachLayer(Layer* layer) { layers.push_back(layer); }
 
 		void OnApplicationEvent(ApplicationEvent& event);
 		void OnInputEvent(InputEvent& event);

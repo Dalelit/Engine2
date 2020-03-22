@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "Common.h"
 #include "DXDevice.h"
 
 #pragma comment(lib,"d3d11.lib")
@@ -6,7 +7,6 @@
 #pragma comment(lib,"dxguid.lib")
 
 #define E2DX_DEBUG_LOG(msg)       OutputDebugStringA(msg);
-#define E2DX_ASSERT_HR(hr, msg)   assert(SUCCEEDED(hr));
 
 namespace Engine2
 {
@@ -34,7 +34,7 @@ namespace Engine2
 		ReleasePipeline();
 
 		HRESULT hr = pSwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0); // resize, retaining previous settings
-		E2DX_ASSERT_HR(hr, "ResizeBuffers failed");
+		E2_ASSERT_HR(hr, "ResizeBuffers failed");
 
 		ConfigurePipeline();
 
@@ -67,7 +67,7 @@ namespace Engine2
 
 		wrl::ComPtr<ID3D11Debug> pDebug = nullptr;
 		hr = pDevice->QueryInterface(__uuidof(ID3D11Debug), &pDebug);
-		E2DX_ASSERT_HR(hr, "Failed to get ID3D11Debug");
+		E2_ASSERT_HR(hr, "Failed to get ID3D11Debug");
 
 		msg << "------------------------------" << std::endl;
 		E2DX_DEBUG_LOG(msg.str().c_str());
@@ -121,12 +121,12 @@ namespace Engine2
 			&featureLevel,
 			&pImmediateContext0
 		);
-		E2DX_ASSERT_HR(hr, "D3D11CreateDeviceAndSwapChain failed");
+		E2_ASSERT_HR(hr, "D3D11CreateDeviceAndSwapChain failed");
 
 		// store them as later versions of the interface
-		hr = pSwapChain0.As(&pSwapChain);               E2DX_ASSERT_HR(hr, "Conversion of swapchain version failed");
-		hr = pDevice0.As(&pDevice);                     E2DX_ASSERT_HR(hr, "Conversion of device version failed");
-		hr = pImmediateContext0.As(&pImmediateContext); E2DX_ASSERT_HR(hr, "Conversion of context version failed");
+		hr = pSwapChain0.As(&pSwapChain);               E2_ASSERT_HR(hr, "Conversion of swapchain version failed");
+		hr = pDevice0.As(&pDevice);                     E2_ASSERT_HR(hr, "Conversion of device version failed");
+		hr = pImmediateContext0.As(&pImmediateContext); E2_ASSERT_HR(hr, "Conversion of context version failed");
 	}
 
 	void DXDevice::ConfigurePipeline()
@@ -135,11 +135,11 @@ namespace Engine2
 
 		hr = pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), &pBackBuffer);
 
-		E2DX_ASSERT_HR(hr, "GetBuffer failed");
+		E2_ASSERT_HR(hr, "GetBuffer failed");
 
 		hr = pDevice->CreateRenderTargetView(pBackBuffer.Get(), nullptr, &pRenderTargetView);
 
-		E2DX_ASSERT_HR(hr, "CreateRenderTargetView failed");
+		E2_ASSERT_HR(hr, "CreateRenderTargetView failed");
 
 		pBackBuffer->GetDesc(&bufferDesc);
 
@@ -161,7 +161,7 @@ namespace Engine2
 
 		hr = pDevice->CreateDepthStencilState(&dsDesc, &pDepthStencilStateOn);
 
-		E2DX_ASSERT_HR(hr, "CreateDepthStencilState failed");
+		E2_ASSERT_HR(hr, "CreateDepthStencilState failed");
 
 		pImmediateContext->OMSetDepthStencilState(pDepthStencilStateOn.Get(), 0u);
 
@@ -180,7 +180,7 @@ namespace Engine2
 
 		hr = pDevice->CreateTexture2D(&dtDesc, nullptr, &pDepthTexture);
 
-		E2DX_ASSERT_HR(hr, "CreateTexture2D failed");
+		E2_ASSERT_HR(hr, "CreateTexture2D failed");
 
 		D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
 		dsvDesc.Format = dtDesc.Format;
@@ -190,7 +190,7 @@ namespace Engine2
 
 		hr = pDevice->CreateDepthStencilView(pDepthTexture.Get(), &dsvDesc, &pDepthStencilView);
 
-		E2DX_ASSERT_HR(hr, "CreateDepthStencilView failed");
+		E2_ASSERT_HR(hr, "CreateDepthStencilView failed");
 	}
 	void DXDevice::ReleasePipeline()
 	{

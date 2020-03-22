@@ -37,7 +37,7 @@ namespace Engine2
 		// update layers
 		for (auto layer : layers)
 		{
-			layer->OnUpdate(deltaTime);
+			if (layer->IsActive()) layer->OnUpdate(deltaTime);
 		}
 
 		// render layers
@@ -45,7 +45,7 @@ namespace Engine2
 		{
 			for (auto layer : layers)
 			{
-				layer->OnRender();
+				if (layer->IsActive()) layer->OnRender();
 			}
 		}
 
@@ -58,7 +58,7 @@ namespace Engine2
 
 			for (auto layer : layers)
 			{
-				layer->OnImgui();
+				layer->ImguiWindow();
 			}
 
 			imgui.EndFrame();
@@ -120,6 +120,11 @@ namespace Engine2
 				}
 				ImGui::EndMenuBar();
 			}
+
+			if (ImGui::CollapsingHeader("Layer windows"))
+			{
+				for (auto layer : layers) ImGui::Checkbox(layer->GetName().c_str(), &layer->imguiOpen);
+			}
 		}
 
 		ImGui::End();
@@ -136,8 +141,10 @@ namespace Engine2
 			float avg = 0.0f;
 			for (int i = 0; i < frameTimeCount; i++) avg += frameTimes[i];
 			avg /= frameTimeCount;
-			std::string msg = "Frame rate avg ms " + std::to_string(avg);
-			ImGui::PlotLines("", frameTimes, frameTimeCount, frameTimeCurrent, msg.c_str(), 0.0f, 30.0f, {0,40});
+			char buffer[13];
+			sprintf_s(buffer, ARRAYSIZE(buffer), "FR ms %.1f", avg);
+			ImGui::PlotLines("", frameTimes, frameTimeCount, frameTimeCurrent, buffer, 0.0f, 30.0f, {0,40});
+
 			ImGui::End();
 		}
 
