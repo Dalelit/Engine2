@@ -3,6 +3,7 @@
 #include "Common.h"
 #include "Layer.h"
 #include "Model.h"
+#include "ConstantBuffer.h"
 
 class Playground : public Engine2::Layer
 {
@@ -22,5 +23,5 @@ private:
 
 	void AddModel1();
 	void AddModel2();
+	void AddModel3();
 };
-

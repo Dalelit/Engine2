@@ -3,6 +3,7 @@
 #include "pch.h"
 #include "Common.h"
 #include "Shader.h"
+#include "ConstantBuffer.h"
 
 namespace Engine2
 {
@@ -15,6 +16,8 @@ namespace Engine2
 
 		std::shared_ptr<VertexShader> pVS;
 		std::shared_ptr<PixelShader> pPS;
+		
+		ResourceVector resources;
 
 	protected:
 		std::string name;

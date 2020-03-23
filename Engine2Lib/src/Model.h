@@ -15,6 +15,8 @@ namespace Engine2
 		std::shared_ptr<Mesh> pMesh;
 		std::shared_ptr<Material> pMaterial;
 
+		void Bind();
+
 		bool IsActive() { return active; }
 		void SetActive(bool makeActive = true) { active = makeActive; }
 

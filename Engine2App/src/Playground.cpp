@@ -13,9 +13,7 @@ void Playground::OnRender()
 	{
 		if (model->IsActive())
 		{
-			model->pMaterial->pVS->Bind();
-			model->pMaterial->pPS->Bind();
-			model->pMesh->Bind();
+			model->Bind();
 			model->pMesh->Draw();
 		}
 	}
@@ -31,6 +29,7 @@ void Playground::OnImgui()
 		{
 			model->OnImgui();
 		}
+
 		ImGui::TreePop();
 	}
 }
@@ -39,6 +38,7 @@ void Playground::CreateScene()
 {
 	AddModel1();
 	AddModel2();
+	AddModel3();
 }
 
 void Playground::AddModel1()
@@ -129,6 +129,60 @@ void Playground::AddModel2()
 		float4 main(float4 col : Color) : SV_TARGET
 		{
 			return col;
+		})";
+
+	model->pMaterial->pPS = PixelShader::CreateFromString(psCode);
+}
+
+void Playground::AddModel3()
+{
+	auto model = std::make_shared<Model>("Model 3");
+	models.push_back(model);
+
+	struct Vertex {
+		float x, y, z;
+	};
+
+	std::vector<Vertex> verticies = {
+		{0.0f, -0.5f, 0.0f},
+		{0.5f, 0.75f, 0.0f},
+		{1.0f, -0.5f, 0.0f},
+	};
+
+	VertexShaderLayout vsLayout = {
+		{"Position", DXGI_FORMAT_R32G32B32_FLOAT}
+	};
+
+	model->pMesh = std::make_shared<MeshTriangleList<Vertex>>(verticies);
+
+	struct ConstData
+	{
+		float r, g, b, a;
+	};
+
+	model->pMaterial = std::make_shared<Material>("Material 3");
+
+	auto pscb = std::make_shared<PSConstantBuffer<ConstData>>();
+	pscb->data = { 0.2f, 8.0f, 0.6f, 1.0f };
+	model->pMaterial->resources.push_back(pscb);
+
+	std::string vsCode = R"(
+		float4 main(float3 pos : Position) : SV_POSITION
+		{
+			return float4(pos, 1.0f);
+		})";
+
+	model->pMaterial->pVS = VertexShader::CreateFromString(vsCode, vsLayout);
+
+	std::string psCode = R"(
+		cbuffer sceneBuffer
+		{
+			float4 color;
+		}
+
+		float4 main() : SV_TARGET
+		{
+			return color;
 		})";
 
 	model->pMaterial->pPS = PixelShader::CreateFromString(psCode);

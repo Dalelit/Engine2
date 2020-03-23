@@ -148,6 +148,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\ConstantBuffer.h" />
     <ClInclude Include="src\Common.h" />
     <ClInclude Include="src\DXImgui.h" />
     <ClInclude Include="src\Layer.h" />
@@ -169,10 +170,12 @@
     <ClInclude Include="src\submodules\imgui\imstb_truetype.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\ConstantBuffer.cpp" />
     <ClCompile Include="src\DXImgui.cpp" />
     <ClCompile Include="src\Events.cpp" />
     <ClCompile Include="src\DXDevice.cpp" />
     <ClCompile Include="src\Engine2.cpp" />
+    <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

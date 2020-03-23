@@ -3,6 +3,11 @@
 
 namespace Engine2
 {
+	void Model::Bind()
+	{
+		pMaterial->Bind();
+		pMesh->Bind();
+	}
 	void Model::OnImgui()
 	{
 		if (ImGui::TreeNode(name.c_str()))
