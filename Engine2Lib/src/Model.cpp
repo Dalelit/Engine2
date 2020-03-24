@@ -14,6 +14,8 @@ namespace Engine2
 		{
 			ImGui::Checkbox("Active", &active);
 
+			pMesh->OnImgui();
+
 			pMaterial->OnImgui();
 
 			ImGui::TreePop();

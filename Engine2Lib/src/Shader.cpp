@@ -23,7 +23,7 @@ namespace Engine2
 
 		E2_ASSERT_HR(hr, "VertexShader D3DCompile failed");
 
-		return std::make_shared<VertexShader>(*pBlob.Get(), layout, "VertexShader " + entryPoint + " " + target);
+		return std::make_shared<VertexShader>(*pBlob.Get(), layout, "Vertex Shader from string: " + entryPoint + " " + target);
 	}
 
 	VertexShader::VertexShader(ID3DBlob& shaderBlob, VertexShaderLayout& layout, std::string name) : Shader(name)
@@ -86,6 +86,6 @@ namespace Engine2
 
 		E2_ASSERT_HR(hr, "PixelShader D3DCompile failed");
 
-		return std::make_shared<PixelShader>(*pBlob.Get(), "PixelShader " + entryPoint + " " + target);
+		return std::make_shared<PixelShader>(*pBlob.Get(), "Pixel Shader from string: " + entryPoint + " " + target);
 	}
 }

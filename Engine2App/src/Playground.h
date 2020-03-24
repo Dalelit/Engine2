@@ -24,4 +24,5 @@ private:
 	void AddModel1();
 	void AddModel2();
 	void AddModel3();
+	void AddModel4();
 };

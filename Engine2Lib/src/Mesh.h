@@ -12,6 +12,10 @@ namespace Engine2
 		virtual ~Mesh() = default;
 		virtual void Bind() = 0;
 		virtual void Draw() = 0;
+		virtual void OnImgui() { ImGui::Text(info.c_str()); }
+
+	protected:
+		std::string info;
 	};
 
 	template <typename V>
@@ -42,7 +46,9 @@ namespace Engine2
 
 			HRESULT hr = Engine::GetDevice().CreateBuffer(&bufferDesc, &data, &pVertexBuffer);
 
-			E2_ASSERT_HR(hr, "Mesh CreateBuffer failed");
+			E2_ASSERT_HR(hr, "Mesh vertex CreateBuffer failed");
+
+			info = "Mesh TriangleList vertex count: " + std::to_string(vertexCount);
 		}
 
 		void Bind() {
@@ -54,12 +60,11 @@ namespace Engine2
 			Engine::GetContext().Draw(vertexCount, 0u);
 		}
 
-		std::vector<V> verticies;
-
 		UINT slot = 0u;
 		UINT numberOfBuffers = 1u;
 
 	protected:
+		MeshTriangleList() = default;
 		wrl::ComPtr<ID3D11Buffer> pVertexBuffer = nullptr;
 
 		D3D11_PRIMITIVE_TOPOLOGY topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
@@ -69,4 +74,51 @@ namespace Engine2
 
 		UINT vertexCount;
 	};
+
+	template <typename V>
+	class MeshTriangleIndexList : public MeshTriangleList<V>
+	{
+	public:
+		MeshTriangleIndexList(std::vector<V>& verticies, std::vector<unsigned int>& indicies) :
+			MeshTriangleList<V>(verticies)
+		{
+			HRESULT hr;
+
+			indxCount = (unsigned int)indicies.size();
+
+			D3D11_SUBRESOURCE_DATA data = {};
+			data.SysMemPitch = 0;
+			data.SysMemSlicePitch = 0;
+			data.pSysMem = indicies.data();
+
+			D3D11_BUFFER_DESC bufferDesc = {};
+			bufferDesc.ByteWidth = sizeof(unsigned int) * indxCount;
+			bufferDesc.Usage = D3D11_USAGE_DEFAULT;
+			bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+			bufferDesc.CPUAccessFlags = 0;
+			bufferDesc.MiscFlags = 0;
+			bufferDesc.StructureByteStride = sizeof(unsigned int);
+
+			hr = Engine::GetDevice().CreateBuffer(&bufferDesc, &data, &pIndexBuffer);
+
+			E2_ASSERT_HR(hr, "Mesh index CreateBuffer failed");
+
+			this->info += " index count: " + std::to_string(indxCount);
+		}
+
+		void Bind() {
+			Engine::GetContext().IASetPrimitiveTopology(this->topology);
+			Engine::GetContext().IASetVertexBuffers(this->slot, this->numberOfBuffers, this->pVertexBuffer.GetAddressOf(), this->bufferStrides, this->bufferOffsets);
+			Engine::GetContext().IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0u);
+		}
+
+		void Draw() {
+			Engine::GetContext().DrawIndexed(indxCount, 0u, 0u);
+		}
+
+	protected:
+		wrl::ComPtr<ID3D11Buffer> pIndexBuffer = nullptr;
+		unsigned int indxCount = 0;
+	};
+
 }
