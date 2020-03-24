@@ -33,6 +33,7 @@ namespace Engine2
 
 			E2_ASSERT_HR(hr, "ConstantBuffer CreateBuffer failed");
 
+			// to do: update rather than create each time
 			//Engine::GetContext().UpdateSubresource(pConstantBuffer.Get(), 0u, nullptr, constBufferData.pSysMem, constBufferData.SysMemPitch, constBufferData.SysMemSlicePitch);
 		}
 

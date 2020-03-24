@@ -19,6 +19,8 @@ namespace Engine2
 		
 		ResourceVector resources;
 
+		void OnImgui();
+
 	protected:
 		std::string name;
 

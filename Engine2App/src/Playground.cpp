@@ -23,15 +23,7 @@ void Playground::OnImgui()
 {
 	ImGui::Checkbox("Active", &active);
 
-	if (ImGui::TreeNode("Models"))
-	{
-		for (auto& model : models)
-		{
-			model->OnImgui();
-		}
-
-		ImGui::TreePop();
-	}
+	for (auto& model : models) model->OnImgui();
 }
 
 void Playground::CreateScene()
@@ -155,15 +147,15 @@ void Playground::AddModel3()
 
 	model->pMesh = std::make_shared<MeshTriangleList<Vertex>>(verticies);
 
-	struct ConstData
-	{
-		float r, g, b, a;
-	};
-
 	model->pMaterial = std::make_shared<Material>("Material 3");
 
+	struct ConstData
+	{
+		float color[4];
+	};
+
 	auto pscb = std::make_shared<PSConstantBuffer<ConstData>>();
-	pscb->data = { 0.2f, 8.0f, 0.6f, 1.0f };
+	pscb->data = { {0.2f, 8.0f, 0.6f, 1.0f} };
 	model->pMaterial->resources.push_back(pscb);
 
 	std::string vsCode = R"(
@@ -186,4 +178,9 @@ void Playground::AddModel3()
 		})";
 
 	model->pMaterial->pPS = PixelShader::CreateFromString(psCode);
+
+	auto* ptr = &pscb->data;
+	pscb->ImguiFunc = [ptr]() {
+		ImGui::ColorEdit4("Color", ptr->color);
+	};
 }

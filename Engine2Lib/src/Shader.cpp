@@ -3,6 +3,11 @@
 
 namespace Engine2
 {
+	void Shader::OnImgui()
+	{
+		ImGui::Text(name.c_str());
+	}
+
 	void VertexShader::Bind()
 	{
 		Engine::GetContext().VSSetShader(pVertexShader.Get(), nullptr, 0u);
@@ -18,10 +23,10 @@ namespace Engine2
 
 		E2_ASSERT_HR(hr, "VertexShader D3DCompile failed");
 
-		return std::make_shared<VertexShader>(*pBlob.Get(), layout);
+		return std::make_shared<VertexShader>(*pBlob.Get(), layout, "VertexShader " + entryPoint + " " + target);
 	}
 
-	VertexShader::VertexShader(ID3DBlob& shaderBlob, VertexShaderLayout& layout)
+	VertexShader::VertexShader(ID3DBlob& shaderBlob, VertexShaderLayout& layout, std::string name) : Shader(name)
 	{
 		HRESULT hr;
 		
@@ -56,7 +61,7 @@ namespace Engine2
 		E2_ASSERT_HR(hr, "VertexShader CreateInputLayout failed");
 	}
 
-	PixelShader::PixelShader(ID3DBlob& shaderBlob)
+	PixelShader::PixelShader(ID3DBlob& shaderBlob, std::string name) : Shader(name)
 	{
 		HRESULT hr = Engine::GetDevice().CreatePixelShader(
 			shaderBlob.GetBufferPointer(),
@@ -81,6 +86,6 @@ namespace Engine2
 
 		E2_ASSERT_HR(hr, "PixelShader D3DCompile failed");
 
-		return std::make_shared<PixelShader>(*pBlob.Get());
+		return std::make_shared<PixelShader>(*pBlob.Get(), "PixelShader " + entryPoint + " " + target);
 	}
 }

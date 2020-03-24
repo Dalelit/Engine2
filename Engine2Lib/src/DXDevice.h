@@ -9,6 +9,7 @@ namespace Engine2
 	{
 	public:
 		virtual void Bind() = 0;
+		std::function<void()> ImguiFunc = nullptr;
 	};
 
 	typedef std::vector<std::shared_ptr<Resource>> ResourceVector;

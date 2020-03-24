@@ -13,6 +13,9 @@ namespace Engine2
 		if (ImGui::TreeNode(name.c_str()))
 		{
 			ImGui::Checkbox("Active", &active);
+
+			pMaterial->OnImgui();
+
 			ImGui::TreePop();
 		}
 	}
