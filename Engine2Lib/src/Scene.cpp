@@ -10,7 +10,7 @@ namespace Engine2
 
 	void Scene::OnRender()
 	{
-		vsConstBuffer.data.cameraTransform = DirectX::XMMatrixTranspose(mainCamera.GetViewProjectionMatrix());
+		vsConstBuffer.data.cameraTransform = mainCamera.GetViewProjectionMatrixT();
 		vsConstBuffer.Bind();
 	}
 	void Scene::OnImgui()

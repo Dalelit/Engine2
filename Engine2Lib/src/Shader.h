@@ -16,6 +16,7 @@ namespace Engine2
 
 	protected:
 		std::string name;
+		std::string source;
 	};
 
 	struct VertexShaderLayoutElement

@@ -6,6 +6,7 @@ namespace Engine2
 	void Shader::OnImgui()
 	{
 		ImGui::Text(name.c_str());
+		ImGui::Text(source.c_str());
 	}
 
 	void VertexShader::Bind()
@@ -23,7 +24,11 @@ namespace Engine2
 
 		E2_ASSERT_HR(hr, "VertexShader D3DCompile failed");
 
-		return std::make_shared<VertexShader>(*pBlob.Get(), layout, "Vertex Shader from string: " + entryPoint + " " + target);
+		auto shader = std::make_shared<VertexShader>(*pBlob.Get(), layout, "Vertex Shader from string: " + entryPoint + " " + target);
+
+		shader->source = src;
+
+		return shader;
 	}
 
 	VertexShader::VertexShader(ID3DBlob& shaderBlob, VertexShaderLayout& layout, std::string name) : Shader(name)
@@ -86,6 +91,10 @@ namespace Engine2
 
 		E2_ASSERT_HR(hr, "PixelShader D3DCompile failed");
 
-		return std::make_shared<PixelShader>(*pBlob.Get(), "Pixel Shader from string: " + entryPoint + " " + target);
+		auto shader = std::make_shared<PixelShader>(*pBlob.Get(), "Pixel Shader from string: " + entryPoint + " " + target);
+
+		shader->source = src;
+
+		return shader;
 	}
 }

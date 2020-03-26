@@ -16,8 +16,7 @@ void Playground::OnRender()
 	{
 		if (model->IsActive())
 		{
-			model->Bind();
-			model->pMesh->Draw();
+			model->OnRender();
 		}
 	}
 }
@@ -63,15 +62,10 @@ void Playground::AddModel1()
 
 	model->pMaterial = std::make_shared<Material>("Material 1");
 
-	std::string vsCode = R"(
-		cbuffer sceneConst
-		{
-			matrix cameraTransform;
-		};
-
+	std::string vsCode = scene.GetVSCBHLSL() + EntityInstances::GetVSCBHLSL() + R"(
 		float4 main(float3 pos : Position) : SV_POSITION
 		{
-			return mul(float4(pos, 1.0f), cameraTransform);
+			return mul(mul(float4(pos, 1.0f), entityTransform), cameraTransform);
 		})";
 
 	model->pMaterial->pVS = VertexShader::CreateFromString(vsCode, vsLayout);
@@ -83,6 +77,8 @@ void Playground::AddModel1()
 		})";
 
 	model->pMaterial->pPS = PixelShader::CreateFromString(psCode);
+
+	model->entities.instances.emplace_back(Entity());
 }
 
 void Playground::AddModel2()
@@ -110,7 +106,7 @@ void Playground::AddModel2()
 
 	model->pMaterial = std::make_shared<Material>("Material 2");
 
-	std::string vsCode = scene.GetVSCBHLSL() + R"(
+	std::string vsCode = scene.GetVSCBHLSL() + EntityInstances::GetVSCBHLSL() + R"(
 		struct VSOut
 		{
 			float4 col : Color;
@@ -121,7 +117,7 @@ void Playground::AddModel2()
 		{
 			VSOut vso;
 
-			vso.pos = mul(float4(pos, 1.0f), cameraTransform);
+			vso.pos = mul(mul(float4(pos, 1.0f), entityTransform), cameraTransform);
 			vso.col = col;
 
 			return vso;
@@ -136,6 +132,8 @@ void Playground::AddModel2()
 		})";
 
 	model->pMaterial->pPS = PixelShader::CreateFromString(psCode);
+
+	model->entities.instances.emplace_back(Entity());
 }
 
 void Playground::AddModel3()
@@ -170,10 +168,10 @@ void Playground::AddModel3()
 	pscb->data = { {0.2f, 0.8f, 0.6f, 1.0f} };
 	model->pMaterial->resources.push_back(pscb);
 
-	std::string vsCode = scene.GetVSCBHLSL() + R"(
+	std::string vsCode = scene.GetVSCBHLSL() + EntityInstances::GetVSCBHLSL() + R"(
 		float4 main(float3 pos : Position) : SV_POSITION
 		{
-			return mul(float4(pos, 1.0f), cameraTransform);
+			return mul(mul(float4(pos, 1.0f), entityTransform), cameraTransform);
 		})";
 
 	model->pMaterial->pVS = VertexShader::CreateFromString(vsCode, vsLayout);
@@ -195,6 +193,8 @@ void Playground::AddModel3()
 	pscb->ImguiFunc = [ptr]() {
 		ImGui::ColorEdit4("Color", ptr->color);
 	};
+
+	model->entities.instances.emplace_back(Entity());
 }
 
 void Playground::AddModel4()
@@ -226,11 +226,11 @@ void Playground::AddModel4()
 
 	model->pMaterial = std::make_shared<Material>("Material 4");
 
-	std::string vsCode = scene.GetVSCBHLSL() + R"(
+	std::string vsCode = Scene::GetVSCBHLSL() + EntityInstances::GetVSCBHLSL() + R"(
 
 		float4 main(float3 pos : Position) : SV_POSITION
 		{
-			return mul(float4(pos, 1.0f), cameraTransform);
+			return mul(mul(float4(pos, 1.0f), entityTransform), cameraTransform);
 		})";
 
 	model->pMaterial->pVS = VertexShader::CreateFromString(vsCode, vsLayout);
@@ -242,4 +242,9 @@ void Playground::AddModel4()
 		})";
 
 	model->pMaterial->pPS = PixelShader::CreateFromString(psCode);
+
+	model->entities.instances.reserve(3);
+	model->entities.instances.emplace_back(Entity());
+	model->entities.instances.emplace_back(Entity({ 1.0f, 0.0f, 0.0f, 1.0f }));
+	model->entities.instances.emplace_back(Entity({-1.0f, 0.0f, 0.0f, 1.0f }));
 }

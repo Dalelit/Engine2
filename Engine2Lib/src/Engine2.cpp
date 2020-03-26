@@ -60,10 +60,7 @@ namespace Engine2
 
 			OnImgui(); // engine's own Imgui
 
-			for (auto layer : layers)
-			{
-				layer->ImguiWindow();
-			}
+			for (auto layer : layers) layer->ImguiWindow();
 
 			imgui.EndFrame();
 		}

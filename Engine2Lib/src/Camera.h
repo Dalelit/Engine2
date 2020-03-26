@@ -12,7 +12,7 @@ namespace Engine2
 		void OnApplicationEvent(ApplicationEvent& event);
 		void OnImugui();
 
-		inline DirectX::XMMATRIX GetViewProjectionMatrix() { return viewProjectionMatrix; }
+		inline DirectX::XMMATRIX GetViewProjectionMatrixT() { return DirectX::XMMatrixTranspose(viewProjectionMatrix); } // transpose for directx
 
 		inline void SetPosition(float x, float y, float z) { position = {x, y, z, 1.0f}; }
 

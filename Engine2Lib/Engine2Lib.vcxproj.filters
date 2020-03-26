@@ -23,6 +23,7 @@
     <ClInclude Include="src\ConstantBuffer.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Scene.h" />
+    <ClInclude Include="src\Entity.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\pch.cpp" />
@@ -41,5 +42,6 @@
     <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Scene.cpp" />
+    <ClCompile Include="src\Entity.cpp" />
   </ItemGroup>
 </Project>

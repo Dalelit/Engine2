@@ -10,6 +10,7 @@ namespace Engine2
 	{
 	public:
 
+		Scene() : vsConstBuffer(0) {}
 		~Scene() = default;
 
 		void OnUpdate(float dt);
@@ -24,7 +25,7 @@ namespace Engine2
 		};
 
 		static std::string GetVSCBHLSL() { return R"(
-			cbuffer sceneConst
+			cbuffer sceneConst : register (b0)
 			{
 				matrix cameraTransform;
 			};

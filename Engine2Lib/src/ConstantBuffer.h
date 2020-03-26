@@ -9,9 +9,10 @@ namespace Engine2
 	{
 	public:
 		T data = {};
-		unsigned int slot = 0;
+		unsigned int slot;
 
-		ConstantBuffer()
+		ConstantBuffer(unsigned int bindSlot) :
+			slot(bindSlot)
 		{
 			D3D11_SUBRESOURCE_DATA constBufferData = {};
 			//constBufferData.SysMemPitch = 0;
@@ -60,6 +61,8 @@ namespace Engine2
 	class PSConstantBuffer : public ConstantBuffer<T>
 	{
 	public:
+		PSConstantBuffer(unsigned int bindSlot = 0) : ConstantBuffer<T>(bindSlot) {}
+
 		void Bind()
 		{
 			this->UpdateBuffer();
@@ -71,6 +74,8 @@ namespace Engine2
 	class VSConstantBuffer : public ConstantBuffer<T>
 	{
 	public:
+		VSConstantBuffer(unsigned int bindSlot = 0) : ConstantBuffer<T>(bindSlot) {}
+
 		void Bind()
 		{
 			this->UpdateBuffer();
