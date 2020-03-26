@@ -12,6 +12,7 @@ namespace Engine2
 
 		instance = std::make_unique<Engine>(hwnd);
 	}
+
 	Engine::Engine(HWND hwnd) :
 		device(hwnd)
 	{
@@ -29,16 +30,19 @@ namespace Engine2
 		}
 	}
 
-	void Engine::DoFrame(float deltaTime)
+	void Engine::OnUpdate(float deltaTime)
 	{
-		// dx begin
-		device.BeginFrame();
-
 		// update layers
 		for (auto layer : layers)
 		{
 			if (layer->IsActive()) layer->OnUpdate(deltaTime);
 		}
+	}
+
+	void Engine::OnRender()
+	{
+		// dx begin
+		device.BeginFrame();
 
 		// render layers
 		if (!minimised)

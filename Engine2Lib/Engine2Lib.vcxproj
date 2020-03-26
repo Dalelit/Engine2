@@ -148,6 +148,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Scene.h" />
+    <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\ConstantBuffer.h" />
     <ClInclude Include="src\Common.h" />
     <ClInclude Include="src\DXImgui.h" />
@@ -170,7 +172,8 @@
     <ClInclude Include="src\submodules\imgui\imstb_truetype.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\ConstantBuffer.cpp" />
+    <ClCompile Include="src\Scene.cpp" />
+    <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\DXImgui.cpp" />
     <ClCompile Include="src\Events.cpp" />
     <ClCompile Include="src\DXDevice.cpp" />

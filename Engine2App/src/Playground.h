@@ -4,6 +4,7 @@
 #include "Layer.h"
 #include "Model.h"
 #include "ConstantBuffer.h"
+#include "Scene.h"
 
 class Playground : public Engine2::Layer
 {
@@ -20,6 +21,7 @@ public:
 
 private:
 	std::vector<std::shared_ptr<Engine2::Model>> models;
+	Engine2::Scene scene;
 
 	void AddModel1();
 	void AddModel2();

@@ -20,7 +20,8 @@ namespace Engine2 {
 		Engine(HWND hwnd);
 		~Engine();
 
-		void DoFrame(float deltaTime);
+		void OnUpdate(float deltaTime);
+		void OnRender();
 
 		// Engine will own the layer and delete at the end.
 		void AttachLayer(Layer* layer) { layers.push_back(layer); }

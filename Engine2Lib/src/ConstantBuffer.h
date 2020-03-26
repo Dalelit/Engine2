@@ -8,38 +8,51 @@ namespace Engine2
 	class ConstantBuffer : public Resource
 	{
 	public:
-		T data;
+		T data = {};
 		unsigned int slot = 0;
 
 		ConstantBuffer()
 		{
-			constBufferData.SysMemPitch = 0;
-			constBufferData.SysMemSlicePitch = 0;
+			D3D11_SUBRESOURCE_DATA constBufferData = {};
+			//constBufferData.SysMemPitch = 0;
+			//constBufferData.SysMemSlicePitch = 0;
 			constBufferData.pSysMem = &data;
 
+			D3D11_BUFFER_DESC bufferDesc = {};
 			bufferDesc.ByteWidth = sizeof(T);
 			bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 			bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 			bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-			bufferDesc.MiscFlags = 0;
-			bufferDesc.StructureByteStride = sizeof(T);
+			//bufferDesc.MiscFlags = 0;
+			//bufferDesc.StructureByteStride = 0; // sizeof(T);
+
+			HRESULT hr = Engine::GetDevice().CreateBuffer(&bufferDesc, &constBufferData, &pConstantBuffer);
+
+			E2_ASSERT_HR(hr, "ConstantBuffer CreateBuffer failed");
 		}
 
 		~ConstantBuffer() {};
 
 		void UpdateBuffer()
 		{
-			HRESULT hr = Engine::GetDevice().CreateBuffer(&bufferDesc, &constBufferData, &pConstantBuffer);
+			// to do: D3D11_MAP_WRITE_DISCARD v D3D11_MAP_WRITE_NO_OVERWRITE ?
 
-			E2_ASSERT_HR(hr, "ConstantBuffer CreateBuffer failed");
+			HRESULT hr;
 
-			// to do: update rather than create each time
-			//Engine::GetContext().UpdateSubresource(pConstantBuffer.Get(), 0u, nullptr, constBufferData.pSysMem, constBufferData.SysMemPitch, constBufferData.SysMemSlicePitch);
+			auto& context = Engine::GetContext();
+			auto ptrBuffer = pConstantBuffer.Get();
+
+			D3D11_MAPPED_SUBRESOURCE mappedSubResource = {};
+			hr = context.Map(ptrBuffer, 0u, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubResource);
+
+			E2_ASSERT_HR(hr, "ConstantBuffer Map failed");
+			
+			memcpy(mappedSubResource.pData, &data, sizeof(T)); //*(T*)mappedSubResource.pData = data;
+
+			context.Unmap(ptrBuffer, 0);
 		}
 
 	protected:
-		D3D11_SUBRESOURCE_DATA constBufferData = {};
-		D3D11_BUFFER_DESC bufferDesc = {};
 		wrl::ComPtr<ID3D11Buffer> pConstantBuffer = nullptr;
 	};
 
@@ -51,6 +64,17 @@ namespace Engine2
 		{
 			this->UpdateBuffer();
 			Engine::GetContext().PSSetConstantBuffers(this->slot, 1u, this->pConstantBuffer.GetAddressOf());
+		}
+	};
+
+	template <typename T>
+	class VSConstantBuffer : public ConstantBuffer<T>
+	{
+	public:
+		void Bind()
+		{
+			this->UpdateBuffer();
+			Engine::GetContext().VSSetConstantBuffers(this->slot, 1u, this->pConstantBuffer.GetAddressOf());
 		}
 	};
 

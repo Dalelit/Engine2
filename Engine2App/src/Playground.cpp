@@ -5,10 +5,13 @@ using namespace Engine2;
 
 void Playground::OnUpdate(float dt)
 {
+	scene.OnUpdate(dt);
 }
 
 void Playground::OnRender()
 {
+	scene.OnRender();
+
 	for (auto model : models)
 	{
 		if (model->IsActive())
@@ -21,6 +24,8 @@ void Playground::OnRender()
 
 void Playground::OnImgui()
 {
+	scene.OnImgui();
+
 	ImGui::Checkbox("Active", &active);
 
 	for (auto& model : models) model->OnImgui();
@@ -28,7 +33,8 @@ void Playground::OnImgui()
 
 void Playground::CreateScene()
 {
-	AddModel1(); models[0]->SetActive(false);
+	scene.mainCamera.SetPosition(0.0f, 0.0f, -3.0f);
+	AddModel1(); //models[0]->SetActive(false);
 	AddModel2();
 	AddModel3();
 	AddModel4();
@@ -44,9 +50,9 @@ void Playground::AddModel1()
 	};
 
 	std::vector<Vertex> verticies = {
-		{-0.5f, -0.5f, 0.0f},
-		{0.0f, 0.5f, 0.0f},
-		{0.5f, -0.5f, 0.0f},
+		{-0.5f, -0.5f, 0.01f},
+		{ 0.0f,  0.5f, 0.01f},
+		{ 0.5f, -0.5f, 0.01f},
 	};
 
 	VertexShaderLayout vsLayout = {
@@ -58,9 +64,14 @@ void Playground::AddModel1()
 	model->pMaterial = std::make_shared<Material>("Material 1");
 
 	std::string vsCode = R"(
+		cbuffer sceneConst
+		{
+			matrix cameraTransform;
+		};
+
 		float4 main(float3 pos : Position) : SV_POSITION
 		{
-			return float4(pos, 1.0f);
+			return mul(float4(pos, 1.0f), cameraTransform);
 		})";
 
 	model->pMaterial->pVS = VertexShader::CreateFromString(vsCode, vsLayout);
@@ -85,9 +96,9 @@ void Playground::AddModel2()
 	};
 
 	std::vector<Vertex> verticies = {
-		{-0.9f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f},
-		{-0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f},
-		{0.1f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f},
+		{-0.9f, -0.5f, -0.01f, 1.0f, 0.0f, 0.0f, 1.0f},
+		{-0.5f,  0.5f, -0.01f, 0.0f, 1.0f, 0.0f, 1.0f},
+		{ 0.1f, -0.5f, -0.01f, 0.0f, 0.0f, 1.0f, 1.0f},
 	};
 
 	VertexShaderLayout vsLayout = {
@@ -99,7 +110,7 @@ void Playground::AddModel2()
 
 	model->pMaterial = std::make_shared<Material>("Material 2");
 
-	std::string vsCode = R"(
+	std::string vsCode = scene.GetVSCBHLSL() + R"(
 		struct VSOut
 		{
 			float4 col : Color;
@@ -110,7 +121,7 @@ void Playground::AddModel2()
 		{
 			VSOut vso;
 
-			vso.pos = float4(pos, 1.0f);
+			vso.pos = mul(float4(pos, 1.0f), cameraTransform);
 			vso.col = col;
 
 			return vso;
@@ -137,9 +148,9 @@ void Playground::AddModel3()
 	};
 
 	std::vector<Vertex> verticies = {
-		{0.0f, -0.5f, 0.0f},
-		{0.5f, 0.75f, 0.0f},
-		{1.0f, -0.5f, 0.0f},
+		{0.0f, -0.50f, 0.02f},
+		{0.5f,  0.75f, 0.02f},
+		{1.0f, -0.50f, 0.02f},
 	};
 
 	VertexShaderLayout vsLayout = {
@@ -159,10 +170,10 @@ void Playground::AddModel3()
 	pscb->data = { {0.2f, 0.8f, 0.6f, 1.0f} };
 	model->pMaterial->resources.push_back(pscb);
 
-	std::string vsCode = R"(
+	std::string vsCode = scene.GetVSCBHLSL() + R"(
 		float4 main(float3 pos : Position) : SV_POSITION
 		{
-			return float4(pos, 1.0f);
+			return mul(float4(pos, 1.0f), cameraTransform);
 		})";
 
 	model->pMaterial->pVS = VertexShader::CreateFromString(vsCode, vsLayout);
@@ -196,10 +207,10 @@ void Playground::AddModel4()
 	};
 
 	std::vector<Vertex> verticies = {
-		{0.25f, -0.75f, 0.0f},
+		{-0.25f, -0.25f, 0.0f},
+		{-0.25f, 0.25f, 0.0f},
+		{0.25f, 0.25f, 0.0f},
 		{0.25f, -0.25f, 0.0f},
-		{0.75f, -0.25f, 0.0f},
-		{0.75f, -0.75f, 0.0f},
 	};
 
 	VertexShaderLayout vsLayout = {
@@ -215,10 +226,11 @@ void Playground::AddModel4()
 
 	model->pMaterial = std::make_shared<Material>("Material 4");
 
-	std::string vsCode = R"(
+	std::string vsCode = scene.GetVSCBHLSL() + R"(
+
 		float4 main(float3 pos : Position) : SV_POSITION
 		{
-			return float4(pos, 1.0f);
+			return mul(float4(pos, 1.0f), cameraTransform);
 		})";
 
 	model->pMaterial->pVS = VertexShader::CreateFromString(vsCode, vsLayout);
