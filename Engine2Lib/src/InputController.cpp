@@ -1,10 +1,15 @@
 #include "pch.h"
 #include "InputController.h"
+#include <Windows.h>
 
 namespace Engine2
 {
 	void InputController::OnUpdate(float dt)
 	{
+		if (IsKeyPressed(KeyboardConfiguration.forward)) pCamera->TranslateForward(dt * MovementConfiguration.moveSpeed);
+		if (IsKeyPressed(KeyboardConfiguration.back))    pCamera->TranslateForward(-dt * MovementConfiguration.moveSpeed);
+		if (IsKeyPressed(KeyboardConfiguration.right))   pCamera->TranslateRight(dt * MovementConfiguration.moveSpeed);
+		if (IsKeyPressed(KeyboardConfiguration.left))    pCamera->TranslateRight(-dt * MovementConfiguration.moveSpeed);
 	}
 
 	void InputController::OnInputEvent(InputEvent& event)
@@ -44,6 +49,7 @@ namespace Engine2
 
 			if (ImGui::CollapsingHeader("Movement configuration"))
 			{
+				ImGui::DragFloat("Move speed", &MovementConfiguration.moveSpeed);
 				ImGui::DragFloat("Yaw speed", &MovementConfiguration.yawSpeed);
 				ImGui::DragFloat("Pitch speed", &MovementConfiguration.pitchSpeed);
 			}
@@ -55,6 +61,11 @@ namespace Engine2
 			}
 		}
 		ImGui::End();
+	}
+
+	bool InputController::IsKeyPressed(int vKeyCode)
+	{
+		return GetKeyState(vKeyCode) & 0x8000;
 	}
 
 }

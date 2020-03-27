@@ -13,13 +13,10 @@ namespace Engine2
 		XMMATRIX projectionMatrix;
 
 		// view matrix
-		constexpr XMVECTOR forward = { 0.0f, 0.0f, 1.0f, 1.0f };
-		constexpr XMVECTOR up = { 0.0f, 1.0f, 0.0f, 1.0f };
-
 		XMMATRIX rot = XMMatrixRotationRollPitchYaw(pitch, yaw, 0.0f);
-		XMVECTOR dir = XMVector3Normalize(XMVector3Transform(forward, rot));
+		forward = XMVector3Normalize(XMVector3Transform({ 0.0f, 0.0f, 1.0f, 1.0f }, rot)); // rotate from the default forward direciton 0,0,1
 
-		viewMatrix = XMMatrixLookToLH(position, dir, up);
+		viewMatrix = XMMatrixLookToLH(position, forward, { 0.0f, 1.0f, 0.0f, 1.0f }); // default up 0,1,0
 
 		// projection matrix
 		projectionMatrix = XMMatrixPerspectiveFovLH(fov, aspectRatio, nearZ, farZ);

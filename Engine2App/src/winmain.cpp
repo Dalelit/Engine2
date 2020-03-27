@@ -104,12 +104,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		// key controls /////////////////////////
 		case WM_KEYDOWN:
 		{
-			switch (wParam)
-			{
-			case VK_ESCAPE:
-				PostQuitMessage(0);
-				break;
-			}
+			if (wParam == VK_ESCAPE) PostQuitMessage(0); // to do: put exit controls into the engine
+
+			//Engine2::KeyPressedEvent event(wParam, (UINT32)(lParam & 0x00ff));
+			//E2_OUTPUT_DEBUG(event.ToString().c_str());
+			//OnInputEventFunc(event);
 			break;
 		}
 

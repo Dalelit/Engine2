@@ -23,6 +23,7 @@ namespace Engine2
 		} KeyboardConfiguration;
 
 		struct {
+			float moveSpeed = 1.0f;
 			float yawSpeed = 0.001f;
 			float pitchSpeed = 0.001f;
 		} MovementConfiguration;
@@ -35,6 +36,8 @@ namespace Engine2
 		void OnUpdate(float dt);
 		void OnInputEvent(InputEvent& event);
 		void ImguiWindow(bool* pOpen);
+
+		bool IsKeyPressed(int vKeyCode);
 
 	protected:
 		Camera* pCamera;

@@ -8,7 +8,7 @@ namespace Engine2
 
 	enum class EventType
 	{
-		None, WindowResize, MouseMove, MouseButtonPressed, MouseButtonReleased
+		None, WindowResize, MouseMove, MouseButtonPressed, MouseButtonReleased, KeyPressed, KeyReleased
 	};
 
 	enum class EventGroup
@@ -113,6 +113,22 @@ namespace Engine2
 	protected:
 		bool left, right;
 		int x, y;
+	};
+
+	class KeyPressedEvent : public InputEvent
+	{
+	public:
+		KeyPressedEvent(UINT32 key, UINT32 repeat) : key(key), repeat(repeat) {}
+		EventType GetType() override { return GetStaticType(); }
+		EventGroup GetGroup() override { return EventGroup::Keyboard; }
+		static EventType GetStaticType() { return EventType::KeyPressed; }
+		const char* GetName() const override { return "KeyPressed"; }
+
+		std::string ToString() const { std::stringstream ss; ss << "KeyPressed " << (char)key << " repeat " << repeat; return ss.str(); }
+
+	protected:
+		UINT32 key;
+		UINT32 repeat;
 	};
 
 
