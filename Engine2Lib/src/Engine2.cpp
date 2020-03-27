@@ -80,10 +80,21 @@ namespace Engine2
 		EventDispatcher dispacher(event);
 
 		dispacher.Dispatch<WindowResizeEvent>(E2_BIND_EVENT_FUNC(Engine::OnResize));
+
+		for (auto layer : layers)
+		{
+			layer->OnApplicationEvent(event);
+		}
 	}
 
 	void Engine::OnInputEvent(InputEvent& event)
 	{
+		//EventDispatcher dispacher(event);
+
+		for (auto layer : layers)
+		{
+			if (layer->IsActive()) layer->OnInputEvent(event);
+		}
 	}
 
 	bool Engine::OnResize(WindowResizeEvent& event)

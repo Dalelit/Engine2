@@ -16,14 +16,23 @@ namespace Engine2
 		RecalcViewProjectionMatrix();
 	}
 
-	void Camera::OnInputEvent(InputEvent& event)
+	// on mouse move rotate and clamp/wrap rotation
+	bool Camera::OnMouseMove(MouseMoveEvent& event)
 	{
-		// on mouse move rotate and clamp/wrap rotation
+		yaw += (float)event.GetX() * yawSpeed;
+		WrapYaw();
+
+		pitch += (float)event.GetY() * pitchSpeed;
+		ClampPitch();
+
+		return false;
 	}
 
-	void Camera::OnApplicationEvent(ApplicationEvent& event)
+	// on window size change update aspect ratio
+	bool Camera::OnWindowResize(WindowResizeEvent& event)
 	{
-		// on window size change update aspect ratio
+		SetAspectRatio((float)event.GetWidth(), (float)event.GetHeight());
+		return false;
 	}
 
 	void Camera::RecalcViewMatrix()
@@ -58,6 +67,8 @@ namespace Engine2
 			ImGui::DragFloat("FOV", &fov, 0.25f); ImGui::SameLine(); ImGui::Text("%.1f Degs", XMConvertToDegrees(fov));
 			ImGui::DragFloat("Near Z", &nearZ, 0.25f);
 			ImGui::DragFloat("Far Z", &farZ, 0.25f);
+			ImGui::DragFloat("YawSpeed", &yawSpeed);
+			ImGui::DragFloat("PitchSpeed", &pitchSpeed);
 			ImGui::End();
 		}
 	}

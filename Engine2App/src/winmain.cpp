@@ -12,6 +12,7 @@ public:
 	{
 		Regsiter(hInstance, wndProc);
 		Create(hInstance);
+		SetupRawMouseIntput();
 	}
 
 	~AppWindow()
@@ -39,6 +40,16 @@ private:
 		windowClass.lpszClassName = L"Engine2";
 
 		HRESULT hr = RegisterClass(&windowClass);
+	}
+
+	void SetupRawMouseIntput()
+	{
+		RAWINPUTDEVICE rid;
+		rid.usUsagePage = 0x01; // mouse page
+		rid.usUsage = 0x02; // mouse usage
+		rid.dwFlags = 0;
+		rid.hwndTarget = nullptr;
+		E2_ASSERT(RegisterRawInputDevices(&rid, 1u, sizeof(rid)) == TRUE, "Error with RegisterRawInputDevices");
 	}
 
 	void Unregsiter()
@@ -98,7 +109,34 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			}
 			break;
 		}
-		
+
+		// mouse controls /////////////////////////
+		case WM_INPUT:
+		{
+			BYTE rawBuffer[64];
+			UINT size;
+
+			if (GetRawInputData((HRAWINPUT)lParam, RID_INPUT, nullptr, &size, sizeof(RAWINPUTHEADER)) == -1) break;
+			if (size == 0) break;
+
+			E2_ASSERT(size <= ARRAYSIZE(rawBuffer), "rawBuffer smaller than rawInputSize");
+
+			E2_ASSERT(GetRawInputData((HRAWINPUT)lParam, RID_INPUT, rawBuffer, &size, sizeof(RAWINPUTHEADER)) == size, "Raw buffer read did not match");
+
+			RAWINPUT* raw = (RAWINPUT*)rawBuffer;
+
+			if (raw->header.dwType == RIM_TYPEMOUSE)
+			{
+				if (raw->data.mouse.lLastX != 0 || raw->data.mouse.lLastY != 0) // remove 0,0 events
+				{
+					Engine2::MouseMoveEvent event((int)raw->data.mouse.lLastX, (int)raw->data.mouse.lLastY);
+					OnInputEventFunc(event);
+				}
+			}
+
+			break;
+		}
+
 		default:
 			return DefWindowProc(hWnd, msg, wParam, lParam);
 	}

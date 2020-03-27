@@ -47,7 +47,9 @@ namespace Engine2 {
 		unsigned int frameTimeCurrent = 59;
 		float frameTimes[frameTimeCount] = {};
 
+		// application event handlers
 		bool OnResize(WindowResizeEvent& event);
+
 		void ImguiStatsWindow(bool* pOpen);
 	};
 

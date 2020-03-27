@@ -21,6 +21,26 @@ void Playground::OnRender()
 	}
 }
 
+bool Playground::OnInputEvent(InputEvent& event)
+{
+	EventDispatcher dispatcher(event);
+
+	dispatcher.Dispatch<MouseMoveEvent>(E2_BIND_EVENT_FUNC(Playground::OnMouseMove));
+
+	return false;
+}
+
+bool Playground::OnMouseMove(MouseMoveEvent& event)
+{
+	scene.mainCamera.OnMouseMove(event);
+	return false;
+}
+
+bool Playground::OnApplicationEvent(ApplicationEvent& event)
+{
+	return false;
+}
+
 void Playground::OnImgui()
 {
 	scene.OnImgui();

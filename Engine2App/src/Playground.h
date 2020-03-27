@@ -14,6 +14,8 @@ public:
 
 	void OnUpdate(float dt);
 	void OnRender();
+	bool OnInputEvent(Engine2::InputEvent& event);
+	bool OnApplicationEvent(Engine2::ApplicationEvent& event);
 	void OnImgui();
 
 	void CreateScene();
@@ -22,6 +24,8 @@ public:
 private:
 	std::vector<std::shared_ptr<Engine2::Model>> models;
 	Engine2::Scene scene;
+
+	bool OnMouseMove(Engine2::MouseMoveEvent& event);
 
 	void AddModel1();
 	void AddModel2();

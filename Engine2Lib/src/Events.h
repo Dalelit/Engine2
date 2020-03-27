@@ -8,7 +8,7 @@ namespace Engine2
 
 	enum class EventType
 	{
-		None, WindowResize
+		None, WindowResize, MouseMove
 	};
 
 	class Event
@@ -54,6 +54,23 @@ namespace Engine2
 
 	class InputEvent : public Event {};
 
+	class MouseMoveEvent : public InputEvent
+	{
+	public:
+		MouseMoveEvent(UINT32 x, UINT32 y) : x(x), y(y) {}
+		EventType GetType() override { return GetStaticType(); }
+		static EventType GetStaticType() { return EventType::MouseMove; }
+		const char* GetName() const override { return "MouseMove"; }
+
+		int GetX() { return x; }
+		int GetY() { return y; }
+
+		std::string ToString() const { return "MouseMove " + std::to_string(x) + "," + std::to_string(y); }
+
+	protected:
+		int x, y = 0;
+	};
+
 
 	///////////////////// Applicaiton events /////////////////////
 
@@ -65,14 +82,15 @@ namespace Engine2
 		WindowResizeEvent(UINT32 width, UINT32 height) : width(width), height(height) {}
 		EventType GetType() override { return GetStaticType(); }
 		static EventType GetStaticType() { return EventType::WindowResize; }
-		const char* GetName() const override { return "WindowResizeEvent"; }
+		const char* GetName() const override { return "WindowResize"; }
 
 		inline UINT32 GetWidth() { return width; }
 		inline UINT32 GetHeight() { return height; }
 
+		std::string ToString() const { return "WindowResize " + std::to_string(width) + "," + std::to_string(height); }
+
 	protected:
-		UINT32 width;
-		UINT32 height;
+		UINT32 width, height;
 	};
 
 }
