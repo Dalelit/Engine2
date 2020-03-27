@@ -37,9 +37,8 @@ namespace Engine2
 		E2_ASSERT_HR(hr, "ResizeBuffers failed");
 
 		ConfigurePipeline();
-
-		E2DX_DEBUG_LOG("Resized dxdevice\n");
 	}
+
 	void DXDevice::LogDebugInfo()
 	{
 		HRESULT hr;

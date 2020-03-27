@@ -28,6 +28,8 @@ namespace Engine2
 		ID3D11Device3& GetDevice() { return *pDevice.Get(); }
 		ID3D11DeviceContext3& GetContext() { return *pImmediateContext.Get(); }
 
+		float GetAspectRatio() { return (float)bufferDesc.Width / (float)bufferDesc.Height; }
+
 		void LogDebugInfo();
 
 	protected:

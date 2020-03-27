@@ -33,9 +33,7 @@ namespace Engine2
 		} State;
 
 		void OnUpdate(float dt);
-		//void OnRender()
 		void OnInputEvent(InputEvent& event);
-		void OnApplicationEvent(ApplicationEvent& event);
 		void ImguiWindow(bool* pOpen);
 
 	protected:
@@ -44,6 +42,5 @@ namespace Engine2
 		void OnMouseMove(MouseMoveEvent& event);
 		void OnMouseButtonPressed(MouseButtonPressedEvent& event);
 		void OnMouseButtonReleased(MouseButtonReleasedEvent& event);
-		void OnWindowResize(WindowResizeEvent& event);
 	};
 }

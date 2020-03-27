@@ -17,7 +17,7 @@ namespace Engine2
 		inline void Rotate(float yawRads, float pitchRads) { yaw += yawRads; pitch += pitchRads; WrapYaw(); ClampPitch(); }
 		inline void SetRotation(float yawRads, float pitchRads) { yaw = yawRads; pitch = pitchRads; WrapYaw(); ClampPitch(); }
 
-		inline void SetAspectRatio(float width, float height) { aspectRatio = width / height; }
+		inline void SetAspectRatio(float ratio) { aspectRatio = ratio; }
 
 	protected:
 		float aspectRatio = 1.0f;

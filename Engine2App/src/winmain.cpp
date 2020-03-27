@@ -6,6 +6,8 @@
 #include <windows.h>
 #include <windowsx.h>
 
+#define E2_OUTPUT_DEBUG(msg) OutputDebugStringA(msg); OutputDebugStringA("\n");
+
 class AppWindow
 {
 public:
@@ -71,8 +73,8 @@ private:
 };
 
 // Functions to call to raise events to the engine. Once the engine is instantiated, the lambda will get replaced with the engine function.
-std::function<void(Engine2::ApplicationEvent&)> OnApplicationEventFunc = [](Engine2::ApplicationEvent& event) { OutputDebugStringA(event.GetName()); OutputDebugStringA("\n"); };
-std::function<void(Engine2::InputEvent&)> OnInputEventFunc = [](Engine2::InputEvent& event) { OutputDebugStringA(event.GetName()); OutputDebugStringA("\n"); };
+std::function<void(Engine2::ApplicationEvent&)> OnApplicationEventFunc = [](Engine2::ApplicationEvent& event) { E2_OUTPUT_DEBUG(event.GetName()); };
+std::function<void(Engine2::InputEvent&)> OnInputEventFunc = [](Engine2::InputEvent& event) { E2_OUTPUT_DEBUG(event.GetName()); };
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -94,7 +96,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		}
 		case WM_SIZE:
 		{
-			Engine2::WindowResizeEvent event(LOBYTE(lParam), HIBYTE(lParam));
+			Engine2::WindowResizeEvent event(wParam == SIZE_MINIMIZED, wParam == SIZE_MAXIMIZED);
 			OnApplicationEventFunc(event);
 			break;
 		}

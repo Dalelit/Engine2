@@ -11,6 +11,11 @@ namespace Engine2
 		None, WindowResize, MouseMove, MouseButtonPressed, MouseButtonReleased
 	};
 
+	enum class EventGroup
+	{
+		None, Application, Mouse, Keyboard
+	};
+
 	class Event
 	{
 	public:
@@ -19,15 +24,13 @@ namespace Engine2
 		virtual ~Event() = default;
 
 		virtual EventType GetType() = 0;
+		virtual EventGroup GetGroup() = 0;
 
 		virtual const char* GetName() const = 0;
 
 		virtual std::string ToString() const { return GetName(); }
 
 		inline std::ostream& operator<< (std::ostream& stream) { return stream << ToString(); }
-
-	protected:
-		EventType type = EventType::None;
 	};
 
 	class EventDispatcher
@@ -57,6 +60,7 @@ namespace Engine2
 	public:
 		MouseMoveEvent(UINT32 x, UINT32 y) : x(x), y(y) {}
 		EventType GetType() override { return GetStaticType(); }
+		EventGroup GetGroup() override { return EventGroup::Mouse; }
 		static EventType GetStaticType() { return EventType::MouseMove; }
 		const char* GetName() const override { return "MouseMove"; }
 
@@ -74,6 +78,7 @@ namespace Engine2
 	public:
 		MouseButtonPressedEvent(bool left, bool right, UINT32 x, UINT32 y) : left(left), right(right), x(x), y(y) {}
 		EventType GetType() override { return GetStaticType(); }
+		EventGroup GetGroup() override { return EventGroup::Mouse; }
 		static EventType GetStaticType() { return EventType::MouseButtonPressed; }
 		const char* GetName() const override { return "MouseButtonPressed"; }
 
@@ -94,6 +99,7 @@ namespace Engine2
 	public:
 		MouseButtonReleasedEvent(bool left, bool right, UINT32 x, UINT32 y) : left(left), right(right), x(x), y(y) {}
 		EventType GetType() override { return GetStaticType(); }
+		EventGroup GetGroup() override { return EventGroup::Mouse; }
 		static EventType GetStaticType() { return EventType::MouseButtonReleased; }
 		const char* GetName() const override { return "MouseButtonReleased"; }
 
@@ -117,18 +123,20 @@ namespace Engine2
 	class WindowResizeEvent : public ApplicationEvent
 	{
 	public:
-		WindowResizeEvent(UINT32 width, UINT32 height) : width(width), height(height) {}
+		WindowResizeEvent(bool minimised, bool maximised) :minimised(minimised), maximised(maximised) {}
 		EventType GetType() override { return GetStaticType(); }
+		EventGroup GetGroup() override { return EventGroup::Application; }
 		static EventType GetStaticType() { return EventType::WindowResize; }
 		const char* GetName() const override { return "WindowResize"; }
 
-		inline UINT32 GetWidth() { return width; }
-		inline UINT32 GetHeight() { return height; }
+		bool IsMinimised() { return minimised; }
+		bool IsMaximised() { return maximised; }
 
-		std::string ToString() const { return "WindowResize " + std::to_string(width) + "," + std::to_string(height); }
+		std::string ToString() const { std::string msg = "WindowResize"; if (minimised) msg += " minimised"; else if (maximised) msg += " maximised"; return msg; }
 
 	protected:
-		UINT32 width, height;
+		bool minimised;
+		bool maximised;
 	};
 
 }

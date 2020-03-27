@@ -16,13 +16,6 @@ namespace Engine2
 		dispatcher.Dispatch<MouseButtonReleasedEvent>(E2_BIND_EVENT_FUNC(InputController::OnMouseButtonReleased));
 	}
 
-	void InputController::OnApplicationEvent(ApplicationEvent& event)
-	{
-		EventDispatcher dispatcher(event);
-
-		dispatcher.Dispatch<WindowResizeEvent>(E2_BIND_EVENT_FUNC(InputController::OnWindowResize));
-	}
-
 	void InputController::OnMouseMove(MouseMoveEvent& event)
 	{
 		if (State.LeftMouseDown) pCamera->Rotate((float)event.GetX() * MovementConfiguration.yawSpeed, (float)event.GetY() * MovementConfiguration.pitchSpeed);
@@ -38,11 +31,6 @@ namespace Engine2
 	{
 		if (event.Left()) State.LeftMouseDown = false;
 		if (event.Right()) State.RightMouseDown = false;
-	}
-
-	void InputController::OnWindowResize(WindowResizeEvent& event)
-	{
-		pCamera->SetAspectRatio((float)event.GetWidth(), (float)event.GetHeight());
 	}
 
 	void InputController::ImguiWindow(bool* pOpen)

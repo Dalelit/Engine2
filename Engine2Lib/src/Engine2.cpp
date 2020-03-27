@@ -19,6 +19,8 @@ namespace Engine2
 		imgui.Initialise(hwnd, device);
 		imguiActive = true;
 
+		mainCamera.SetAspectRatio(device.GetAspectRatio());
+
 		frameLastTime = clock();
 	}
 
@@ -79,8 +81,6 @@ namespace Engine2
 
 	void Engine::OnApplicationEvent(ApplicationEvent& event)
 	{
-		inputController.OnApplicationEvent(event);
-
 		EventDispatcher dispacher(event);
 
 		dispacher.Dispatch<WindowResizeEvent>(E2_BIND_EVENT_FUNC(Engine::OnResize));
@@ -93,6 +93,10 @@ namespace Engine2
 
 	void Engine::OnInputEvent(InputEvent& event)
 	{
+		// check if ImGui handled the event
+		if (event.GetGroup() == EventGroup::Mouse && ImGui::GetIO().WantCaptureMouse) return;
+		if (event.GetGroup() == EventGroup::Keyboard && ImGui::GetIO().WantCaptureKeyboard) return;
+
 		inputController.OnInputEvent(event);
 
 		//EventDispatcher dispacher(event);
@@ -105,14 +109,15 @@ namespace Engine2
 
 	bool Engine::OnResize(WindowResizeEvent& event)
 	{
-		if (event.GetWidth() > 0 && event.GetHeight() > 0)
+		if (event.IsMinimised())
 		{
-			device.ScreenSizeChanged();
-			minimised = false;
+			minimised = true;
 		}
 		else
 		{
-			minimised = true;
+			minimised = false;
+			device.ScreenSizeChanged();
+			mainCamera.SetAspectRatio(device.GetAspectRatio());
 		}
 
 		return true;

@@ -36,9 +36,9 @@ namespace Engine2
 			ImGui::DragFloat("Yaw", &yaw, 0.01f); ImGui::SameLine(); ImGui::Text("%.1f Degs", XMConvertToDegrees(yaw)); // note: not wrapping the yaw
 			ImGui::DragFloat("Pitch", &pitch, 0.01f, -pitchBound, pitchBound); ImGui::SameLine(); ImGui::Text("%.1f Degs", XMConvertToDegrees(pitch));
 			ImGui::DragFloat("Aspect ratio", &aspectRatio, 0.25f, 0.1f);
-			ImGui::DragFloat("FOV", &fov, 0.25f); ImGui::SameLine(); ImGui::Text("%.1f Degs", XMConvertToDegrees(fov));
-			ImGui::DragFloat("Near Z", &nearZ, 0.25f);
-			ImGui::DragFloat("Far Z", &farZ, 0.25f);
+			ImGui::DragFloat("FOV", &fov, 0.01f); ImGui::SameLine(); ImGui::Text("%.1f Degs", XMConvertToDegrees(fov));
+			ImGui::DragFloat("Near Z", &nearZ, 0.25f, 0.001f, farZ);
+			ImGui::DragFloat("Far Z", &farZ, 0.25f, nearZ + 0.01f, 1000000.0f);
 		}
 		ImGui::End();
 	}
