@@ -1,22 +1,20 @@
 #include "pch.h"
 #include "Scene.h"
+#include "Camera.h"
 
 namespace Engine2
 {
 	void Scene::OnUpdate(float dt)
 	{
-		mainCamera.OnUpdate(dt);
 	}
 
 	void Scene::OnRender()
 	{
-		vsConstBuffer.data.cameraTransform = mainCamera.GetViewProjectionMatrixT();
+		Engine::Get().mainCamera.LoadViewProjectionMatrixT(vsConstBuffer.data.cameraTransform);
 		vsConstBuffer.Bind();
 	}
+
 	void Scene::OnImgui()
 	{
-		static bool cameraOpen = true;
-		if (cameraOpen) mainCamera.OnImugui();
-
 	}
 }

@@ -50,9 +50,4 @@ namespace Engine2
 		ImGui::Render();
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 	}
-
-	bool DXImgui::WantCaptureKeyboard()
-	{
-		return ImGui::GetIO().WantCaptureKeyboard;
-	}
 }

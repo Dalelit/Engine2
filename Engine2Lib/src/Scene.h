@@ -1,6 +1,5 @@
 #pragma once
 #include "pch.h"
-#include "Camera.h"
 #include "ConstantBuffer.h"
 
 namespace Engine2
@@ -16,8 +15,6 @@ namespace Engine2
 		void OnUpdate(float dt);
 		void OnRender();
 		void OnImgui();
-
-		Camera mainCamera;
 
 		struct VSSceneData
 		{

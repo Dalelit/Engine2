@@ -21,26 +21,6 @@ void Playground::OnRender()
 	}
 }
 
-bool Playground::OnInputEvent(InputEvent& event)
-{
-	EventDispatcher dispatcher(event);
-
-	dispatcher.Dispatch<MouseMoveEvent>(E2_BIND_EVENT_FUNC(Playground::OnMouseMove));
-
-	return false;
-}
-
-bool Playground::OnMouseMove(MouseMoveEvent& event)
-{
-	scene.mainCamera.OnMouseMove(event);
-	return false;
-}
-
-bool Playground::OnApplicationEvent(ApplicationEvent& event)
-{
-	return false;
-}
-
 void Playground::OnImgui()
 {
 	scene.OnImgui();
@@ -52,7 +32,7 @@ void Playground::OnImgui()
 
 void Playground::CreateScene()
 {
-	scene.mainCamera.SetPosition(0.0f, 0.0f, -3.0f);
+	Engine::Get().mainCamera.SetPosition(0.0f, 0.0f, -3.0f);
 	AddModel1(); //models[0]->SetActive(false);
 	AddModel2();
 	AddModel3();

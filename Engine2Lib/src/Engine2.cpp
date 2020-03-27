@@ -14,7 +14,7 @@ namespace Engine2
 	}
 
 	Engine::Engine(HWND hwnd) :
-		device(hwnd)
+		device(hwnd), inputController(&mainCamera)
 	{
 		imgui.Initialise(hwnd, device);
 		imguiActive = true;
@@ -32,6 +32,8 @@ namespace Engine2
 
 	void Engine::OnUpdate(float deltaTime)
 	{
+		inputController.OnUpdate(deltaTime);
+
 		// update layers
 		for (auto layer : layers)
 		{
@@ -77,6 +79,8 @@ namespace Engine2
 
 	void Engine::OnApplicationEvent(ApplicationEvent& event)
 	{
+		inputController.OnApplicationEvent(event);
+
 		EventDispatcher dispacher(event);
 
 		dispacher.Dispatch<WindowResizeEvent>(E2_BIND_EVENT_FUNC(Engine::OnResize));
@@ -89,6 +93,8 @@ namespace Engine2
 
 	void Engine::OnInputEvent(InputEvent& event)
 	{
+		inputController.OnInputEvent(event);
+
 		//EventDispatcher dispacher(event);
 
 		for (auto layer : layers)
@@ -119,6 +125,12 @@ namespace Engine2
 
 		static bool statsOpen = true;
 		if (statsOpen) ImguiStatsWindow(&statsOpen);
+
+		static bool inputControllerOpen = true;
+		if (inputControllerOpen) inputController.ImguiWindow(&inputControllerOpen);
+
+		static bool cameraOpen = true;
+		if (cameraOpen) mainCamera.ImuguiWindow(&cameraOpen);
 
 		if (ImGui::Begin("Engine2", nullptr, ImGuiWindowFlags_MenuBar))
 		{

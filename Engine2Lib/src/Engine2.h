@@ -5,6 +5,8 @@
 #include "DXImgui.h"
 #include "Events.h"
 #include "Layer.h"
+#include "Camera.h"
+#include "InputController.h"
 
 namespace Engine2 {
 
@@ -19,6 +21,9 @@ namespace Engine2 {
 
 		Engine(HWND hwnd);
 		~Engine();
+
+		Camera mainCamera;
+		InputController inputController;
 
 		void OnUpdate(float deltaTime);
 		void OnRender();

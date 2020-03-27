@@ -4,6 +4,7 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <windowsx.h>
 
 class AppWindow
 {
@@ -134,6 +135,30 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				}
 			}
 
+			break;
+		}
+		case WM_LBUTTONDOWN:
+		{
+			Engine2::MouseButtonPressedEvent event(true, false, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+			OnInputEventFunc(event);
+			break;
+		}
+		case WM_LBUTTONUP:
+		{
+			Engine2::MouseButtonReleasedEvent event(true, false, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+			OnInputEventFunc(event);
+			break;
+		}
+		case WM_RBUTTONDOWN:
+		{
+			Engine2::MouseButtonPressedEvent event(false, true, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+			OnInputEventFunc(event);
+			break;
+		}
+		case WM_RBUTTONUP:
+		{
+			Engine2::MouseButtonReleasedEvent event(false, true, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+			OnInputEventFunc(event);
 			break;
 		}
 

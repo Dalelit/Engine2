@@ -19,8 +19,8 @@ namespace Engine2
 
 		virtual void OnUpdate(float dt) {}
 		virtual void OnRender() {}
-		virtual bool OnInputEvent(InputEvent& event) { return false; }
-		virtual bool OnApplicationEvent(ApplicationEvent& event) { return false; }
+		virtual void OnInputEvent(InputEvent& event) {}
+		virtual void OnApplicationEvent(ApplicationEvent& event) {}
 		virtual void OnImgui() {}; // override this as the imgui window content for the layer
 
 		// called from the engine

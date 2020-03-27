@@ -8,13 +8,13 @@ namespace Engine2
 
 	enum class EventType
 	{
-		None, WindowResize, MouseMove
+		None, WindowResize, MouseMove, MouseButtonPressed, MouseButtonReleased
 	};
 
 	class Event
 	{
 	public:
-		bool handled = false;
+		//bool handled = false; // to do: later when we need for multiple layers
 
 		virtual ~Event() = default;
 
@@ -36,14 +36,12 @@ namespace Engine2
 		EventDispatcher(Event& event) : event(event) {};
 
 		template <typename E, typename F>
-		bool Dispatch(const F& func)
+		void Dispatch(const F& func)
 		{
 			if (event.GetType() == E::GetStaticType())
 			{
-				event.handled = func(static_cast<E&>(event));
-				return true;
+				func(static_cast<E&>(event));
 			}
-			else return false;
 		}
 
 	protected:
@@ -68,7 +66,47 @@ namespace Engine2
 		std::string ToString() const { return "MouseMove " + std::to_string(x) + "," + std::to_string(y); }
 
 	protected:
-		int x, y = 0;
+		int x, y;
+	};
+
+	class MouseButtonPressedEvent : public InputEvent
+	{
+	public:
+		MouseButtonPressedEvent(bool left, bool right, UINT32 x, UINT32 y) : left(left), right(right), x(x), y(y) {}
+		EventType GetType() override { return GetStaticType(); }
+		static EventType GetStaticType() { return EventType::MouseButtonPressed; }
+		const char* GetName() const override { return "MouseButtonPressed"; }
+
+		bool Left() { return left; }
+		bool Right() { return right; }
+		int GetX() { return x; }
+		int GetY() { return y; }
+
+		std::string ToString() const { std::stringstream ss; ss << "MouseButtonPressed " << (left ? "left " : "") << (right ? "right " : "") << x << "," << y; return ss.str(); }
+
+	protected:
+		bool left, right;
+		int x, y;
+	};
+
+	class MouseButtonReleasedEvent : public InputEvent
+	{
+	public:
+		MouseButtonReleasedEvent(bool left, bool right, UINT32 x, UINT32 y) : left(left), right(right), x(x), y(y) {}
+		EventType GetType() override { return GetStaticType(); }
+		static EventType GetStaticType() { return EventType::MouseButtonReleased; }
+		const char* GetName() const override { return "MouseButtonReleased"; }
+
+		bool Left() { return left; }
+		bool Right() { return right; }
+		int GetX() { return x; }
+		int GetY() { return y; }
+
+		std::string ToString() const { std::stringstream ss; ss << "MouseButtonReleased " << (left ? "left " : "") << (right ? "right " : "") << x << "," << y; return ss.str(); }
+
+	protected:
+		bool left, right;
+		int x, y;
 	};
 
 

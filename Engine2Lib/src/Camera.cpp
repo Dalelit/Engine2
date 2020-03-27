@@ -7,36 +7,12 @@ namespace Engine2
 {
 	using namespace DirectX;
 
-	void Camera::OnUpdate(float dt)
+	void Camera::LoadViewProjectionMatrixT(DirectX::XMMATRIX& vpMatrix)
 	{
-		// move position if keys down
+		XMMATRIX viewMatrix;
+		XMMATRIX projectionMatrix;
 
-		RecalcViewMatrix();
-		RecalcProjectionMatrix();
-		RecalcViewProjectionMatrix();
-	}
-
-	// on mouse move rotate and clamp/wrap rotation
-	bool Camera::OnMouseMove(MouseMoveEvent& event)
-	{
-		yaw += (float)event.GetX() * yawSpeed;
-		WrapYaw();
-
-		pitch += (float)event.GetY() * pitchSpeed;
-		ClampPitch();
-
-		return false;
-	}
-
-	// on window size change update aspect ratio
-	bool Camera::OnWindowResize(WindowResizeEvent& event)
-	{
-		SetAspectRatio((float)event.GetWidth(), (float)event.GetHeight());
-		return false;
-	}
-
-	void Camera::RecalcViewMatrix()
-	{
+		// view matrix
 		constexpr XMVECTOR forward = { 0.0f, 0.0f, 1.0f, 1.0f };
 		constexpr XMVECTOR up = { 0.0f, 1.0f, 0.0f, 1.0f };
 
@@ -44,21 +20,17 @@ namespace Engine2
 		XMVECTOR dir = XMVector3Normalize(XMVector3Transform(forward, rot));
 
 		viewMatrix = XMMatrixLookToLH(position, dir, up);
-	}
 
-	void Camera::RecalcProjectionMatrix()
-	{
+		// projection matrix
 		projectionMatrix = XMMatrixPerspectiveFovLH(fov, aspectRatio, nearZ, farZ);
+
+		// view projection matrix
+		vpMatrix = XMMatrixTranspose(viewMatrix * projectionMatrix); // transpose for DX.
 	}
 
-	void Camera::RecalcViewProjectionMatrix()
+	void Camera::ImuguiWindow(bool* pOpen)
 	{
-		viewProjectionMatrix = viewMatrix * projectionMatrix;
-	}
-
-	void Camera::OnImugui()
-	{
-		if (ImGui::Begin("Camera"))
+		if (ImGui::Begin("Camera", pOpen))
 		{
 			ImGui::DragFloat3("Position", position.m128_f32, 0.1f);
 			ImGui::DragFloat("Yaw", &yaw, 0.01f); ImGui::SameLine(); ImGui::Text("%.1f Degs", XMConvertToDegrees(yaw)); // note: not wrapping the yaw
@@ -67,10 +39,8 @@ namespace Engine2
 			ImGui::DragFloat("FOV", &fov, 0.25f); ImGui::SameLine(); ImGui::Text("%.1f Degs", XMConvertToDegrees(fov));
 			ImGui::DragFloat("Near Z", &nearZ, 0.25f);
 			ImGui::DragFloat("Far Z", &farZ, 0.25f);
-			ImGui::DragFloat("YawSpeed", &yawSpeed);
-			ImGui::DragFloat("PitchSpeed", &pitchSpeed);
-			ImGui::End();
 		}
+		ImGui::End();
 	}
 
 }

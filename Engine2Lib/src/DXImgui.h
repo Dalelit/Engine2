@@ -16,9 +16,6 @@ namespace Engine2
 
 		void BeginFrame();
 		void EndFrame();
-
-		bool WantCaptureKeyboard();
-
 	};
 
 }
