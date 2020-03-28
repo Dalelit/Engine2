@@ -246,15 +246,17 @@ void Playground::AddModel4()
 	//model->pMaterial->pPS = PixelShader::CreateFromCompiledFile(psfilename);
 
 	std::string vsfilename = Config::directories["ShaderSourceDir"] + "MaterialTest1VS.hlsl";
-	model->pMaterial->pVS = VertexShader::CreateFromSourceFile(vsfilename, vsLayout);
-	E2_ASSERT(model->pMaterial->pVS, "VertexShader::CreateFromSourceFile returned null");
+	auto vs = VertexShader::CreateFromSourceFile(vsfilename, vsLayout);
+	E2_ASSERT(vs, "VertexShader::CreateFromSourceFile returned null");
+
+	auto vsd = std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout, vs);
+	model->pMaterial->pVS = vsd;
 
 	std::string psfilename = Config::directories["ShaderSourceDir"] + "MaterialTest1PS.hlsl";
 	auto ps = PixelShader::CreateFromSourceFile(psfilename);
 	E2_ASSERT(ps, "PixelShader::CreateFromSourceFile returned null");
 
-	auto psd = std::make_shared<ShaderDynamic<PixelShader>>(psfilename, ps);
-
+	auto psd = std::make_shared<PixelShaderDynamic>(psfilename, ps);
 	model->pMaterial->pPS = psd;
 
 	model->entities.instances.reserve(3);

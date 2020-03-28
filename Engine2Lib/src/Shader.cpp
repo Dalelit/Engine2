@@ -129,6 +129,7 @@ namespace Engine2
 
 		return shader;
 	}
+
 	std::shared_ptr<PixelShader> PixelShader::CreateFromCompiledFile(std::string& filename)
 	{
 		wrl::ComPtr<ID3DBlob> pBlob;
@@ -139,6 +140,7 @@ namespace Engine2
 
 		return std::make_shared<PixelShader>(*pBlob.Get(), "Pixel Shader, compiled file: " + filename);
 	}
+
 	std::shared_ptr<PixelShader> PixelShader::CreateFromSourceFile(std::string& filename, std::string entryPoint, std::string target)
 	{
 		wrl::ComPtr<ID3DBlob> pBlob;

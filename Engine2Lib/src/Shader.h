@@ -63,39 +63,61 @@ namespace Engine2
 
 	/////////////////// dynamic shader wrapper ///////////////////
 
-	template <typename T>
-	class ShaderDynamic : public Shader
+	class VertexShaderDynamic : public Shader
 	{
 	public:
-		ShaderDynamic(std::string filename, std::shared_ptr<T> shader) :
-			fileWatcher(filename), shader(shader)
-		{
-			this->name = shader->GetName() + " dynamic";
-		}
+		VertexShaderDynamic(std::string filename, VertexShaderLayout& layout, std::shared_ptr<VertexShader> shader) :
+			shader(shader), fileWatcher(filename), layout(layout)
+		{}
 
-		void Bind()
+		inline void Bind()
 		{
 			if (fileWatcher.Check())
 			{
-				auto newShader = T::CreateFromSourceFile(fileWatcher.GetFilename());
-				if (newShader)
-				{
-					this->name = shader->GetName() + " dynamic";
-					shader = newShader;
-				}
+				auto newShader = VertexShader::CreateFromSourceFile(fileWatcher.GetFilename(), layout);
+				if (newShader) shader = newShader;
 			}
 
 			shader->Bind();
 		}
 
-		void OnImgui()
+		inline void OnImgui()
 		{
 			ImGui::Text("Dynamic file: %s", fileWatcher.GetFilename().c_str());
 			shader->OnImgui();
 		}
 
 	protected:
-		std::shared_ptr<T> shader;
+		std::shared_ptr<VertexShader> shader;
+		FileWatcher fileWatcher;
+		VertexShaderLayout layout;
+	};
+
+	class PixelShaderDynamic : public Shader
+	{
+	public:
+		PixelShaderDynamic(std::string filename, std::shared_ptr<PixelShader> shader) :
+			shader(shader), fileWatcher(filename)
+		{}
+
+		inline void Bind()
+		{
+			if (fileWatcher.Check())
+			{
+				auto newShader = PixelShader::CreateFromSourceFile(fileWatcher.GetFilename());
+				if (newShader) shader = newShader;
+			}
+			shader->Bind();
+		}
+
+		inline void OnImgui()
+		{
+			ImGui::Text("Dynamic file: %s", fileWatcher.GetFilename().c_str());
+			shader->OnImgui();
+		}
+
+	protected:
+		std::shared_ptr<PixelShader> shader;
 		FileWatcher fileWatcher;
 	};
 }
