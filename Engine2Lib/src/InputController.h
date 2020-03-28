@@ -18,8 +18,10 @@ namespace Engine2
 			DWORD back    = 'S';
 			DWORD right   = 'D';
 			DWORD left    = 'A';
+			DWORD up      = 'E';
+			DWORD down    = 'Q';
 
-			DWORD quitKey = VK_ESCAPE;
+			DWORD quit    = VK_ESCAPE;
 		} KeyboardConfiguration;
 
 		struct {

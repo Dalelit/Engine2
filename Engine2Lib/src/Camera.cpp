@@ -40,4 +40,15 @@ namespace Engine2
 		ImGui::End();
 	}
 
+	void Camera::Move(float forwardDist, float rightDist, float upDist)
+	{
+		position += forwardDist * forward;
+
+		XMVECTOR right = XMVector3Normalize(XMVector3Cross({ 0.0f, 1.0f, 0.0f, 1.0f }, forward));
+		position += right * rightDist;
+
+		XMVECTOR up = XMVector3Normalize(XMVector3Cross(forward, right));
+		position += up * upDist;
+	}
+
 }

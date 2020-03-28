@@ -1,4 +1,9 @@
-float4 main() : SV_TARGET
+float4 main(float3 posWS : worldPosition) : SV_TARGET
 {
-	return float4(1.0f, 1.0f, 1.0f, 1.0f);
+	float height = abs(posWS.y - floor(posWS.y));
+	height = max(height, 0.1);
+	height = min(height, 1.0);
+	float4 color = float4(0.1, height, 0.1, 1.0);
+
+	return color;
 }

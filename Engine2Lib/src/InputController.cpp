@@ -6,10 +6,16 @@ namespace Engine2
 {
 	void InputController::OnUpdate(float dt)
 	{
-		if (IsKeyPressed(KeyboardConfiguration.forward)) pCamera->TranslateForward(dt * MovementConfiguration.moveSpeed);
-		if (IsKeyPressed(KeyboardConfiguration.back))    pCamera->TranslateForward(-dt * MovementConfiguration.moveSpeed);
-		if (IsKeyPressed(KeyboardConfiguration.right))   pCamera->TranslateRight(dt * MovementConfiguration.moveSpeed);
-		if (IsKeyPressed(KeyboardConfiguration.left))    pCamera->TranslateRight(-dt * MovementConfiguration.moveSpeed);
+		float forward = 0.0f, right = 0.0f, up = 0.0f;
+
+		if (IsKeyPressed(KeyboardConfiguration.forward)) forward =  dt * MovementConfiguration.moveSpeed;
+		if (IsKeyPressed(KeyboardConfiguration.back))    forward = -dt * MovementConfiguration.moveSpeed;
+		if (IsKeyPressed(KeyboardConfiguration.right))   right   =  dt * MovementConfiguration.moveSpeed;
+		if (IsKeyPressed(KeyboardConfiguration.left))    right   = -dt * MovementConfiguration.moveSpeed;
+		if (IsKeyPressed(KeyboardConfiguration.up))      up      =  dt * MovementConfiguration.moveSpeed;
+		if (IsKeyPressed(KeyboardConfiguration.down))    up      = -dt * MovementConfiguration.moveSpeed;
+		
+		if (forward != 0.0f || right != 0.0f || up != 0.0f) pCamera->Move(forward, right, up);
 	}
 
 	void InputController::OnInputEvent(InputEvent& event)
@@ -42,9 +48,16 @@ namespace Engine2
 	{
 		if (ImGui::Begin("Input Controller", pOpen))
 		{
-			if (ImGui::CollapsingHeader("Keyboard configuration"))
+			if (ImGui::CollapsingHeader("Input configuration"))
 			{
-
+				ImGui::Text("Forward: %c", KeyboardConfiguration.forward);
+				ImGui::Text("Left   : %c", KeyboardConfiguration.left);
+				ImGui::Text("Back   : %c", KeyboardConfiguration.back);
+				ImGui::Text("Right  : %c", KeyboardConfiguration.right);
+				ImGui::Text("Up     : %c", KeyboardConfiguration.up);
+				ImGui::Text("Down   : %c", KeyboardConfiguration.down);
+				ImGui::Text("Quit   : ESC");
+				ImGui::Text("Right mouse hold: mouse look");
 			}
 
 			if (ImGui::CollapsingHeader("Movement configuration"))

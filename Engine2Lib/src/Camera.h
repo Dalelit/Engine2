@@ -13,17 +13,12 @@ namespace Engine2
 
 		inline void Translate(float x, float y, float z)   { position.m128_f32[0] += x; position.m128_f32[1] += y; position.m128_f32[2] += z; }
 		inline void SetPosition(float x, float y, float z) { position = {x, y, z, 1.0f}; }
-
-		inline void TranslateForward(float dist) { position = DirectX::XMVectorAdd(position, DirectX::XMVectorScale(ForwardDirection(), dist)); } // position += dist * ForwardDirection();
-		inline void TranslateRight(float dist)   { position = DirectX::XMVectorAdd(position, DirectX::XMVectorScale(RightDirection(), dist)); }   // position += dist * RightDirection();
+		void Move(float forwardDist, float rightDist, float upDist);
 
 		inline void Rotate(float yawRads, float pitchRads)      { yaw += yawRads; pitch += pitchRads; WrapYaw(); ClampPitch(); }
 		inline void SetRotation(float yawRads, float pitchRads) { yaw = yawRads; pitch = pitchRads; WrapYaw(); ClampPitch(); }
 
 		inline void SetAspectRatio(float ratio) { aspectRatio = ratio; }
-
-		inline DirectX::XMVECTOR ForwardDirection() { return forward; }
-		inline DirectX::XMVECTOR RightDirection()   { return DirectX::XMVector3Normalize(DirectX::XMVector3Cross({ 0.0f, 1.0f, 0.0f, 1.0f }, forward)); }
 
 	protected:
 		float aspectRatio = 1.0f;

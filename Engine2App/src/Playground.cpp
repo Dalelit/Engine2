@@ -206,20 +206,34 @@ void Playground::AddModel4()
 		float x, y, z;
 	};
 
-	std::vector<Vertex> verticies = {
-		{-0.25f, -0.25f, 0.0f},
-		{-0.25f, 0.25f, 0.0f},
-		{0.25f, 0.25f, 0.0f},
-		{0.25f, -0.25f, 0.0f},
-	};
-
 	VertexShaderLayout vsLayout = {
 		{"Position", DXGI_FORMAT_R32G32B32_FLOAT}
 	};
 
+	std::vector<Vertex> verticies = {
+		{0.0f, 0.0f, 0.0f},
+		{0.0f, 1.0f, 0.0f},
+		{1.0f, 1.0f, 0.0f},
+		{1.0f, 0.0f, 0.0f},
+		{0.0f, 0.0f, 1.0f},
+		{0.0f, 1.0f, 1.0f},
+		{1.0f, 1.0f, 1.0f},
+		{1.0f, 0.0f, 1.0f},
+	};
+
 	std::vector<unsigned int> indicies = {
 		0,1,2,
-		0,2,3
+		0,2,3,
+		3,2,6,
+		3,6,7,
+		7,6,5,
+		7,5,4,
+		4,5,1,
+		4,1,0,
+		1,5,6,
+		1,6,2,
+		0,3,7,
+		0,7,4,
 	};
 
 	model->pMesh = std::make_shared<MeshTriangleIndexList<Vertex>>(verticies, indicies);
@@ -227,24 +241,40 @@ void Playground::AddModel4()
 	model->pMaterial = std::make_shared<Material>("Material 4");
 
 	std::string vsCode = Scene::GetVSCBHLSL() + EntityInstances::GetVSCBHLSL() + R"(
+			struct VSOut
+			{
+				float3 posMS : modelPosition;
+				float4 pos : SV_POSITION;
+			};
 
-		float4 main(float3 pos : Position) : SV_POSITION
-		{
-			return mul(mul(float4(pos, 1.0f), entityTransform), cameraTransform);
-		})";
+			VSOut main(float3 pos : Position)
+			{
+				VSOut vso;
+				vso.posMS = pos;
+
+				float4 posWS = mul(float4(pos, 1.0f), entityTransform);
+				vso.pos = mul(posWS, cameraTransform);
+
+				return vso;
+			}
+		)";
 
 	model->pMaterial->pVS = VertexShader::CreateFromString(vsCode, vsLayout);
 
 	std::string psCode = R"(
-		float4 main() : SV_TARGET
-		{
-			return float4(0.7f, 0.7f, 0.2f, 1.0f);
-		})";
+			float4 main(float3 posMS : modelPosition) : SV_TARGET
+			{
+				float height = posMS.y;
+				float4 color = float4(0.1, height, 0.1, 1.0);
+
+				return color;
+			}
+		)";
 
 	model->pMaterial->pPS = PixelShader::CreateFromString(psCode);
 
 	model->entities.instances.reserve(3);
 	model->entities.instances.emplace_back(Entity());
-	model->entities.instances.emplace_back(Entity({ 1.0f, 0.0f, 0.0f, 1.0f }));
-	model->entities.instances.emplace_back(Entity({-1.0f, 0.0f, 0.0f, 1.0f }));
+	model->entities.instances.emplace_back(Entity({ 2.0f, 0.0f, 0.0f, 1.0f }));
+	model->entities.instances.emplace_back(Entity({-2.0f, 0.0f, 0.0f, 1.0f }));
 }
