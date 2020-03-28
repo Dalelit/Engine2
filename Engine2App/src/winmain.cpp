@@ -29,6 +29,12 @@ public:
 
 	HWND GetHandle() { return handle; }
 
+	std::string GetDirectory() {
+		char buffer[256];
+		GetCurrentDirectoryA(ARRAYSIZE(buffer), buffer);
+		return std::string(buffer);
+	}
+
 private:
 	HWND handle;
 	WNDCLASS windowClass = {};
@@ -181,6 +187,7 @@ int WINAPI WinMain(
 
 	AppWindow app(hInstance, WndProc);
 	//app.Maximise();
+	E2_OUTPUT_DEBUG(app.GetDirectory().c_str());
 
 	Engine2::Engine::CreateEngine(app.GetHandle());
 

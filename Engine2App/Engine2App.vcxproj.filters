@@ -12,5 +12,8 @@
   <ItemGroup>
     <FxCompile Include="Assets\Shaders\VSTest.hlsl" />
     <FxCompile Include="Assets\Shaders\PSTest.hlsl" />
+    <FxCompile Include="Assets\Materials\MaterialTest1VS.hlsl" />
+    <FxCompile Include="Assets\Materials\MaterialTest1PS.hlsl" />
+    <FxCompile Include="Assets\Materials\SceneEntityCBVS.hlsl" />
   </ItemGroup>
 </Project>

@@ -34,6 +34,7 @@ namespace Engine2
 		void Bind();
 
 		static std::shared_ptr<VertexShader> CreateFromString(std::string& src, VertexShaderLayout& layout, std::string entryPoint = "main", std::string target = "vs_5_0");
+		static std::shared_ptr<VertexShader> CreateFromCompiledFile(std::string& filename, VertexShaderLayout& layout);
 
 	protected:
 		wrl::ComPtr<ID3D11VertexShader> pVertexShader = nullptr;
@@ -48,6 +49,7 @@ namespace Engine2
 		void Bind();
 
 		static std::shared_ptr<PixelShader> CreateFromString(std::string& src, std::string entryPoint = "main", std::string target = "ps_5_0");
+		static std::shared_ptr<PixelShader> CreateFromCompiledFile(std::string& filename);
 
 	protected:
 		wrl::ComPtr<ID3D11PixelShader> pPixelShader = nullptr;

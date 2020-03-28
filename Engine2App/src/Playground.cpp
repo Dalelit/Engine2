@@ -240,38 +240,13 @@ void Playground::AddModel4()
 
 	model->pMaterial = std::make_shared<Material>("Material 4");
 
-	std::string vsCode = Scene::GetVSCBHLSL() + EntityInstances::GetVSCBHLSL() + R"(
-			struct VSOut
-			{
-				float3 posMS : modelPosition;
-				float4 pos : SV_POSITION;
-			};
+	std::string vsfilename = Config::directories["ShaderCompiledDir"] + "MaterialTest1VS.cso";
 
-			VSOut main(float3 pos : Position)
-			{
-				VSOut vso;
-				vso.posMS = pos;
+	model->pMaterial->pVS = VertexShader::CreateFromCompiledFile(vsfilename, vsLayout);
 
-				float4 posWS = mul(float4(pos, 1.0f), entityTransform);
-				vso.pos = mul(posWS, cameraTransform);
+	std::string psfilename = Config::directories["ShaderCompiledDir"] + "MaterialTest1PS.cso";
 
-				return vso;
-			}
-		)";
-
-	model->pMaterial->pVS = VertexShader::CreateFromString(vsCode, vsLayout);
-
-	std::string psCode = R"(
-			float4 main(float3 posMS : modelPosition) : SV_TARGET
-			{
-				float height = posMS.y;
-				float4 color = float4(0.1, height, 0.1, 1.0);
-
-				return color;
-			}
-		)";
-
-	model->pMaterial->pPS = PixelShader::CreateFromString(psCode);
+	model->pMaterial->pPS = PixelShader::CreateFromCompiledFile(psfilename);
 
 	model->entities.instances.reserve(3);
 	model->entities.instances.emplace_back(Entity());

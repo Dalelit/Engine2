@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "Common.h"
 #include "Shader.h"
 
 namespace Engine2
@@ -29,6 +30,17 @@ namespace Engine2
 		shader->source = src;
 
 		return shader;
+	}
+
+	std::shared_ptr<VertexShader> VertexShader::CreateFromCompiledFile(std::string& filename, VertexShaderLayout& layout)
+	{
+		wrl::ComPtr<ID3DBlob> pBlob;
+
+		HRESULT hr = D3DReadFileToBlob(Util::ToWString(filename).c_str(), &pBlob);
+
+		E2_ASSERT_HR(hr, "VertexShader D3DReadFileToBlob failed");
+
+		return std::make_shared<VertexShader>(*pBlob.Get(), layout, "Vertex Shader " + filename);
 	}
 
 	VertexShader::VertexShader(ID3DBlob& shaderBlob, VertexShaderLayout& layout, std::string name) : Shader(name)
@@ -96,5 +108,15 @@ namespace Engine2
 		shader->source = src;
 
 		return shader;
+	}
+	std::shared_ptr<PixelShader> PixelShader::CreateFromCompiledFile(std::string& filename)
+	{
+		wrl::ComPtr<ID3DBlob> pBlob;
+
+		HRESULT hr = D3DReadFileToBlob(Util::ToWString(filename).c_str(), &pBlob);
+
+		E2_ASSERT_HR(hr, "PixelShader D3DReadFileToBlob failed");
+
+		return std::make_shared<PixelShader>(*pBlob.Get(), "Pixel Shader " + filename);
 	}
 }
