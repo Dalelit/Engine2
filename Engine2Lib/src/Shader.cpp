@@ -25,7 +25,7 @@ namespace Engine2
 
 		E2_ASSERT_HR(hr, "VertexShader D3DCompile failed");
 
-		auto shader = std::make_shared<VertexShader>(*pBlob.Get(), layout, "Vertex Shader from string: " + entryPoint + " " + target);
+		auto shader = std::make_shared<VertexShader>(*pBlob.Get(), layout, "Vertex Shader, string: " + entryPoint + " " + target);
 
 		shader->source = src;
 
@@ -40,7 +40,19 @@ namespace Engine2
 
 		E2_ASSERT_HR(hr, "VertexShader D3DReadFileToBlob failed");
 
-		return std::make_shared<VertexShader>(*pBlob.Get(), layout, "Vertex Shader " + filename);
+		return std::make_shared<VertexShader>(*pBlob.Get(), layout, "Vertex Shader, compiled file: " + filename);
+	}
+
+	std::shared_ptr<VertexShader> VertexShader::CreateFromSourceFile(std::string& filename, VertexShaderLayout& layout, std::string entryPoint, std::string target)
+	{
+		wrl::ComPtr<ID3DBlob> pBlob;
+		wrl::ComPtr<ID3DBlob> pErrBlob;
+
+		HRESULT hr = D3DCompileFromFile(Util::ToWString(filename).c_str(), 0, D3D_COMPILE_STANDARD_FILE_INCLUDE, entryPoint.c_str(), target.c_str(), 0, 0, &pBlob, &pErrBlob);
+
+		if (FAILED(hr)) return nullptr;
+
+		return std::make_shared<VertexShader>(*pBlob.Get(), layout, "Vertex Shader, source file: " + entryPoint + " " + target);
 	}
 
 	VertexShader::VertexShader(ID3DBlob& shaderBlob, VertexShaderLayout& layout, std::string name) : Shader(name)
@@ -103,7 +115,7 @@ namespace Engine2
 
 		E2_ASSERT_HR(hr, "PixelShader D3DCompile failed");
 
-		auto shader = std::make_shared<PixelShader>(*pBlob.Get(), "Pixel Shader from string: " + entryPoint + " " + target);
+		auto shader = std::make_shared<PixelShader>(*pBlob.Get(), "Pixel Shader, string: " + entryPoint + " " + target);
 
 		shader->source = src;
 
@@ -117,6 +129,17 @@ namespace Engine2
 
 		E2_ASSERT_HR(hr, "PixelShader D3DReadFileToBlob failed");
 
-		return std::make_shared<PixelShader>(*pBlob.Get(), "Pixel Shader " + filename);
+		return std::make_shared<PixelShader>(*pBlob.Get(), "Pixel Shader, compiled file: " + filename);
+	}
+	std::shared_ptr<PixelShader> PixelShader::CreateFromSourceFile(std::string& filename, std::string entryPoint, std::string target)
+	{
+		wrl::ComPtr<ID3DBlob> pBlob;
+		wrl::ComPtr<ID3DBlob> pErrBlob;
+
+		HRESULT hr = D3DCompileFromFile(Util::ToWString(filename).c_str(), 0, D3D_COMPILE_STANDARD_FILE_INCLUDE, entryPoint.c_str(), target.c_str(), 0, 0, &pBlob, &pErrBlob);
+
+		if (FAILED(hr)) return nullptr;
+
+		return std::make_shared<PixelShader>(*pBlob.Get(), "Pixel Shader, source file: " + entryPoint + " " + target);
 	}
 }
