@@ -6,7 +6,7 @@
 #include <windows.h>
 #include <windowsx.h>
 
-#define E2_OUTPUT_DEBUG(msg) OutputDebugStringA(msg); OutputDebugStringA("\n");
+#define E2_OUTPUT_DEBUG(msg) { OutputDebugStringA(msg); OutputDebugStringA("\n"); }
 
 class AppWindow
 {
@@ -58,7 +58,7 @@ private:
 		rid.usUsage = 0x02; // mouse usage
 		rid.dwFlags = 0;
 		rid.hwndTarget = nullptr;
-		E2_ASSERT(RegisterRawInputDevices(&rid, 1u, sizeof(rid)) == TRUE, "Error with RegisterRawInputDevices");
+		if (!RegisterRawInputDevices(&rid, 1u, sizeof(rid))) { E2_OUTPUT_DEBUG("Error with RegisterRawInputDevices"); }
 	}
 
 	void Unregsiter()
@@ -129,7 +129,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 			E2_ASSERT(size <= ARRAYSIZE(rawBuffer), "rawBuffer smaller than rawInputSize");
 
-			E2_ASSERT(GetRawInputData((HRAWINPUT)lParam, RID_INPUT, rawBuffer, &size, sizeof(RAWINPUTHEADER)) == size, "Raw buffer read did not match");
+			if (GetRawInputData((HRAWINPUT)lParam, RID_INPUT, rawBuffer, &size, sizeof(RAWINPUTHEADER)) != size) E2_OUTPUT_DEBUG("Raw buffer read did not match");
 
 			RAWINPUT* raw = (RAWINPUT*)rawBuffer;
 
