@@ -106,6 +106,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			OnApplicationEventFunc(event);
 			break;
 		}
+		case WM_ACTIVATE:
+		{
+			Engine2::WindowFocusEvent event(wParam != WA_INACTIVE, wParam == WA_CLICKACTIVE);
+			E2_OUTPUT_DEBUG(event.ToString().c_str());
+			OnApplicationEventFunc(event);
+			break;
+		}
 
 		// key controls /////////////////////////
 		case WM_KEYDOWN:

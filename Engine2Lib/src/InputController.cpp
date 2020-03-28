@@ -6,6 +6,8 @@ namespace Engine2
 {
 	void InputController::OnUpdate(float dt)
 	{
+		if (!State.WindowFocused) return; // ignore input when window is not focused
+
 		float forward = 0.0f, right = 0.0f, up = 0.0f;
 
 		if (IsKeyPressed(KeyboardConfiguration.forward)) forward =  dt * MovementConfiguration.moveSpeed;
@@ -27,6 +29,13 @@ namespace Engine2
 		dispatcher.Dispatch<MouseButtonReleasedEvent>(E2_BIND_EVENT_FUNC(InputController::OnMouseButtonReleased));
 	}
 
+	void InputController::OnApplicationEvent(ApplicationEvent& event)
+	{
+		EventDispatcher dispatcher(event);
+
+		dispatcher.Dispatch<WindowFocusEvent>(E2_BIND_EVENT_FUNC(InputController::OnWindowFocus));
+	}
+
 	void InputController::OnMouseMove(MouseMoveEvent& event)
 	{
 		if (State.LeftMouseDown) pCamera->Rotate((float)event.GetX() * MovementConfiguration.yawSpeed, (float)event.GetY() * MovementConfiguration.pitchSpeed);
@@ -42,6 +51,11 @@ namespace Engine2
 	{
 		if (event.Left()) State.LeftMouseDown = false;
 		if (event.Right()) State.RightMouseDown = false;
+	}
+
+	void InputController::OnWindowFocus(WindowFocusEvent& event)
+	{
+		State.WindowFocused = event.IsActive();
 	}
 
 	void InputController::ImguiWindow(bool* pOpen)
@@ -71,6 +85,7 @@ namespace Engine2
 			{
 				if (State.LeftMouseDown) ImGui::Text("Left Mousebutton down"); else  ImGui::Text("Left Mousebutton up");
 				if (State.RightMouseDown) ImGui::Text("Right Mousebutton down"); else  ImGui::Text("Right Mousebutton up");
+				if (State.WindowFocused) ImGui::Text("Window active"); else  ImGui::Text("Window inactive");
 			}
 		}
 		ImGui::End();

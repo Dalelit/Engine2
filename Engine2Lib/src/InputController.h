@@ -31,12 +31,14 @@ namespace Engine2
 		} MovementConfiguration;
 
 		struct {
-			bool LeftMouseDown = false;
+			bool LeftMouseDown  = false;
 			bool RightMouseDown = false;
+			bool WindowFocused  = false;
 		} State;
 
 		void OnUpdate(float dt);
 		void OnInputEvent(InputEvent& event);
+		void OnApplicationEvent(ApplicationEvent& event);
 		void ImguiWindow(bool* pOpen);
 
 		bool IsKeyPressed(int vKeyCode);
@@ -47,5 +49,6 @@ namespace Engine2
 		void OnMouseMove(MouseMoveEvent& event);
 		void OnMouseButtonPressed(MouseButtonPressedEvent& event);
 		void OnMouseButtonReleased(MouseButtonReleasedEvent& event);
+		void OnWindowFocus(WindowFocusEvent& event);
 	};
 }

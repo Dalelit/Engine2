@@ -81,6 +81,8 @@ namespace Engine2
 
 	void Engine::OnApplicationEvent(ApplicationEvent& event)
 	{
+		inputController.OnApplicationEvent(event);
+
 		EventDispatcher dispacher(event);
 
 		dispacher.Dispatch<WindowResizeEvent>(E2_BIND_EVENT_FUNC(Engine::OnResize));

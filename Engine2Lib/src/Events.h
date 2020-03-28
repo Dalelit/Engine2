@@ -8,7 +8,7 @@ namespace Engine2
 
 	enum class EventType
 	{
-		None, WindowResize, MouseMove, MouseButtonPressed, MouseButtonReleased, KeyPressed, KeyReleased
+		None, WindowResize, WindowFocus, MouseMove, MouseButtonPressed, MouseButtonReleased, KeyPressed, KeyReleased
 	};
 
 	enum class EventGroup
@@ -153,6 +153,26 @@ namespace Engine2
 	protected:
 		bool minimised;
 		bool maximised;
+	};
+
+	class WindowFocusEvent : public ApplicationEvent
+	{
+	public:
+		WindowFocusEvent(bool activate, bool clicked) : active(activate), clicked(clicked) {}
+		EventType GetType() override { return GetStaticType(); }
+		EventGroup GetGroup() override { return EventGroup::Application; }
+		static EventType GetStaticType() { return EventType::WindowFocus; }
+		const char* GetName() const override { return "WindowFocus"; }
+
+		bool IsActive() { return active; }
+		bool WasClicked() { return clicked; }
+		bool WasKeyboard() { return !clicked; }
+
+		std::string ToString() const { std::stringstream msg; msg << "WindowFocus " << (active ? "Active " : "Inactive ") << (clicked ? "by Click" : "by Keyboard"); return msg.str(); }
+
+	protected:
+		bool active;
+		bool clicked;
 	};
 
 }
