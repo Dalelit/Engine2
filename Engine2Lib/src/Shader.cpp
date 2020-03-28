@@ -7,8 +7,10 @@ namespace Engine2
 	void Shader::OnImgui()
 	{
 		ImGui::Text(name.c_str());
-		ImGui::Text(source.c_str());
+		if (source.size() > 0) ImGui::Text(source.c_str());
 	}
+
+	///////////////// Vertex shaders /////////////////
 
 	void VertexShader::Bind()
 	{
@@ -52,11 +54,13 @@ namespace Engine2
 
 		if (FAILED(hr)) return nullptr;
 
-		return std::make_shared<VertexShader>(*pBlob.Get(), layout, "Vertex Shader, source file: " + entryPoint + " " + target);
+		return std::make_shared<VertexShader>(*pBlob.Get(), layout, "Vertex Shader, source file: " + filename + " " + entryPoint + " " + target);
 	}
 
-	VertexShader::VertexShader(ID3DBlob& shaderBlob, VertexShaderLayout& layout, std::string name) : Shader(name)
+	VertexShader::VertexShader(ID3DBlob& shaderBlob, VertexShaderLayout& layout, std::string name)
 	{
+		this->name = name;
+
 		HRESULT hr;
 		
 		hr = Engine::GetDevice().CreateVertexShader(
@@ -90,8 +94,12 @@ namespace Engine2
 		E2_ASSERT_HR(hr, "VertexShader CreateInputLayout failed");
 	}
 
-	PixelShader::PixelShader(ID3DBlob& shaderBlob, std::string name) : Shader(name)
+	///////////////// Pixel shaders /////////////////
+
+	PixelShader::PixelShader(ID3DBlob& shaderBlob, std::string name)
 	{
+		this->name = name;
+
 		HRESULT hr = Engine::GetDevice().CreatePixelShader(
 			shaderBlob.GetBufferPointer(),
 			shaderBlob.GetBufferSize(),
@@ -140,6 +148,7 @@ namespace Engine2
 
 		if (FAILED(hr)) return nullptr;
 
-		return std::make_shared<PixelShader>(*pBlob.Get(), "Pixel Shader, source file: " + entryPoint + " " + target);
+		return std::make_shared<PixelShader>(*pBlob.Get(), "Pixel Shader, source file: " + filename + " "+ entryPoint + " " + target);
 	}
+
 }

@@ -14,8 +14,8 @@ namespace Engine2
 		~Material() = default;
 		void Bind();
 
-		std::shared_ptr<VertexShader> pVS;
-		std::shared_ptr<PixelShader> pPS;
+		std::shared_ptr<Shader> pVS;
+		std::shared_ptr<Shader> pPS;
 		
 		ResourceVector resources;
 

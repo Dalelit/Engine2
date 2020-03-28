@@ -22,4 +22,5 @@ namespace Engine2
 		WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), srclength, &r[0], tgtlength, 0, 0);
 		return r;
 	}
+
 }

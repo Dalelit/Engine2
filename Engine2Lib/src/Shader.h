@@ -9,10 +9,11 @@ namespace Engine2
 	class Shader
 	{
 	public:
-		Shader(std::string name) : name(name) {}
 		virtual ~Shader() = default;
 		virtual void Bind() = 0;
 		virtual void OnImgui();
+
+		inline std::string& GetName() { return name; }
 
 	protected:
 		std::string name;
@@ -27,6 +28,8 @@ namespace Engine2
 
 	typedef std::vector<VertexShaderLayoutElement> VertexShaderLayout;
 
+	/////////////////// vertex shader ///////////////////
+
 	class VertexShader : public Shader
 	{
 	public:
@@ -40,8 +43,9 @@ namespace Engine2
 	protected:
 		wrl::ComPtr<ID3D11VertexShader> pVertexShader = nullptr;
 		wrl::ComPtr<ID3D11InputLayout> pInputLayout = nullptr;
-		std::string name;
 	};
+
+	/////////////////// pixel shader ///////////////////
 
 	class PixelShader : public Shader
 	{
@@ -55,5 +59,43 @@ namespace Engine2
 
 	protected:
 		wrl::ComPtr<ID3D11PixelShader> pPixelShader = nullptr;
+	};
+
+	/////////////////// dynamic shader wrapper ///////////////////
+
+	template <typename T>
+	class ShaderDynamic : public Shader
+	{
+	public:
+		ShaderDynamic(std::string filename, std::shared_ptr<T> shader) :
+			fileWatcher(filename), shader(shader)
+		{
+			this->name = shader->GetName() + " dynamic";
+		}
+
+		void Bind()
+		{
+			if (fileWatcher.Check())
+			{
+				auto newShader = T::CreateFromSourceFile(fileWatcher.GetFilename());
+				if (newShader)
+				{
+					this->name = shader->GetName() + " dynamic";
+					shader = newShader;
+				}
+			}
+
+			shader->Bind();
+		}
+
+		void OnImgui()
+		{
+			ImGui::Text("Dynamic file: %s", fileWatcher.GetFilename().c_str());
+			shader->OnImgui();
+		}
+
+	protected:
+		std::shared_ptr<T> shader;
+		FileWatcher fileWatcher;
 	};
 }
