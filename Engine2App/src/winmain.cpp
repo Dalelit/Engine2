@@ -110,7 +110,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		case WM_ACTIVATE:
 		{
 			Engine2::WindowFocusEvent event(wParam != WA_INACTIVE, wParam == WA_CLICKACTIVE);
-			E2_OUTPUT_DEBUG(event.ToString().c_str());
 			OnApplicationEventFunc(event);
 			break;
 		}
@@ -173,6 +172,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		case WM_RBUTTONUP:
 		{
 			Engine2::MouseButtonReleasedEvent event(false, true, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+			OnInputEventFunc(event);
+			break;
+		}
+		case WM_MOUSEWHEEL:
+		{
+			Engine2::MouseScrollEvent event(GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 			OnInputEventFunc(event);
 			break;
 		}

@@ -26,6 +26,9 @@ namespace Engine2
 
 		struct {
 			float moveSpeed = 1.0f;
+			float mouseMoveSpeed = 0.01f;
+			float mouseScrollSpeed = 0.5f;
+			float runMultiplier = 3.0f;
 			float yawSpeed = 0.001f;
 			float pitchSpeed = 0.001f;
 		} MovementConfiguration;
@@ -49,6 +52,7 @@ namespace Engine2
 		void OnMouseMove(MouseMoveEvent& event);
 		void OnMouseButtonPressed(MouseButtonPressedEvent& event);
 		void OnMouseButtonReleased(MouseButtonReleasedEvent& event);
+		void OnMouseScroll(MouseScrollEvent& event);
 		void OnWindowFocus(WindowFocusEvent& event);
 	};
 }

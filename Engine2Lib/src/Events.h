@@ -8,7 +8,7 @@ namespace Engine2
 
 	enum class EventType
 	{
-		None, WindowResize, WindowFocus, MouseMove, MouseButtonPressed, MouseButtonReleased, KeyPressed, KeyReleased
+		None, WindowResize, WindowFocus, MouseMove, MouseButtonPressed, MouseButtonReleased, MouseScroll, KeyPressed, KeyReleased
 	};
 
 	enum class EventGroup
@@ -112,6 +112,26 @@ namespace Engine2
 
 	protected:
 		bool left, right;
+		int x, y;
+	};
+
+	class MouseScrollEvent : public InputEvent
+	{
+	public:
+		MouseScrollEvent(int delta, UINT32 x, UINT32 y) : delta(delta), x(x), y(y) {}
+		EventType GetType() override { return GetStaticType(); }
+		EventGroup GetGroup() override { return EventGroup::Mouse; }
+		static EventType GetStaticType() { return EventType::MouseScroll; }
+		const char* GetName() const override { return "MouseScroll"; }
+
+		int GetDelta() { return delta; }
+		int GetX() { return x; }
+		int GetY() { return y; }
+
+		std::string ToString() const { std::stringstream ss; ss << "MouseScroll " << delta << " " << x << "," << y; return ss.str(); }
+
+	protected:
+		int delta;
 		int x, y;
 	};
 
