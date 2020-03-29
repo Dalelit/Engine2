@@ -15,6 +15,8 @@ namespace Engine2
 		inline void SetPosition(float x, float y, float z) { position = {x, y, z, 1.0f}; }
 		void Move(float forwardDist, float rightDist, float upDist);
 
+		void LookAt(float x, float y, float z);
+
 		inline void Rotate(float yawRads, float pitchRads)      { yaw += yawRads; pitch += pitchRads; WrapYaw(); ClampPitch(); }
 		inline void SetRotation(float yawRads, float pitchRads) { yaw = yawRads; pitch = pitchRads; WrapYaw(); ClampPitch(); }
 
@@ -27,7 +29,7 @@ namespace Engine2
 		float farZ = 100.0f;
 
 		DirectX::XMVECTOR position = {};
-		DirectX::XMVECTOR forward = {};
+		DirectX::XMVECTOR direction = {};
 
 		float yaw = 0.0f;
 		float pitch = 0.0f;

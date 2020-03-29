@@ -31,7 +31,8 @@ void BoxWorld::OnImgui()
 
 void BoxWorld::CreateScene()
 {
-	Engine::Get().mainCamera.SetPosition(0.0f, 0.0f, -3.0f);
+	Engine::Get().mainCamera.SetPosition(0.0f, 10.0f, -10.0f);
+	Engine::Get().mainCamera.LookAt(0.0f, 0.0f, 0.0f);
 
 	auto model = std::make_shared<Model>("Cube");
 	models.push_back(model);
@@ -59,6 +60,11 @@ void BoxWorld::CreateScene()
 	std::string psfilename = Config::directories["ShaderSourceDir"] + "BoxWorldCubePS.hlsl";
 	model->pMaterial->pPS = std::make_shared<PixelShaderDynamic>(psfilename);
 
-	model->entities.instances.reserve(3);
-	model->entities.instances.emplace_back(Entity());
+	pVoxel = std::make_unique<Voxel>(10, 10, 10);
+
+	model->entities.instances.reserve(pVoxel->Size());
+	for (auto pPoint : *pVoxel)
+	{
+		model->entities.instances.emplace_back(pPoint.x, pPoint.y, pPoint.z);
+	}
 }

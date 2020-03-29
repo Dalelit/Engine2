@@ -10,6 +10,7 @@
     <ClInclude Include="src\pch.h" />
     <ClInclude Include="src\Playground.h" />
     <ClInclude Include="src\BoxWorld.h" />
+    <ClInclude Include="src\Voxel.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Assets\Shaders\VSTest.hlsl" />

@@ -11,6 +11,8 @@ namespace Engine2
 			   DirectX::XMVECTOR rotation = { 0.0f, 0.0f, 0.0f, 1.0f },
 			   DirectX::XMVECTOR scale    = { 1.0f, 1.0f, 1.0f, 1.0f });
 
+		Entity(float x, float y, float z) : Entity({ x, y, z, 1.0f }) {}
+
 		inline void SetPosition(float x, float y, float z) { position = { x, y, z, 1.0f }; }
 		inline void SetRotation(float x, float y, float z) { rotation = { x, y, z, 1.0f }; }
 		inline void SetScale(float x, float y, float z) { scale = { x, y, z, 1.0f }; }

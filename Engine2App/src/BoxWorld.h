@@ -4,6 +4,7 @@
 #include "Model.h"
 #include "ConstantBuffer.h"
 #include "Scene.h"
+#include "Voxel.h"
 
 class BoxWorld : public Engine2::Layer
 {
@@ -21,5 +22,7 @@ public:
 protected:
 	std::vector<std::shared_ptr<Engine2::Model>> models;
 	Engine2::Scene scene;
+
+	std::unique_ptr<Voxel> pVoxel;
 };
 
