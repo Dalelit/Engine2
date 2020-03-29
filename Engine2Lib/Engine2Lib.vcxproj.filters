@@ -27,6 +27,7 @@
     <ClInclude Include="src\InputController.h" />
     <ClInclude Include="src\Util.h" />
     <ClInclude Include="src\Config.h" />
+    <ClInclude Include="src\MeshPrimatives.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\pch.cpp" />
@@ -49,5 +50,6 @@
     <ClCompile Include="src\InputController.cpp" />
     <ClCompile Include="src\Util.cpp" />
     <ClCompile Include="src\Config.cpp" />
+    <ClCompile Include="src\MeshPrimatives.cpp" />
   </ItemGroup>
 </Project>

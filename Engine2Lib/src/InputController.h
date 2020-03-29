@@ -33,7 +33,7 @@ namespace Engine2
 		struct {
 			bool LeftMouseDown  = false;
 			bool RightMouseDown = false;
-			bool WindowFocused  = false;
+			bool WindowFocused  = true;
 		} State;
 
 		void OnUpdate(float dt);

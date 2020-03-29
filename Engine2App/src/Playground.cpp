@@ -12,7 +12,7 @@ void Playground::OnRender()
 {
 	scene.OnRender();
 
-	for (auto model : models)
+	for (auto& model : models)
 	{
 		if (model->IsActive())
 		{

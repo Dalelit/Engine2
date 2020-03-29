@@ -66,9 +66,18 @@ namespace Engine2
 	class VertexShaderDynamic : public Shader
 	{
 	public:
+		// wrap an existing shader
 		VertexShaderDynamic(std::string filename, VertexShaderLayout& layout, std::shared_ptr<VertexShader> shader) :
 			shader(shader), fileWatcher(filename), layout(layout)
 		{}
+
+		// create and wrap a shader
+		VertexShaderDynamic(std::string filename, VertexShaderLayout& layout) :
+			fileWatcher(filename), layout(layout)
+		{
+			shader = VertexShader::CreateFromSourceFile(filename, layout);
+			E2_ASSERT(shader, "VertexShader::CreateFromSourceFile returned null");
+		}
 
 		inline void Bind()
 		{
@@ -96,9 +105,18 @@ namespace Engine2
 	class PixelShaderDynamic : public Shader
 	{
 	public:
+		// wrap an existing shader
 		PixelShaderDynamic(std::string filename, std::shared_ptr<PixelShader> shader) :
 			shader(shader), fileWatcher(filename)
 		{}
+
+		// create and wrap a shader
+		PixelShaderDynamic(std::string filename) :
+			fileWatcher(filename)
+		{
+			shader = PixelShader::CreateFromSourceFile(filename);
+			E2_ASSERT(shader, "PixelShader::CreateFromSourceFile returned null");
+		}
 
 		inline void Bind()
 		{

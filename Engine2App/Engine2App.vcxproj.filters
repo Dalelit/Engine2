@@ -4,10 +4,12 @@
     <ClCompile Include="src\winmain.cpp" />
     <ClCompile Include="src\pch.cpp" />
     <ClCompile Include="src\Playground.cpp" />
+    <ClCompile Include="src\BoxWorld.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h" />
     <ClInclude Include="src\Playground.h" />
+    <ClInclude Include="src\BoxWorld.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Assets\Shaders\VSTest.hlsl" />
@@ -15,5 +17,7 @@
     <FxCompile Include="Assets\Materials\MaterialTest1VS.hlsl" />
     <FxCompile Include="Assets\Materials\MaterialTest1PS.hlsl" />
     <FxCompile Include="Assets\Materials\SceneEntityCBVS.hlsl" />
+    <FxCompile Include="Assets\Materials\BoxWorldCubeVS.hlsl" />
+    <FxCompile Include="Assets\Materials\BoxWorldCubePS.hlsl" />
   </ItemGroup>
 </Project>

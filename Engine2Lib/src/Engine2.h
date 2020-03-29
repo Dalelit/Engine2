@@ -30,6 +30,7 @@ namespace Engine2 {
 
 		// Engine will own the layer and delete at the end.
 		void AttachLayer(Layer* layer) { layers.push_back(layer); }
+		Layer& GetLayer(unsigned int indx) { return *layers[indx]; }
 
 		void OnApplicationEvent(ApplicationEvent& event);
 		void OnInputEvent(InputEvent& event);
