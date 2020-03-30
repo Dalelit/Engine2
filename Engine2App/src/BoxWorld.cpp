@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "BoxWorld.h"
 #include "MeshPrimatives.h"
+#include "Surface.h"
 
 using namespace Engine2;
 using namespace DirectX;
@@ -31,28 +32,28 @@ void BoxWorld::OnImgui()
 
 void BoxWorld::CreateScene()
 {
-	Engine::Get().mainCamera.SetPosition(0.0f, 10.0f, -10.0f);
+	Engine::Get().mainCamera.SetPosition(7.0f, 9.0f, -10.0f);
 	Engine::Get().mainCamera.LookAt(0.0f, 0.0f, 0.0f);
 
 	auto model = std::make_shared<Model>("Cube");
 	models.push_back(model);
 
-	struct Vertex
-	{
-		XMFLOAT3 position;
-	};
-
 	VertexShaderLayout vsLayout = {
-		{"Position", DXGI_FORMAT_R32G32B32_FLOAT}
+		{"Position", DXGI_FORMAT_R32G32B32_FLOAT},
 	};
 
-	std::vector<Vertex> verticies;
-	verticies.reserve(MeshPrimatives::Cube::vertexPositions.size());
-	for (auto p : MeshPrimatives::Cube::vertexPositions) verticies.emplace_back(Vertex({ p }));
+	Util::Random rng(0.0f,255.0f);
 
-	model->pMesh = std::make_shared<MeshTriangleIndexList<Vertex>>(verticies, MeshPrimatives::Cube::indicies);
+	model->pMesh = std::make_shared<MeshTriangleIndexList<XMFLOAT3>>(MeshPrimatives::Cube::vertexPositions, MeshPrimatives::Cube::indicies);
+
+	Surface2D<XMFLOAT4> tex(2, 2);
+	tex.SetValue(0, 0, { 1.0f, 1.0f, 1.0f, 1.0f});
+	tex.SetValue(1, 1, { 1.0f, 1.0f, 1.0f, 1.0f });
 
 	model->pMaterial = std::make_shared<Material>("Cube1");
+
+	model->pMaterial->pTexture = std::make_shared<Texture>(0, tex, DXGI_FORMAT_R32G32B32A32_FLOAT);
+	model->pMaterial->pTexture->SetSampler(std::make_shared<TextureSampler>(D3D11_FILTER_MIN_MAG_MIP_POINT, D3D11_TEXTURE_ADDRESS_WRAP));
 
 	std::string vsfilename = Config::directories["ShaderSourceDir"] + "BoxWorldCubeVS.hlsl";
 	model->pMaterial->pVS = std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout);

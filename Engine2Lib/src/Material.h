@@ -4,6 +4,7 @@
 #include "Common.h"
 #include "Shader.h"
 #include "ConstantBuffer.h"
+#include "Texture.h"
 
 namespace Engine2
 {
@@ -16,7 +17,8 @@ namespace Engine2
 
 		std::shared_ptr<Shader> pVS;
 		std::shared_ptr<Shader> pPS;
-		
+		std::shared_ptr<Texture> pTexture;
+
 		ResourceVector resources;
 
 		void OnImgui();

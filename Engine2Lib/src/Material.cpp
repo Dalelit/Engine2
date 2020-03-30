@@ -7,6 +7,7 @@ namespace Engine2
 	{
 		pVS->Bind();
 		pPS->Bind();
+		if (pTexture) pTexture->Bind();
 
 		for (auto& r : resources) r->Bind();
 	}
@@ -25,6 +26,8 @@ namespace Engine2
 			pPS->OnImgui();
 			ImGui::TreePop();
 		}
+
+		if (pTexture) pTexture->OnImgui();
 
 		if (ImGui::TreeNode("Resources"))
 		{

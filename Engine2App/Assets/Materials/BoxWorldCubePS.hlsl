@@ -1,7 +1,16 @@
+Texture2D tex;
+SamplerState smplr;
+
+
 float4 main(float3 posMS : modelPosition) : SV_TARGET
 {
-	float height = posMS.y;
-	float4 color = float4(0.9, height, 0.1, 1.0);
+	float4 result;
 
-	return color;
+	if (posMS.x < 0.001 || posMS.x > 0.999) result = float4(tex.Sample(smplr, posMS.yz).rgb, 1.0f);
+	else if (posMS.y < 0.001 || posMS.y > 0.999) result = float4(tex.Sample(smplr, posMS.xz).rgb, 1.0f);
+	else result = float4(tex.Sample(smplr, posMS.xy).rgb, 1.0f);
+
+	//float4 result = float4(0.6f, posMS.y * 0.6f, 0.2f, 1.0);
+
+	return result;
 }

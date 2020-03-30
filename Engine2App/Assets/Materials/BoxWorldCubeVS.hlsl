@@ -3,7 +3,7 @@
 struct VSOut
 {
 	float3 posMS : modelPosition;
-	float4 pos : SV_POSITION;
+	float4 pos   : SV_POSITION;
 };
 
 VSOut main(float3 pos : Position)
