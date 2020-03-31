@@ -11,6 +11,7 @@ namespace Engine2
 	public:
 		virtual ~Shader() = default;
 		virtual void Bind() = 0;
+		virtual void Unbind() = 0;
 		virtual void OnImgui();
 
 		inline std::string& GetName() { return name; }
@@ -35,6 +36,7 @@ namespace Engine2
 	public:
 		VertexShader(ID3DBlob& shaderBlob, VertexShaderLayout& layout, std::string name);
 		void Bind();
+		void Unbind();
 
 		static std::shared_ptr<VertexShader> CreateFromString(std::string& src, VertexShaderLayout& layout, std::string entryPoint = "main", std::string target = "vs_5_0");
 		static std::shared_ptr<VertexShader> CreateFromCompiledFile(std::string& filename, VertexShaderLayout& layout);
@@ -52,6 +54,7 @@ namespace Engine2
 	public:
 		PixelShader(ID3DBlob& shaderBlob, std::string name);
 		void Bind();
+		void Unbind();
 
 		static std::shared_ptr<PixelShader> CreateFromString(std::string& src, std::string entryPoint = "main", std::string target = "ps_5_0");
 		static std::shared_ptr<PixelShader> CreateFromCompiledFile(std::string& filename);
@@ -59,6 +62,21 @@ namespace Engine2
 
 	protected:
 		wrl::ComPtr<ID3D11PixelShader> pPixelShader = nullptr;
+	};
+
+	/////////////////// geometry shader ///////////////////
+
+	class GeometryShader : public Shader
+	{
+	public:
+		GeometryShader(ID3DBlob& shaderBlob, std::string name);
+		void Bind();
+		void Unbind();
+
+		static std::shared_ptr<GeometryShader> CreateFromSourceFile(std::string& filename, std::string entryPoint = "main", std::string target = "gs_5_0");
+
+	protected:
+		wrl::ComPtr<ID3D11GeometryShader> pGeometryShader = nullptr;
 	};
 
 	/////////////////// dynamic shader wrapper ///////////////////
@@ -89,6 +107,8 @@ namespace Engine2
 
 			shader->Bind();
 		}
+
+		inline void Unbind() { shader->Unbind(); }
 
 		inline void OnImgui()
 		{
@@ -128,6 +148,8 @@ namespace Engine2
 			shader->Bind();
 		}
 
+		inline void Unbind() { shader->Unbind(); }
+
 		inline void OnImgui()
 		{
 			ImGui::Text("Dynamic file: %s", fileWatcher.GetFilename().c_str());
@@ -136,6 +158,45 @@ namespace Engine2
 
 	protected:
 		std::shared_ptr<PixelShader> shader;
+		FileWatcher fileWatcher;
+	};
+
+	class GeometryShaderDynamic : public Shader
+	{
+	public:
+		// wrap an existing shader
+		GeometryShaderDynamic(std::string filename, std::shared_ptr<GeometryShader> shader) :
+			shader(shader), fileWatcher(filename)
+		{}
+
+		// create and wrap a shader
+		GeometryShaderDynamic(std::string filename) :
+			fileWatcher(filename)
+		{
+			shader = GeometryShader::CreateFromSourceFile(filename);
+			E2_ASSERT(shader, "GeometryShader::CreateFromSourceFile returned null");
+		}
+
+		inline void Bind()
+		{
+			if (fileWatcher.Check())
+			{
+				auto newShader = GeometryShader::CreateFromSourceFile(fileWatcher.GetFilename());
+				if (newShader) shader = newShader;
+			}
+			shader->Bind();
+		}
+
+		inline void Unbind() { shader->Unbind(); }
+
+		inline void OnImgui()
+		{
+			ImGui::Text("Dynamic file: %s", fileWatcher.GetFilename().c_str());
+			shader->OnImgui();
+		}
+
+	protected:
+		std::shared_ptr<GeometryShader> shader;
 		FileWatcher fileWatcher;
 	};
 }

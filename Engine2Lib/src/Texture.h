@@ -31,7 +31,8 @@ namespace Engine2
 
 	protected:
 		unsigned int slot;
-		std::string name = "Texture";
+		std::string name;
+		std::string info;
 
 		std::shared_ptr<TextureSampler> pSampler = nullptr;
 

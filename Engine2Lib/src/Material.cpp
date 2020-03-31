@@ -7,6 +7,7 @@ namespace Engine2
 	{
 		pVS->Bind();
 		pPS->Bind();
+		if (pGS) pGS->Bind();
 		if (pTexture) pTexture->Bind();
 
 		for (auto& r : resources) r->Bind();
@@ -27,7 +28,17 @@ namespace Engine2
 			ImGui::TreePop();
 		}
 
-		if (pTexture) pTexture->OnImgui();
+		if (pGS && ImGui::TreeNode("Geometry shader"))
+		{
+			pGS->OnImgui();
+			ImGui::TreePop();
+		}
+
+		if (pTexture && ImGui::TreeNode("Texture"))
+		{
+			pTexture->OnImgui();
+			ImGui::TreePop();
+		}
 
 		if (ImGui::TreeNode("Resources"))
 		{

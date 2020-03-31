@@ -17,6 +17,7 @@ namespace Engine2
 
 		std::shared_ptr<Shader> pVS;
 		std::shared_ptr<Shader> pPS;
+		std::shared_ptr<Shader> pGS;
 		std::shared_ptr<Texture> pTexture;
 
 		ResourceVector resources;

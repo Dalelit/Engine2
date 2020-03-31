@@ -34,6 +34,8 @@ namespace Engine2
 
 		~ConstantBuffer() {};
 
+		virtual void Unbind() = 0;
+
 		void UpdateBuffer()
 		{
 			// to do: D3D11_MAP_WRITE_DISCARD v D3D11_MAP_WRITE_NO_OVERWRITE ?
@@ -68,6 +70,8 @@ namespace Engine2
 			this->UpdateBuffer();
 			Engine::GetContext().PSSetConstantBuffers(this->slot, 1u, this->pConstantBuffer.GetAddressOf());
 		}
+
+		void Unbind() { Engine::GetContext().PSSetConstantBuffers(this->slot, 0u, nullptr); }
 	};
 
 	template <typename T>
@@ -81,6 +85,23 @@ namespace Engine2
 			this->UpdateBuffer();
 			Engine::GetContext().VSSetConstantBuffers(this->slot, 1u, this->pConstantBuffer.GetAddressOf());
 		}
+
+		void Unbind() { Engine::GetContext().VSSetConstantBuffers(this->slot, 0u, nullptr); }
+	};
+
+	template <typename T>
+	class GSConstantBuffer : public ConstantBuffer<T>
+	{
+	public:
+		GSConstantBuffer(unsigned int bindSlot = 0) : ConstantBuffer<T>(bindSlot) {}
+
+		void Bind()
+		{
+			this->UpdateBuffer();
+			Engine::GetContext().GSSetConstantBuffers(this->slot, 1u, this->pConstantBuffer.GetAddressOf());
+		}
+
+		void Unbind() { Engine::GetContext().GSSetConstantBuffers(this->slot, 0u, nullptr); }
 	};
 
 }

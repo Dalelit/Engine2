@@ -39,6 +39,9 @@ namespace Engine2
 		hr = Engine::GetDevice().CreateShaderResourceView(pTexture.Get(), &srvDesc, &pSRView);
 
 		E2_ASSERT_HR(hr, "CreateShaderResourceView failed");
+
+		name = "Texture2D " + std::to_string(texDesc.Width) + "x" + std::to_string(texDesc.Height);
+		info = "MipsLevels " + std::to_string(srvDesc.Texture2D.MipLevels);
 	}
 
 	void Texture::Bind()
@@ -49,11 +52,9 @@ namespace Engine2
 
 	void Texture::OnImgui()
 	{
-		if (ImGui::TreeNode(name.c_str()))
-		{
-			ImGui::Text("Slot %i", slot);
-			ImGui::TreePop();
-		}
+		ImGui::Text(name.c_str());
+		ImGui::Text("Slot %i", slot);
+		ImGui::Text(info.c_str());
 	}
 
 	TextureSampler::TextureSampler(D3D11_FILTER filter, D3D11_TEXTURE_ADDRESS_MODE addressMode)

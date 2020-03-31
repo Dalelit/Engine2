@@ -12,10 +12,53 @@ namespace Engine2
 
 	///////////////// Vertex shaders /////////////////
 
+	VertexShader::VertexShader(ID3DBlob& shaderBlob, VertexShaderLayout& layout, std::string name)
+	{
+		this->name = name;
+
+		HRESULT hr;
+
+		hr = Engine::GetDevice().CreateVertexShader(
+			shaderBlob.GetBufferPointer(),
+			shaderBlob.GetBufferSize(),
+			nullptr,
+			&pVertexShader);
+
+		E2_ASSERT_HR(hr, "VertexShader CreateVertexShader failed");
+
+		std::vector<D3D11_INPUT_ELEMENT_DESC> inputDesc(layout.size());
+
+		for (int i = 0; i < layout.size(); i++)
+		{
+			inputDesc[i].SemanticName = layout[i].name.c_str();
+			inputDesc[i].SemanticIndex = 0;
+			inputDesc[i].Format = layout[i].format;
+			inputDesc[i].InputSlot = 0u;
+			inputDesc[i].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+			inputDesc[i].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+			inputDesc[i].InstanceDataStepRate = 0u;
+		}
+
+		hr = Engine::GetDevice().CreateInputLayout(
+			inputDesc.data(),
+			(UINT)inputDesc.size(),
+			shaderBlob.GetBufferPointer(),
+			shaderBlob.GetBufferSize(),
+			&pInputLayout);
+
+		E2_ASSERT_HR(hr, "VertexShader CreateInputLayout failed");
+	}
+
 	void VertexShader::Bind()
 	{
 		Engine::GetContext().VSSetShader(pVertexShader.Get(), nullptr, 0u);
 		Engine::GetContext().IASetInputLayout(pInputLayout.Get());
+	}
+
+	void VertexShader::Unbind()
+	{
+		Engine::GetContext().VSSetShader(nullptr, nullptr, 0u);
+		Engine::GetContext().IASetInputLayout(nullptr);
 	}
 
 	std::shared_ptr<VertexShader> VertexShader::CreateFromString(std::string& src, VertexShaderLayout& layout, std::string entryPoint, std::string target)
@@ -57,42 +100,6 @@ namespace Engine2
 		return std::make_shared<VertexShader>(*pBlob.Get(), layout, "Vertex Shader, source file: " + filename + " " + entryPoint + " " + target);
 	}
 
-	VertexShader::VertexShader(ID3DBlob& shaderBlob, VertexShaderLayout& layout, std::string name)
-	{
-		this->name = name;
-
-		HRESULT hr;
-		
-		hr = Engine::GetDevice().CreateVertexShader(
-			shaderBlob.GetBufferPointer(),
-			shaderBlob.GetBufferSize(),
-			nullptr,
-			&pVertexShader);
-
-		E2_ASSERT_HR(hr, "VertexShader CreateVertexShader failed");
-
-		std::vector<D3D11_INPUT_ELEMENT_DESC> inputDesc(layout.size());
-
-		for (int i = 0; i < layout.size(); i++)
-		{
-			inputDesc[i].SemanticName = layout[i].name.c_str();
-			inputDesc[i].SemanticIndex = 0;
-			inputDesc[i].Format = layout[i].format;
-			inputDesc[i].InputSlot = 0u;
-			inputDesc[i].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-			inputDesc[i].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-			inputDesc[i].InstanceDataStepRate = 0u;
-		}
-
-		hr = Engine::GetDevice().CreateInputLayout(
-			inputDesc.data(),
-			(UINT)inputDesc.size(),
-			shaderBlob.GetBufferPointer(),
-			shaderBlob.GetBufferSize(),
-			&pInputLayout);
-
-		E2_ASSERT_HR(hr, "VertexShader CreateInputLayout failed");
-	}
 
 	///////////////// Pixel shaders /////////////////
 
@@ -112,6 +119,11 @@ namespace Engine2
 	void PixelShader::Bind()
 	{
 		Engine::GetContext().PSSetShader(pPixelShader.Get(), nullptr, 0u);
+	}
+
+	void PixelShader::Unbind()
+	{
+		Engine::GetContext().PSSetShader(nullptr, nullptr, 0u);
 	}
 
 	std::shared_ptr<PixelShader> PixelShader::CreateFromString(std::string& src, std::string entryPoint, std::string target)
@@ -151,6 +163,44 @@ namespace Engine2
 		if (FAILED(hr)) return nullptr;
 
 		return std::make_shared<PixelShader>(*pBlob.Get(), "Pixel Shader, source file: " + filename + " "+ entryPoint + " " + target);
+	}
+
+	///////////////// Geometry shaders /////////////////
+
+
+	GeometryShader::GeometryShader(ID3DBlob& shaderBlob, std::string name)
+	{
+		this->name = name;
+
+		HRESULT hr = Engine::GetDevice().CreateGeometryShader(
+			shaderBlob.GetBufferPointer(),
+			shaderBlob.GetBufferSize(),
+			nullptr,
+			&pGeometryShader);
+
+		E2_ASSERT_HR(hr, "GeometryShader CreateGeometryShader failed");
+	}
+
+	void GeometryShader::Bind()
+	{
+		Engine::GetContext().GSSetShader(pGeometryShader.Get(), nullptr, 0u);
+	}
+
+	void GeometryShader::Unbind()
+	{
+		Engine::GetContext().GSSetShader(nullptr, nullptr, 0u);
+	}
+
+	std::shared_ptr<GeometryShader> GeometryShader::CreateFromSourceFile(std::string& filename, std::string entryPoint, std::string target)
+	{
+		wrl::ComPtr<ID3DBlob> pBlob;
+		wrl::ComPtr<ID3DBlob> pErrBlob;
+
+		HRESULT hr = D3DCompileFromFile(Util::ToWString(filename).c_str(), 0, D3D_COMPILE_STANDARD_FILE_INCLUDE, entryPoint.c_str(), target.c_str(), 0, 0, &pBlob, &pErrBlob);
+
+		if (FAILED(hr)) return nullptr;
+
+		return std::make_shared<GeometryShader>(*pBlob.Get(), "Geometry Shader, source file: " + filename + " " + entryPoint + " " + target);
 	}
 
 }

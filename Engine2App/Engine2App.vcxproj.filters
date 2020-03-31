@@ -13,12 +13,16 @@
     <ClInclude Include="src\Voxel.h" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Assets\Shaders\VSTest.hlsl" />
-    <FxCompile Include="Assets\Shaders\PSTest.hlsl" />
     <FxCompile Include="Assets\Materials\MaterialTest1VS.hlsl" />
     <FxCompile Include="Assets\Materials\MaterialTest1PS.hlsl" />
     <FxCompile Include="Assets\Materials\SceneEntityCBVS.hlsl" />
     <FxCompile Include="Assets\Materials\BoxWorldCubeVS.hlsl" />
     <FxCompile Include="Assets\Materials\BoxWorldCubePS.hlsl" />
+    <FxCompile Include="Assets\Materials\PSTest.hlsl" />
+    <FxCompile Include="Assets\Materials\VSTest.hlsl" />
+    <FxCompile Include="Assets\Materials\GSTest.hlsl" />
+    <FxCompile Include="Assets\Materials\BW_GSTest_PS.hlsl" />
+    <FxCompile Include="Assets\Materials\BW_GSTest_GS.hlsl" />
+    <FxCompile Include="Assets\Materials\BW_GSTest_VS.hlsl" />
   </ItemGroup>
 </Project>
