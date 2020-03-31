@@ -60,7 +60,8 @@ void BoxWorld::CreateScene()
 	model->pMesh = std::make_shared<MeshTriangleIndexList<XMFLOAT3>>(MeshPrimatives::Cube::vertexPositions, MeshPrimatives::Cube::indicies);
 
 	Surface2D<XMFLOAT4> tex(2, 2);
-	tex.SetValue(0, 0, { 1.0f, 1.0f, 1.0f, 1.0f});
+	tex.Clear({ 0.0f, 0.0f, 0.0f, 1.0f });
+	tex.SetValue(0, 0, { 1.0f, 1.0f, 1.0f, 1.0f });
 	tex.SetValue(1, 1, { 1.0f, 1.0f, 1.0f, 1.0f });
 
 	model->pMaterial = std::make_shared<Material>("Cube1");
