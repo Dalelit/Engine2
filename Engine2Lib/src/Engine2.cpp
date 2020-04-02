@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Common.h"
 #include "Engine2.h"
+#include "Instrumentation.h"
 
 namespace Engine2
 {
@@ -133,6 +134,9 @@ namespace Engine2
 		static bool statsOpen = true;
 		if (statsOpen) ImguiStatsWindow(&statsOpen);
 
+		static bool memoryOpen = true;
+		if (memoryOpen) Instrumentation::ImguiWindow(&memoryOpen);
+
 		static bool inputControllerOpen = true;
 		if (inputControllerOpen) inputController.ImguiWindow(&inputControllerOpen);
 
@@ -147,6 +151,7 @@ namespace Engine2
 				{
 					ImGui::MenuItem("Demo window", nullptr, &demoOpen);
 					ImGui::MenuItem("Stats overlay", nullptr, &statsOpen);
+					ImGui::MenuItem("Memory overlay", nullptr, &memoryOpen);
 					ImGui::EndMenu();
 				}
 				ImGui::EndMenuBar();
