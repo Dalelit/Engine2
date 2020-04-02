@@ -2,6 +2,7 @@
 
 #include "Common.h"
 #include "DXDevice.h"
+#include "Resources.h"
 #include "DXImgui.h"
 #include "Events.h"
 #include "Layer.h"

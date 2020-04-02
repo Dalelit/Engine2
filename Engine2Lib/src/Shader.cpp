@@ -6,17 +6,21 @@ namespace Engine2
 {
 	void Shader::OnImgui()
 	{
-		ImGui::Text(name.c_str());
-		if (source.size() > 0) ImGui::Text(source.c_str());
+		if (ImGui::TreeNode(name.c_str()))
+		{
+			ImGui::Text(info.c_str());
+			ImGui::TreePop();
+		}
 	}
 
 	///////////////// Vertex shaders /////////////////
 
-	VertexShader::VertexShader(ID3DBlob& shaderBlob, VertexShaderLayout& layout, std::string name)
+	VertexShader::VertexShader(ID3DBlob& shaderBlob, VertexShaderLayout& layout, std::string info)
 	{
-		this->name = name;
+		this->name = "VertexShader";
+		this->info = info;
 
-		HRESULT hr;
+			HRESULT hr;
 
 		hr = Engine::GetDevice().CreateVertexShader(
 			shaderBlob.GetBufferPointer(),
@@ -70,11 +74,7 @@ namespace Engine2
 
 		E2_ASSERT_HR(hr, "VertexShader D3DCompile failed");
 
-		auto shader = std::make_shared<VertexShader>(*pBlob.Get(), layout, "Vertex Shader, string: " + entryPoint + " " + target);
-
-		shader->source = src;
-
-		return shader;
+		return std::make_shared<VertexShader>(*pBlob.Get(), layout, entryPoint + " " + target + "\nSource string\n" + src);
 	}
 
 	std::shared_ptr<VertexShader> VertexShader::CreateFromCompiledFile(std::string& filename, VertexShaderLayout& layout)
@@ -85,7 +85,7 @@ namespace Engine2
 
 		E2_ASSERT_HR(hr, "VertexShader D3DReadFileToBlob failed");
 
-		return std::make_shared<VertexShader>(*pBlob.Get(), layout, "Vertex Shader, compiled file: " + filename);
+		return std::make_shared<VertexShader>(*pBlob.Get(), layout, "Compiled file: " + filename);
 	}
 
 	std::shared_ptr<VertexShader> VertexShader::CreateFromSourceFile(std::string& filename, VertexShaderLayout& layout, std::string entryPoint, std::string target)
@@ -97,15 +97,16 @@ namespace Engine2
 
 		if (FAILED(hr)) return nullptr;
 
-		return std::make_shared<VertexShader>(*pBlob.Get(), layout, "Vertex Shader, source file: " + filename + " " + entryPoint + " " + target);
+		return std::make_shared<VertexShader>(*pBlob.Get(), layout, "Source file: " + filename + "\n" + entryPoint + " " + target);
 	}
 
 
 	///////////////// Pixel shaders /////////////////
 
-	PixelShader::PixelShader(ID3DBlob& shaderBlob, std::string name)
+	PixelShader::PixelShader(ID3DBlob& shaderBlob, std::string info)
 	{
-		this->name = name;
+		this->name = "PixelShader";
+		this->info = info;
 
 		HRESULT hr = Engine::GetDevice().CreatePixelShader(
 			shaderBlob.GetBufferPointer(),
@@ -135,11 +136,7 @@ namespace Engine2
 
 		E2_ASSERT_HR(hr, "PixelShader D3DCompile failed");
 
-		auto shader = std::make_shared<PixelShader>(*pBlob.Get(), "Pixel Shader, string: " + entryPoint + " " + target);
-
-		shader->source = src;
-
-		return shader;
+		return std::make_shared<PixelShader>(*pBlob.Get(), entryPoint + " " + target + "\nSource\n" + src);
 	}
 
 	std::shared_ptr<PixelShader> PixelShader::CreateFromCompiledFile(std::string& filename)
@@ -150,7 +147,7 @@ namespace Engine2
 
 		E2_ASSERT_HR(hr, "PixelShader D3DReadFileToBlob failed");
 
-		return std::make_shared<PixelShader>(*pBlob.Get(), "Pixel Shader, compiled file: " + filename);
+		return std::make_shared<PixelShader>(*pBlob.Get(), "Compiled file: " + filename);
 	}
 
 	std::shared_ptr<PixelShader> PixelShader::CreateFromSourceFile(std::string& filename, std::string entryPoint, std::string target)
@@ -162,15 +159,16 @@ namespace Engine2
 
 		if (FAILED(hr)) return nullptr;
 
-		return std::make_shared<PixelShader>(*pBlob.Get(), "Pixel Shader, source file: " + filename + " "+ entryPoint + " " + target);
+		return std::make_shared<PixelShader>(*pBlob.Get(), "Source file: " + filename + "\n"+ entryPoint + " " + target);
 	}
 
 	///////////////// Geometry shaders /////////////////
 
 
-	GeometryShader::GeometryShader(ID3DBlob& shaderBlob, std::string name)
+	GeometryShader::GeometryShader(ID3DBlob& shaderBlob, std::string info)
 	{
-		this->name = name;
+		this->name = "GeometryShader";
+		this->info = info;
 
 		HRESULT hr = Engine::GetDevice().CreateGeometryShader(
 			shaderBlob.GetBufferPointer(),
@@ -200,7 +198,7 @@ namespace Engine2
 
 		if (FAILED(hr)) return nullptr;
 
-		return std::make_shared<GeometryShader>(*pBlob.Get(), "Geometry Shader, source file: " + filename + " " + entryPoint + " " + target);
+		return std::make_shared<GeometryShader>(*pBlob.Get(), "Source file: " + filename + "\n" + entryPoint + " " + target);
 	}
 
 }

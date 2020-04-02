@@ -50,11 +50,21 @@ namespace Engine2
 		Engine::GetContext().PSSetSamplers(slot, 1u, pSampler->GetSamplerState().GetAddressOf());
 	}
 
+	void Texture::Unbind()
+	{
+		// to do: untested
+		Engine::GetContext().PSSetShaderResources(slot, 0u, nullptr);
+		Engine::GetContext().PSSetSamplers(slot, 0u, nullptr);
+	}
+
 	void Texture::OnImgui()
 	{
-		ImGui::Text(name.c_str());
-		ImGui::Text("Slot %i", slot);
-		ImGui::Text(info.c_str());
+		if (ImGui::TreeNode(name.c_str()))
+		{
+			ImGui::Text("Slot %i", slot);
+			ImGui::Text(info.c_str());
+			ImGui::TreePop();
+		}
 	}
 
 	TextureSampler::TextureSampler(D3D11_FILTER filter, D3D11_TEXTURE_ADDRESS_MODE addressMode)

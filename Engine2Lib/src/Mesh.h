@@ -6,12 +6,10 @@
 
 namespace Engine2
 {
-	class Mesh
+	class Mesh : public Drawable
 	{
 	public:
 		virtual ~Mesh() = default;
-		virtual void Bind() = 0;
-		virtual void Draw() = 0;
 		virtual void OnImgui() { ImGui::Text(info.c_str()); }
 
 	protected:
@@ -54,6 +52,11 @@ namespace Engine2
 		void Bind() {
 			Engine::GetContext().IASetPrimitiveTopology(topology);
 			Engine::GetContext().IASetVertexBuffers(slot, numberOfBuffers, pVertexBuffer.GetAddressOf(), bufferStrides, bufferOffsets);
+		}
+
+		void Unbind() {
+			// to do: untested
+			Engine::GetContext().IASetVertexBuffers(slot, numberOfBuffers, nullptr, 0, 0);
 		}
 
 		void Draw() {
@@ -110,6 +113,12 @@ namespace Engine2
 			Engine::GetContext().IASetPrimitiveTopology(this->topology);
 			Engine::GetContext().IASetVertexBuffers(this->slot, this->numberOfBuffers, this->pVertexBuffer.GetAddressOf(), this->bufferStrides, this->bufferOffsets);
 			Engine::GetContext().IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0u);
+		}
+
+		void Unbind() {
+			// to do: untested
+			Engine::GetContext().IASetVertexBuffers(this->slot, 0, nullptr, 0, 0);
+			Engine::GetContext().IASetIndexBuffer(nullptr, DXGI_FORMAT_R32_UINT, 0u);
 		}
 
 		void Draw() {

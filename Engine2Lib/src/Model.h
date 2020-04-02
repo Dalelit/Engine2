@@ -3,7 +3,7 @@
 #include "pch.h"
 #include "Common.h"
 #include "Mesh.h"
-#include "Material.h"
+#include "RenderNode.h"
 #include "Entity.h"
 
 namespace Engine2
@@ -14,7 +14,7 @@ namespace Engine2
 		Model(std::string name) : name(name) {}
 
 		std::shared_ptr<Mesh> pMesh;
-		std::shared_ptr<Material> pMaterial;
+		std::shared_ptr<RenderNode> pMaterial;
 
 		void OnRender();
 

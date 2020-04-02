@@ -60,7 +60,7 @@ void Playground::AddModel1()
 
 	model->pMesh = std::make_shared<MeshTriangleList<Vertex>>(verticies);
 
-	model->pMaterial = std::make_shared<Material>("Material 1");
+	model->pMaterial = std::make_shared<RenderNode>("Material 1");
 
 	std::string vsCode = scene.GetVSCBHLSL() + EntityInstances::GetVSCBHLSL() + R"(
 		float4 main(float3 pos : Position) : SV_POSITION
@@ -68,7 +68,7 @@ void Playground::AddModel1()
 			return mul(mul(float4(pos, 1.0f), entityTransform), cameraTransform);
 		})";
 
-	model->pMaterial->pVS = VertexShader::CreateFromString(vsCode, vsLayout);
+	model->pMaterial->AddBindable(VertexShader::CreateFromString(vsCode, vsLayout));
 
 	std::string psCode = R"(
 		float4 main() : SV_TARGET
@@ -76,7 +76,7 @@ void Playground::AddModel1()
 			return float4(0.8f, 0.2f, 0.2f, 1.0f);
 		})";
 
-	model->pMaterial->pPS = PixelShader::CreateFromString(psCode);
+	model->pMaterial->AddBindable(PixelShader::CreateFromString(psCode));
 
 	model->entities.instances.emplace_back(Entity());
 }
@@ -104,7 +104,7 @@ void Playground::AddModel2()
 
 	model->pMesh = std::make_shared<MeshTriangleList<Vertex>>(verticies);
 
-	model->pMaterial = std::make_shared<Material>("Material 2");
+	model->pMaterial = std::make_shared<RenderNode>("Material 2");
 
 	std::string vsCode = scene.GetVSCBHLSL() + EntityInstances::GetVSCBHLSL() + R"(
 		struct VSOut
@@ -123,7 +123,7 @@ void Playground::AddModel2()
 			return vso;
 		})";
 
-	model->pMaterial->pVS = VertexShader::CreateFromString(vsCode, vsLayout);
+	model->pMaterial->AddBindable(VertexShader::CreateFromString(vsCode, vsLayout));
 
 	std::string psCode = R"(
 		float4 main(float4 col : Color) : SV_TARGET
@@ -131,7 +131,7 @@ void Playground::AddModel2()
 			return col;
 		})";
 
-	model->pMaterial->pPS = PixelShader::CreateFromString(psCode);
+	model->pMaterial->AddBindable(PixelShader::CreateFromString(psCode));
 
 	model->entities.instances.emplace_back(Entity());
 }
@@ -157,7 +157,7 @@ void Playground::AddModel3()
 
 	model->pMesh = std::make_shared<MeshTriangleList<Vertex>>(verticies);
 
-	model->pMaterial = std::make_shared<Material>("Material 3");
+	model->pMaterial = std::make_shared<RenderNode>("Material 3");
 
 	struct ConstData
 	{
@@ -166,7 +166,7 @@ void Playground::AddModel3()
 
 	auto pscb = std::make_shared<PSConstantBuffer<ConstData>>();
 	pscb->data = { {0.2f, 0.8f, 0.6f, 1.0f} };
-	model->pMaterial->resources.push_back(pscb);
+	model->pMaterial->AddBindable(pscb);
 
 	std::string vsCode = scene.GetVSCBHLSL() + EntityInstances::GetVSCBHLSL() + R"(
 		float4 main(float3 pos : Position) : SV_POSITION
@@ -174,7 +174,7 @@ void Playground::AddModel3()
 			return mul(mul(float4(pos, 1.0f), entityTransform), cameraTransform);
 		})";
 
-	model->pMaterial->pVS = VertexShader::CreateFromString(vsCode, vsLayout);
+	model->pMaterial->AddBindable(VertexShader::CreateFromString(vsCode, vsLayout));
 
 	std::string psCode = R"(
 		cbuffer sceneBuffer
@@ -187,7 +187,7 @@ void Playground::AddModel3()
 			return color;
 		})";
 
-	model->pMaterial->pPS = PixelShader::CreateFromString(psCode);
+	model->pMaterial->AddBindable(PixelShader::CreateFromString(psCode));
 
 	auto* ptr = &pscb->data;
 	pscb->ImguiFunc = [ptr]() {
@@ -238,7 +238,7 @@ void Playground::AddModel4()
 
 	model->pMesh = std::make_shared<MeshTriangleIndexList<Vertex>>(verticies, indicies);
 
-	model->pMaterial = std::make_shared<Material>("Material 4");
+	model->pMaterial = std::make_shared<RenderNode>("Material 4");
 
 	//std::string vsfilename = Config::directories["ShaderCompiledDir"] + "MaterialTest1VS.cso";
 	//model->pMaterial->pVS = VertexShader::CreateFromCompiledFile(vsfilename, vsLayout);
@@ -249,16 +249,15 @@ void Playground::AddModel4()
 	auto vs = VertexShader::CreateFromSourceFile(vsfilename, vsLayout);
 	E2_ASSERT(vs, "VertexShader::CreateFromSourceFile returned null");
 
-	auto vsd = std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout, vs);
-	model->pMaterial->pVS = vsd;
+	model->pMaterial->AddBindable(std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout, vs));
+	
 
 	std::string psfilename = Config::directories["ShaderSourceDir"] + "MaterialTest1PS.hlsl";
 	auto ps = PixelShader::CreateFromSourceFile(psfilename);
 	E2_ASSERT(ps, "PixelShader::CreateFromSourceFile returned null");
 
-	auto psd = std::make_shared<PixelShaderDynamic>(psfilename, ps);
-	model->pMaterial->pPS = psd;
-
+	model->pMaterial->AddBindable(std::make_shared<PixelShaderDynamic>(psfilename, ps));
+	
 	model->entities.instances.reserve(3);
 	model->entities.instances.emplace_back(Entity());
 	model->entities.instances.emplace_back(Entity({ 2.0f, 0.0f, 0.0f, 1.0f }));

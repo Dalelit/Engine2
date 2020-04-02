@@ -18,8 +18,9 @@ namespace Engine2
 			}
 		}
 
-		if (pMaterial->pGS) pMaterial->pGS->Unbind(); // to do: temp - do this as most things don't have a GS
+		pMaterial->UnbindAfterDraw();
 	}
+
 	void Model::OnImgui()
 	{
 		if (ImGui::TreeNode(name.c_str()))

@@ -17,13 +17,14 @@ namespace Engine2
 		Microsoft::WRL::ComPtr<ID3D11SamplerState> pSamplerState = nullptr;
 	};
 
-	class Texture
+	class Texture : public Bindable
 	{
 	public:
 		Texture(unsigned int slot, Surface& surface, DXGI_FORMAT format);
 		~Texture() = default;
 
 		void Bind();
+		void Unbind();
 
 		void SetSampler(std::shared_ptr<TextureSampler> pTexSampler) { pSampler = pTexSampler; }
 

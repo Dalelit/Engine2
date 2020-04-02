@@ -6,7 +6,7 @@
 
 namespace Engine2
 {
-	class Shader
+	class Shader : public Bindable
 	{
 	public:
 		virtual ~Shader() = default;
@@ -18,7 +18,7 @@ namespace Engine2
 
 	protected:
 		std::string name;
-		std::string source;
+		std::string info;
 	};
 
 	struct VertexShaderLayoutElement
@@ -34,7 +34,7 @@ namespace Engine2
 	class VertexShader : public Shader
 	{
 	public:
-		VertexShader(ID3DBlob& shaderBlob, VertexShaderLayout& layout, std::string name);
+		VertexShader(ID3DBlob& shaderBlob, VertexShaderLayout& layout, std::string info);
 		void Bind();
 		void Unbind();
 
@@ -52,7 +52,7 @@ namespace Engine2
 	class PixelShader : public Shader
 	{
 	public:
-		PixelShader(ID3DBlob& shaderBlob, std::string name);
+		PixelShader(ID3DBlob& shaderBlob, std::string info);
 		void Bind();
 		void Unbind();
 
@@ -69,7 +69,7 @@ namespace Engine2
 	class GeometryShader : public Shader
 	{
 	public:
-		GeometryShader(ID3DBlob& shaderBlob, std::string name);
+		GeometryShader(ID3DBlob& shaderBlob, std::string info);
 		void Bind();
 		void Unbind();
 
@@ -112,8 +112,12 @@ namespace Engine2
 
 		inline void OnImgui()
 		{
-			ImGui::Text("Dynamic file: %s", fileWatcher.GetFilename().c_str());
-			shader->OnImgui();
+			if (ImGui::TreeNode("Dynamic Vertex Shader"))
+			{
+				ImGui::Text("Watching file: %s", fileWatcher.GetFilename().c_str());
+				shader->OnImgui();
+				ImGui::TreePop();
+			}
 		}
 
 	protected:
@@ -152,8 +156,12 @@ namespace Engine2
 
 		inline void OnImgui()
 		{
-			ImGui::Text("Dynamic file: %s", fileWatcher.GetFilename().c_str());
-			shader->OnImgui();
+			if (ImGui::TreeNode("Dynamic Pixel Shader"))
+			{
+				ImGui::Text("Watching file: %s", fileWatcher.GetFilename().c_str());
+				shader->OnImgui();
+				ImGui::TreePop();
+			}
 		}
 
 	protected:
@@ -191,8 +199,12 @@ namespace Engine2
 
 		inline void OnImgui()
 		{
-			ImGui::Text("Dynamic file: %s", fileWatcher.GetFilename().c_str());
-			shader->OnImgui();
+			if (ImGui::TreeNode("Dynamic Geometry Shader"))
+			{
+				ImGui::Text("Watching file: %s", fileWatcher.GetFilename().c_str());
+				shader->OnImgui();
+				ImGui::TreePop();
+			}
 		}
 
 	protected:

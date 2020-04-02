@@ -1,11 +1,12 @@
 #pragma once
 #include "Common.h"
+#include "Resources.h"
 #include "Engine2.h"
 
 namespace Engine2
 {
 	template <typename T>
-	class ConstantBuffer : public Resource
+	class ConstantBuffer : public Bindable
 	{
 	public:
 		T data = {};
@@ -54,6 +55,17 @@ namespace Engine2
 
 			context.Unmap(ptrBuffer, 0);
 		}
+
+		void OnImgui()
+		{
+			if (ImGui::TreeNode("Constant buffer"))
+			{
+				if (ImguiFunc) ImguiFunc();
+				ImGui::TreePop();
+			}
+		}
+
+		std::function<void()> ImguiFunc = nullptr;
 
 	protected:
 		wrl::ComPtr<ID3D11Buffer> pConstantBuffer = nullptr;

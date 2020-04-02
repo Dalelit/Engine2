@@ -154,6 +154,7 @@
     <ClInclude Include="src\Entity.h" />
     <ClInclude Include="src\InputController.h" />
     <ClInclude Include="src\MeshPrimatives.h" />
+    <ClInclude Include="src\Resources.h" />
     <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\ConstantBuffer.h" />
@@ -163,7 +164,7 @@
     <ClInclude Include="src\Events.h" />
     <ClInclude Include="src\DXDevice.h" />
     <ClInclude Include="src\Engine2.h" />
-    <ClInclude Include="src\Material.h" />
+    <ClInclude Include="src\RenderNode.h" />
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\pch.h" />
@@ -191,7 +192,6 @@
     <ClCompile Include="src\Events.cpp" />
     <ClCompile Include="src\DXDevice.cpp" />
     <ClCompile Include="src\Engine2.cpp" />
-    <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

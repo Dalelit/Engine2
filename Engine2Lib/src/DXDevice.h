@@ -5,15 +5,6 @@ namespace wrl = Microsoft::WRL;
 
 namespace Engine2
 {
-	class Resource
-	{
-	public:
-		virtual void Bind() = 0;
-		std::function<void()> ImguiFunc = nullptr;
-	};
-
-	typedef std::vector<std::shared_ptr<Resource>> ResourceVector;
-
 	class DXDevice
 	{
 	public:

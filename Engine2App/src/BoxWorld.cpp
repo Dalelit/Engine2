@@ -64,16 +64,17 @@ void BoxWorld::CreateScene()
 	tex.SetValue(0, 0, { 1.0f, 1.0f, 1.0f, 1.0f });
 	tex.SetValue(1, 1, { 1.0f, 1.0f, 1.0f, 1.0f });
 
-	model->pMaterial = std::make_shared<Material>("Cube1");
+	model->pMaterial = std::make_shared<RenderNode>("Cube1");
 
-	model->pMaterial->pTexture = std::make_shared<Texture>(0, tex, DXGI_FORMAT_R32G32B32A32_FLOAT);
-	model->pMaterial->pTexture->SetSampler(std::make_shared<TextureSampler>(D3D11_FILTER_MIN_MAG_MIP_POINT, D3D11_TEXTURE_ADDRESS_WRAP));
+	auto pTexture = std::make_shared<Texture>(0, tex, DXGI_FORMAT_R32G32B32A32_FLOAT);
+	pTexture->SetSampler(std::make_shared<TextureSampler>(D3D11_FILTER_MIN_MAG_MIP_POINT, D3D11_TEXTURE_ADDRESS_WRAP));
+	model->pMaterial->AddBindable(pTexture);
 
 	std::string vsfilename = Config::directories["ShaderSourceDir"] + "BoxWorldCubeVS.hlsl";
-	model->pMaterial->pVS = std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout);
+	model->pMaterial->AddBindable(std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout));
 
 	std::string psfilename = Config::directories["ShaderSourceDir"] + "BoxWorldCubePS.hlsl";
-	model->pMaterial->pPS = std::make_shared<PixelShaderDynamic>(psfilename);
+	model->pMaterial->AddBindable(std::make_shared<PixelShaderDynamic>(psfilename));
 
 	pVoxel = std::make_unique<Voxel>(3, 3, 3);
 
@@ -96,10 +97,10 @@ void BoxWorld::GSTestScene()
 
 	auto model = std::make_shared<Model>("GS +4 Cube");
 	model->pMesh = std::make_shared<MeshTriangleIndexList<XMFLOAT3>>(MeshPrimatives::Cube::vertexPositions, MeshPrimatives::Cube::indicies);
-	model->pMaterial = std::make_shared<Material>("VSGSPSTest");
-	model->pMaterial->pVS = std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout);
-	model->pMaterial->pPS = std::make_shared<PixelShaderDynamic>(psfilename);
-	model->pMaterial->pGS = std::make_shared<GeometryShaderDynamic>(gsfilename);
+	model->pMaterial = std::make_shared<RenderNode>("VSGSPSTest");
+	model->pMaterial->AddBindable(std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout));
+	model->pMaterial->AddBindable(std::make_shared<PixelShaderDynamic>(psfilename));
+	model->pMaterial->AddBindable(std::make_shared<GeometryShaderDynamic>(gsfilename), true);
 	model->entities.instances.emplace_back(4.0f, 0.0f, 0.0f);
 	models.push_back(model);
 
