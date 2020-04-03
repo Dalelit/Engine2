@@ -13,9 +13,9 @@ namespace Engine2
 	public:
 		RenderNode(std::string name) : name(name) {}
 		~RenderNode() = default;
-		void Bind()            { for (auto r : resources) r->Bind(); };
-		void Unbind()          { for (auto r : resources) r->Unbind(); };
-		void UnbindAfterDraw() { for (auto r : resourcesToUnbind) r->Unbind(); };
+		void Bind()            { for (auto& r : resources) r->Bind(); };
+		void Unbind()          { for (auto& r : resources) r->Unbind(); };
+		void UnbindAfterDraw() { for (auto& r : resourcesToUnbind) r->Unbind(); };
 
 		void AddBindable(std::shared_ptr<Bindable> pBindable, bool unbindAfterDraw = false)
 		{
@@ -25,8 +25,8 @@ namespace Engine2
 
 		void OnImgui()
 		{
-			ImGui::Text(("Material: " + name).c_str());
-			for (auto r : resources) r->OnImgui();
+			ImGui::Text("Material: %s", name.c_str());
+			for (auto& r : resources) r->OnImgui();
 		}
 
 	protected:

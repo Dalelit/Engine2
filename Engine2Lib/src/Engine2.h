@@ -58,6 +58,8 @@ namespace Engine2 {
 		Instrumentation::Timer frameTime;
 		Instrumentation::MemoryTracker updateMemory;
 		Instrumentation::MemoryTracker renderMemory;
+		Instrumentation::MemoryTracker renderLayersMemory;
+		Instrumentation::MemoryTracker renderImguiMemory;
 	};
 
 }

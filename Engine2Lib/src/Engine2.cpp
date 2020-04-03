@@ -54,26 +54,32 @@ namespace Engine2
 		// dx begin
 		device.BeginFrame();
 
+		renderLayersMemory.Set();
+
 		// render layers
 		if (!minimised)
 		{
-			for (auto layer : layers)
+			for (auto& layer : layers)
 			{
 				if (layer->IsActive()) layer->OnRender();
 			}
 		}
+		renderLayersMemory.Tick();
 
 		// render imgui
+		renderImguiMemory.Set();
+
 		if (imguiActive)
 		{
 			imgui.BeginFrame();
 
 			OnImgui(); // engine's own Imgui
 
-			for (auto layer : layers) layer->ImguiWindow();
+			for (auto& layer : layers) layer->ImguiWindow();
 
 			imgui.EndFrame();
 		}
+		renderImguiMemory.Tick();
 
 		frameTime.Tick();
 
@@ -182,8 +188,10 @@ namespace Engine2
 			frameRate.OnImgui();
 			ImGui::Text("Frame time");
 			frameTime.OnImgui();
-			ImGui::Text("Update mallocs %i", updateMemory.allocations.Average());
-			ImGui::Text("Render mallocs %i", renderMemory.allocations.Average());
+			ImGui::Text("Update mallocs %.1f", updateMemory.allocations.Average());
+			ImGui::Text("Render mallocs %.1f", renderMemory.allocations.Average());
+			ImGui::Text(" layer mallocs %.1f", renderLayersMemory.allocations.Average());
+			ImGui::Text(" Imgui mallocs %.1f", renderImguiMemory.allocations.Average());
 			ImGui::End();
 		}
 

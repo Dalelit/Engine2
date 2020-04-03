@@ -17,8 +17,6 @@ namespace Engine2
 		inline void SetRotation(float x, float y, float z) { rotation = { x, y, z, 1.0f }; }
 		inline void SetScale(float x, float y, float z) { scale = { x, y, z, 1.0f }; }
 
-		inline unsigned long GetID() { return id; }
-
 		inline void SetActive(bool makeActive = true) { active = makeActive; }
 		inline bool IsActive() { return active; }
 
@@ -30,7 +28,7 @@ namespace Engine2
 		static unsigned long entityCounter;
 
 		bool active = true;
-		unsigned long id;
+		std::string id;
 		DirectX::XMVECTOR position;
 		DirectX::XMVECTOR rotation;
 		DirectX::XMVECTOR scale;

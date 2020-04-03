@@ -25,8 +25,6 @@ private:
 	std::vector<std::shared_ptr<Engine2::Model>> models;
 	Engine2::Scene scene;
 
-	void OnMouseMove(Engine2::MouseMoveEvent& event);
-
 	void AddModel1();
 	void AddModel2();
 	void AddModel3();

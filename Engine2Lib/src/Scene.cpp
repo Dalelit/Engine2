@@ -13,8 +13,4 @@ namespace Engine2
 		Engine::Get().mainCamera.LoadViewProjectionMatrixT(vsConstBuffer.data.cameraTransform);
 		vsConstBuffer.Bind();
 	}
-
-	void Scene::OnImgui()
-	{
-	}
 }

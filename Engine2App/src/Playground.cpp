@@ -23,8 +23,6 @@ void Playground::OnRender()
 
 void Playground::OnImgui()
 {
-	scene.OnImgui();
-
 	ImGui::Checkbox("Active", &active);
 
 	for (auto& model : models) model->OnImgui();

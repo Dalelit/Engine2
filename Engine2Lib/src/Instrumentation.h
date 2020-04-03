@@ -24,14 +24,14 @@ namespace Engine2
 				data[current] = value;            // set the value
 			}
 
-			T Average()
+			float Average()
 			{
 				T amt = 0;
 				for (auto v : data)
 				{
 					amt += v;
 				}
-				return amt / (T)SIZE;
+				return (float)amt / (float)SIZE;
 			}
 
 			unsigned int current = 0;

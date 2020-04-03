@@ -11,7 +11,7 @@ namespace Engine2
 	Entity::Entity(XMVECTOR position,
 				   XMVECTOR rotation,
 				   XMVECTOR scale)
-		: id(entityCounter++),
+		: id(std::to_string(entityCounter++)),
 		  position(position),
 		  rotation(rotation),
 		  scale(scale)
@@ -30,7 +30,7 @@ namespace Engine2
 
 	void Entity::OnImgui()
 	{
-		if (ImGui::TreeNode(std::to_string(id).c_str()))
+		if (ImGui::TreeNode(id.c_str()))
 		{
 			// to do: change to float3?... leaving for now to make w visible
 			ImGui::Checkbox("Active", &active);
