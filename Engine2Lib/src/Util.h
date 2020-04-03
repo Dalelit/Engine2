@@ -30,15 +30,20 @@ namespace Engine2
 
 		inline std::string& GetFilename() { return filename; }
 
+		// note: replace std::filesystem::last_write_time(filename) with below as it was doing memory allocations
 		bool Check() {
-			auto currentWriteTime = std::filesystem::last_write_time(filename);
-			if (currentWriteTime == lastWriteTime) return false;
-			lastWriteTime = currentWriteTime;
-			return true;
+			WIN32_FILE_ATTRIBUTE_DATA data;
+			bool result = GetFileAttributesExA(filename.c_str(), GET_FILEEX_INFO_LEVELS::GetFileExInfoStandard, &data);
+			if (lastWriteTime.dwLowDateTime != data.ftLastWriteTime.dwLowDateTime || lastWriteTime.dwHighDateTime != data.ftLastWriteTime.dwHighDateTime)
+			{
+				lastWriteTime = data.ftLastWriteTime;
+				return true; // has changed
+			}
+			return false; // no change
 		}
 
 	protected:
 		std::string filename;
-		std::filesystem::file_time_type lastWriteTime;
+		FILETIME lastWriteTime = {};
 	};
 }

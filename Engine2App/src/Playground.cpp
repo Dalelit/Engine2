@@ -238,23 +238,12 @@ void Playground::AddModel4()
 
 	model->pMaterial = std::make_shared<RenderNode>("Material 4");
 
-	//std::string vsfilename = Config::directories["ShaderCompiledDir"] + "MaterialTest1VS.cso";
-	//model->pMaterial->pVS = VertexShader::CreateFromCompiledFile(vsfilename, vsLayout);
-	//std::string psfilename = Config::directories["ShaderCompiledDir"] + "MaterialTest1PS.cso";
-	//model->pMaterial->pPS = PixelShader::CreateFromCompiledFile(psfilename);
-
 	std::string vsfilename = Config::directories["ShaderSourceDir"] + "MaterialTest1VS.hlsl";
-	auto vs = VertexShader::CreateFromSourceFile(vsfilename, vsLayout);
-	E2_ASSERT(vs, "VertexShader::CreateFromSourceFile returned null");
+	model->pMaterial->AddBindable(std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout));
 
-	model->pMaterial->AddBindable(std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout, vs));
-	
 
 	std::string psfilename = Config::directories["ShaderSourceDir"] + "MaterialTest1PS.hlsl";
-	auto ps = PixelShader::CreateFromSourceFile(psfilename);
-	E2_ASSERT(ps, "PixelShader::CreateFromSourceFile returned null");
-
-	model->pMaterial->AddBindable(std::make_shared<PixelShaderDynamic>(psfilename, ps));
+	model->pMaterial->AddBindable(std::make_shared<PixelShaderDynamic>(psfilename));
 	
 	model->entities.instances.reserve(3);
 	model->entities.instances.emplace_back(Entity());
