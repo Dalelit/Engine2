@@ -21,8 +21,6 @@ namespace Engine2
 		imguiActive = true;
 
 		mainCamera.SetAspectRatio(device.GetAspectRatio());
-
-		frameLastTime = clock();
 	}
 
 	Engine::~Engine()
@@ -35,6 +33,9 @@ namespace Engine2
 
 	void Engine::OnUpdate(float deltaTime)
 	{
+		updateMemory.Set();
+		frameTime.Set(); // Tick just before present frame
+
 		inputController.OnUpdate(deltaTime);
 
 		// update layers
@@ -42,10 +43,14 @@ namespace Engine2
 		{
 			if (layer->IsActive()) layer->OnUpdate(deltaTime);
 		}
+
+		updateMemory.Tick();
 	}
 
 	void Engine::OnRender()
 	{
+		renderMemory.Set();
+
 		// dx begin
 		device.BeginFrame();
 
@@ -70,14 +75,13 @@ namespace Engine2
 			imgui.EndFrame();
 		}
 
+		frameTime.Tick();
+
 		// dx present
 		device.PresentFrame();
 
-		// to do: temp
-		clock_t currentTime = clock();
-		frameTimeCurrent++;  if (frameTimeCurrent >= frameTimeCount) frameTimeCurrent = 0;
-		frameTimes[frameTimeCurrent] = (float)(currentTime - frameLastTime);
-		frameLastTime = currentTime;
+		frameRate.Tick();
+		renderMemory.Tick();
 	}
 
 	void Engine::OnApplicationEvent(ApplicationEvent& event)
@@ -135,7 +139,7 @@ namespace Engine2
 		if (statsOpen) ImguiStatsWindow(&statsOpen);
 
 		static bool memoryOpen = true;
-		if (memoryOpen) Instrumentation::ImguiWindow(&memoryOpen);
+		if (memoryOpen) Instrumentation::Memory::ImguiWindow(&memoryOpen);
 
 		static bool inputControllerOpen = true;
 		if (inputControllerOpen) inputController.ImguiWindow(&inputControllerOpen);
@@ -174,13 +178,12 @@ namespace Engine2
 
 		if (ImGui::Begin("Stats", pOpen, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize))
 		{
-			float avg = 0.0f;
-			for (int i = 0; i < frameTimeCount; i++) avg += frameTimes[i];
-			avg /= frameTimeCount;
-			char buffer[13];
-			sprintf_s(buffer, ARRAYSIZE(buffer), "FR ms %.1f", avg);
-			ImGui::PlotLines("", frameTimes, frameTimeCount, frameTimeCurrent, buffer, 0.0f, 30.0f, {0,40});
-
+			ImGui::Text("Frame rate");
+			frameRate.OnImgui();
+			ImGui::Text("Frame time");
+			frameTime.OnImgui();
+			ImGui::Text("Update mallocs %i", updateMemory.allocations.Average());
+			ImGui::Text("Render mallocs %i", renderMemory.allocations.Average());
 			ImGui::End();
 		}
 

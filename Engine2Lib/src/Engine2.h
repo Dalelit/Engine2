@@ -8,6 +8,7 @@
 #include "Layer.h"
 #include "Camera.h"
 #include "InputController.h"
+#include "Instrumentation.h"
 
 namespace Engine2 {
 
@@ -48,16 +49,15 @@ namespace Engine2 {
 		bool minimised = false;
 		bool imguiActive = false;
 
-		// to do: temp
-		clock_t frameLastTime;
-		static constexpr unsigned int frameTimeCount = 60;
-		unsigned int frameTimeCurrent = 59;
-		float frameTimes[frameTimeCount] = {};
-
 		// application event handlers
 		bool OnResize(WindowResizeEvent& event);
 
 		void ImguiStatsWindow(bool* pOpen);
+
+		Instrumentation::Timer frameRate;
+		Instrumentation::Timer frameTime;
+		Instrumentation::MemoryTracker updateMemory;
+		Instrumentation::MemoryTracker renderMemory;
 	};
 
 }
