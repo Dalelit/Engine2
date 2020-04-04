@@ -43,13 +43,15 @@ namespace Engine2
 		{
 		public:
 			Timer() { startTime = clock(); }
-			void Set() { startTime = clock(); }
+			inline void Set() { startTime = clock(); }
 
-			void Tick() {
+			inline void Tick() {
 				clock_t current = clock();
 				times.Log((float)(current - startTime));
 				startTime = current;
 			}
+
+			inline float Average() { return times.Average(); }
 
 			void OnImgui();
 

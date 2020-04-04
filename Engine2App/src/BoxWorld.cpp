@@ -13,6 +13,7 @@ BoxWorld::BoxWorld() : Layer("BoxWorld")
 
 	GSTestScene();
 	CreateScene();
+	CreateScreenCopy();
 }
 
 void BoxWorld::OnUpdate(float dt)
@@ -22,6 +23,8 @@ void BoxWorld::OnUpdate(float dt)
 
 void BoxWorld::OnRender()
 {
+	Engine::GetDX().SetOffscreenRenderTarget(offscreenId, true);
+
 	scene.OnRender();
 
 	pGSTestModel->entities.instances[0].LoadTransformT(pGSCB->data.entityTransform, pGSCB->data.entityTransformRotation);
@@ -32,6 +35,11 @@ void BoxWorld::OnRender()
 	{
 		if (model->IsActive()) model->OnRender();
 	}
+
+	Engine::GetDX().SetBackbufferRenderTarget();
+	for (auto& r : offscreenResources) r->Bind();
+	offscreenDrawable->Draw();
+	offscreenTexture->Unbind();
 }
 
 void BoxWorld::OnImgui()
@@ -50,7 +58,7 @@ void BoxWorld::CreateScene()
 	models.push_back(model);
 
 	VertexShaderLayout vsLayout = {
-		{"Position", DXGI_FORMAT_R32G32B32_FLOAT},
+		{"Position", DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT},
 	};
 
 	Util::Random rng(0.0f,255.0f);
@@ -64,8 +72,8 @@ void BoxWorld::CreateScene()
 
 	model->pMaterial = std::make_shared<RenderNode>("Cube1");
 
-	auto pTexture = std::make_shared<Texture>(0, tex, DXGI_FORMAT_R32G32B32A32_FLOAT);
-	pTexture->SetSampler(std::make_shared<TextureSampler>(D3D11_FILTER_MIN_MAG_MIP_POINT, D3D11_TEXTURE_ADDRESS_WRAP));
+	auto pTexture = std::make_shared<Texture>(0, tex, DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT);
+	pTexture->SetSampler(std::make_shared<TextureSampler>(D3D11_FILTER::D3D11_FILTER_MIN_MAG_MIP_POINT, D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_WRAP));
 	model->pMaterial->AddBindable(pTexture);
 
 	std::string vsfilename = Config::directories["ShaderSourceDir"] + "BoxWorldCubeVS.hlsl";
@@ -86,7 +94,7 @@ void BoxWorld::CreateScene()
 void BoxWorld::GSTestScene()
 {
 	VertexShaderLayout vsLayout = {
-		{"Position", DXGI_FORMAT_R32G32B32_FLOAT},
+		{"Position", DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT},
 	};
 
 	std::string vsfilename = Config::directories["ShaderSourceDir"] + "BW_GSTest_VS.hlsl";
@@ -104,4 +112,54 @@ void BoxWorld::GSTestScene()
 
 	pGSTestModel = model; // hack to make it easy to update
 	pGSCB = std::make_shared<GSConstantBuffer<GSConstantData>>(1u);
+}
+
+void BoxWorld::CreateScreenCopy()
+{
+	struct Vertex {
+		float position[3];
+		float texCoord[2];
+	};
+
+	VertexShaderLayout vsLayout = {
+		{"Position", DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT},
+		{"TexCoord", DXGI_FORMAT::DXGI_FORMAT_R32G32_FLOAT},
+	};
+
+	std::vector<Vertex> verticies = {
+		{ {-1.0f, -1.0f, 0.0f}, {0.0f, 1.0f} },
+		{ {-1.0f,  1.0f, 0.0f}, {0.0f, 0.0f} },
+		{ { 1.0f,  1.0f, 0.0f}, {1.0f, 0.0f} },
+		{ {-1.0f, -1.0f, 0.0f}, {0.0f, 1.0f} },
+		{ { 1.0f,  1.0f, 0.0f}, {1.0f, 0.0f} },
+		{ { 1.0f, -1.0f, 0.0f}, {1.0f, 1.0f} },
+	};
+
+
+	std::string VSsrc = R"(
+		struct VSOut
+		{
+			float2 texCoord : TexCoord;
+			float4 pos : SV_POSITION;
+		};
+
+		VSOut main(float3 pos : Position, float2 texCoord : TexCoord)
+		{
+			VSOut vso;
+
+			vso.pos = float4(pos, 1.0f);
+			vso.texCoord = texCoord;
+
+			return vso;
+		}
+		)";
+
+	offscreenId = Engine::GetDX().CreateFullOffscreenRenderTarget();
+	offscreenDrawable = std::make_shared<MeshTriangleList<Vertex>>(verticies);
+	offscreenResources.push_back(offscreenDrawable);
+	offscreenResources.push_back(VertexShader::CreateFromString(VSsrc, vsLayout));
+	offscreenResources.push_back(std::make_shared<PixelShaderDynamic>(Config::directories["ShaderSourceDir"] + "PS_BlurSimple.hlsl"));
+	offscreenTexture = std::make_shared<Texture>(0u, Engine::GetDX().GetOffScreenTexture(offscreenId));
+	offscreenTexture->SetSampler(std::make_shared<TextureSampler>(D3D11_FILTER::D3D11_FILTER_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_BORDER));
+	offscreenResources.push_back(offscreenTexture);
 }

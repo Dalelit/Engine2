@@ -21,6 +21,15 @@ namespace Engine2
 
 		float GetAspectRatio() { return (float)bufferDesc.Width / (float)bufferDesc.Height; }
 
+		unsigned int CreateOffscreenRenderTarget(unsigned int width, unsigned int height);
+		unsigned int CreateFullOffscreenRenderTarget();
+		void SetOffscreenRenderTarget(unsigned int id, bool useDepthBuffer = false);
+		void SetBackbufferRenderTarget();
+		void RecreateOffscreenRenderTargets();
+
+		wrl::ComPtr<ID3D11Texture2D>& GetOffScreenTexture(unsigned int id) { return targetBuffers[id]; }
+
+
 		void LogDebugInfo();
 
 	protected:
@@ -41,6 +50,9 @@ namespace Engine2
 		void CreateDeviceAndSwapchain();
 		void ConfigurePipeline();
 		void ReleasePipeline();
+
+		std::vector<wrl::ComPtr<ID3D11Texture2D>> targetBuffers;
+		std::vector<wrl::ComPtr<ID3D11RenderTargetView>> renderTargetViews;
 	};
 
 }

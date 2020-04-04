@@ -20,12 +20,18 @@ public:
 
 	void CreateScene();
 	void GSTestScene();
+	void CreateScreenCopy();
 
 protected:
 	std::vector<std::shared_ptr<Engine2::Model>> models;
 	Engine2::Scene scene;
 
 	std::unique_ptr<Voxel> pVoxel;
+	
+	unsigned int offscreenId;
+	std::vector<std::shared_ptr<Engine2::Bindable>> offscreenResources;
+	std::shared_ptr<Engine2::Drawable> offscreenDrawable = nullptr;
+	std::shared_ptr<Engine2::Texture> offscreenTexture = nullptr;
 
 	struct GSConstantData
 	{

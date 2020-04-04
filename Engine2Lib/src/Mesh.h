@@ -55,8 +55,7 @@ namespace Engine2
 		}
 
 		void Unbind() {
-			// to do: untested
-			Engine::GetContext().IASetVertexBuffers(slot, numberOfBuffers, nullptr, 0, 0);
+			Engine::GetContext().IASetVertexBuffers(slot, 0, nullptr, 0, 0);
 		}
 
 		void Draw() {

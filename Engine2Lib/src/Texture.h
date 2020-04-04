@@ -21,6 +21,7 @@ namespace Engine2
 	{
 	public:
 		Texture(unsigned int slot, Surface& surface, DXGI_FORMAT format);
+		Texture(unsigned int slot, Microsoft::WRL::ComPtr<ID3D11Texture2D> pTextureToWrap);
 		~Texture() = default;
 
 		void Bind();

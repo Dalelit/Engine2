@@ -19,9 +19,14 @@ namespace Engine2
 
 	void DXDevice::BeginFrame()
 	{
-		pImmediateContext->OMSetRenderTargets(1u, pRenderTargetView.GetAddressOf(), pDepthStencilView.Get());
+		for (unsigned int i = 0; i < renderTargetViews.size(); i++)
+		{
+			pImmediateContext->ClearRenderTargetView(renderTargetViews[i].Get(), clearColor);
+		}
 		pImmediateContext->ClearRenderTargetView(pRenderTargetView.Get(), clearColor);
 		pImmediateContext->ClearDepthStencilView(pDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u);
+		
+		pImmediateContext->OMSetRenderTargets(1u, pRenderTargetView.GetAddressOf(), pDepthStencilView.Get());
 	}
 
 	void DXDevice::PresentFrame()
@@ -33,10 +38,85 @@ namespace Engine2
 	{
 		ReleasePipeline();
 
-		HRESULT hr = pSwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0); // resize, retaining previous settings
+		HRESULT hr = pSwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT::DXGI_FORMAT_UNKNOWN, 0); // resize, retaining previous settings
 		E2_ASSERT_HR(hr, "ResizeBuffers failed");
 
 		ConfigurePipeline();
+	}
+
+	unsigned int DXDevice::CreateOffscreenRenderTarget(unsigned int width, unsigned int height)
+	{
+		// to do: not tested
+		HRESULT hr;
+		wrl::ComPtr<ID3D11Texture2D> pBuffer = nullptr;
+		wrl::ComPtr<ID3D11RenderTargetView> pRTV = nullptr;
+
+		D3D11_TEXTURE2D_DESC texDesc = bufferDesc; // default to the back buffer desc
+		texDesc.Width = width;
+		texDesc.Height = height;
+		texDesc.BindFlags = texDesc.BindFlags | D3D11_BIND_FLAG::D3D11_BIND_SHADER_RESOURCE;
+
+		hr = pDevice->CreateTexture2D(&texDesc, nullptr, &pBuffer);
+
+		E2_ASSERT_HR(hr, "CreateTexture2D for offscreen failed");
+
+		hr = pDevice->CreateRenderTargetView(pBuffer.Get(), nullptr, &pRTV);
+
+		E2_ASSERT_HR(hr, "CreateRenderTargetView for offscreen failed");
+
+		// store them for reuse
+		unsigned int indx = (unsigned int)renderTargetViews.size();
+		targetBuffers.push_back(pBuffer);
+		renderTargetViews.push_back(pRTV);
+
+		return indx;
+	}
+
+	unsigned int DXDevice::CreateFullOffscreenRenderTarget()
+	{
+		HRESULT hr;
+		wrl::ComPtr<ID3D11Texture2D> pBuffer = nullptr;
+		wrl::ComPtr<ID3D11RenderTargetView> pRTV = nullptr;
+
+		D3D11_TEXTURE2D_DESC texDesc = bufferDesc; // default to the back buffer desc
+		texDesc.BindFlags = texDesc.BindFlags | D3D11_BIND_FLAG::D3D11_BIND_SHADER_RESOURCE;
+
+		hr = pDevice->CreateTexture2D(&texDesc, nullptr, &pBuffer);
+
+		E2_ASSERT_HR(hr, "CreateTexture2D for full offscreen failed");
+
+		hr = pDevice->CreateRenderTargetView(pBuffer.Get(), nullptr, &pRTV);
+
+		E2_ASSERT_HR(hr, "CreateRenderTargetView for full offscreen failed");
+
+		// store them for reuse
+		unsigned int indx = (unsigned int)renderTargetViews.size();
+		targetBuffers.push_back(pBuffer);
+		renderTargetViews.push_back(pRTV);
+
+		return indx;
+	}
+
+	void DXDevice::SetOffscreenRenderTarget(unsigned int id, bool useDepthBuffer)
+	{
+		if (useDepthBuffer)
+		{
+			pImmediateContext->OMSetRenderTargets(1u, renderTargetViews[id].GetAddressOf(), pDepthStencilView.Get());
+		}
+		else
+		{
+			pImmediateContext->OMSetRenderTargets(1u, renderTargetViews[id].GetAddressOf(), nullptr);
+		}
+	}
+
+	void DXDevice::SetBackbufferRenderTarget()
+	{
+		pImmediateContext->OMSetRenderTargets(1u, pRenderTargetView.GetAddressOf(), pDepthStencilView.Get());
+	}
+
+	void DXDevice::RecreateOffscreenRenderTargets()
+	{
+		// to do: for resize
 	}
 
 	void DXDevice::LogDebugInfo()
@@ -89,10 +169,10 @@ namespace Engine2
 		DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
 		swapChainDesc.BufferDesc.Width = 0;
 		swapChainDesc.BufferDesc.Height = 0;
-		swapChainDesc.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+		swapChainDesc.BufferDesc.Format = DXGI_FORMAT::DXGI_FORMAT_B8G8R8A8_UNORM;
 		swapChainDesc.BufferDesc.RefreshRate.Numerator = 0;
 		swapChainDesc.BufferDesc.RefreshRate.Denominator = 0;
-		swapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+		swapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING::DXGI_MODE_SCALING_UNSPECIFIED;
 		swapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 		swapChainDesc.SampleDesc.Count = 1;
 		swapChainDesc.SampleDesc.Quality = 0;
@@ -103,7 +183,7 @@ namespace Engine2
 		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD; // DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL?
 		swapChainDesc.Flags = 0;
 
-		D3D_FEATURE_LEVEL featureLevels[] = { D3D_FEATURE_LEVEL_11_1 };
+		D3D_FEATURE_LEVEL featureLevels[] = { D3D_FEATURE_LEVEL::D3D_FEATURE_LEVEL_11_1 };
 		D3D_FEATURE_LEVEL featureLevel; // will get populated with the actual feature level used... wanting 11_1
 
 		hr = D3D11CreateDeviceAndSwapChain(
@@ -154,8 +234,8 @@ namespace Engine2
 
 		D3D11_DEPTH_STENCIL_DESC dsDesc = {};
 		dsDesc.DepthEnable = TRUE;
-		dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-		dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
+		dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK::D3D11_DEPTH_WRITE_MASK_ALL;
+		dsDesc.DepthFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS;
 		dsDesc.StencilEnable = FALSE;
 
 		hr = pDevice->CreateDepthStencilState(&dsDesc, &pDepthStencilStateOn);
@@ -169,11 +249,11 @@ namespace Engine2
 		dtDesc.Height = bufferDesc.Height;
 		dtDesc.MipLevels = 1u;
 		dtDesc.ArraySize = 1u;
-		dtDesc.Format = DXGI_FORMAT_D32_FLOAT;
+		dtDesc.Format = DXGI_FORMAT::DXGI_FORMAT_D32_FLOAT;
 		dtDesc.SampleDesc.Count = 1u;
 		dtDesc.SampleDesc.Quality = 0u;
-		dtDesc.Usage = D3D11_USAGE_DEFAULT;
-		dtDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+		dtDesc.Usage = D3D11_USAGE::D3D11_USAGE_DEFAULT;
+		dtDesc.BindFlags = D3D11_BIND_FLAG::D3D11_BIND_DEPTH_STENCIL;
 		dtDesc.CPUAccessFlags = 0u;
 		dtDesc.MiscFlags = 0u;
 
@@ -183,7 +263,7 @@ namespace Engine2
 
 		D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
 		dsvDesc.Format = dtDesc.Format;
-		dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+		dsvDesc.ViewDimension = D3D11_DSV_DIMENSION::D3D11_DSV_DIMENSION_TEXTURE2D;
 		dsvDesc.Flags = 0;
 		dsvDesc.Texture2D.MipSlice = 0u;
 

@@ -18,6 +18,7 @@ namespace Engine2 {
 
 		static void CreateEngine(HWND hwnd);
 		inline static Engine& Get() { return *instance.get(); }
+		inline static DXDevice& GetDX() { return instance->device; }
 		inline static ID3D11Device3& GetDevice() { return instance->device.GetDevice(); }
 		inline static ID3D11DeviceContext3& GetContext() { return instance->device.GetContext(); }
 

@@ -53,7 +53,7 @@ void Playground::AddModel1()
 	};
 
 	VertexShaderLayout vsLayout = {
-		{"Position", DXGI_FORMAT_R32G32B32_FLOAT}
+		{"Position", DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT}
 	};
 
 	model->pMesh = std::make_shared<MeshTriangleList<Vertex>>(verticies);

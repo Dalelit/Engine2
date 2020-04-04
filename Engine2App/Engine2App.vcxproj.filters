@@ -24,5 +24,6 @@
     <FxCompile Include="Assets\Materials\BW_GSTest_PS.hlsl" />
     <FxCompile Include="Assets\Materials\BW_GSTest_GS.hlsl" />
     <FxCompile Include="Assets\Materials\BW_GSTest_VS.hlsl" />
+    <FxCompile Include="Assets\Materials\PS_BlurSimple.hlsl" />
   </ItemGroup>
 </Project>

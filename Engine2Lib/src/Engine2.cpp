@@ -184,7 +184,7 @@ namespace Engine2
 
 		if (ImGui::Begin("Stats", pOpen, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize))
 		{
-			ImGui::Text("Frame rate");
+			ImGui::Text("Frame rate %.1f", (1000.0f / frameRate.Average()));
 			frameRate.OnImgui();
 			ImGui::Text("Frame time");
 			frameTime.OnImgui();

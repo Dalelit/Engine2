@@ -32,7 +32,7 @@ namespace Engine2
 
 		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 		srvDesc.Format = texDesc.Format;
-		srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+		srvDesc.ViewDimension = D3D11_SRV_DIMENSION::D3D11_SRV_DIMENSION_TEXTURE2D;
 		srvDesc.Texture2D.MostDetailedMip = 0;
 		srvDesc.Texture2D.MipLevels = 1;
 
@@ -44,6 +44,32 @@ namespace Engine2
 		info = "MipsLevels " + std::to_string(srvDesc.Texture2D.MipLevels);
 	}
 
+	Texture::Texture(unsigned int slot, Microsoft::WRL::ComPtr<ID3D11Texture2D> pTextureToWrap) :
+		slot(slot)
+	{
+		HRESULT hr;
+
+		hr = pTextureToWrap.As(&pTexture);
+
+		E2_ASSERT_HR(hr, "Texture as ver 1 failed");
+
+		D3D11_TEXTURE2D_DESC1 texDesc;
+		pTexture->GetDesc1(&texDesc);
+
+		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+		srvDesc.Format = texDesc.Format;
+		srvDesc.ViewDimension = D3D11_SRV_DIMENSION::D3D11_SRV_DIMENSION_TEXTURE2D;
+		srvDesc.Texture2D.MostDetailedMip = 0;
+		srvDesc.Texture2D.MipLevels = 1;
+
+		hr = Engine::GetDevice().CreateShaderResourceView(pTexture.Get(), &srvDesc, &pSRView);
+
+		E2_ASSERT_HR(hr, "CreateShaderResourceView failed");
+
+		name = "Texture2D wrap existing texture";
+		info = "MipsLevels " + std::to_string(srvDesc.Texture2D.MipLevels);
+	}
+
 	void Texture::Bind()
 	{
 		Engine::GetContext().PSSetShaderResources(slot, 1u, pSRView.GetAddressOf());
@@ -52,8 +78,8 @@ namespace Engine2
 
 	void Texture::Unbind()
 	{
-		// to do: untested
-		Engine::GetContext().PSSetShaderResources(slot, 0u, nullptr);
+		ID3D11ShaderResourceView* const srv[1] = { nullptr };
+		Engine::GetContext().PSSetShaderResources(slot, 1u, srv);
 		Engine::GetContext().PSSetSamplers(slot, 0u, nullptr);
 	}
 
