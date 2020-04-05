@@ -23,7 +23,7 @@ void BoxWorld::OnUpdate(float dt)
 
 void BoxWorld::OnRender()
 {
-	Engine::GetDX().SetOffscreenRenderTarget(offscreenId, true);
+	Engine::GetDX().BindRenderTargetAsTarget(offscreenId, true);
 
 	scene.OnRender();
 
@@ -36,10 +36,11 @@ void BoxWorld::OnRender()
 		if (model->IsActive()) model->OnRender();
 	}
 
-	Engine::GetDX().SetBackbufferRenderTarget();
+	Engine::GetDX().BindBackbufferRenderTarget();
+	Engine::GetDX().BindRenderTargetAsResource(offscreenId, 0u);
 	for (auto& r : offscreenResources) r->Bind();
 	offscreenDrawable->Draw();
-	offscreenTexture->Unbind();
+	Engine::GetDX().UnbindRenderTargetAsResource(offscreenId, 0u);
 }
 
 void BoxWorld::OnImgui()
@@ -154,12 +155,9 @@ void BoxWorld::CreateScreenCopy()
 		}
 		)";
 
-	offscreenId = Engine::GetDX().CreateFullOffscreenRenderTarget();
+	offscreenId = Engine::GetDX().CreateOffscreenRenderTarget();
 	offscreenDrawable = std::make_shared<MeshTriangleList<Vertex>>(verticies);
 	offscreenResources.push_back(offscreenDrawable);
 	offscreenResources.push_back(VertexShader::CreateFromString(VSsrc, vsLayout));
 	offscreenResources.push_back(std::make_shared<PixelShaderDynamic>(Config::directories["ShaderSourceDir"] + "PS_BlurSimple.hlsl"));
-	offscreenTexture = std::make_shared<Texture>(0u, Engine::GetDX().GetOffScreenTexture(offscreenId));
-	offscreenTexture->SetSampler(std::make_shared<TextureSampler>(D3D11_FILTER::D3D11_FILTER_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_BORDER));
-	offscreenResources.push_back(offscreenTexture);
 }

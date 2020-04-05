@@ -5,6 +5,15 @@ namespace wrl = Microsoft::WRL;
 
 namespace Engine2
 {
+	class RenderTarget
+	{
+	public:
+		wrl::ComPtr<ID3D11Texture2D> pBuffer = nullptr;
+		wrl::ComPtr<ID3D11RenderTargetView> pTargetView = nullptr;
+		wrl::ComPtr<ID3D11ShaderResourceView> pResourceView = nullptr;
+		wrl::ComPtr<ID3D11SamplerState> pSamplerState = nullptr;
+	};
+
 	class DXDevice
 	{
 	public:
@@ -19,16 +28,14 @@ namespace Engine2
 		ID3D11Device3& GetDevice() { return *pDevice.Get(); }
 		ID3D11DeviceContext3& GetContext() { return *pImmediateContext.Get(); }
 
-		float GetAspectRatio() { return (float)bufferDesc.Width / (float)bufferDesc.Height; }
+		float GetAspectRatio() { return (float)backBufferDesc.Width / (float)backBufferDesc.Height; }
 
-		unsigned int CreateOffscreenRenderTarget(unsigned int width, unsigned int height);
-		unsigned int CreateFullOffscreenRenderTarget();
-		void SetOffscreenRenderTarget(unsigned int id, bool useDepthBuffer = false);
-		void SetBackbufferRenderTarget();
-		void RecreateOffscreenRenderTargets();
+		unsigned int CreateOffscreenRenderTarget();
+		void BindRenderTargetAsTarget(unsigned int id, bool useDepthBuffer = false);
+		void BindBackbufferRenderTarget() { BindRenderTargetAsTarget(0, true); };
 
-		wrl::ComPtr<ID3D11Texture2D>& GetOffScreenTexture(unsigned int id) { return targetBuffers[id]; }
-
+		void BindRenderTargetAsResource(unsigned int id, unsigned int slot);
+		void UnbindRenderTargetAsResource(unsigned int id, unsigned int slot);
 
 		void LogDebugInfo();
 
@@ -40,19 +47,20 @@ namespace Engine2
 		wrl::ComPtr<IDXGISwapChain1> pSwapChain = nullptr;
 		wrl::ComPtr<ID3D11Device3> pDevice = nullptr;
 		wrl::ComPtr<ID3D11DeviceContext3> pImmediateContext = nullptr;
-		D3D11_TEXTURE2D_DESC bufferDesc;
-		wrl::ComPtr<ID3D11Texture2D> pBackBuffer = nullptr;
-		wrl::ComPtr<ID3D11RenderTargetView> pRenderTargetView = nullptr;
 		wrl::ComPtr<ID3D11DepthStencilView> pDepthStencilView = nullptr;
 		wrl::ComPtr<ID3D11Texture2D> pDepthTexture = nullptr;
 		wrl::ComPtr<ID3D11DepthStencilState> pDepthStencilStateOn = nullptr;
+		D3D11_TEXTURE2D_DESC backBufferDesc;
 
 		void CreateDeviceAndSwapchain();
+		void SetBackBuffer();
+		void ConfigureDepthBuffer();
 		void ConfigurePipeline();
 		void ReleasePipeline();
 
-		std::vector<wrl::ComPtr<ID3D11Texture2D>> targetBuffers;
-		std::vector<wrl::ComPtr<ID3D11RenderTargetView>> renderTargetViews;
+		void ConfigureRenderTarget(RenderTarget& rt);
+
+		std::vector<RenderTarget> renderTargets;
 	};
 
 }
