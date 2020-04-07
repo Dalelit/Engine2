@@ -2,6 +2,7 @@
 #include "Engine2.h"
 #include "Playground.h"
 #include "BoxWorld.h"
+#include "BallWorld.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -210,6 +211,8 @@ int WINAPI WinMain(
 	Engine2::Engine::Get().AttachLayer(new Playground());
 	Engine2::Engine::Get().GetLayer(0).SetActive(false);
 	Engine2::Engine::Get().AttachLayer(new BoxWorld());
+	Engine2::Engine::Get().GetLayer(1).SetActive(false);
+	Engine2::Engine::Get().AttachLayer(new BallWorld());
 
 	clock_t lastTime = clock();
 
