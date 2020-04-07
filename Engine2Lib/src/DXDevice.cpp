@@ -13,18 +13,20 @@ namespace Engine2
 	DXDevice::DXDevice(HWND hwnd) :
 		hwnd(hwnd)
 	{
+		renderTargets.emplace_back(); // create the placeholder back buffer target at index 0
 		CreateDeviceAndSwapchain();
 		ConfigurePipeline();
 	}
 
 	void DXDevice::BeginFrame()
 	{
-		for (unsigned int i = 0; i < renderTargets.size(); i++)
+		for (auto& rt : renderTargets)
 		{
-			pImmediateContext->ClearRenderTargetView(renderTargets[i].pTargetView.Get(), clearColor);
+			pImmediateContext->ClearRenderTargetView(rt.pTargetView.Get(), clearColor);
+			if (rt.depthBuffer)
+				pImmediateContext->ClearDepthStencilView(rt.pDepthStencilView.Get(), D3D11_CLEAR_FLAG::D3D11_CLEAR_DEPTH, 1.0f, 0u);
 		}
-		pImmediateContext->ClearDepthStencilView(pDepthStencilView.Get(), D3D11_CLEAR_FLAG::D3D11_CLEAR_DEPTH, 1.0f, 0u);
-		
+
 		BindBackbufferRenderTarget();
 	}
 
@@ -35,8 +37,6 @@ namespace Engine2
 
 	void DXDevice::ScreenSizeChanged()
 	{
-		size_t renderTargetCount = renderTargets.size(); // so we know how many targets to recreate
-
 		// release the attached pipeline
 		ReleasePipeline();
 
@@ -45,30 +45,29 @@ namespace Engine2
 
 		// recreate the pipeline
 		ConfigurePipeline();
-
-		// recreate the offscreen targets.
-		// note: 0 is the back buffer which is already in the vector.
-		for (size_t i = 1; i < renderTargetCount; i++) CreateOffscreenRenderTarget();
 	}
 
-	unsigned int DXDevice::CreateOffscreenRenderTarget()
+	unsigned int DXDevice::CreateOffscreenRenderTarget(bool withDepthBuffer)
 	{
 		unsigned int indx = (unsigned int)renderTargets.size();
-		RenderTarget rt;
-		ConfigureRenderTarget(rt);
-		renderTargets.push_back(rt);
+		renderTargets.emplace_back();
+		renderTargets[indx].depthBuffer = withDepthBuffer;
+		ConfigureRenderTarget(indx);
 		return indx;
 	}
 
-	void DXDevice::BindRenderTargetAsTarget(unsigned int id, bool useDepthBuffer)
+	void DXDevice::BindRenderTargetAsTarget(unsigned int id)
 	{
-		if (useDepthBuffer)
+		RenderTarget& rt = renderTargets[id];
+
+		if (rt.depthBuffer)
 		{
-			pImmediateContext->OMSetRenderTargets(1u, renderTargets[id].pTargetView.GetAddressOf(), pDepthStencilView.Get());
+			pImmediateContext->OMSetRenderTargets(1u, rt.pTargetView.GetAddressOf(), rt.pDepthStencilView.Get());
+			pImmediateContext->OMSetDepthStencilState(rt.pDepthStencilState.Get(), 0u);
 		}
 		else
 		{
-			pImmediateContext->OMSetRenderTargets(1u, renderTargets[id].pTargetView.GetAddressOf(), nullptr);
+			pImmediateContext->OMSetRenderTargets(1u, rt.pTargetView.GetAddressOf(), nullptr);
 		}
 	}
 
@@ -181,7 +180,7 @@ namespace Engine2
 	void DXDevice::SetBackBuffer()
 	{
 		HRESULT hr;
-		RenderTarget rt;
+		RenderTarget& rt = renderTargets[0];
 
 		hr = pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), &rt.pBuffer);
 
@@ -203,14 +202,13 @@ namespace Engine2
 
 		pImmediateContext->RSSetViewports(1, &viewport);
 
-		E2_ASSERT(renderTargets.size() == 0, "Assuming renderTargets is empty so backbuffer will be pushed into 0 index");
-
-		renderTargets.push_back(rt);
+		ConfigureDepthBuffer(0); // and the depth buffer for it
 	}
 
-	void DXDevice::ConfigureDepthBuffer()
+	void DXDevice::ConfigureDepthBuffer(unsigned int indx)
 	{
 		HRESULT hr;
+		RenderTarget& rt = renderTargets[indx];
 
 		D3D11_DEPTH_STENCIL_DESC dsDesc = {};
 		dsDesc.DepthEnable = TRUE;
@@ -218,11 +216,9 @@ namespace Engine2
 		dsDesc.DepthFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS;
 		dsDesc.StencilEnable = FALSE;
 
-		hr = pDevice->CreateDepthStencilState(&dsDesc, &pDepthStencilStateOn);
+		hr = pDevice->CreateDepthStencilState(&dsDesc, &rt.pDepthStencilState);
 
 		E2_ASSERT_HR(hr, "CreateDepthStencilState failed");
-
-		pImmediateContext->OMSetDepthStencilState(pDepthStencilStateOn.Get(), 0u);
 
 		D3D11_TEXTURE2D_DESC dtDesc = {};
 		dtDesc.Width = backBufferDesc.Width;
@@ -237,7 +233,7 @@ namespace Engine2
 		dtDesc.CPUAccessFlags = 0u;
 		dtDesc.MiscFlags = 0u;
 
-		hr = pDevice->CreateTexture2D(&dtDesc, nullptr, &pDepthTexture);
+		hr = pDevice->CreateTexture2D(&dtDesc, nullptr, &rt.pDepthTexture);
 
 		E2_ASSERT_HR(hr, "CreateTexture2D failed");
 
@@ -247,41 +243,34 @@ namespace Engine2
 		dsvDesc.Flags = 0;
 		dsvDesc.Texture2D.MipSlice = 0u;
 
-		hr = pDevice->CreateDepthStencilView(pDepthTexture.Get(), &dsvDesc, &pDepthStencilView);
+		hr = pDevice->CreateDepthStencilView(rt.pDepthTexture.Get(), &dsvDesc, &rt.pDepthStencilView);
 
 		E2_ASSERT_HR(hr, "CreateDepthStencilView failed");
 	}
 
 	void DXDevice::ConfigurePipeline()
 	{
-		SetBackBuffer();
-		ConfigureDepthBuffer();
+		SetBackBuffer(); // sort out the back buffer
+
+		// reconfigure the offscreen targets.
+		// note: 0 is the back buffer which is already in the vector.
+		for (size_t i = 1; i < renderTargets.size(); i++) ConfigureRenderTarget((unsigned int)i);
 	}
 
 	void DXDevice::ReleasePipeline()
 	{
 		pImmediateContext->OMSetRenderTargets(0, 0, 0);
 
-		for (auto& rt : renderTargets)
-		{
-			rt.pBuffer.Reset();
-			rt.pTargetView.Reset();
-			rt.pResourceView.Reset();
-			rt.pSamplerState.Reset(); // not really needed.
-		}
-		renderTargets.clear();
-
-		pDepthStencilStateOn.Reset();
-		pDepthTexture.Reset();
-		pDepthStencilView.Reset();
+		for (auto& rt : renderTargets) rt.Reset();
 
 		pImmediateContext->ClearState();
 		pImmediateContext->Flush();
 	}
 
-	void DXDevice::ConfigureRenderTarget(RenderTarget& rt)
+	void DXDevice::ConfigureRenderTarget(unsigned int indx)
 	{
 		HRESULT hr;
+		RenderTarget& rt = renderTargets[indx];
 
 		D3D11_TEXTURE2D_DESC texDesc = backBufferDesc; // default to the back buffer desc
 		texDesc.BindFlags = texDesc.BindFlags | D3D11_BIND_FLAG::D3D11_BIND_SHADER_RESOURCE;
@@ -313,5 +302,7 @@ namespace Engine2
 		hr = pDevice->CreateSamplerState(&sampDesc, &rt.pSamplerState);
 
 		E2_ASSERT_HR(hr, "CreateSamplerState failed");
+
+		if (rt.depthBuffer) ConfigureDepthBuffer(indx);
 	}
 }

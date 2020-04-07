@@ -5,6 +5,7 @@
 #include "ConstantBuffer.h"
 #include "Scene.h"
 #include "Voxel.h"
+#include "Offscreen.h"
 
 class BoxWorld : public Engine2::Layer
 {
@@ -20,7 +21,6 @@ public:
 
 	void CreateScene();
 	void GSTestScene();
-	void CreateScreenCopy();
 
 protected:
 	std::vector<std::shared_ptr<Engine2::Model>> models;
@@ -28,11 +28,6 @@ protected:
 
 	std::unique_ptr<Voxel> pVoxel;
 	
-	unsigned int offscreenId;
-	std::vector<std::shared_ptr<Engine2::Bindable>> offscreenResources;
-	std::shared_ptr<Engine2::Drawable> offscreenDrawable = nullptr;
-	std::shared_ptr<Engine2::Texture> offscreenTexture = nullptr;
-
 	struct GSConstantData
 	{
 		DirectX::XMMATRIX cameraTransform;
@@ -42,5 +37,7 @@ protected:
 
 	std::shared_ptr<Engine2::Model> pGSTestModel = nullptr;
 	std::shared_ptr<Engine2::GSConstantBuffer<GSConstantData>> pGSCB = nullptr;
+
+	Engine2::Offscreen offscreen;
 };
 

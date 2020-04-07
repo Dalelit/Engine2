@@ -13,7 +13,9 @@ BoxWorld::BoxWorld() : Layer("BoxWorld")
 
 	GSTestScene();
 	CreateScene();
-	CreateScreenCopy();
+
+	// change the offscreen copy to be a blur
+	offscreen.pPS = std::make_shared<PixelShaderDynamic>(Config::directories["ShaderSourceDir"] + "PS_BlurSimple.hlsl");
 }
 
 void BoxWorld::OnUpdate(float dt)
@@ -23,9 +25,8 @@ void BoxWorld::OnUpdate(float dt)
 
 void BoxWorld::OnRender()
 {
-	Engine::GetDX().BindRenderTargetAsTarget(offscreenId, true);
-
 	scene.OnRender();
+	offscreen.SetAsTarget();
 
 	pGSTestModel->entities.instances[0].LoadTransformT(pGSCB->data.entityTransform, pGSCB->data.entityTransformRotation);
 	Engine::Get().mainCamera.LoadViewProjectionMatrixT(pGSCB->data.cameraTransform);
@@ -36,11 +37,7 @@ void BoxWorld::OnRender()
 		if (model->IsActive()) model->OnRender();
 	}
 
-	Engine::GetDX().BindBackbufferRenderTarget();
-	Engine::GetDX().BindRenderTargetAsResource(offscreenId, 0u);
-	for (auto& r : offscreenResources) r->Bind();
-	offscreenDrawable->Draw();
-	Engine::GetDX().UnbindRenderTargetAsResource(offscreenId, 0u);
+	offscreen.Draw();
 }
 
 void BoxWorld::OnImgui()
@@ -113,51 +110,4 @@ void BoxWorld::GSTestScene()
 
 	pGSTestModel = model; // hack to make it easy to update
 	pGSCB = std::make_shared<GSConstantBuffer<GSConstantData>>(1u);
-}
-
-void BoxWorld::CreateScreenCopy()
-{
-	struct Vertex {
-		float position[3];
-		float texCoord[2];
-	};
-
-	VertexShaderLayout vsLayout = {
-		{"Position", DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT},
-		{"TexCoord", DXGI_FORMAT::DXGI_FORMAT_R32G32_FLOAT},
-	};
-
-	std::vector<Vertex> verticies = {
-		{ {-1.0f, -1.0f, 0.0f}, {0.0f, 1.0f} },
-		{ {-1.0f,  1.0f, 0.0f}, {0.0f, 0.0f} },
-		{ { 1.0f,  1.0f, 0.0f}, {1.0f, 0.0f} },
-		{ {-1.0f, -1.0f, 0.0f}, {0.0f, 1.0f} },
-		{ { 1.0f,  1.0f, 0.0f}, {1.0f, 0.0f} },
-		{ { 1.0f, -1.0f, 0.0f}, {1.0f, 1.0f} },
-	};
-
-
-	std::string VSsrc = R"(
-		struct VSOut
-		{
-			float2 texCoord : TexCoord;
-			float4 pos : SV_POSITION;
-		};
-
-		VSOut main(float3 pos : Position, float2 texCoord : TexCoord)
-		{
-			VSOut vso;
-
-			vso.pos = float4(pos, 1.0f);
-			vso.texCoord = texCoord;
-
-			return vso;
-		}
-		)";
-
-	offscreenId = Engine::GetDX().CreateOffscreenRenderTarget();
-	offscreenDrawable = std::make_shared<MeshTriangleList<Vertex>>(verticies);
-	offscreenResources.push_back(offscreenDrawable);
-	offscreenResources.push_back(VertexShader::CreateFromString(VSsrc, vsLayout));
-	offscreenResources.push_back(std::make_shared<PixelShaderDynamic>(Config::directories["ShaderSourceDir"] + "PS_BlurSimple.hlsl"));
 }

@@ -43,6 +43,7 @@ namespace Engine2
 		static std::shared_ptr<VertexShader> CreateFromSourceFile(std::string& filename, VertexShaderLayout& layout, std::string entryPoint = "main", std::string target = "vs_5_0");
 
 	protected:
+		VertexShader() = default;
 		wrl::ComPtr<ID3D11VertexShader> pVertexShader = nullptr;
 		wrl::ComPtr<ID3D11InputLayout> pInputLayout = nullptr;
 	};
@@ -61,6 +62,7 @@ namespace Engine2
 		static std::shared_ptr<PixelShader> CreateFromSourceFile(std::string& filename, std::string entryPoint = "main", std::string target = "ps_5_0");
 
 	protected:
+		PixelShader() = default;
 		wrl::ComPtr<ID3D11PixelShader> pPixelShader = nullptr;
 	};
 
@@ -76,12 +78,13 @@ namespace Engine2
 		static std::shared_ptr<GeometryShader> CreateFromSourceFile(std::string& filename, std::string entryPoint = "main", std::string target = "gs_5_0");
 
 	protected:
+		GeometryShader() = default;
 		wrl::ComPtr<ID3D11GeometryShader> pGeometryShader = nullptr;
 	};
 
 	/////////////////// dynamic shader wrapper ///////////////////
 
-	class VertexShaderDynamic : public Shader
+	class VertexShaderDynamic : public VertexShader
 	{
 	public:
 		// wrap an existing shader
@@ -126,7 +129,7 @@ namespace Engine2
 		VertexShaderLayout layout;
 	};
 
-	class PixelShaderDynamic : public Shader
+	class PixelShaderDynamic : public PixelShader
 	{
 	public:
 		// wrap an existing shader
@@ -169,7 +172,7 @@ namespace Engine2
 		FileWatcher fileWatcher;
 	};
 
-	class GeometryShaderDynamic : public Shader
+	class GeometryShaderDynamic : public GeometryShader
 	{
 	public:
 		// wrap an existing shader
