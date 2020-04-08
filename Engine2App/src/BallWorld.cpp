@@ -27,7 +27,7 @@ void BallWorld::OnRender()
 void BallWorld::OnImgui()
 {
 	ImGui::Checkbox("Active", &active);
-
+	pModel->OnImgui();
 }
 
 void BallWorld::CreateScene()
@@ -93,7 +93,7 @@ void BallWorld::CreateScene()
 	model->pMaterial = std::make_shared<RenderNode>("RN1");
 	model->pMaterial->AddBindable(std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout));
 	model->pMaterial->AddBindable(std::make_shared<PixelShaderDynamic>(psfilename));
-	model->entities.instances.emplace_back(4.0f, 0.0f, 0.0f);
+	model->entities.instances.emplace_back(0.0f, 0.0f, 0.0f);
 
 	pModel = model;
 }

@@ -2,7 +2,7 @@
 #include "pch.h"
 #include "Offscreen.h"
 #include "Engine2.h"
-#include "Mesh.h"
+#include "VertexBuffer.h"
 
 namespace Engine2
 {

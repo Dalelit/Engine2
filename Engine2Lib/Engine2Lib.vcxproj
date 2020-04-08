@@ -167,7 +167,7 @@
     <ClInclude Include="src\DXDevice.h" />
     <ClInclude Include="src\Engine2.h" />
     <ClInclude Include="src\RenderNode.h" />
-    <ClInclude Include="src\Mesh.h" />
+    <ClInclude Include="src\VertexBuffer.h" />
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\pch.h" />
     <ClInclude Include="src\Shader.h" />

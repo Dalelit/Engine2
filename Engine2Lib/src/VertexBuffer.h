@@ -6,21 +6,11 @@
 
 namespace Engine2
 {
-	class Mesh : public Drawable
+	template <typename V, D3D11_PRIMITIVE_TOPOLOGY TOP>
+	class VertexBuffer : public Drawable
 	{
 	public:
-		virtual ~Mesh() = default;
-		virtual void OnImgui() { ImGui::Text(info.c_str()); }
-
-	protected:
-		std::string info;
-	};
-
-	template <typename V>
-	class MeshTriangleList : public Mesh
-	{
-	public:
-		MeshTriangleList(std::vector<V>& verticies) {
+		VertexBuffer(std::vector<V>& verticies) {
 
 			bufferStrides[0] = sizeof(V);
 			bufferOffsets[0] = 0;
@@ -44,32 +34,38 @@ namespace Engine2
 
 			HRESULT hr = Engine::GetDevice().CreateBuffer(&bufferDesc, &data, &pVertexBuffer);
 
-			E2_ASSERT_HR(hr, "Mesh vertex CreateBuffer failed");
+			E2_ASSERT_HR(hr, "VertexBuffer CreateBuffer failed");
 
-			info = "Mesh TriangleList vertex count: " + std::to_string(vertexCount);
+			info = "VertexBuffer vertex count: " + std::to_string(vertexCount);
 		}
 
-		void Bind() {
+		virtual ~VertexBuffer() = default;
+
+		virtual void Bind() {
 			Engine::GetContext().IASetPrimitiveTopology(topology);
 			Engine::GetContext().IASetVertexBuffers(slot, numberOfBuffers, pVertexBuffer.GetAddressOf(), bufferStrides, bufferOffsets);
 		}
 
-		void Unbind() {
+		virtual void Unbind() {
 			Engine::GetContext().IASetVertexBuffers(slot, 0, nullptr, 0, 0);
 		}
 
-		void Draw() {
+		virtual void Draw() {
 			Engine::GetContext().Draw(vertexCount, 0u);
 		}
+
+		virtual void OnImgui() { ImGui::Text(info.c_str()); }
 
 		UINT slot = 0u;
 		UINT numberOfBuffers = 1u;
 
 	protected:
-		MeshTriangleList() = default;
+		VertexBuffer() = default;
+		std::string info;
 		wrl::ComPtr<ID3D11Buffer> pVertexBuffer = nullptr;
 
-		D3D11_PRIMITIVE_TOPOLOGY topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+		//D3D11_PRIMITIVE_TOPOLOGY topology = D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+		D3D11_PRIMITIVE_TOPOLOGY topology = TOP;
 
 		UINT bufferStrides[1] = {  }; // set by vertexSize in constructor
 		UINT bufferOffsets[1] = { 0 };
@@ -77,12 +73,12 @@ namespace Engine2
 		UINT vertexCount;
 	};
 
-	template <typename V>
-	class MeshTriangleIndexList : public MeshTriangleList<V>
+	template <typename V, D3D11_PRIMITIVE_TOPOLOGY TOP>
+	class VertexBufferIndex : public VertexBuffer<V, TOP>
 	{
 	public:
-		MeshTriangleIndexList(std::vector<V>& verticies, std::vector<unsigned int>& indicies) :
-			MeshTriangleList<V>(verticies)
+		VertexBufferIndex(std::vector<V>& verticies, std::vector<unsigned int>& indicies) :
+			VertexBuffer<V, TOP>(verticies)
 		{
 			HRESULT hr;
 
@@ -103,7 +99,7 @@ namespace Engine2
 
 			hr = Engine::GetDevice().CreateBuffer(&bufferDesc, &data, &pIndexBuffer);
 
-			E2_ASSERT_HR(hr, "Mesh index CreateBuffer failed");
+			E2_ASSERT_HR(hr, "VertexBufferIndex CreateBuffer failed");
 
 			this->info += " index count: " + std::to_string(indxCount);
 		}
@@ -129,4 +125,17 @@ namespace Engine2
 		unsigned int indxCount = 0;
 	};
 
+	template <typename V>
+	class MeshTriangleList : public VertexBuffer<V, D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST>
+	{
+	public:
+		MeshTriangleList(std::vector<V>& verticies) : VertexBuffer<V, D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST>(verticies) {}
+	};
+
+	template <typename V>
+	class MeshTriangleIndexList : public VertexBufferIndex<V, D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST>
+	{
+	public:
+		MeshTriangleIndexList(std::vector<V>& verticies, std::vector<unsigned int>& indicies) : VertexBufferIndex<V, D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST>(verticies, indicies) {}
+	};
 }

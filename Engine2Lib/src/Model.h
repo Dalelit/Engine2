@@ -2,7 +2,7 @@
 
 #include "pch.h"
 #include "Common.h"
-#include "Mesh.h"
+#include "VertexBuffer.h"
 #include "RenderNode.h"
 #include "Entity.h"
 
@@ -13,7 +13,7 @@ namespace Engine2
 	public:
 		Model(std::string name) : name(name) {}
 
-		std::shared_ptr<Mesh> pMesh;
+		std::shared_ptr<Drawable> pMesh;
 		std::shared_ptr<RenderNode> pMaterial;
 
 		void OnRender();
