@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "BoxWorld.h"
-#include "MeshPrimatives.h"
+#include "Primatives.h"
 #include "Surface.h"
 
 using namespace Engine2;
@@ -55,13 +55,20 @@ void BoxWorld::CreateScene()
 	auto model = std::make_shared<Model>("Voxel Cube");
 	models.push_back(model);
 
+	struct Vertex {
+		XMFLOAT3 position;
+	};
+
 	VertexShaderLayout vsLayout = {
 		{"Position", DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT},
 	};
 
+	std::vector<Vertex> verticies;
+	Primatives::CopyPosition(verticies, Primatives::Cube::verticies);
+
 	Util::Random rng(0.0f,255.0f);
 
-	model->pMesh = std::make_shared<MeshTriangleIndexList<XMFLOAT3>>(MeshPrimatives::Cube::vertexPositions, MeshPrimatives::Cube::indicies);
+	model->pMesh = std::make_shared<MeshTriangleIndexList<Vertex>>(verticies, Primatives::Cube::indicies);
 
 	Surface2D<XMFLOAT4> tex(2, 2);
 	tex.Clear({ 0.0f, 0.0f, 0.0f, 1.0f });
@@ -91,16 +98,23 @@ void BoxWorld::CreateScene()
 
 void BoxWorld::GSTestScene()
 {
+	struct Vertex {
+		XMFLOAT3 position;
+	};
+
 	VertexShaderLayout vsLayout = {
 		{"Position", DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT},
 	};
+
+	std::vector<Vertex> verticies;
+	Primatives::CopyPosition(verticies, Primatives::Cube::verticies);
 
 	std::string vsfilename = Config::directories["ShaderSourceDir"] + "BW_GSTest_VS.hlsl";
 	std::string psfilename = Config::directories["ShaderSourceDir"] + "BW_GSTest_PS.hlsl";
 	std::string gsfilename = Config::directories["ShaderSourceDir"] + "BW_GSTest_GS.hlsl";
 
 	auto model = std::make_shared<Model>("GS +4 Cube");
-	model->pMesh = std::make_shared<MeshTriangleIndexList<XMFLOAT3>>(MeshPrimatives::Cube::vertexPositions, MeshPrimatives::Cube::indicies);
+	model->pMesh = std::make_shared<MeshTriangleIndexList<Vertex>>(verticies, Primatives::Cube::indicies);
 	model->pMaterial = std::make_shared<RenderNode>("VSGSPSTest");
 	model->pMaterial->AddBindable(std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout));
 	model->pMaterial->AddBindable(std::make_shared<PixelShaderDynamic>(psfilename));

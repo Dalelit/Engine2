@@ -29,5 +29,7 @@
     <FxCompile Include="Assets\Materials\PS_BlurSimple.hlsl" />
     <FxCompile Include="Assets\Materials\BallWorld1PS.hlsl" />
     <FxCompile Include="Assets\Materials\BallWorld1VS.hlsl" />
+    <FxCompile Include="Assets\Materials\WireframeBasicPS.hlsl" />
+    <FxCompile Include="Assets\Materials\WireframeBasicVS.hlsl" />
   </ItemGroup>
 </Project>

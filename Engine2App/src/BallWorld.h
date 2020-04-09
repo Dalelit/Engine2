@@ -14,11 +14,13 @@ public:
 	void OnRender();
 	void OnImgui();
 
-	void CreateScene();
-
 protected:
 	Engine2::Scene scene;
 
-	std::shared_ptr<Engine2::Model> pModel;
+	std::vector<std::shared_ptr<Engine2::Model>> models;
+
+	void CreateCube();
+	void CreateCubeWireframe();
+	void CreateAxis();
 };
 

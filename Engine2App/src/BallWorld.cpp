@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "BallWorld.h"
-#include "MeshPrimatives.h"
+#include "Primatives.h"
 
 using namespace Engine2;
 using namespace DirectX;
@@ -10,7 +10,9 @@ BallWorld::BallWorld() : Layer("BallWorld")
 	Engine::Get().mainCamera.SetPosition(2.0f, 3.0f, -4.0f);
 	Engine::Get().mainCamera.LookAt(0.0f, 0.0f, 0.0f);
 
-	CreateScene();
+	CreateCube();
+	CreateCubeWireframe();
+	CreateAxis();
 }
 
 void BallWorld::OnUpdate(float dt)
@@ -21,16 +23,17 @@ void BallWorld::OnUpdate(float dt)
 void BallWorld::OnRender()
 {
 	scene.OnRender();
-	pModel->OnRender();
+
+	for (auto& m : models) if (m->IsActive()) m->OnRender();
 }
 
 void BallWorld::OnImgui()
 {
 	ImGui::Checkbox("Active", &active);
-	pModel->OnImgui();
+	for (auto& m : models) m->OnImgui();
 }
 
-void BallWorld::CreateScene()
+void BallWorld::CreateCube()
 {
 	struct Vertex {
 		XMFLOAT3 position;
@@ -44,56 +47,71 @@ void BallWorld::CreateScene()
 		{"Color", DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT},
 	};
 
-	std::vector<Vertex> verticies = {
-		{ {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}, {0.8f, 0.1f, 0.1f, 1.0f} },
-		{ {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, -1.0f}, {0.8f, 0.1f, 0.1f, 1.0f} },
-		{ {1.0f, 1.0f, 0.0f}, {0.0f, 0.0f, -1.0f}, {0.8f, 0.1f, 0.1f, 1.0f} },
-		{ {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}, {0.8f, 0.1f, 0.1f, 1.0f} },
-		{ {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.1f, 0.8f, 0.1f, 1.0f} },
-		{ {1.0f, 1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.1f, 0.8f, 0.1f, 1.0f} },
-		{ {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f, 0.0f}, {0.1f, 0.8f, 0.1f, 1.0f} },
-		{ {1.0f, 0.0f, 1.0f}, {1.0f, 0.0f, 0.0f}, {0.1f, 0.8f, 0.1f, 1.0f} },
-		{ {1.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}, {0.1f, 0.1f, 0.8f, 1.0f} },
-		{ {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}, {0.1f, 0.1f, 0.8f, 1.0f} },
-		{ {0.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}, {0.1f, 0.1f, 0.8f, 1.0f} },
-		{ {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}, {0.1f, 0.1f, 0.8f, 1.0f} },
-		{ {0.0f, 0.0f, 1.0f}, {-1.0f, 0.0f, 0.0f}, {0.8f, 0.1f, 0.8f, 1.0f} },
-		{ {0.0f, 1.0f, 1.0f}, {-1.0f, 0.0f, 0.0f}, {0.8f, 0.1f, 0.8f, 1.0f} },
-		{ {0.0f, 1.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}, {0.8f, 0.1f, 0.8f, 1.0f} },
-		{ {0.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}, {0.8f, 0.1f, 0.8f, 1.0f} },
-		{ {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.8f, 0.8f, 0.1f, 1.0f} },
-		{ {0.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}, {0.8f, 0.8f, 0.1f, 1.0f} },
-		{ {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}, {0.8f, 0.8f, 0.1f, 1.0f} },
-		{ {1.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.8f, 0.8f, 0.1f, 1.0f} },
-		{ {0.0f, 0.0f, 1.0f}, {0.0f, -1.0f, 0.0f}, {0.1f, 0.8f, 0.8f, 1.0f} },
-		{ {0.0f, 0.0f, 0.0f}, {0.0f, -1.0f, 0.0f}, {0.1f, 0.8f, 0.8f, 1.0f} },
-		{ {1.0f, 0.0f, 0.0f}, {0.0f, -1.0f, 0.0f}, {0.1f, 0.8f, 0.8f, 1.0f} },
-		{ {1.0f, 0.0f, 1.0f}, {0.0f, -1.0f, 0.0f}, {0.1f, 0.8f, 0.8f, 1.0f} },
-	};
-	std::vector<unsigned int> indicies = {
-		0, 1, 2,
-		0, 2, 3,
-		4, 5, 6,
-		4, 6, 7,
-		8, 9, 10,
-		8, 10, 11,
-		12, 13, 14,
-		12, 14, 15,
-		16, 17, 18,
-		16, 18, 19,
-		20, 21, 22,
-		20, 22, 23,
-	};
+	std::vector<Vertex> verticies(Primatives::Cube::verticies.size());
+	Primatives::CopyPositionNormalColor(verticies, Primatives::Cube::verticies);
 
 	std::string vsfilename = Config::directories["ShaderSourceDir"] + "BallWorld1VS.hlsl";
 	std::string psfilename = Config::directories["ShaderSourceDir"] + "BallWorld1PS.hlsl";
 
 	auto model = std::make_shared<Model>("Cube");
-	model->pMesh = std::make_shared<MeshTriangleIndexList<Vertex>>(verticies, indicies);
+	model->pMesh = std::make_shared<MeshTriangleIndexList<Vertex>>(verticies, Primatives::Cube::indicies);
 	model->pMaterial = std::make_shared<RenderNode>("RN1");
 	model->pMaterial->AddBindable(std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout));
 	model->pMaterial->AddBindable(std::make_shared<PixelShaderDynamic>(psfilename));
 	model->entities.instances.emplace_back(0.0f, 0.0f, 0.0f);
 
-	pModel = model;
+	models.push_back(model);
+}
+
+void BallWorld::CreateCubeWireframe()
+{
+	VertexShaderLayout vsLayout = {
+		{"Position", DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT},
+	};
+
+	std::string vsfilename = Config::directories["ShaderSourceDir"] + "WireframeBasicVS.hlsl";
+	std::string psfilename = Config::directories["ShaderSourceDir"] + "WireframeBasicPS.hlsl";
+
+	auto model = std::make_shared<Model>("Cube Wireframe");
+	model->pMesh = std::make_shared<WireframeIndexList<XMFLOAT3>>(Primatives::CubeWireframe::verticies, Primatives::CubeWireframe::indicies);
+	model->pMaterial = std::make_shared<RenderNode>("RN1");
+	model->pMaterial->AddBindable(VertexShader::CreateFromSourceFile(vsfilename, vsLayout));
+	model->pMaterial->AddBindable(PixelShader::CreateFromSourceFile(psfilename));
+	model->entities.instances.emplace_back(2.0f, 0.0f, 0.0f);
+
+	models.push_back(model);
+}
+
+void BallWorld::CreateAxis()
+{
+	struct Vertex {
+		XMFLOAT3 position;
+		XMFLOAT4 color;
+	};
+
+	VertexShaderLayout vsLayout = {
+		{"Position", DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT},
+		{"Color", DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT},
+	};
+
+	std::vector<Vertex> verticies = {
+		{ {0.0f, 0.0f, 0.0f},  {1.0f, 0.0f, 0.0f, 1.0f} },
+		{ {1.0f, 0.0f, 0.0f},  {1.0f, 0.0f, 0.0f, 1.0f} },
+		{ {0.0f, 0.0f, 0.0f},  {0.0f, 1.0f, 0.0f, 1.0f} },
+		{ {0.0f, 1.0f, 0.0f},  {0.0f, 1.0f, 0.0f, 1.0f} },
+		{ {0.0f, 0.0f, 0.0f},  {0.0f, 0.0f, 1.0f, 1.0f} },
+		{ {0.0f, 0.0f, 1.0f},  {0.0f, 0.0f, 1.0f, 1.0f} },
+	};
+
+	std::string vsfilename = Config::directories["ShaderSourceDir"] + "VSTest.hlsl";
+	std::string psfilename = Config::directories["ShaderSourceDir"] + "PSTest.hlsl";
+
+	auto model = std::make_shared<Model>("Axis");
+	model->pMesh = std::make_shared<WireframeList<Vertex>>(verticies);
+	model->pMaterial = std::make_shared<RenderNode>("RN1");
+	model->pMaterial->AddBindable(std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout));
+	model->pMaterial->AddBindable(std::make_shared<PixelShaderDynamic>(psfilename));
+	model->entities.instances.emplace_back(0.0f, 0.0f, 0.0f);
+
+	models.push_back(model);
 }

@@ -3,11 +3,10 @@
 
 namespace Engine2
 {
-	class Util
+	namespace Util
 	{
-	public:
-		static std::wstring ToWString(std::string str);
-		static std::string  ToString(std::wstring wstr);
+		std::wstring ToWString(std::string str);
+		std::string  ToString(std::wstring wstr);
 
 		class Random
 		{

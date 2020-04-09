@@ -138,4 +138,19 @@ namespace Engine2
 	public:
 		MeshTriangleIndexList(std::vector<V>& verticies, std::vector<unsigned int>& indicies) : VertexBufferIndex<V, D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST>(verticies, indicies) {}
 	};
+
+	template <typename V>
+	class WireframeList : public VertexBuffer<V, D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINELIST>
+	{
+	public:
+		WireframeList(std::vector<V>& verticies) : VertexBuffer<V, D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINELIST>(verticies) {}
+	};
+
+	template <typename V>
+	class WireframeIndexList : public VertexBufferIndex<V, D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINELIST>
+	{
+	public:
+		WireframeIndexList(std::vector<V>& verticies, std::vector<unsigned int>& indicies) : VertexBufferIndex<V, D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINELIST>(verticies, indicies) {}
+	};
+
 }
