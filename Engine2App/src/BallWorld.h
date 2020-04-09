@@ -20,7 +20,7 @@ protected:
 	std::vector<std::shared_ptr<Engine2::Model>> models;
 
 	void CreateCube();
-	void CreateCubeWireframe();
+	void CreateSphere();
 	void CreateAxis();
 };
 

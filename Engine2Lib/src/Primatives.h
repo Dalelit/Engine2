@@ -13,6 +13,12 @@ namespace Engine2
 			DirectX::XMFLOAT4 color;
 		};
 
+		struct PrimativesData
+		{
+			std::shared_ptr<std::vector<PrimativesVertex>> verticies = nullptr;
+			std::shared_ptr<std::vector<unsigned int>> indicies = nullptr;
+		};
+
 		class Cube
 		{
 		public:
@@ -27,43 +33,49 @@ namespace Engine2
 			static std::vector<unsigned int> indicies;
 		};
 
+		class IcoSphere
+		{
+		public:
+			static PrimativesData CreateIcoSphere(unsigned int iterations);
+		};
+
 
 		template<typename T>
-		void CopyPositionNormalColor(std::vector<T>& verticies, std::vector<PrimativesVertex>& primativeVerticies)
+		void CopyPositionNormalColor(std::vector<T>& targetVerticies, std::vector<PrimativesVertex>& primativeVerticies)
 		{
 			size_t count = primativeVerticies.size();
-			if (verticies.size() < count) verticies.resize(count);
+			if (targetVerticies.size() < count) targetVerticies.resize(count);
 
 			for (auto i = 0; i < count; i++)
 			{
-				verticies[i].position = primativeVerticies[i].position;
-				verticies[i].normal = primativeVerticies[i].normal;
-				verticies[i].color = primativeVerticies[i].color;
+				targetVerticies[i].position = primativeVerticies[i].position;
+				targetVerticies[i].normal = primativeVerticies[i].normal;
+				targetVerticies[i].color = primativeVerticies[i].color;
 			}
 		}
 
 		template<typename T>
-		void CopyPositionNormal(std::vector<T>& verticies, std::vector<PrimativesVertex>& primativeVerticies)
+		void CopyPositionNormal(std::vector<T>& targetVerticies, std::vector<PrimativesVertex>& primativeVerticies)
 		{
 			size_t count = primativeVerticies.size();
-			if (verticies.size() < count) verticies.resize(count);
+			if (targetVerticies.size() < count) targetVerticies.resize(count);
 
 			for (auto i = 0; i < count; i++)
 			{
-				verticies[i].position = primativeVerticies[i].position;
-				verticies[i].normal = primativeVerticies[i].normal;
+				targetVerticies[i].position = primativeVerticies[i].position;
+				targetVerticies[i].normal = primativeVerticies[i].normal;
 			}
 		}
 
 		template<typename T>
-		void CopyPosition(std::vector<T>& verticies, std::vector<PrimativesVertex>& primativeVerticies)
+		void CopyPosition(std::vector<T>& targetVerticies, std::vector<PrimativesVertex>& primativeVerticies)
 		{
 			size_t count = primativeVerticies.size();
-			if (verticies.size() < count) verticies.resize(count);
+			if (targetVerticies.size() < count) targetVerticies.resize(count);
 
 			for (auto i = 0; i < count; i++)
 			{
-				verticies[i].position = primativeVerticies[i].position;
+				targetVerticies[i].position = primativeVerticies[i].position;
 			}
 		}
 	};

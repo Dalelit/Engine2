@@ -11,7 +11,7 @@ BallWorld::BallWorld() : Layer("BallWorld")
 	Engine::Get().mainCamera.LookAt(0.0f, 0.0f, 0.0f);
 
 	CreateCube();
-	CreateCubeWireframe();
+	CreateSphere();
 	CreateAxis();
 }
 
@@ -63,17 +63,21 @@ void BallWorld::CreateCube()
 	models.push_back(model);
 }
 
-void BallWorld::CreateCubeWireframe()
+void BallWorld::CreateSphere()
 {
 	VertexShaderLayout vsLayout = {
 		{"Position", DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT},
+		{"Normal", DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT},
+		{"Color", DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT},
 	};
 
-	std::string vsfilename = Config::directories["ShaderSourceDir"] + "WireframeBasicVS.hlsl";
-	std::string psfilename = Config::directories["ShaderSourceDir"] + "WireframeBasicPS.hlsl";
+	auto sphereData = Primatives::IcoSphere::CreateIcoSphere(2);
+
+	std::string vsfilename = Config::directories["ShaderSourceDir"] + "BallWorld1VS.hlsl";
+	std::string psfilename = Config::directories["ShaderSourceDir"] + "BallWorld1PS.hlsl";
 
 	auto model = std::make_shared<Model>("Cube Wireframe");
-	model->pMesh = std::make_shared<WireframeIndexList<XMFLOAT3>>(Primatives::CubeWireframe::verticies, Primatives::CubeWireframe::indicies);
+	model->pMesh = std::make_shared<MeshTriangleIndexList<Primatives::PrimativesVertex>>(*sphereData.verticies, *sphereData.indicies);
 	model->pMaterial = std::make_shared<RenderNode>("RN1");
 	model->pMaterial->AddBindable(VertexShader::CreateFromSourceFile(vsfilename, vsLayout));
 	model->pMaterial->AddBindable(PixelShader::CreateFromSourceFile(psfilename));
