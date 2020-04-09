@@ -33,6 +33,7 @@
     <ClInclude Include="src\Offscreen.h" />
     <ClInclude Include="src\VertexBuffer.h" />
     <ClInclude Include="src\Primatives.h" />
+    <ClInclude Include="src\Lights.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\pch.cpp" />
@@ -58,5 +59,6 @@
     <ClCompile Include="src\Instrumentation.cpp" />
     <ClCompile Include="src\Offscreen.cpp" />
     <ClCompile Include="src\Primatives.cpp" />
+    <ClCompile Include="src\Lights.cpp" />
   </ItemGroup>
 </Project>

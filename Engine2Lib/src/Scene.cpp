@@ -4,13 +4,42 @@
 
 namespace Engine2
 {
-	void Scene::OnUpdate(float dt)
+	Scene::Scene() : vsConstBuffer(0), psConstBuffer(0)
 	{
 	}
 
 	void Scene::OnRender()
 	{
+		UpdateVSConstBuffer();
+		UpdatePSConstBuffer();
+	}
+
+	void Scene::OnImgui()
+	{
+		if (ImGui::TreeNode("Scene"))
+		{
+			if (ImGui::CollapsingHeader("Lights"))
+			{
+				for (auto& l : pointLights) l.OnImgui();
+			}
+			ImGui::TreePop();
+		}
+	}
+
+	void Scene::UpdateVSConstBuffer()
+	{
 		Engine::Get().mainCamera.LoadViewProjectionMatrixT(vsConstBuffer.data.cameraTransform);
 		vsConstBuffer.Bind();
+	}
+
+	void Scene::UpdatePSConstBuffer()
+	{
+		psConstBuffer.data.CameraPosition = Engine::Get().mainCamera.GetPosition();
+		if (pointLights.size() > 0)
+		{
+			psConstBuffer.data.pointLightPosition = pointLights[0].GetPosition();
+			psConstBuffer.data.pointLightColor = pointLights[0].GetColor();
+		}
+		psConstBuffer.Bind();
 	}
 }

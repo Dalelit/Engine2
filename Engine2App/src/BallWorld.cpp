@@ -10,6 +10,8 @@ BallWorld::BallWorld() : Layer("BallWorld")
 	Engine::Get().mainCamera.SetPosition(2.0f, 3.0f, -4.0f);
 	Engine::Get().mainCamera.LookAt(0.0f, 0.0f, 0.0f);
 
+	scene.pointLights.emplace_back(PointLight({ -1.0f, 4.0f, -2.0f, 1.0f }, { 0.8f, 0.8f, 0.8f, 1.0f }));
+
 	CreateCube();
 	CreateSphere();
 	CreateAxis();
@@ -30,6 +32,7 @@ void BallWorld::OnRender()
 void BallWorld::OnImgui()
 {
 	ImGui::Checkbox("Active", &active);
+	scene.OnImgui();
 	for (auto& m : models) m->OnImgui();
 }
 
@@ -58,7 +61,7 @@ void BallWorld::CreateCube()
 	model->pMaterial = std::make_shared<RenderNode>("RN1");
 	model->pMaterial->AddBindable(std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout));
 	model->pMaterial->AddBindable(std::make_shared<PixelShaderDynamic>(psfilename));
-	model->entities.instances.emplace_back(0.0f, 0.0f, 0.0f);
+	model->entities.instances.emplace_back(1.0f, 0.0f, 0.0f);
 
 	models.push_back(model);
 }
@@ -72,16 +75,17 @@ void BallWorld::CreateSphere()
 	};
 
 	auto sphereData = Primatives::IcoSphere::CreateIcoSphere(2);
+	for (auto& v : *sphereData.verticies) v.color = { 0.1f, 0.2f, 0.8f, 1.0f };
 
 	std::string vsfilename = Config::directories["ShaderSourceDir"] + "BallWorld1VS.hlsl";
 	std::string psfilename = Config::directories["ShaderSourceDir"] + "BallWorld1PS.hlsl";
 
-	auto model = std::make_shared<Model>("Cube Wireframe");
+	auto model = std::make_shared<Model>("IcoSphere");
 	model->pMesh = std::make_shared<MeshTriangleIndexList<Primatives::PrimativesVertex>>(*sphereData.verticies, *sphereData.indicies);
 	model->pMaterial = std::make_shared<RenderNode>("RN1");
-	model->pMaterial->AddBindable(VertexShader::CreateFromSourceFile(vsfilename, vsLayout));
-	model->pMaterial->AddBindable(PixelShader::CreateFromSourceFile(psfilename));
-	model->entities.instances.emplace_back(2.0f, 0.0f, 0.0f);
+	model->pMaterial->AddBindable(std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout));
+	model->pMaterial->AddBindable(std::make_shared<PixelShaderDynamic>(psfilename));
+	model->entities.instances.emplace_back(-1.0f, 0.0f, 0.0f);
 
 	models.push_back(model);
 }

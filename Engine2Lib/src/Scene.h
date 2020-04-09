@@ -1,6 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "ConstantBuffer.h"
+#include "Lights.h"
 
 namespace Engine2
 {
@@ -9,27 +10,43 @@ namespace Engine2
 	{
 	public:
 
-		Scene() : vsConstBuffer(0) {}
+		Scene();
 		~Scene() = default;
 
-		void OnUpdate(float dt);
+		void OnUpdate(float dt) {}
 		void OnRender();
+
+		void OnImgui();
 
 		struct VSSceneData
 		{
 			DirectX::XMMATRIX cameraTransform;
 		};
+		VSConstantBuffer<VSSceneData> vsConstBuffer;
 
-		static std::string GetVSCBHLSL() { return R"(
+		struct PSSceneData
+		{
+			DirectX::XMVECTOR CameraPosition;
+			DirectX::XMVECTOR pointLightPosition;
+			DirectX::XMVECTOR pointLightColor;
+		};
+		PSConstantBuffer<PSSceneData> psConstBuffer;
+
+		std::vector<PointLight> pointLights;
+
+
+		static std::string GetVSCBHLSL() {
+			return R"(
 			cbuffer sceneConst : register (b0)
 			{
 				matrix cameraTransform;
 			};
-		)"; }
-
-		VSConstantBuffer<VSSceneData> vsConstBuffer;
+		)";
+		}
 
 	protected:
+		void UpdateVSConstBuffer();
+		void UpdatePSConstBuffer();
 	};
 
 }

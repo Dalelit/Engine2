@@ -22,6 +22,8 @@ namespace Engine2
 
 		inline void SetAspectRatio(float ratio) { aspectRatio = ratio; }
 
+		inline DirectX::XMVECTOR GetPosition() { return position; }
+
 	protected:
 		float aspectRatio = 1.0f;
 		float fov = DirectX::XMConvertToRadians(75.0f);

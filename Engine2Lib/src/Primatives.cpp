@@ -88,11 +88,11 @@ namespace Engine2
 			std::vector<XMVECTOR> positions;
 			std::vector<unsigned int>& indicies = *data.indicies;
 
-			// note - swapping the order of the indicies from the code sample
+			// helper to add indicies
 			auto addTriangleIndicies = [&indicies](unsigned int i0, unsigned int i1, unsigned int i2) mutable {
 				indicies.push_back(i0);
-				indicies.push_back(i2);
 				indicies.push_back(i1);
+				indicies.push_back(i2);
 			};
 
 			// Create a new vertex between 2 others. Adjust to unit sphere.
