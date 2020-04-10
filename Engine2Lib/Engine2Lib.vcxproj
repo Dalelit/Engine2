@@ -152,6 +152,7 @@
   <ItemGroup>
     <ClInclude Include="src\Config.h" />
     <ClInclude Include="src\Entity.h" />
+    <ClInclude Include="src\Gizmos.h" />
     <ClInclude Include="src\InputController.h" />
     <ClInclude Include="src\Instrumentation.h" />
     <ClInclude Include="src\Lights.h" />
@@ -168,6 +169,7 @@
     <ClInclude Include="src\DXDevice.h" />
     <ClInclude Include="src\Engine2.h" />
     <ClInclude Include="src\RenderNode.h" />
+    <ClInclude Include="src\VertexBufferDynamic.h" />
     <ClInclude Include="src\VertexBuffer.h" />
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\pch.h" />
@@ -187,6 +189,7 @@
   <ItemGroup>
     <ClCompile Include="src\Config.cpp" />
     <ClCompile Include="src\Entity.cpp" />
+    <ClCompile Include="src\Gizmos.cpp" />
     <ClCompile Include="src\InputController.cpp" />
     <ClCompile Include="src\Instrumentation.cpp" />
     <ClCompile Include="src\Lights.cpp" />
@@ -230,6 +233,24 @@
     </ClCompile>
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\Util.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Assets\Shaders\GizmosPS.hlsl">
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)$(Platform)\Shaders\%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)$(Platform)\Shaders\%(Filename).cso</ObjectFileOutput>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Assets\Shaders\GizmosVS.hlsl">
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)$(Platform)\Shaders\%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)$(Platform)\Shaders\%(Filename).cso</ObjectFileOutput>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

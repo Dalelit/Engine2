@@ -17,17 +17,15 @@ namespace Engine2
 
 			vertexCount = (UINT)verticies.size();
 
-			// create triangle data
 			D3D11_SUBRESOURCE_DATA data = {};
 			data.SysMemPitch = 0;
 			data.SysMemSlicePitch = 0;
 			data.pSysMem = verticies.data();
 
-			// create the triangle buffer
 			D3D11_BUFFER_DESC bufferDesc = {};
 			bufferDesc.ByteWidth = sizeof(V) * vertexCount;
-			bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-			bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+			bufferDesc.Usage = D3D11_USAGE::D3D11_USAGE_DEFAULT;
+			bufferDesc.BindFlags = D3D11_BIND_FLAG::D3D11_BIND_VERTEX_BUFFER;
 			bufferDesc.CPUAccessFlags = 0;
 			bufferDesc.MiscFlags = 0;
 			bufferDesc.StructureByteStride = sizeof(V);
@@ -64,7 +62,6 @@ namespace Engine2
 		std::string info;
 		wrl::ComPtr<ID3D11Buffer> pVertexBuffer = nullptr;
 
-		//D3D11_PRIMITIVE_TOPOLOGY topology = D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 		D3D11_PRIMITIVE_TOPOLOGY topology = TOP;
 
 		UINT bufferStrides[1] = {  }; // set by vertexSize in constructor
@@ -91,8 +88,8 @@ namespace Engine2
 
 			D3D11_BUFFER_DESC bufferDesc = {};
 			bufferDesc.ByteWidth = sizeof(unsigned int) * indxCount;
-			bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-			bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+			bufferDesc.Usage = D3D11_USAGE::D3D11_USAGE_DEFAULT;
+			bufferDesc.BindFlags = D3D11_BIND_FLAG::D3D11_BIND_INDEX_BUFFER;
 			bufferDesc.CPUAccessFlags = 0;
 			bufferDesc.MiscFlags = 0;
 			bufferDesc.StructureByteStride = sizeof(unsigned int);
