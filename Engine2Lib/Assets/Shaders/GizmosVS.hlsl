@@ -3,7 +3,7 @@ cbuffer sceneConst : register (b0)
 	matrix cameraTransform;
 }; 
 
-float4 main( float3 pos : POSITION ) : SV_POSITION
+float4 main( float4 pos : POSITION ) : SV_POSITION
 {
-	return mul(float4(pos, 1.0), cameraTransform);
+	return mul(pos, cameraTransform);
 }

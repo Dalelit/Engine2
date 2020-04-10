@@ -57,7 +57,7 @@ namespace Engine2
 			auto& context = Engine::GetContext();
 			auto ptrBuffer = pVertexBuffer.Get();
 
-			D3D11_MAPPED_SUBRESOURCE mappedSubResource = {};
+			D3D11_MAPPED_SUBRESOURCE mappedSubResource;
 			hr = context.Map(ptrBuffer, 0u, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubResource);
 
 			E2_ASSERT_HR(hr, "VertexBufferDynamic Map failed");

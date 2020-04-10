@@ -28,9 +28,7 @@ void BallWorld::OnRender()
 
 	scene.OnRender();
 
-	gizmos.AddLine({ 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f });
-	gizmos.AddLine({ 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f });
-	gizmos.AddLine({ 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f });
+	gizmos.DrawAxis({ 0.0f, 0.0f, 0.0f });
 
 	for (auto& m : models) if (m->IsActive()) m->OnRender();
 
