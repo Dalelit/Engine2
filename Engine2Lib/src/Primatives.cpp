@@ -19,9 +19,23 @@ namespace Engine2
 			auto& verticies = *data.verticies;
 			auto& indicies = *data.indicies;
 
-
 			std::vector<XMVECTOR> points;
 			points.reserve(verticies.size() * 2); // to do: check sensible size
+
+			auto AddIfMissing = [&points](XMVECTOR& v0, XMVECTOR& v1) mutable {
+				auto point = points.begin();
+				while (point != points.end())
+				{
+					if ((XMVector3Equal(*point, v0) && XMVector3Equal(*(point + 1), v1)) || (XMVector3Equal(*point, v1) && XMVector3Equal(*(point + 1), v0))) break; // found it
+					point += 2;
+				}
+
+				if (point == points.end()) // reached the end so add it
+				{
+					points.push_back(v0);
+					points.push_back(v1);
+				}
+			};
 
 			auto currentIndx = indicies.begin();
 
@@ -29,20 +43,11 @@ namespace Engine2
 			{
 				XMVECTOR p0 = Util::ToXMVECTORw1(verticies[*currentIndx++].position);
 				XMVECTOR p1 = Util::ToXMVECTORw1(verticies[*currentIndx++].position);
+				XMVECTOR p2 = Util::ToXMVECTORw1(verticies[*currentIndx++].position);
 
-				// check if it's already in the list of points
-				auto point = points.begin();
-				while (point != points.end())
-				{
-					if ((XMVector3Equal(*point, p0) && XMVector3Equal(*(point + 1), p1)) || (XMVector3Equal(*point, p1) && XMVector3Equal(*(point + 1), p0))) break; // found it
-					point += 2;
-				}
-
-				if (point == points.end()) // reached the end so add it
-				{
-					points.push_back(p0);
-					points.push_back(p1);
-				}
+				AddIfMissing(p0, p1);
+				AddIfMissing(p1, p2);
+				AddIfMissing(p2, p1);
 			}
 
 			std::ofstream ofs(filename);    E2_ASSERT(ofs.is_open(), "Could not open file");

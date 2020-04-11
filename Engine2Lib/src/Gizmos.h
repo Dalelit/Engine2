@@ -6,11 +6,11 @@
 
 namespace Engine2
 {
-	class GizmosBuffer
+	class Gizmos
 	{
 	public:
-		GizmosBuffer();
-		~GizmosBuffer() = default;
+		Gizmos();
+		~Gizmos() = default;
 
 		void NewFrame();
 		void Draw();
@@ -18,9 +18,9 @@ namespace Engine2
 
 		void DrawLine(DirectX::XMVECTOR p0, DirectX::XMVECTOR p1);
 		
-		void DrawAxis(DirectX::XMVECTOR p0);
+		void DrawAxis(DirectX::XMVECTOR pos) { AddLines(pos, AxisWireframe); }
 
-		void DrawSphere(DirectX::XMVECTOR p0);
+		void DrawSphere(DirectX::XMVECTOR pos) { AddLines(pos, SphereWireframe); }
 
 		inline bool IsActive() { return active; }
 
@@ -34,6 +34,9 @@ namespace Engine2
 		std::shared_ptr<PixelShader> pPS;
 		std::shared_ptr<VertexShader> pVS;
 
+		void AddLines(DirectX::XMVECTOR pos, std::vector<DirectX::XMVECTOR>& points);
+
+		static std::vector<DirectX::XMVECTOR> AxisWireframe;
 		static std::vector<DirectX::XMVECTOR> SphereWireframe;
 	};
 }

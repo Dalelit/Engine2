@@ -20,7 +20,7 @@ protected:
 
 	std::vector<std::shared_ptr<Engine2::Model>> models;
 
-	Engine2::GizmosBuffer gizmos;
+	Engine2::Gizmos gizmos;
 
 	void CreateCube();
 	void CreateSphere();
