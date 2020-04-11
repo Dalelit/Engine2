@@ -24,16 +24,16 @@ namespace Engine2
 		};
 		VSConstantBuffer<VSSceneData> vsConstBuffer;
 
+		std::vector<PointLight> pointLights;
+
 		struct PSSceneData
 		{
 			DirectX::XMVECTOR CameraPosition;
+			DirectX::XMVECTOR ambientLight;
 			DirectX::XMVECTOR pointLightPosition;
 			DirectX::XMVECTOR pointLightColor;
 		};
 		PSConstantBuffer<PSSceneData> psConstBuffer;
-
-		std::vector<PointLight> pointLights;
-
 
 		static std::string GetVSCBHLSL() {
 			return R"(

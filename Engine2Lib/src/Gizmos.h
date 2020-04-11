@@ -2,6 +2,7 @@
 #include "pch.h"
 #include "VertexBufferDynamic.h"
 #include "Shader.h"
+#include "Util.h"
 
 namespace Engine2
 {
@@ -16,7 +17,10 @@ namespace Engine2
 		void OnImgui();
 
 		void DrawLine(DirectX::XMVECTOR p0, DirectX::XMVECTOR p1);
-		void DrawAxis(DirectX::XMFLOAT3 p0);
+		
+		void DrawAxis(DirectX::XMVECTOR p0);
+
+		void DrawSphere(DirectX::XMVECTOR p0);
 
 		inline bool IsActive() { return active; }
 
@@ -29,5 +33,7 @@ namespace Engine2
 		LineBufferDynamic<DirectX::XMVECTOR> vertexBuffer;
 		std::shared_ptr<PixelShader> pPS;
 		std::shared_ptr<VertexShader> pVS;
+
+		static std::vector<DirectX::XMVECTOR> SphereWireframe;
 	};
 }

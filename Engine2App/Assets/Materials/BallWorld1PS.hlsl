@@ -1,18 +1,19 @@
 cbuffer sceneConst : register (b0)
 {
 	float4 cameraPosition;
+	float4 ambientLight;
 	float4 pointLightPosition;
 	float4 pointLightColor;
 };
 
 float4 main(float3 posWS : WSPosition, float3 norWS : WSNormal, float4 col : Color) : SV_TARGET
 {
-	float4 light = 0.0;
+	float4 light;
 
 	float3 nor = normalize(norWS);
 
 	// ambient light
-	//light = ambientSceneColor * ambientColor;
+	light = ambientLight * col;
 
 	// direcitonal light
 	//light += max(0, -dot(nor, lightDirection.xyz)) * lightDirecitonColor * diffuseColor;

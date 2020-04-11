@@ -24,6 +24,5 @@ protected:
 
 	void CreateCube();
 	void CreateSphere();
-	void CreateAxis();
 };
 

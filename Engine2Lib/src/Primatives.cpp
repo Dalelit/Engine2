@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "Primatives.h"
+#include "Common.h"
+#include "Util.h"
 
 using namespace DirectX;
 
@@ -7,6 +9,56 @@ namespace Engine2
 {
 	namespace Primatives
 	{
+		///////////////////////////////////////
+		// Utils
+		///////////////////////////////////////
+		void WriteMeshAsWireframeToFile(const PrimativesData& data, std::string filename)
+		{
+			using namespace DirectX;
+
+			auto& verticies = *data.verticies;
+			auto& indicies = *data.indicies;
+
+
+			std::vector<XMVECTOR> points;
+			points.reserve(verticies.size() * 2); // to do: check sensible size
+
+			auto currentIndx = indicies.begin();
+
+			while (currentIndx != indicies.end())
+			{
+				XMVECTOR p0 = Util::ToXMVECTORw1(verticies[*currentIndx++].position);
+				XMVECTOR p1 = Util::ToXMVECTORw1(verticies[*currentIndx++].position);
+
+				// check if it's already in the list of points
+				auto point = points.begin();
+				while (point != points.end())
+				{
+					if ((XMVector3Equal(*point, p0) && XMVector3Equal(*(point + 1), p1)) || (XMVector3Equal(*point, p1) && XMVector3Equal(*(point + 1), p0))) break; // found it
+					point += 2;
+				}
+
+				if (point == points.end()) // reached the end so add it
+				{
+					points.push_back(p0);
+					points.push_back(p1);
+				}
+			}
+
+			std::ofstream ofs(filename);    E2_ASSERT(ofs.is_open(), "Could not open file");
+			ofs.precision(6);
+			ofs << std::fixed;
+			for (auto p : points) ofs << "{ " << p << " }," << std::endl;
+			ofs.close();
+		}
+
+		void GenerateFiles()
+		{
+			WriteMeshAsWireframeToFile(IcoSphere::CreateIcoSphere(0), "..\\Icosphere0Wireframe.txt");
+			WriteMeshAsWireframeToFile(IcoSphere::CreateIcoSphere(1), "..\\Icosphere1Wireframe.txt");
+			WriteMeshAsWireframeToFile(IcoSphere::CreateIcoSphere(2), "..\\Icosphere2Wireframe.txt");
+		}
+
 		///////////////////////////////////////
 		// Cube
 		///////////////////////////////////////

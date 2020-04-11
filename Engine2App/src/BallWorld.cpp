@@ -10,11 +10,11 @@ BallWorld::BallWorld() : Layer("BallWorld")
 	Engine::Get().mainCamera.SetPosition(2.0f, 3.0f, -4.0f);
 	Engine::Get().mainCamera.LookAt(0.0f, 0.0f, 0.0f);
 
+	scene.psConstBuffer.data.ambientLight = { 0.1f, 0.1f, 0.1f, 1.0f };
 	scene.pointLights.emplace_back(PointLight({ -1.0f, 4.0f, -2.0f, 1.0f }, { 0.8f, 0.8f, 0.8f, 1.0f }));
 
 	CreateCube();
 	CreateSphere();
-	//CreateAxis();
 }
 
 void BallWorld::OnUpdate(float dt)
@@ -28,7 +28,9 @@ void BallWorld::OnRender()
 
 	scene.OnRender();
 
-	gizmos.DrawAxis({ 0.0f, 0.0f, 0.0f });
+	gizmos.DrawAxis({ 0.0f, 0.0f, 0.0f, 1.0f });
+
+	gizmos.DrawSphere(scene.pointLights[0].GetPosition());
 
 	for (auto& m : models) if (m->IsActive()) m->OnRender();
 
@@ -93,40 +95,6 @@ void BallWorld::CreateSphere()
 	model->pMaterial->AddBindable(std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout));
 	model->pMaterial->AddBindable(std::make_shared<PixelShaderDynamic>(psfilename));
 	model->entities.instances.emplace_back(-1.0f, 0.0f, 0.0f);
-
-	models.push_back(model);
-}
-
-void BallWorld::CreateAxis()
-{
-	struct Vertex {
-		XMFLOAT3 position;
-		XMFLOAT4 color;
-	};
-
-	VertexShaderLayout vsLayout = {
-		{"Position", DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT},
-		{"Color", DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT},
-	};
-
-	std::vector<Vertex> verticies = {
-		{ {0.0f, 0.0f, 0.0f},  {1.0f, 0.0f, 0.0f, 1.0f} },
-		{ {1.0f, 0.0f, 0.0f},  {1.0f, 0.0f, 0.0f, 1.0f} },
-		{ {0.0f, 0.0f, 0.0f},  {0.0f, 1.0f, 0.0f, 1.0f} },
-		{ {0.0f, 1.0f, 0.0f},  {0.0f, 1.0f, 0.0f, 1.0f} },
-		{ {0.0f, 0.0f, 0.0f},  {0.0f, 0.0f, 1.0f, 1.0f} },
-		{ {0.0f, 0.0f, 1.0f},  {0.0f, 0.0f, 1.0f, 1.0f} },
-	};
-
-	std::string vsfilename = Config::directories["ShaderSourceDir"] + "VSTest.hlsl";
-	std::string psfilename = Config::directories["ShaderSourceDir"] + "PSTest.hlsl";
-
-	auto model = std::make_shared<Model>("Axis");
-	model->pMesh = std::make_shared<WireframeList<Vertex>>(verticies);
-	model->pMaterial = std::make_shared<RenderNode>("RN1");
-	model->pMaterial->AddBindable(std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout));
-	model->pMaterial->AddBindable(std::make_shared<PixelShaderDynamic>(psfilename));
-	model->entities.instances.emplace_back(0.0f, 0.0f, 0.0f);
 
 	models.push_back(model);
 }

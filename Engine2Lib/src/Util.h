@@ -8,6 +8,8 @@ namespace Engine2
 		std::wstring ToWString(std::string str);
 		std::string  ToString(std::wstring wstr);
 
+		inline DirectX::XMVECTOR ToXMVECTORw1(DirectX::XMFLOAT3& f3) { DirectX::XMVECTOR v = DirectX::XMLoadFloat3(&f3); v.m128_f32[3] = 1.0f; return v; }
+
 		class Random
 		{
 		public:

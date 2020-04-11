@@ -39,6 +39,9 @@ namespace Engine2
 			static PrimativesData CreateIcoSphere(unsigned int iterations);
 		};
 
+		void WriteMeshAsWireframeToFile(const PrimativesData& data, std::string filename);
+
+		void GenerateFiles();
 
 		template<typename T>
 		void CopyPositionNormalColor(std::vector<T>& targetVerticies, std::vector<PrimativesVertex>& primativeVerticies)

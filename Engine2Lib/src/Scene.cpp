@@ -20,6 +20,8 @@ namespace Engine2
 		{
 			if (ImGui::CollapsingHeader("Lights"))
 			{
+				ImGui::ColorEdit4("Ambient", psConstBuffer.data.ambientLight.m128_f32);
+
 				for (auto& l : pointLights) l.OnImgui();
 			}
 			ImGui::TreePop();
