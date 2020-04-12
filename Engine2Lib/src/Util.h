@@ -22,6 +22,11 @@ namespace Engine2
 			std::mt19937_64 gen;
 			std::uniform_real_distribution<float> dist;
 		};
+
+		static Random rng;
+
+		DirectX::XMVECTOR RandomOnUnitSphere();
+		DirectX::XMVECTOR RandomInUnitSphere();
 	};
 
 	class FileWatcher

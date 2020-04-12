@@ -31,5 +31,6 @@
     <FxCompile Include="Assets\Materials\BallWorld1VS.hlsl" />
     <FxCompile Include="Assets\Materials\WireframeBasicPS.hlsl" />
     <FxCompile Include="Assets\Materials\WireframeBasicVS.hlsl" />
+    <FxCompile Include="Assets\Materials\PixelShaderCommon.hlsl" />
   </ItemGroup>
 </Project>

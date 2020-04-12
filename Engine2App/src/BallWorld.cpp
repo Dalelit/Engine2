@@ -70,6 +70,7 @@ void BallWorld::CreateCube()
 	model->pMaterial = std::make_shared<RenderNode>("RN1");
 	model->pMaterial->AddBindable(std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout));
 	model->pMaterial->AddBindable(std::make_shared<PixelShaderDynamic>(psfilename));
+
 	model->entities.instances.emplace_back(1.0f, 0.0f, 0.0f);
 
 	models.push_back(model);
@@ -94,7 +95,10 @@ void BallWorld::CreateSphere()
 	model->pMaterial = std::make_shared<RenderNode>("RN1");
 	model->pMaterial->AddBindable(std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout));
 	model->pMaterial->AddBindable(std::make_shared<PixelShaderDynamic>(psfilename));
-	model->entities.instances.emplace_back(-1.0f, 0.0f, 0.0f);
+
+	model->entities.instances.reserve(100000);
+	XMVECTOR scale = { 20.0f, 20.0f, 20.0f, 1.0f };
+	for (int i = 0; i < 100; i++) model->entities.instances.emplace_back(Util::RandomInUnitSphere() * scale);
 
 	models.push_back(model);
 }

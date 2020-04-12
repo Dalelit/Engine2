@@ -1,3 +1,6 @@
+#include "PixelShaderCommon.hlsl"
+
+
 cbuffer sceneConst : register (b0)
 {
 	float4 cameraPosition;
@@ -6,40 +9,36 @@ cbuffer sceneConst : register (b0)
 	float4 pointLightColor;
 };
 
+
+float attenuation(float distance)
+{
+	return 1.0 / (1.0 + 0.045 * distance + 0.0075 * distance * distance);
+}
+
 float4 main(float3 posWS : WSPosition, float3 norWS : WSNormal, float4 col : Color) : SV_TARGET
 {
-	float4 light;
+	float light = 0.0;
+	//col = float4(1.0, 1.0, 1.0, 1.0);
 
-	float3 nor = normalize(norWS);
+	norWS = normalize(norWS);
 
-	// ambient light
-	light = ambientLight * col;
+	float3 toLight = pointLightPosition.xyz - posWS.xyz;
+	float norDotLight = dot(norWS, normalize(toLight));
 
-	// direcitonal light
-	//light += max(0, -dot(nor, lightDirection.xyz)) * lightDirecitonColor * diffuseColor;
-
-	// point light
-	float3 toPL = pointLightPosition.xyz - posWS.xyz;
-
-	float plNorDot = dot(nor, normalize(toPL));
-
-	if (plNorDot > 0.0) // ignore if it is facing away
+	if (norDotLight > 0.0)
 	{
-		// light from point light
-		float len = length(toPL);
-		float att = 1.0 / (1.0 + 0.045 * len + 0.0075 * len * len);
-		light += att * plNorDot * pointLightColor * col;
-		//light += att * plNorDot * pointLightColor * diffuseColor;
+		const float PI = 3.14159565359;
 
-		// point light specular
-		float3 toCam = normalize(cameraPosition.xyz - posWS);
-		float3 reflected = normalize(2.0 * dot(nor, toPL) * nor - toPL);
-		float spec = saturate(dot(reflected, toCam));
-		const float specularExponent = 5.0;
-		spec = pow(spec, specularExponent); // *specIntensity;
-		light += spec * pointLightColor * col;
-		//light += spec * pointLightColor * specularColor;
+		float specLight = specular(posWS.xyz, norWS.xyz, pointLightPosition.xyz, cameraPosition.xyz, 5.0);
+		light += specLight;
+
+		float att = attenuation(length(toLight)) * norDotLight;
+		att /= PI;
+		light += att;
 	}
 
-	return saturate(light);
+	//float3 toCam = normalize(cameraPosition.xyz - posWS);
+	//light = fresnelSchlick(dot(norWS, toCam), col);
+
+	return light * pointLightColor * col + ambientLight * col;
 }

@@ -24,6 +24,21 @@ namespace Engine2
 			WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), srclength, &r[0], tgtlength, 0, 0);
 			return r;
 		}
+
+		DirectX::XMVECTOR RandomOnUnitSphere()
+		{
+			float xzAng = DirectX::XM_2PI * rng.Next();
+			float yzAng = DirectX::XM_PI * rng.Next();
+			return { sinf(yzAng) * cosf(xzAng), sinf(yzAng) * sin(xzAng), cosf(yzAng), 1.0f };
+		}
+
+		DirectX::XMVECTOR RandomInUnitSphere()
+		{
+			float xzAng = DirectX::XM_2PI * rng.Next();
+			float yzAng = DirectX::XM_PI * rng.Next();
+			float len = rng.Next();
+			return { len * sinf(yzAng) * cosf(xzAng), len * sinf(yzAng) * sin(xzAng), len * cosf(yzAng), 1.0f };
+		}
 	}
 
 
