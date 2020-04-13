@@ -8,14 +8,11 @@ struct VSOut
 	float4 posSS : SV_POSITION;
 };
 
-VSOut main(float3 pos : Position, float3 nor : Normal, uint  instanceID : SV_InstanceID)
+VSOut main(float3 pos : Position, float3 nor : Normal, float3 instPos : InstancePos, uint  instanceID : SV_InstanceID)
 {
 	VSOut vso;
 
-	pos.z += cos(instanceID * 3.14 / 5.0);
-	pos.x += sin(instanceID * 3.14 / 5.0);
-	pos.y += instanceID * 0.5;
-	float4 pws = mul(float4(pos, 1.0f), entityTransform);
+	float4 pws = float4(pos + instPos, 1.0f);
 
 	vso.posWS = pws.xyz;
 	vso.norWS = nor;

@@ -68,7 +68,7 @@ void BallWorld::CreateCube()
 	std::string psfilename = Config::directories["ShaderSourceDir"] + "BallWorld1PS.hlsl";
 
 	auto model = std::make_shared<Model>("Cube");
-	model->pMesh = std::make_shared<TriangleListIndexInstanced<Vertex>>(verticies, Primatives::Cube::indicies, 10);
+	model->pMesh = std::make_shared<MeshTriangleIndexList<Vertex>>(verticies, Primatives::Cube::indicies);
 	model->pMaterial = std::make_shared<RenderNode>("RN1");
 	model->pMaterial->AddBindable(std::make_shared<VertexShaderDynamic>(vsfilename, layout));
 	model->pMaterial->AddBindable(std::make_shared<PixelShaderDynamic>(psfilename));
@@ -86,34 +86,38 @@ void BallWorld::CreateSphere()
 	};
 	std::vector<Vertex> verticies;
 
-	std::vector<D3D11_INPUT_ELEMENT_DESC> vsLayout = {
-		{"Position", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"Normal", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+	struct InstanceInfo {
+		XMFLOAT3 position;
 	};
-	//LPCSTR                     SemanticName;
-	//UINT                       SemanticIndex;
-	//DXGI_FORMAT                Format;
-	//UINT                       InputSlot;
-	//UINT                       AlignedByteOffset;
-	//D3D11_INPUT_CLASSIFICATION InputSlotClass;
-	//UINT                       InstanceDataStepRate
+	std::vector<InstanceInfo> instances;
+
+	std::vector<D3D11_INPUT_ELEMENT_DESC> vsLayout = {
+		{"Position", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"Normal", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"InstancePos", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_INSTANCE_DATA, 1},
+	};
 
 	auto sphereData = Primatives::IcoSphere::CreateIcoSphere(2);
 	Primatives::CopyPositionNormal<Vertex>(verticies, *sphereData.verticies);
+
+	instances.resize(100000);
+	for (int i = 0; i < instances.size(); i++)
+	{
+		XMVECTOR p4 = Util::RandomInUnitSphere() * 50.0f;
+		XMStoreFloat3(&instances[i].position, p4);
+	}
 
 	std::string vsfilename = Config::directories["ShaderSourceDir"] + "BallWorld2VS.hlsl";
 	std::string psfilename = Config::directories["ShaderSourceDir"] + "BallWorld1PS.hlsl";
 
 	auto model = std::make_shared<Model>("IcoSphere");
-	model->pMesh = std::make_shared<TriangleListIndexInstanced<Primatives::PrimativesVertex>>(*sphereData.verticies, *sphereData.indicies, 200);
+	auto vertBuffer = std::make_shared<TriangleListIndexInstanced<Vertex, InstanceInfo>>(verticies, *sphereData.indicies, instances);
+	model->pMesh = vertBuffer;
 	model->pMaterial = std::make_shared<RenderNode>("RN1");
 	model->pMaterial->AddBindable(std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout));
 	model->pMaterial->AddBindable(std::make_shared<PixelShaderDynamic>(psfilename));
 
-	model->entities.instances.emplace_back(-1.0f, 0.0f, 0.0f);
-	//model->entities.instances.reserve(100000);
-	//XMVECTOR scale = { 20.0f, 20.0f, 20.0f, 1.0f };
-	//for (int i = 0; i < 100; i++) model->entities.instances.emplace_back(Util::RandomInUnitSphere() * scale);
+	model->entities.instances.emplace_back(0.0f, 0.0f, 0.0f);
 
 	models.push_back(model);
 }
