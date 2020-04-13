@@ -8,11 +8,13 @@ struct VSOut
 	float4 posSS : SV_POSITION;
 };
 
-VSOut main(float3 pos : Position, float3 nor : Normal, float4 col : Color)
+VSOut main(float3 pos : Position, float3 nor : Normal, float4 col : Color, matrix instTransform : InstanceTransform)
 {
 	VSOut vso;
+	
+	float4 newPos = mul(float4(pos, 1.0f), instTransform);
 
-	float4 pws = mul(float4(pos, 1.0f), entityTransform);
+	float4 pws = mul(newPos, entityTransform);
 
 	vso.posWS = pws.xyz;
 	vso.norWS = nor;

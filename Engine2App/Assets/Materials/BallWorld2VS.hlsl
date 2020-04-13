@@ -8,7 +8,7 @@ struct VSOut
 	float4 posSS : SV_POSITION;
 };
 
-VSOut main(float3 pos : Position, float3 nor : Normal, float3 instPos : InstancePos, uint  instanceID : SV_InstanceID)
+VSOut main(float3 pos : Position, float3 nor : Normal, float3 instPos : InstancePos, float3 instCol : InstanceCol, uint instanceID : SV_InstanceID)
 {
 	VSOut vso;
 
@@ -16,7 +16,7 @@ VSOut main(float3 pos : Position, float3 nor : Normal, float3 instPos : Instance
 
 	vso.posWS = pws.xyz;
 	vso.norWS = nor;
-	vso.col   = float4(instanceID % 2 * 1.0, 1.0, 1.0, 1.0);
+	vso.col   = float4(instCol, 1.0);
 	vso.posSS = mul(pws, cameraTransform);
 
 	return vso;

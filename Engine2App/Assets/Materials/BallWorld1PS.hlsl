@@ -38,7 +38,7 @@ float4 main(float3 posWS : WSPosition, float3 norWS : WSNormal, float4 col : Col
 	}
 
 	//float3 toCam = normalize(cameraPosition.xyz - posWS);
-	//light = fresnelSchlick(dot(norWS, toCam), col);
+	//return fresnelSchlick(dot(norWS, toCam), col);
 
 	return light * pointLightColor * col + ambientLight * col;
 }

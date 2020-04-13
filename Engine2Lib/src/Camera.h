@@ -28,7 +28,7 @@ namespace Engine2
 		float aspectRatio = 1.0f;
 		float fov = DirectX::XMConvertToRadians(75.0f);
 		float nearZ = 0.5f;
-		float farZ = 100.0f;
+		float farZ = 10000.0f;
 
 		DirectX::XMVECTOR position = {};
 		DirectX::XMVECTOR direction = {};
