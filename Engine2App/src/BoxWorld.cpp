@@ -59,9 +59,10 @@ void BoxWorld::CreateScene()
 		XMFLOAT3 position;
 	};
 
-	VertexShaderLayout vsLayout = {
+	VertexLayoutSimple::VertexShaderLayout vsLayout = {
 		{"Position", DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT},
 	};
+	auto layout = VertexLayoutSimple::ToDescriptor(vsLayout);
 
 	std::vector<Vertex> verticies;
 	Primatives::CopyPosition(verticies, Primatives::Cube::verticies);
@@ -82,7 +83,7 @@ void BoxWorld::CreateScene()
 	model->pMaterial->AddBindable(pTexture);
 
 	std::string vsfilename = Config::directories["ShaderSourceDir"] + "BoxWorldCubeVS.hlsl";
-	model->pMaterial->AddBindable(std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout));
+	model->pMaterial->AddBindable(std::make_shared<VertexShaderDynamic>(vsfilename, layout));
 
 	std::string psfilename = Config::directories["ShaderSourceDir"] + "BoxWorldCubePS.hlsl";
 	model->pMaterial->AddBindable(std::make_shared<PixelShaderDynamic>(psfilename));
@@ -102,9 +103,10 @@ void BoxWorld::GSTestScene()
 		XMFLOAT3 position;
 	};
 
-	VertexShaderLayout vsLayout = {
+	VertexLayoutSimple::VertexShaderLayout vsLayout = {
 		{"Position", DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT},
 	};
+	auto layout = VertexLayoutSimple::ToDescriptor(vsLayout);
 
 	std::vector<Vertex> verticies;
 	Primatives::CopyPosition(verticies, Primatives::Cube::verticies);
@@ -116,7 +118,7 @@ void BoxWorld::GSTestScene()
 	auto model = std::make_shared<Model>("GS +4 Cube");
 	model->pMesh = std::make_shared<MeshTriangleIndexList<Vertex>>(verticies, Primatives::Cube::indicies);
 	model->pMaterial = std::make_shared<RenderNode>("VSGSPSTest");
-	model->pMaterial->AddBindable(std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout));
+	model->pMaterial->AddBindable(std::make_shared<VertexShaderDynamic>(vsfilename, layout));
 	model->pMaterial->AddBindable(std::make_shared<PixelShaderDynamic>(psfilename));
 	model->pMaterial->AddBindable(std::make_shared<GeometryShaderDynamic>(gsfilename), true);
 	model->entities.instances.emplace_back(4.0f, 0.0f, 0.0f);

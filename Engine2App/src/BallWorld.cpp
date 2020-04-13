@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "BallWorld.h"
 #include "Primatives.h"
+#include "VertexBufferInstanced.h"
 
 using namespace Engine2;
 using namespace DirectX;
@@ -13,7 +14,7 @@ BallWorld::BallWorld() : Layer("BallWorld")
 	scene.psConstBuffer.data.ambientLight = { 0.1f, 0.1f, 0.1f, 1.0f };
 	scene.pointLights.emplace_back(PointLight({ -1.0f, 4.0f, -2.0f, 1.0f }, { 0.8f, 0.8f, 0.8f, 1.0f }));
 
-	CreateCube();
+	//CreateCube();
 	CreateSphere();
 }
 
@@ -53,11 +54,12 @@ void BallWorld::CreateCube()
 		XMFLOAT4 color;
 	};
 
-	VertexShaderLayout vsLayout = {
+	VertexLayoutSimple::VertexShaderLayout vsLayout = {
 		{"Position", DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT},
 		{"Normal", DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT},
 		{"Color", DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT},
 	};
+	auto layout = VertexLayoutSimple::ToDescriptor(vsLayout);
 
 	std::vector<Vertex> verticies(Primatives::Cube::verticies.size());
 	Primatives::CopyPositionNormalColor(verticies, Primatives::Cube::verticies);
@@ -66,9 +68,9 @@ void BallWorld::CreateCube()
 	std::string psfilename = Config::directories["ShaderSourceDir"] + "BallWorld1PS.hlsl";
 
 	auto model = std::make_shared<Model>("Cube");
-	model->pMesh = std::make_shared<MeshTriangleIndexList<Vertex>>(verticies, Primatives::Cube::indicies);
+	model->pMesh = std::make_shared<TriangleListIndexInstanced<Vertex>>(verticies, Primatives::Cube::indicies, 10);
 	model->pMaterial = std::make_shared<RenderNode>("RN1");
-	model->pMaterial->AddBindable(std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout));
+	model->pMaterial->AddBindable(std::make_shared<VertexShaderDynamic>(vsfilename, layout));
 	model->pMaterial->AddBindable(std::make_shared<PixelShaderDynamic>(psfilename));
 
 	model->entities.instances.emplace_back(1.0f, 0.0f, 0.0f);
@@ -78,27 +80,40 @@ void BallWorld::CreateCube()
 
 void BallWorld::CreateSphere()
 {
-	VertexShaderLayout vsLayout = {
-		{"Position", DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT},
-		{"Normal", DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT},
-		{"Color", DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT},
+	struct Vertex {
+		XMFLOAT3 position;
+		XMFLOAT3 normal;
 	};
+	std::vector<Vertex> verticies;
+
+	std::vector<D3D11_INPUT_ELEMENT_DESC> vsLayout = {
+		{"Position", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"Normal", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+	};
+	//LPCSTR                     SemanticName;
+	//UINT                       SemanticIndex;
+	//DXGI_FORMAT                Format;
+	//UINT                       InputSlot;
+	//UINT                       AlignedByteOffset;
+	//D3D11_INPUT_CLASSIFICATION InputSlotClass;
+	//UINT                       InstanceDataStepRate
 
 	auto sphereData = Primatives::IcoSphere::CreateIcoSphere(2);
-	for (auto& v : *sphereData.verticies) v.color = { 0.1f, 0.2f, 0.8f, 1.0f };
+	Primatives::CopyPositionNormal<Vertex>(verticies, *sphereData.verticies);
 
-	std::string vsfilename = Config::directories["ShaderSourceDir"] + "BallWorld1VS.hlsl";
+	std::string vsfilename = Config::directories["ShaderSourceDir"] + "BallWorld2VS.hlsl";
 	std::string psfilename = Config::directories["ShaderSourceDir"] + "BallWorld1PS.hlsl";
 
 	auto model = std::make_shared<Model>("IcoSphere");
-	model->pMesh = std::make_shared<MeshTriangleIndexList<Primatives::PrimativesVertex>>(*sphereData.verticies, *sphereData.indicies);
+	model->pMesh = std::make_shared<TriangleListIndexInstanced<Primatives::PrimativesVertex>>(*sphereData.verticies, *sphereData.indicies, 200);
 	model->pMaterial = std::make_shared<RenderNode>("RN1");
 	model->pMaterial->AddBindable(std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout));
 	model->pMaterial->AddBindable(std::make_shared<PixelShaderDynamic>(psfilename));
 
-	model->entities.instances.reserve(100000);
-	XMVECTOR scale = { 20.0f, 20.0f, 20.0f, 1.0f };
-	for (int i = 0; i < 100; i++) model->entities.instances.emplace_back(Util::RandomInUnitSphere() * scale);
+	model->entities.instances.emplace_back(-1.0f, 0.0f, 0.0f);
+	//model->entities.instances.reserve(100000);
+	//XMVECTOR scale = { 20.0f, 20.0f, 20.0f, 1.0f };
+	//for (int i = 0; i < 100; i++) model->entities.instances.emplace_back(Util::RandomInUnitSphere() * scale);
 
 	models.push_back(model);
 }

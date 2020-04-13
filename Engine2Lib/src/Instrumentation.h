@@ -1,7 +1,10 @@
 #pragma once
 
-#define E2_STATS_VERTEXDRAW(x) { Instrumentation::Drawing::drawCount++; Instrumentation::Drawing::vertexCount += x; }
-#define E2_STATS_INDEXDRAW(x)  { Instrumentation::Drawing::drawCount++; Instrumentation::Drawing::indexCount += x; }
+#define E2_STATS_VERTEXDRAW(x)                 { Instrumentation::Drawing::drawCount++; Instrumentation::Drawing::vertexCount += x; }
+#define E2_STATS_INDEXDRAW(x)                  { Instrumentation::Drawing::drawCount++; Instrumentation::Drawing::indexCount += x; }
+#define E2_STATS_INDEXINSTANCEDRAW(indx, inst) { Instrumentation::Drawing::drawCount++; Instrumentation::Drawing::indexCount += indx; Instrumentation::Drawing::instanceCount += inst; }
+
+
 #define E2_STATS_VSCB_BIND     { Instrumentation::Drawing::vsConstBufferCount++; }
 #define E2_STATS_PSCB_BIND     { Instrumentation::Drawing::psConstBufferCount++; }
 #define E2_STATS_GSCB_BIND     { Instrumentation::Drawing::gsConstBufferCount++; }
@@ -29,6 +32,7 @@ namespace Engine2
 			static unsigned long long drawCount;
 			static unsigned long long vertexCount;
 			static unsigned long long indexCount;
+			static unsigned long long instanceCount;
 			static unsigned long long vsConstBufferCount;
 			static unsigned long long psConstBufferCount;
 			static unsigned long long gsConstBufferCount;

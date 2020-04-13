@@ -12,9 +12,10 @@ namespace Engine2
 
 	Gizmos::Gizmos() : lineBuffer(MAXVERTICIES), vertexBuffer(MAXVERTICIES)
 	{
-		VertexShaderLayout vsLayout = { {"Position", DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT} };
+		VertexLayoutSimple::VertexShaderLayout vsLayout = { {"Position", DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT} };
+		auto layout = VertexLayoutSimple::ToDescriptor(vsLayout);
 		std::string vsFileName = Config::directories["ShaderCompiledDir"] + "GizmosVS.cso";
-		pVS = VertexShader::CreateFromCompiledFile(vsFileName, vsLayout);
+		pVS = VertexShader::CreateFromCompiledFile(vsFileName, layout);
 
 		std::string psFileName = Config::directories["ShaderCompiledDir"] + "GizmosPS.cso";
 		pPS = PixelShader::CreateFromCompiledFile(psFileName);

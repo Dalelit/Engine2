@@ -185,6 +185,7 @@
     <ClInclude Include="src\Surface.h" />
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\Util.h" />
+    <ClInclude Include="src\VertexBufferInstanced.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Config.cpp" />

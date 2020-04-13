@@ -3,13 +3,11 @@
   <ItemGroup>
     <ClCompile Include="src\winmain.cpp" />
     <ClCompile Include="src\pch.cpp" />
-    <ClCompile Include="src\Playground.cpp" />
     <ClCompile Include="src\BoxWorld.cpp" />
     <ClCompile Include="src\BallWorld.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h" />
-    <ClInclude Include="src\Playground.h" />
     <ClInclude Include="src\BoxWorld.h" />
     <ClInclude Include="src\Voxel.h" />
     <ClInclude Include="src\BallWorld.h" />
@@ -32,5 +30,6 @@
     <FxCompile Include="Assets\Materials\WireframeBasicPS.hlsl" />
     <FxCompile Include="Assets\Materials\WireframeBasicVS.hlsl" />
     <FxCompile Include="Assets\Materials\PixelShaderCommon.hlsl" />
+    <FxCompile Include="Assets\Materials\BallWorld2VS.hlsl" />
   </ItemGroup>
 </Project>

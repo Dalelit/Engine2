@@ -60,10 +60,11 @@ namespace Engine2
 			float texCoord[2];
 		};
 
-		VertexShaderLayout vsLayout = {
+		VertexLayoutSimple::VertexShaderLayout vsLayout = {
 			{"Position", DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT},
 			{"TexCoord", DXGI_FORMAT::DXGI_FORMAT_R32G32_FLOAT},
 		};
+		auto layout = VertexLayoutSimple::ToDescriptor(vsLayout);
 
 		std::vector<Vertex> verticies = {
 			{ {-1.0f, -1.0f, 0.0f}, {0.0f, 1.0f} },
@@ -103,7 +104,7 @@ namespace Engine2
 			}
 		)";
 
-		pVS = VertexShader::CreateFromString(VSsrc, vsLayout);
+		pVS = VertexShader::CreateFromString(VSsrc, layout);
 		pPS = PixelShader::CreateFromString(PSsrc);
 		pDrawable = std::make_shared<MeshTriangleList<Vertex>>(verticies);
 	}

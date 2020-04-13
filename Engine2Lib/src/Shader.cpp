@@ -13,9 +13,27 @@ namespace Engine2
 		}
 	}
 
+	VertexShaderLayoutDesc VertexLayoutSimple::ToDescriptor(VertexShaderLayout& layout)
+	{
+		VertexShaderLayoutDesc inputDesc(layout.size());
+
+		for (int i = 0; i < layout.size(); i++)
+		{
+			inputDesc[i].SemanticName = layout[i].name.c_str();
+			inputDesc[i].SemanticIndex = 0;
+			inputDesc[i].Format = layout[i].format;
+			inputDesc[i].InputSlot = 0u;
+			inputDesc[i].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+			inputDesc[i].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+			inputDesc[i].InstanceDataStepRate = 0u;
+		}
+
+		return inputDesc;
+	}
+
 	///////////////// Vertex shaders /////////////////
 
-	VertexShader::VertexShader(ID3DBlob& shaderBlob, VertexShaderLayout& layout, std::string info)
+	VertexShader::VertexShader(ID3DBlob& shaderBlob, VertexShaderLayoutDesc& layout, std::string info)
 	{
 		this->name = "VertexShader";
 		this->info = info;
@@ -30,22 +48,9 @@ namespace Engine2
 
 		E2_ASSERT_HR(hr, "VertexShader CreateVertexShader failed");
 
-		std::vector<D3D11_INPUT_ELEMENT_DESC> inputDesc(layout.size());
-
-		for (int i = 0; i < layout.size(); i++)
-		{
-			inputDesc[i].SemanticName = layout[i].name.c_str();
-			inputDesc[i].SemanticIndex = 0;
-			inputDesc[i].Format = layout[i].format;
-			inputDesc[i].InputSlot = 0u;
-			inputDesc[i].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-			inputDesc[i].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-			inputDesc[i].InstanceDataStepRate = 0u;
-		}
-
 		hr = Engine::GetDevice().CreateInputLayout(
-			inputDesc.data(),
-			(UINT)inputDesc.size(),
+			layout.data(),
+			(UINT)layout.size(),
 			shaderBlob.GetBufferPointer(),
 			shaderBlob.GetBufferSize(),
 			&pInputLayout);
@@ -65,7 +70,7 @@ namespace Engine2
 		Engine::GetContext().IASetInputLayout(nullptr);
 	}
 
-	std::shared_ptr<VertexShader> VertexShader::CreateFromString(std::string& src, VertexShaderLayout& layout, std::string entryPoint, std::string target)
+	std::shared_ptr<VertexShader> VertexShader::CreateFromString(std::string& src, VertexShaderLayoutDesc& layout, std::string entryPoint, std::string target)
 	{
 		wrl::ComPtr<ID3DBlob> pBlob;
 		wrl::ComPtr<ID3DBlob> pErrBlob;
@@ -77,7 +82,7 @@ namespace Engine2
 		return std::make_shared<VertexShader>(*pBlob.Get(), layout, entryPoint + " " + target + "\nSource string\n" + src);
 	}
 
-	std::shared_ptr<VertexShader> VertexShader::CreateFromCompiledFile(std::string& filename, VertexShaderLayout& layout)
+	std::shared_ptr<VertexShader> VertexShader::CreateFromCompiledFile(std::string& filename, VertexShaderLayoutDesc& layout)
 	{
 		wrl::ComPtr<ID3DBlob> pBlob;
 
@@ -88,7 +93,7 @@ namespace Engine2
 		return std::make_shared<VertexShader>(*pBlob.Get(), layout, "Compiled file: " + filename);
 	}
 
-	std::shared_ptr<VertexShader> VertexShader::CreateFromSourceFile(std::string& filename, VertexShaderLayout& layout, std::string entryPoint, std::string target)
+	std::shared_ptr<VertexShader> VertexShader::CreateFromSourceFile(std::string& filename, VertexShaderLayoutDesc& layout, std::string entryPoint, std::string target)
 	{
 		wrl::ComPtr<ID3DBlob> pBlob;
 		wrl::ComPtr<ID3DBlob> pErrBlob;
@@ -99,7 +104,6 @@ namespace Engine2
 
 		return std::make_shared<VertexShader>(*pBlob.Get(), layout, "Source file: " + filename + "\n" + entryPoint + " " + target);
 	}
-
 
 	///////////////// Pixel shaders /////////////////
 

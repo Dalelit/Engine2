@@ -21,31 +21,41 @@ namespace Engine2
 		std::string info;
 	};
 
-	struct VertexShaderLayoutElement
-	{
-		std::string name;
-		DXGI_FORMAT format;
-	};
+	typedef std::vector<D3D11_INPUT_ELEMENT_DESC> VertexShaderLayoutDesc;
 
-	typedef std::vector<VertexShaderLayoutElement> VertexShaderLayout;
+	// Helpers to do some simpler vertex only layouts
+	namespace VertexLayoutSimple
+	{
+		struct VertexShaderLayoutElement
+		{
+			std::string name;
+			DXGI_FORMAT format;
+		};
+
+		typedef std::vector<VertexShaderLayoutElement> VertexShaderLayout;
+
+		VertexShaderLayoutDesc ToDescriptor(VertexShaderLayout& layout);
+	}
 
 	/////////////////// vertex shader ///////////////////
 
 	class VertexShader : public Shader
 	{
 	public:
-		VertexShader(ID3DBlob& shaderBlob, VertexShaderLayout& layout, std::string info);
+		VertexShader(ID3DBlob& shaderBlob, VertexShaderLayoutDesc& layout, std::string info);
 		void Bind();
 		void Unbind();
 
-		static std::shared_ptr<VertexShader> CreateFromString(std::string& src, VertexShaderLayout& layout, std::string entryPoint = "main", std::string target = "vs_5_0");
-		static std::shared_ptr<VertexShader> CreateFromCompiledFile(std::string& filename, VertexShaderLayout& layout);
-		static std::shared_ptr<VertexShader> CreateFromSourceFile(std::string& filename, VertexShaderLayout& layout, std::string entryPoint = "main", std::string target = "vs_5_0");
+		static std::shared_ptr<VertexShader> CreateFromString(std::string& src, VertexShaderLayoutDesc& layout, std::string entryPoint = "main", std::string target = "vs_5_0");
+		static std::shared_ptr<VertexShader> CreateFromCompiledFile(std::string& filename, VertexShaderLayoutDesc& layout);
+		static std::shared_ptr<VertexShader> CreateFromSourceFile(std::string& filename, VertexShaderLayoutDesc& layout, std::string entryPoint = "main", std::string target = "vs_5_0");
 
 	protected:
 		VertexShader() = default;
 		wrl::ComPtr<ID3D11VertexShader> pVertexShader = nullptr;
 		wrl::ComPtr<ID3D11InputLayout> pInputLayout = nullptr;
+
+		void CreateVertexShader(ID3DBlob& shaderBlob, std::vector<D3D11_INPUT_ELEMENT_DESC>& layout, std::string info);
 	};
 
 	/////////////////// pixel shader ///////////////////
@@ -88,12 +98,12 @@ namespace Engine2
 	{
 	public:
 		// wrap an existing shader
-		VertexShaderDynamic(std::string filename, VertexShaderLayout& layout, std::shared_ptr<VertexShader> shader) :
+		VertexShaderDynamic(std::string filename, VertexShaderLayoutDesc& layout, std::shared_ptr<VertexShader> shader) :
 			shader(shader), fileWatcher(filename), layout(layout)
 		{}
 
 		// create and wrap a shader
-		VertexShaderDynamic(std::string filename, VertexShaderLayout& layout) :
+		VertexShaderDynamic(std::string filename, VertexShaderLayoutDesc& layout) :
 			fileWatcher(filename), layout(layout)
 		{
 			shader = VertexShader::CreateFromSourceFile(filename, layout);
@@ -126,7 +136,7 @@ namespace Engine2
 	protected:
 		std::shared_ptr<VertexShader> shader;
 		FileWatcher fileWatcher;
-		VertexShaderLayout layout;
+		VertexShaderLayoutDesc layout;
 	};
 
 	class PixelShaderDynamic : public PixelShader

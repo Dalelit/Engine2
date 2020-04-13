@@ -24,6 +24,7 @@ namespace Engine2
 		unsigned long long Drawing::drawCount = 0;
 		unsigned long long Drawing::vertexCount = 0;
 		unsigned long long Drawing::indexCount = 0;
+		unsigned long long Drawing::instanceCount = 0;
 		unsigned long long Drawing::vsConstBufferCount = 0;
 		unsigned long long Drawing::psConstBufferCount = 0;
 		unsigned long long Drawing::gsConstBufferCount = 0;
@@ -33,6 +34,7 @@ namespace Engine2
 			Drawing::drawCount = 0;
 			Drawing::vertexCount = 0;
 			Drawing::indexCount = 0;
+			Drawing::instanceCount = 0;
 			Drawing::vsConstBufferCount = 0;
 			Drawing::psConstBufferCount = 0;
 			Drawing::gsConstBufferCount = 0;
@@ -68,6 +70,7 @@ namespace Engine2
 				ImGui::Text("Verticies : %i\n", vertexCount + indexCount);
 				ImGui::Text("   Vertex : %i", vertexCount);
 				ImGui::Text("   Index  : %i", indexCount);
+				ImGui::Text("Instances : %i", instanceCount);
 				ImGui::Text("Const Buff Bind: %i", vsConstBufferCount + psConstBufferCount + gsConstBufferCount);
 				ImGui::Text("   VS : %i", vsConstBufferCount);
 				ImGui::Text("   PS : %i", psConstBufferCount);
