@@ -1,9 +1,14 @@
 #pragma once
 
+#define E2_STATS_VERTEXDRAW(x) Instrumentation::Drawing::vertexCount += x;
+#define E2_STATS_INDEXDRAW(x) Instrumentation::Drawing::indexCount += x;
+
 namespace Engine2
 {
 	namespace Instrumentation
 	{
+		void FrameReset();
+
 		class Memory
 		{
 		public:
@@ -11,6 +16,15 @@ namespace Engine2
 
 			static unsigned long long allocated;
 			static unsigned long long freed;
+		};
+
+		class Drawing
+		{
+		public:
+			static void ImguiWindow(bool* pOpen);
+
+			static unsigned long long vertexCount;
+			static unsigned long long indexCount;
 		};
 
 		template <typename T, unsigned int SIZE>

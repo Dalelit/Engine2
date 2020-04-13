@@ -19,8 +19,16 @@ namespace Engine2
 {
 	namespace Instrumentation
 	{
-		unsigned long long Memory::allocated;
-		unsigned long long Memory::freed;
+		unsigned long long Memory::allocated = 0;
+		unsigned long long Memory::freed = 0;
+		unsigned long long Drawing::vertexCount = 0;
+		unsigned long long Drawing::indexCount = 0;
+
+		void FrameReset()
+		{
+			Drawing::vertexCount = 0;
+			Drawing::indexCount = 0;
+		}
 
 		void Memory::ImguiWindow(bool* pOpen)
 		{
@@ -33,6 +41,24 @@ namespace Engine2
 				ImGui::Text("Allocated: %i", allocated);
 				ImGui::Text("Freed    : %i", freed);
 				ImGui::Text("Diff     : %i", allocated - freed);
+
+				ImGui::End();
+			}
+
+			ImGui::GetStyle().Colors[ImGuiCol_FrameBg] = bg; // recover the background color
+		}
+
+		void Drawing::ImguiWindow(bool* pOpen)
+		{
+			ImGui::SetNextWindowBgAlpha(0.35f); // Transparent background
+			ImVec4 bg = ImGui::GetStyleColorVec4(ImGuiCol_FrameBg); // store the current background color
+			ImGui::GetStyle().Colors[ImGuiCol_FrameBg] = { 0,0,0,0 }; // set background to transparent
+
+			if (ImGui::Begin("Drawing", pOpen, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize))
+			{
+				ImGui::Text("Vertex count: %i", vertexCount);
+				ImGui::Text("Index count : %i", indexCount);
+				ImGui::Text("Total count : %i", vertexCount + indexCount);
 
 				ImGui::End();
 			}

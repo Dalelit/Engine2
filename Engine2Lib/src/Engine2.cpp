@@ -31,6 +31,13 @@ namespace Engine2
 		}
 	}
 
+	void Engine::DoFrame(float deltaTime)
+	{
+		Instrumentation::FrameReset();
+		OnUpdate(deltaTime);
+		OnRender();
+	}
+
 	void Engine::OnUpdate(float deltaTime)
 	{
 		updateMemory.Set();
@@ -147,6 +154,9 @@ namespace Engine2
 		static bool memoryOpen = true;
 		if (memoryOpen) Instrumentation::Memory::ImguiWindow(&memoryOpen);
 
+		static bool drawStatsOpen = true;
+		if (drawStatsOpen) Instrumentation::Drawing::ImguiWindow(&drawStatsOpen);
+
 		static bool inputControllerOpen = true;
 		if (inputControllerOpen) inputController.ImguiWindow(&inputControllerOpen);
 
@@ -162,6 +172,7 @@ namespace Engine2
 					ImGui::MenuItem("Demo window", nullptr, &demoOpen);
 					ImGui::MenuItem("Stats overlay", nullptr, &statsOpen);
 					ImGui::MenuItem("Memory overlay", nullptr, &memoryOpen);
+					ImGui::MenuItem("Draw stats overlay", nullptr, &drawStatsOpen);
 					ImGui::EndMenu();
 				}
 				ImGui::EndMenuBar();

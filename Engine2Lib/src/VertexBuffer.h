@@ -49,6 +49,7 @@ namespace Engine2
 		}
 
 		virtual void Draw() {
+			E2_STATS_VERTEXDRAW(vertexCount);
 			Engine::GetContext().Draw(vertexCount, 0u);
 		}
 
@@ -114,6 +115,7 @@ namespace Engine2
 		}
 
 		void Draw() {
+			E2_STATS_INDEXDRAW(indxCount);
 			Engine::GetContext().DrawIndexed(indxCount, 0u, 0u);
 		}
 

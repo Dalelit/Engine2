@@ -44,6 +44,7 @@ namespace Engine2
 		}
 
 		virtual void Draw() {
+			E2_STATS_VERTEXDRAW(vertexCount);
 			Engine::GetContext().Draw(vertexCount, 0u);
 		}
 

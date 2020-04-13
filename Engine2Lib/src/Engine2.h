@@ -28,6 +28,7 @@ namespace Engine2 {
 		Camera mainCamera;
 		InputController inputController;
 
+		void DoFrame(float deltaTime); // does update then render
 		void OnUpdate(float deltaTime);
 		void OnRender();
 

@@ -230,8 +230,7 @@ int WINAPI WinMain(
 		clock_t currentTime = clock();
 		float delatTimeSeconds = (float)(currentTime - lastTime) / (float)CLOCKS_PER_SEC;
 
-		Engine2::Engine::Get().OnUpdate(delatTimeSeconds);
-		Engine2::Engine::Get().OnRender();
+		Engine2::Engine::Get().DoFrame(delatTimeSeconds);
 
 		lastTime = currentTime;
 	}
