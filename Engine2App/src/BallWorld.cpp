@@ -21,6 +21,22 @@ BallWorld::BallWorld() : Layer("BallWorld")
 void BallWorld::OnUpdate(float dt)
 {
 	scene.OnUpdate(dt);
+
+	float dAng = XM_2PI / 10.0f * dt;
+	XMMATRIX m = XMMatrixRotationY(dAng);
+	for (auto& p : positions)
+	{
+		XMVECTOR v = XMLoadFloat3(&p);
+		v = XMVector3Transform(v, m);
+		XMStoreFloat3(&p, v);
+	}
+
+	// to do: hack
+	D3D11_MAPPED_SUBRESOURCE mappedSubResource;
+	Engine::GetContext().Map(positionsBufferPtr, 0u, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubResource);
+	memcpy(mappedSubResource.pData, positions.data(), sizeof(XMFLOAT3) * positions.size());
+	Engine::GetContext().Unmap(positionsBufferPtr, 0);
+
 }
 
 void BallWorld::OnRender()
@@ -33,7 +49,7 @@ void BallWorld::OnRender()
 
 	gizmos.DrawSphere(scene.pointLights[0].GetPosition());
 
-	for (auto& m : models) if (m->IsActive()) m->OnRender();
+	for (auto& m : models) if (m->IsActive()) m->Draw();
 
 	gizmos.Draw();
 }
@@ -74,7 +90,7 @@ void BallWorld::CreateCube()
 	Util::Random rngPos(-30.0f, 30.0f);
 	Util::Random rngRot(-XM_PI, XM_PI);
 	Util::Random rngScl(0.5f, 1.5f);
-	std::vector<InstanceInfo> instances(1000);
+	std::vector<InstanceInfo> instances(100000);
 	for (int i = 0; i < instances.size(); i++)
 	{
 		XMMATRIX transform;
@@ -87,7 +103,7 @@ void BallWorld::CreateCube()
 	std::string vsfilename = Config::directories["ShaderSourceDir"] + "BallWorld1VS.hlsl";
 	std::string psfilename = Config::directories["ShaderSourceDir"] + "BallWorld1PS.hlsl";
 
-	auto model = std::make_shared<Model>("Cube");
+	auto model = std::make_shared<ModelEntities>("Cube");
 	model->pMesh = std::make_shared<TriangleListIndexInstanced<Vertex, InstanceInfo>>(verticies, Primatives::Cube::indicies, instances);
 	model->pMaterial = std::make_shared<RenderNode>("RN1");
 	model->pMaterial->AddBindable(std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout));
@@ -106,41 +122,37 @@ void BallWorld::CreateSphere()
 	};
 	std::vector<Vertex> verticies;
 
-	struct InstanceInfo {
-		XMFLOAT3 position;
-		XMFLOAT3 color;
-	};
-	std::vector<InstanceInfo> instances;
+	std::vector<XMFLOAT3> colors;
 
 	std::vector<D3D11_INPUT_ELEMENT_DESC> vsLayout = {
-		{"Position", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"Normal", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"InstancePos", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_INSTANCE_DATA, 1},
+		{"Position",    0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"Normal",      0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"InstanceCol", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_INSTANCE_DATA, 1},
+		{"InstancePos", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 2, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_INSTANCE_DATA, 1},
 	};
 
 	auto sphereData = Primatives::IcoSphere::CreateIcoSphere(2);
 	Primatives::CopyPositionNormal<Vertex>(verticies, *sphereData.verticies);
 
-	Util::Random rng(-30.0f, 30.0f);
-	instances.resize(1000);
-	for (int i = 0; i < instances.size(); i++)
+	Util::Random rng(-40.0f, 40.0f);
+	positions.resize(100000);
+	colors.resize(positions.size());
+	for (int i = 0; i < positions.size(); i++)
 	{
-		instances[i].position = { rng.Next(), rng.Next(), rng.Next() };
-		instances[i].color = { Util::rng.Next(), Util::rng.Next(), Util::rng.Next() };
+		positions[i] = { rng.Next(), rng.Next(), rng.Next() };
+		colors[i] = { Util::rng.Next(), Util::rng.Next(), Util::rng.Next() };
 	}
 
 	std::string vsfilename = Config::directories["ShaderSourceDir"] + "BallWorld2VS.hlsl";
 	std::string psfilename = Config::directories["ShaderSourceDir"] + "BallWorld1PS.hlsl";
 
 	auto model = std::make_shared<Model>("IcoSphere");
-	auto vertBuffer = std::make_shared<TriangleListIndexInstanced<Vertex, InstanceInfo>>(verticies, *sphereData.indicies, instances);
+	auto vertBuffer = std::make_shared<TriangleListIndexInstanced<Vertex, XMFLOAT3>>(verticies, *sphereData.indicies, colors);
+	positionsBufferPtr = vertBuffer->AddBuffer<XMFLOAT3>(positions, true);
 	model->pMesh = vertBuffer;
 	model->pMaterial = std::make_shared<RenderNode>("RN1");
 	model->pMaterial->AddBindable(std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout));
 	model->pMaterial->AddBindable(std::make_shared<PixelShaderDynamic>(psfilename));
-
-	model->entities.instances.emplace_back(0.0f, 0.0f, 0.0f);
 
 	models.push_back(model);
 }

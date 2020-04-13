@@ -3,7 +3,27 @@
 
 namespace Engine2
 {
-	void Model::OnRender()
+	void Model::Draw()
+	{
+		pMaterial->Bind();
+		pMesh->Bind();
+		pMesh->Draw();
+
+		pMaterial->UnbindAfterDraw();
+	}
+
+	void Model::OnImgui()
+	{
+		if (ImGui::TreeNode(name.c_str()))
+		{
+			ImGui::Checkbox("Active", &active);
+			pMesh->OnImgui();
+			pMaterial->OnImgui();
+			ImGui::TreePop();
+		}
+	}
+
+	void ModelEntities::Draw()
 	{
 		pMaterial->Bind();
 		pMesh->Bind();
@@ -21,14 +41,12 @@ namespace Engine2
 		pMaterial->UnbindAfterDraw();
 	}
 
-	void Model::OnImgui()
+	void ModelEntities::OnImgui()
 	{
 		if (ImGui::TreeNode(name.c_str()))
 		{
 			ImGui::Checkbox("Active", &active);
-
 			pMesh->OnImgui();
-
 			pMaterial->OnImgui();
 
 			if (ImGui::TreeNode("Entities"))

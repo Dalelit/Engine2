@@ -35,13 +35,13 @@ namespace Engine2
 			info = "VertexBufferIndexInstanced vertex count: " + std::to_string(vertexCount) + " index count: " + std::to_string(indxCount);
 		}
 		template <typename D>
-		ID3D11Buffer* AddInstances(std::vector<D>& bufferData) {
+		ID3D11Buffer* AddInstances(std::vector<D>& bufferData, bool dynamic = false) {
 			instanceCount = (UINT)bufferData.size();
-			return AddBuffer<D>(bufferData);
+			return AddBuffer<D>(bufferData, dynamic);
 		}
 
 		template <typename D>
-		ID3D11Buffer* AddBuffer(std::vector<D>& bufferData) {
+		ID3D11Buffer* AddBuffer(std::vector<D>& bufferData, bool dynamic = false) {
 			bufferStrides.push_back(sizeof(D));
 			bufferOffsets.push_back(0);
 
@@ -52,9 +52,9 @@ namespace Engine2
 
 			D3D11_BUFFER_DESC bufferDesc = {};
 			bufferDesc.ByteWidth = sizeof(D) * (UINT)bufferData.size();
-			bufferDesc.Usage = D3D11_USAGE::D3D11_USAGE_DEFAULT;
+			bufferDesc.Usage = (dynamic ? D3D11_USAGE::D3D11_USAGE_DYNAMIC : D3D11_USAGE::D3D11_USAGE_DEFAULT);
 			bufferDesc.BindFlags = D3D11_BIND_FLAG::D3D11_BIND_VERTEX_BUFFER;
-			bufferDesc.CPUAccessFlags = 0;
+			bufferDesc.CPUAccessFlags = (dynamic ? D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE : 0);
 			bufferDesc.MiscFlags = 0;
 			bufferDesc.StructureByteStride = sizeof(D);
 
@@ -66,6 +66,7 @@ namespace Engine2
 
 			E2_ASSERT_HR(hr, "VertexBufferIndexInstanced AddBuffer CreateBuffer failed");
 
+			bufferCount++;
 			return pBuffer.Get();
 		}
 
@@ -76,12 +77,14 @@ namespace Engine2
 		}
 
 		virtual void Unbind() {
-			throw "Not implemented";
+			// to do: untested
 			Engine::GetContext().IASetVertexBuffers(startSlot, 0, nullptr, 0, 0);
 			Engine::GetContext().IASetIndexBuffer(nullptr, DXGI_FORMAT_R32_UINT, 0u);
 		}
 
 		virtual void Draw() {
+			E2_ASSERT(instanceCount > 0, "Instance count should be greater than 0, need to AddInstances");
+
 			E2_STATS_INDEXINSTANCEDRAW(indxCount, instanceCount);
 			Engine::GetContext().DrawIndexedInstanced(indxCount, instanceCount, 0u, 0u, 0u);
 		}
@@ -94,6 +97,7 @@ namespace Engine2
 
 	protected:
 		std::string info;
+		unsigned int bufferCount = 0;
 		std::vector<wrl::ComPtr<ID3D11Buffer>> vertexBuffers;
 		std::vector<ID3D11Buffer*> vertexBufferPtrs;
 		wrl::ComPtr<ID3D11Buffer> pIndexBuffer = nullptr;
@@ -113,7 +117,7 @@ namespace Engine2
 	{
 	public:
 		TriangleListIndexInstanced(std::vector<V>& verticies, std::vector<unsigned int>& indicies, std::vector<I>& instances) : VertexBufferIndexInstanced<V, D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST>(verticies, indicies) {
-			this->AddInstances<I>(instances);
+			this->AddInstances(instances);
 		}
 	};
 
