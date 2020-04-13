@@ -3,27 +3,18 @@
   <ItemGroup>
     <ClCompile Include="src\winmain.cpp" />
     <ClCompile Include="src\pch.cpp" />
-    <ClCompile Include="src\BoxWorld.cpp" />
     <ClCompile Include="src\BallWorld.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h" />
-    <ClInclude Include="src\BoxWorld.h" />
     <ClInclude Include="src\Voxel.h" />
     <ClInclude Include="src\BallWorld.h" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Assets\Materials\MaterialTest1VS.hlsl" />
-    <FxCompile Include="Assets\Materials\MaterialTest1PS.hlsl" />
     <FxCompile Include="Assets\Materials\SceneEntityCBVS.hlsl" />
-    <FxCompile Include="Assets\Materials\BoxWorldCubeVS.hlsl" />
-    <FxCompile Include="Assets\Materials\BoxWorldCubePS.hlsl" />
     <FxCompile Include="Assets\Materials\PSTest.hlsl" />
     <FxCompile Include="Assets\Materials\VSTest.hlsl" />
     <FxCompile Include="Assets\Materials\GSTest.hlsl" />
-    <FxCompile Include="Assets\Materials\BW_GSTest_PS.hlsl" />
-    <FxCompile Include="Assets\Materials\BW_GSTest_GS.hlsl" />
-    <FxCompile Include="Assets\Materials\BW_GSTest_VS.hlsl" />
     <FxCompile Include="Assets\Materials\PS_BlurSimple.hlsl" />
     <FxCompile Include="Assets\Materials\BallWorld1PS.hlsl" />
     <FxCompile Include="Assets\Materials\BallWorld1VS.hlsl" />
