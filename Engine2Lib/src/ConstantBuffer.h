@@ -33,10 +33,6 @@ namespace Engine2
 			E2_ASSERT_HR(hr, "ConstantBuffer CreateBuffer failed");
 		}
 
-		~ConstantBuffer() {};
-
-		virtual void Unbind() = 0;
-
 		void UpdateBuffer()
 		{
 			// to do: D3D11_MAP_WRITE_DISCARD v D3D11_MAP_WRITE_NO_OVERWRITE ?
@@ -79,6 +75,7 @@ namespace Engine2
 
 		void Bind()
 		{
+			E2_STATS_PSCB_BIND;
 			this->UpdateBuffer();
 			Engine::GetContext().PSSetConstantBuffers(this->slot, 1u, this->pConstantBuffer.GetAddressOf());
 		}
@@ -94,6 +91,7 @@ namespace Engine2
 
 		void Bind()
 		{
+			E2_STATS_VSCB_BIND;
 			this->UpdateBuffer();
 			Engine::GetContext().VSSetConstantBuffers(this->slot, 1u, this->pConstantBuffer.GetAddressOf());
 		}
@@ -109,6 +107,7 @@ namespace Engine2
 
 		void Bind()
 		{
+			E2_STATS_GSCB_BIND;
 			this->UpdateBuffer();
 			Engine::GetContext().GSSetConstantBuffers(this->slot, 1u, this->pConstantBuffer.GetAddressOf());
 		}

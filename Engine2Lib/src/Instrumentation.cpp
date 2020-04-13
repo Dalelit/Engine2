@@ -21,13 +21,21 @@ namespace Engine2
 	{
 		unsigned long long Memory::allocated = 0;
 		unsigned long long Memory::freed = 0;
+		unsigned long long Drawing::drawCount = 0;
 		unsigned long long Drawing::vertexCount = 0;
 		unsigned long long Drawing::indexCount = 0;
+		unsigned long long Drawing::vsConstBufferCount = 0;
+		unsigned long long Drawing::psConstBufferCount = 0;
+		unsigned long long Drawing::gsConstBufferCount = 0;
 
 		void FrameReset()
 		{
+			Drawing::drawCount = 0;
 			Drawing::vertexCount = 0;
 			Drawing::indexCount = 0;
+			Drawing::vsConstBufferCount = 0;
+			Drawing::psConstBufferCount = 0;
+			Drawing::gsConstBufferCount = 0;
 		}
 
 		void Memory::ImguiWindow(bool* pOpen)
@@ -54,11 +62,16 @@ namespace Engine2
 			ImVec4 bg = ImGui::GetStyleColorVec4(ImGuiCol_FrameBg); // store the current background color
 			ImGui::GetStyle().Colors[ImGuiCol_FrameBg] = { 0,0,0,0 }; // set background to transparent
 
-			if (ImGui::Begin("Drawing", pOpen, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize))
+			if (ImGui::Begin("Drawing counters", pOpen, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize))
 			{
-				ImGui::Text("Vertex count: %i", vertexCount);
-				ImGui::Text("Index count : %i", indexCount);
-				ImGui::Text("Total count : %i", vertexCount + indexCount);
+				ImGui::Text("Draw  : %i", drawCount);
+				ImGui::Text("Verticies : %i\n", vertexCount + indexCount);
+				ImGui::Text("   Vertex : %i", vertexCount);
+				ImGui::Text("   Index  : %i", indexCount);
+				ImGui::Text("Const Buff Bind: %i", vsConstBufferCount + psConstBufferCount + gsConstBufferCount);
+				ImGui::Text("   VS : %i", vsConstBufferCount);
+				ImGui::Text("   PS : %i", psConstBufferCount);
+				ImGui::Text("   GS : %i", gsConstBufferCount);
 
 				ImGui::End();
 			}

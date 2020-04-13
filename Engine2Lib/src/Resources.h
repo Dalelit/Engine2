@@ -7,6 +7,7 @@ namespace Engine2
 	class Bindable
 	{
 	public:
+		virtual ~Bindable() = default;
 		virtual void Bind() = 0;
 		virtual void Unbind() = 0;
 		virtual void OnImgui() = 0;

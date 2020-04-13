@@ -1,7 +1,10 @@
 #pragma once
 
-#define E2_STATS_VERTEXDRAW(x) Instrumentation::Drawing::vertexCount += x;
-#define E2_STATS_INDEXDRAW(x) Instrumentation::Drawing::indexCount += x;
+#define E2_STATS_VERTEXDRAW(x) { Instrumentation::Drawing::drawCount++; Instrumentation::Drawing::vertexCount += x; }
+#define E2_STATS_INDEXDRAW(x)  { Instrumentation::Drawing::drawCount++; Instrumentation::Drawing::indexCount += x; }
+#define E2_STATS_VSCB_BIND     { Instrumentation::Drawing::vsConstBufferCount++; }
+#define E2_STATS_PSCB_BIND     { Instrumentation::Drawing::psConstBufferCount++; }
+#define E2_STATS_GSCB_BIND     { Instrumentation::Drawing::gsConstBufferCount++; }
 
 namespace Engine2
 {
@@ -23,8 +26,12 @@ namespace Engine2
 		public:
 			static void ImguiWindow(bool* pOpen);
 
+			static unsigned long long drawCount;
 			static unsigned long long vertexCount;
 			static unsigned long long indexCount;
+			static unsigned long long vsConstBufferCount;
+			static unsigned long long psConstBufferCount;
+			static unsigned long long gsConstBufferCount;
 		};
 
 		template <typename T, unsigned int SIZE>
