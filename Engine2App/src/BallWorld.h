@@ -25,7 +25,8 @@ protected:
 	void CreateCube();
 	void CreateSphere();
 
-	std::vector<DirectX::XMFLOAT3> positions;
+	std::vector<DirectX::XMVECTOR> positions;
+	std::vector<DirectX::XMVECTOR> velocities;
 	ID3D11Buffer* positionsBufferPtr = nullptr;
 
 };

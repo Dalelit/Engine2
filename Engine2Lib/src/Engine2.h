@@ -22,6 +22,16 @@ namespace Engine2 {
 		inline static ID3D11Device3& GetDevice() { return instance->device.GetDevice(); }
 		inline static ID3D11DeviceContext3& GetContext() { return instance->device.GetContext(); }
 
+		// helper function to update a buffer
+		template <typename T>
+		static void UpdateBuffer(ID3D11Buffer* pBuffer, std::vector<T>& source) {
+			D3D11_MAPPED_SUBRESOURCE mappedSubResource;
+			GetContext().Map(pBuffer, 0u, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubResource);
+			memcpy(mappedSubResource.pData, source.data(), sizeof(T) * source.size());
+			GetContext().Unmap(pBuffer, 0);
+		}
+
+
 		Engine(HWND hwnd);
 		~Engine();
 

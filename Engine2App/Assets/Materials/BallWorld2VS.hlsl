@@ -8,11 +8,11 @@ struct VSOut
 	float4 posSS : SV_POSITION;
 };
 
-VSOut main(float3 pos : Position, float3 nor : Normal, float3 instPos : InstancePos, float3 instCol : InstanceCol, uint instanceID : SV_InstanceID)
+VSOut main(float3 pos : Position, float3 nor : Normal, float3 instCol : InstanceCol, float4 instPos : InstancePos, uint instanceID : SV_InstanceID)
 {
 	VSOut vso;
 
-	float4 pws = float4(pos + instPos, 1.0f);
+	float4 pws = float4(pos + instPos.xyz, 1.0f);
 
 	vso.posWS = pws.xyz;
 	vso.norWS = nor;
