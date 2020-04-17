@@ -150,6 +150,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\AssetLoaders\ObjLoader.h" />
     <ClInclude Include="src\Config.h" />
     <ClInclude Include="src\Entity.h" />
     <ClInclude Include="src\Gizmos.h" />
@@ -168,7 +169,6 @@
     <ClInclude Include="src\Events.h" />
     <ClInclude Include="src\DXDevice.h" />
     <ClInclude Include="src\Engine2.h" />
-    <ClInclude Include="src\RenderNode.h" />
     <ClInclude Include="src\VertexBufferDynamic.h" />
     <ClInclude Include="src\VertexBuffer.h" />
     <ClInclude Include="src\Model.h" />
@@ -188,6 +188,7 @@
     <ClInclude Include="src\VertexBufferInstanced.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\AssetLoaders\ObjLoader.cpp" />
     <ClCompile Include="src\Config.cpp" />
     <ClCompile Include="src\Entity.cpp" />
     <ClCompile Include="src\Gizmos.cpp" />

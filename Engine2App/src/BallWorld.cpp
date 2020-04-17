@@ -14,7 +14,7 @@ BallWorld::BallWorld() : Layer("BallWorld")
 	scene.psConstBuffer.data.ambientLight = { 0.1f, 0.1f, 0.1f, 1.0f };
 	scene.pointLights.emplace_back(PointLight({ -1.0f, 4.0f, -2.0f, 1.0f }, { 0.8f, 0.8f, 0.8f, 1.0f }));
 
-	//CreateCube();
+	CreateCube();
 	CreateSphere();
 }
 
@@ -102,10 +102,10 @@ void BallWorld::CreateCube()
 	std::string psfilename = Config::directories["ShaderSourceDir"] + "BallWorld1PS.hlsl";
 
 	auto model = std::make_shared<ModelEntities>("Cube");
-	model->pMesh = std::make_shared<TriangleListIndexInstanced<Vertex, InstanceInfo>>(verticies, Primatives::Cube::indicies, instances);
-	model->pMaterial = std::make_shared<RenderNode>("RN1");
-	model->pMaterial->AddBindable(std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout));
-	model->pMaterial->AddBindable(std::make_shared<PixelShaderDynamic>(psfilename));
+	auto rn = model->AddRenderNode("RN1");
+	rn->SetDrawable(std::make_shared<TriangleListIndexInstanced<Vertex, InstanceInfo>>(verticies, Primatives::Cube::indicies, instances));
+	rn->AddBindable(std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout));
+	rn->AddBindable(std::make_shared<PixelShaderDynamic>(psfilename));
 
 	model->entities.instances.emplace_back(1.0f, 0.0f, 0.0f);
 
@@ -148,12 +148,12 @@ void BallWorld::CreateSphere()
 	std::string psfilename = Config::directories["ShaderSourceDir"] + "BallWorld1PS.hlsl";
 
 	auto model = std::make_shared<Model>("IcoSphere");
+	auto rn = model->AddRenderNode("RN sphere");
 	auto vertBuffer = std::make_shared<TriangleListIndexInstanced<Vertex, XMFLOAT3>>(verticies, *sphereData.indicies, colors);
 	positionsBufferPtr = vertBuffer->AddBuffer<XMVECTOR>(positions, true);
-	model->pMesh = vertBuffer;
-	model->pMaterial = std::make_shared<RenderNode>("RN1");
-	model->pMaterial->AddBindable(std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout));
-	model->pMaterial->AddBindable(std::make_shared<PixelShaderDynamic>(psfilename));
+	rn->SetDrawable(vertBuffer);
+	rn->AddBindable(std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout));
+	rn->AddBindable(std::make_shared<PixelShaderDynamic>(psfilename));
 
 	models.push_back(model);
 }
