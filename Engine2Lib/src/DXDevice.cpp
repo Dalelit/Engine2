@@ -16,6 +16,13 @@ namespace Engine2
 		renderTargets.emplace_back(); // create the placeholder back buffer target at index 0
 		CreateDeviceAndSwapchain();
 		ConfigurePipeline();
+
+		// create the render states for future use
+		pRSDefault = nullptr;
+
+		D3D11_RASTERIZER_DESC rsDesc = CD3D11_RASTERIZER_DESC(CD3D11_DEFAULT());
+		rsDesc.FillMode = D3D11_FILL_MODE::D3D11_FILL_WIREFRAME;
+		pDevice->CreateRasterizerState(&rsDesc, &pRSWireframe);
 	}
 
 	void DXDevice::BeginFrame()
@@ -86,6 +93,16 @@ namespace Engine2
 		ID3D11ShaderResourceView* const srv[1] = { nullptr };
 		pImmediateContext->PSSetShaderResources(slot, 1u, srv);
 		pImmediateContext->PSSetSamplers(slot, 0u, nullptr);
+	}
+
+	void DXDevice::SetWireframeRenderState()
+	{
+		pImmediateContext->RSSetState(pRSWireframe.Get());
+	}
+
+	void DXDevice::SetDefaultRenderState()
+	{
+		pImmediateContext->RSSetState(pRSDefault.Get());
 	}
 
 	void DXDevice::LogDebugInfo()

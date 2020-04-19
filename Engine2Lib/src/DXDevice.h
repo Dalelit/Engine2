@@ -53,6 +53,9 @@ namespace Engine2
 		unsigned int GetBackbufferRenderTargetId() { return 0; } // do this way in case the number should change for some reason
 		void BindBackbufferRenderTarget() { BindRenderTargetAsTarget(0); };
 
+		void SetWireframeRenderState();
+		void SetDefaultRenderState();
+
 		void LogDebugInfo();
 
 	protected:
@@ -74,6 +77,10 @@ namespace Engine2
 
 		// back buffer is always at index 0 for the render targets
 		std::vector<RenderTarget> renderTargets;
+
+		// render states for resue
+		wrl::ComPtr<ID3D11RasterizerState> pRSDefault;
+		wrl::ComPtr<ID3D11RasterizerState> pRSWireframe;
 	};
 
 }

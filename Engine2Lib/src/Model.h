@@ -58,6 +58,7 @@ namespace Engine2
 	protected:
 		std::string name;
 		bool active = true;
+		bool wireframe = false;
 		std::vector<RenderNode*> nodes;
 	};
 

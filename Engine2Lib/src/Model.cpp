@@ -46,7 +46,11 @@ namespace Engine2
 
 	void Model::Draw()
 	{
+		if (wireframe) Engine::GetDX().SetWireframeRenderState();
+
 		for (auto& n : nodes) n->Render();
+
+		if (wireframe) Engine::GetDX().SetDefaultRenderState();
 	}
 
 	void Model::OnImgui()
@@ -54,6 +58,7 @@ namespace Engine2
 		if (ImGui::TreeNode(name.c_str()))
 		{
 			ImGui::Checkbox("Active", &active);
+			ImGui::Checkbox("Wireframe", &wireframe);
 			for (auto& n : nodes) n->OnImgui();
 			ImGui::TreePop();
 		}
