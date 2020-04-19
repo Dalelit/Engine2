@@ -8,8 +8,8 @@ using namespace DirectX;
 
 BallWorld::BallWorld() : Layer("BallWorld")
 {
-	Engine::Get().mainCamera.SetPosition(20.0f, 30.0f, -40.0f);
-	Engine::Get().mainCamera.LookAt(0.0f, 0.0f, 0.0f);
+	Engine::GetActiveCamera().SetPosition(20.0f, 30.0f, -40.0f);
+	Engine::GetActiveCamera().LookAt(0.0f, 0.0f, 0.0f);
 
 	scene.psConstBuffer.data.ambientLight = { 0.1f, 0.1f, 0.1f, 1.0f };
 	scene.pointLights.emplace_back(PointLight({ -1.0f, 4.0f, -2.0f, 1.0f }, { 0.8f, 0.8f, 0.8f, 1.0f }));

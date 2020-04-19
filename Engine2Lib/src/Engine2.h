@@ -21,6 +21,7 @@ namespace Engine2 {
 		inline static DXDevice& GetDX() { return instance->device; }
 		inline static ID3D11Device3& GetDevice() { return instance->device.GetDevice(); }
 		inline static ID3D11DeviceContext3& GetContext() { return instance->device.GetContext(); }
+		inline static Camera& GetActiveCamera() { return *instance->CurrentCamera(); }
 
 		// helper function to update a buffer
 		template <typename T>
@@ -35,8 +36,13 @@ namespace Engine2 {
 		Engine(HWND hwnd);
 		~Engine();
 
-		Camera mainCamera;
 		InputController inputController;
+
+		Camera* CurrentCamera() { return currentCamera; }
+		unsigned int AddCamera(std::string name);
+		void SetCurrentCamera(unsigned int indx);
+		Camera* GetCamera(unsigned int indx);
+		Camera* AddGetCamera(std::string name) { return GetCamera(AddCamera(name)); }
 
 		void DoFrame(float deltaTime); // does update then render
 		void OnUpdate(float deltaTime);
@@ -60,6 +66,11 @@ namespace Engine2 {
 		std::vector<Layer*> layers;
 		bool minimised = false;
 		bool imguiActive = false;
+
+		std::vector<std::unique_ptr<Camera>> cameras;
+		Camera* currentCamera;
+		unsigned int currentCameraIndx;
+		void ImuguiCameraWindow(bool* pOpen);
 
 		// application event handlers
 		bool OnResize(WindowResizeEvent& event);

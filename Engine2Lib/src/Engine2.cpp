@@ -15,12 +15,13 @@ namespace Engine2
 	}
 
 	Engine::Engine(HWND hwnd) :
-		device(hwnd), inputController(&mainCamera)
+		device(hwnd)
 	{
 		imgui.Initialise(hwnd, device);
 		imguiActive = true;
 
-		mainCamera.SetAspectRatio(device.GetAspectRatio());
+		// creates the main camera at 0, and sets the input control to use it
+		SetCurrentCamera(AddCamera("main"));
 	}
 
 	Engine::~Engine()
@@ -29,6 +30,28 @@ namespace Engine2
 		{
 			delete layer;
 		}
+	}
+
+	unsigned int Engine::AddCamera(std::string name)
+	{
+		unsigned int indx = (unsigned int)cameras.size();
+		cameras.emplace_back(std::make_unique<Camera>(name));
+		cameras[indx]->SetAspectRatio(device.GetAspectRatio());
+		return indx;
+	}
+
+	void Engine::SetCurrentCamera(unsigned int indx)
+	{
+		E2_ASSERT(indx >= 0 && indx < cameras.size(), "Trying to set camera indx past number of cameras");
+		currentCamera = cameras[indx].get();
+		currentCameraIndx = indx;
+		inputController.SetCamera(currentCamera);
+	}
+
+	Camera* Engine::GetCamera(unsigned int indx)
+	{
+		E2_ASSERT(indx >= 0 && indx < cameras.size(), "Trying to get camera indx past number of cameras");
+		return cameras[indx].get();
 	}
 
 	void Engine::DoFrame(float deltaTime)
@@ -137,7 +160,7 @@ namespace Engine2
 		{
 			minimised = false;
 			device.ScreenSizeChanged();
-			mainCamera.SetAspectRatio(device.GetAspectRatio());
+			for (auto& c : cameras) if (c->IsAspectRatioLockedToScreen()) c->SetAspectRatio(device.GetAspectRatio());
 		}
 
 		return true;
@@ -161,7 +184,7 @@ namespace Engine2
 		if (inputControllerOpen) inputController.ImguiWindow(&inputControllerOpen);
 
 		static bool cameraOpen = true;
-		if (cameraOpen) mainCamera.ImuguiWindow(&cameraOpen);
+		if (cameraOpen) ImuguiCameraWindow(&cameraOpen);
 
 		if (ImGui::Begin("Engine2", nullptr, ImGuiWindowFlags_MenuBar))
 		{
@@ -185,6 +208,25 @@ namespace Engine2
 		}
 
 		ImGui::End();
+	}
+
+	void Engine::ImuguiCameraWindow(bool* pOpen)
+	{
+		if (ImGui::Begin("Cameras", pOpen))
+		{
+			if (ImGui::BeginCombo("", currentCamera->GetName().c_str()))
+			{
+				for (unsigned int i = 0; i < cameras.size(); i++)
+				{
+					bool isSelected = (i == currentCameraIndx);
+					if (ImGui::Selectable(cameras[i]->GetName().c_str(), isSelected)) SetCurrentCamera(i);
+					if (isSelected) ImGui::SetItemDefaultFocus();
+				}
+				ImGui::EndCombo();
+			}
+			for (auto& c : cameras) c->OnImugui();
+			ImGui::End();
+		}
 	}
 
 	void Engine::ImguiStatsWindow(bool* pOpen)

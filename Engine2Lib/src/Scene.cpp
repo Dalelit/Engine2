@@ -30,13 +30,13 @@ namespace Engine2
 
 	void Scene::UpdateVSConstBuffer()
 	{
-		Engine::Get().mainCamera.LoadViewProjectionMatrixT(vsConstBuffer.data.cameraTransform);
+		Engine::GetActiveCamera().LoadViewProjectionMatrixT(vsConstBuffer.data.cameraTransform);
 		vsConstBuffer.Bind();
 	}
 
 	void Scene::UpdatePSConstBuffer()
 	{
-		psConstBuffer.data.CameraPosition = Engine::Get().mainCamera.GetPosition();
+		psConstBuffer.data.CameraPosition = Engine::GetActiveCamera().GetPosition();
 		if (pointLights.size() > 0)
 		{
 			psConstBuffer.data.pointLightPosition = pointLights[0].GetPosition();

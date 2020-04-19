@@ -10,7 +10,6 @@ namespace Engine2
 	class InputController
 	{
 	public:
-		InputController(Camera* pCamera) : pCamera(pCamera) {}
 		~InputController() = default;
 
 		struct {
@@ -43,6 +42,8 @@ namespace Engine2
 		void OnInputEvent(InputEvent& event);
 		void OnApplicationEvent(ApplicationEvent& event);
 		void ImguiWindow(bool* pOpen);
+
+		void SetCamera(Camera* ptr) { pCamera = ptr; }
 
 		bool IsKeyPressed(int vKeyCode);
 

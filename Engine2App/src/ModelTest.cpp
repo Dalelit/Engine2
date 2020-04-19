@@ -7,8 +7,12 @@ using namespace DirectX;
 
 ModelTest::ModelTest() : Engine2::Layer("ModelTest")
 {
-	Engine::Get().mainCamera.SetPosition(0.5f, 0.7f, -1.0f);
-	Engine::Get().mainCamera.LookAt(0.0f, 0.0f, 0.0f);
+	Engine::GetActiveCamera().SetPosition(0.5f, 0.7f, -1.0f);
+	Engine::GetActiveCamera().LookAt(0.0f, 0.0f, 0.0f);
+
+	Camera* camera = Engine::Get().AddGetCamera("back");
+	camera->SetPosition(-0.5f, 0.7f, 1.0f);
+	camera->LookAt(0.0f, 0.0f, 0.0f);
 
 	scene.psConstBuffer.data.ambientLight = { 0.1f, 0.1f, 0.1f, 1.0f };
 	scene.pointLights.emplace_back(PointLight({ -1.0f, 4.0f, -2.0f, 1.0f }, { 0.8f, 0.8f, 0.8f, 1.0f }));
