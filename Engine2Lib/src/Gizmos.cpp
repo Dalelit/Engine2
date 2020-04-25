@@ -14,6 +14,7 @@ namespace Engine2
 {
 
 	Gizmos::Gizmos() :
+		psCB(0),
 		axisVBuffer(AxisVerticies, AxisIndicies),
 		sphereVBuffer(SphereVerticies, SphereIndicies)
 	{
@@ -31,6 +32,10 @@ namespace Engine2
 		std::string psFileName = Config::directories["ShaderCompiledDir"] + "GizmosPS.cso";
 		pPS = PixelShader::CreateFromCompiledFile(psFileName);
 
+		D3D11_DEPTH_STENCIL_DESC desc = CD3D11_DEPTH_STENCIL_DESC(CD3D11_DEFAULT());
+		desc.DepthFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_GREATER;
+		DXDevice::GetDevice().CreateDepthStencilState(&desc, &pBackDrawDSS);
+
 		axisInstances.resize(E2_GIZMOZ_MAXINSTANCES);
 		axisPtrInstancesBuffer = axisVBuffer.AddInstances(axisInstances, true);
 
@@ -46,22 +51,49 @@ namespace Engine2
 
 	void Gizmos::Render()
 	{
+		UpdateBuffers();
+
 		// Note: Assuming the scene has already bound the camera matrix to VS constant buffer 0
 		pVS->Bind();
 		pPS->Bind();
 
+		psCB.data = visibleColor;
+		psCB.Bind();
+		Draw();
+
+		DXDevice::GetContext().OMSetDepthStencilState(pBackDrawDSS.Get(), 0);
+		psCB.data = hiddenColor;
+		psCB.Bind();
+		Draw();
+
+		DXDevice::GetContext().OMSetDepthStencilState(DXDevice::Get().GetBackbufferRenderTargetResource().pDepthStencilState.Get(), 0); // revert back to default
+	}
+
+	void Gizmos::UpdateBuffers()
+	{
 		if (axisInstanceCount > 0)
 		{
 			DXDevice::UpdateBuffer(axisPtrInstancesBuffer, axisInstances, axisInstanceCount);
 			axisVBuffer.SetInstanceCount(axisInstanceCount);
-			axisVBuffer.Bind();
-			axisVBuffer.Draw();
 		}
 
 		if (sphereInstanceCount > 0)
 		{
 			DXDevice::UpdateBuffer(spherePtrInstancesBuffer, sphereInstances, sphereInstanceCount);
 			sphereVBuffer.SetInstanceCount(sphereInstanceCount);
+		}
+	}
+
+	void Gizmos::Draw()
+	{
+		if (axisInstanceCount > 0)
+		{
+			axisVBuffer.Bind();
+			axisVBuffer.Draw();
+		}
+
+		if (sphereInstanceCount > 0)
+		{
 			sphereVBuffer.Bind();
 			sphereVBuffer.Draw();
 		}
@@ -72,8 +104,10 @@ namespace Engine2
 		if (ImGui::TreeNode("Gizmos"))
 		{
 			ImGui::Checkbox("Active", &active);
-			ImGui::Text("Axis instances %i", axisInstanceCount);
-			ImGui::Text("Sphere instances %i", sphereInstanceCount);
+			ImGui::ColorEdit4("Visible", visibleColor.m128_f32);
+			ImGui::ColorEdit4("Hidden", hiddenColor.m128_f32);
+			ImGui::Text("Axis   %i", axisInstanceCount);
+			ImGui::Text("Sphere %i", sphereInstanceCount);
 			ImGui::TreePop();
 		}
 	}

@@ -84,11 +84,11 @@ void ModelTest::OnRender()
 
 	for (auto& m : models) if (m->IsActive()) m->Draw();
 
-	gizmos.DrawAxis(XMMatrixIdentity());
-	gizmos.DrawSphere(XMMatrixTranslation(2.0f, 0.0f, 0.0f));
-	gizmos.DrawSphere(XMMatrixTranslation(-2.0f, 0.0f, 0.0f));
-	gizmos.DrawSphere(XMMatrixScaling(3.0f, 3.0f, 3.0f) * XMMatrixRotationRollPitchYaw(0.785f, 0.785f, 0.785f) * XMMatrixTranslation(0.0f, 2.0f, 0.0f));
-	gizmos.DrawSphere(XMMatrixScaling(3.0f, 3.0f, 3.0f) * XMMatrixTranslation(0.0f, -2.0f, -1.0f));
+	if (gizmos.IsActive())
+	{
+		gizmos.DrawAxis(XMMatrixIdentity());
+		for (auto& l : scene.pointLights) gizmos.DrawSphere(l.GetTransform());
+	}
 }
 
 void ModelTest::OnImgui()

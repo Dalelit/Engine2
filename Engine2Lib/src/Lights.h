@@ -12,6 +12,8 @@ namespace Engine2
 		inline DirectX::XMVECTOR GetPosition() { return position; }
 		inline DirectX::XMVECTOR GetColor() { return color; }
 
+		inline DirectX::XMMATRIX GetTransform() { return DirectX::XMMatrixTranslationFromVector(position); }
+
 		void OnImgui();
 
 	protected:

@@ -35,15 +35,6 @@ namespace Engine2
 		};
 		PSConstantBuffer<PSSceneData> psConstBuffer;
 
-		static std::string GetVSCBHLSL() {
-			return R"(
-			cbuffer sceneConst : register (b0)
-			{
-				matrix cameraTransform;
-			};
-		)";
-		}
-
 	protected:
 		void UpdateVSConstBuffer();
 		void UpdatePSConstBuffer();

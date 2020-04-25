@@ -36,21 +36,11 @@ namespace Engine2
 
 		void UpdateBuffer()
 		{
-			// to do: D3D11_MAP_WRITE_DISCARD v D3D11_MAP_WRITE_NO_OVERWRITE ?
-
-			HRESULT hr;
-
-			auto& context = DXDevice::GetContext();
-			auto ptrBuffer = pConstantBuffer.Get();
-
-			D3D11_MAPPED_SUBRESOURCE mappedSubResource = {};
-			hr = context.Map(ptrBuffer, 0u, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubResource);
-
+			D3D11_MAPPED_SUBRESOURCE mappedSubResource;
+			HRESULT hr = DXDevice::GetContext().Map(pConstantBuffer.Get(), 0u, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubResource);
 			E2_ASSERT_HR(hr, "ConstantBuffer Map failed");
-			
 			memcpy(mappedSubResource.pData, &data, sizeof(T)); //*(T*)mappedSubResource.pData = data;
-
-			context.Unmap(ptrBuffer, 0);
+			DXDevice::GetContext().Unmap(pConstantBuffer.Get(), 0);
 		}
 
 		void OnImgui()

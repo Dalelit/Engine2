@@ -53,7 +53,8 @@ namespace Engine2
 		void UnbindRenderTargetAsResource(unsigned int id, unsigned int slot);
 
 		unsigned int GetBackbufferRenderTargetId() { return 0; } // do this way in case the number should change for some reason
-		void BindBackbufferRenderTarget() { BindRenderTargetAsTarget(0); };
+		void BindBackbufferRenderTarget() { BindRenderTargetAsTarget(0); }
+		inline RenderTarget& GetBackbufferRenderTargetResource() { return renderTargets[GetBackbufferRenderTargetId()]; }
 
 		void SetWireframeRenderState();
 		void SetDefaultRenderState();

@@ -2,7 +2,7 @@
 #include "pch.h"
 #include "VertexBufferInstanced.h"
 #include "Shader.h"
-#include "Util.h"
+#include "ConstantBuffer.h"
 
 namespace Engine2
 {
@@ -28,6 +28,13 @@ namespace Engine2
 
 		std::shared_ptr<PixelShader> pPS;
 		std::shared_ptr<VertexShader> pVS;
+		PSConstantBuffer<DirectX::XMVECTOR> psCB;
+		DirectX::XMVECTOR visibleColor = { 0.2f, 0.8f, 0.2f, 1.0f };
+		DirectX::XMVECTOR hiddenColor = { 0.1f, 0.4f, 0.1f, 1.0f };
+		wrl::ComPtr<ID3D11DepthStencilState> pBackDrawDSS;
+
+		void UpdateBuffers();
+		void Draw();
 
 		// axis
 		std::vector<DirectX::XMMATRIX> axisInstances;
