@@ -12,27 +12,34 @@ namespace Engine2
 		Layer(std::string name) : name(name) {}
 		virtual ~Layer() = default;
 
-		std::string GetName() const { return name; }
+		inline std::string GetName() const { return name; }
 
 		inline bool IsActive() const { return active; }
 		inline void SetActive(bool makeActive = true) { active = makeActive; }
 
-		virtual void OnUpdate(float dt) {}
-		virtual void OnRender() {}
-		virtual void OnInputEvent(InputEvent& event) {}
-		virtual void OnApplicationEvent(ApplicationEvent& event) {}
-		virtual void OnImgui() {}; // override this as the imgui window content for the layer
+		virtual void OnUpdate(float dt) {}                          // override this to update scene prior to rendering
+		virtual void OnRender() {}                                  // override this with rendering logic
+		virtual void OnInputEvent(InputEvent& event) {}             // handle input events
+		virtual void OnApplicationEvent(ApplicationEvent& event) {} // handle application events
+		virtual void OnImgui() {};                                  // override this as the imgui window content for the layer
+		virtual void OnGizmos() {};                                 // override this to draw any gizmos
 
-		void Render()
+		// Below are called from the engine
+
+		inline void Render() { OnRender(); }
+
+		inline void RenderGizmos()
 		{
-			gizmos.NewFrame();
-			OnRender();
-			if (gizmos.IsActive()) gizmos.Render();
+			if (gizmos.IsActive())
+			{
+				gizmos.NewFrame();
+				OnGizmos();
+				gizmos.Render();
+			}
 		}
 
-		// called from the engine
 		bool imguiOpen = true;
-		void ImguiWindow()
+		inline void ImguiWindow()
 		{
 			if (imguiOpen)
 			{
@@ -47,7 +54,6 @@ namespace Engine2
 	protected:
 		std::string name;
 		bool active = true;
-
 		Gizmos gizmos;
 	};
 

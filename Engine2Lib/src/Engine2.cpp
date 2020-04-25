@@ -90,7 +90,11 @@ namespace Engine2
 		{
 			for (auto& layer : layers)
 			{
-				if (layer->IsActive()) layer->Render();
+				if (layer->IsActive())
+				{
+					layer->Render();
+					layer->RenderGizmos();
+				}
 			}
 		}
 		renderLayersMemory.Tick();

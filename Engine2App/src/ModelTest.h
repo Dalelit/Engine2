@@ -14,6 +14,7 @@ public:
 	void OnUpdate(float dt);
 	void OnRender();
 	void OnImgui();
+	void OnGizmos();
 
 protected:
 	Engine2::Scene scene;

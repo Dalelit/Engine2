@@ -18,8 +18,8 @@ namespace Engine2
 		void OnImgui();
 
 		void DrawAxis(DirectX::XMMATRIX instance);
-
 		void DrawSphere(DirectX::XMMATRIX instance);
+		void DrawCamera(DirectX::XMMATRIX instance);
 
 		inline bool IsActive() { return active; }
 
@@ -30,7 +30,7 @@ namespace Engine2
 		std::shared_ptr<VertexShader> pVS;
 		PSConstantBuffer<DirectX::XMVECTOR> psCB;
 		DirectX::XMVECTOR visibleColor = { 0.2f, 0.8f, 0.2f, 1.0f };
-		DirectX::XMVECTOR hiddenColor = { 0.1f, 0.4f, 0.1f, 1.0f };
+		DirectX::XMVECTOR hiddenColor = { 0.05f, 0.2f, 0.05f, 1.0f };
 		wrl::ComPtr<ID3D11DepthStencilState> pBackDrawDSS;
 
 		void UpdateBuffers();
@@ -51,5 +51,13 @@ namespace Engine2
 		ID3D11Buffer* spherePtrInstancesBuffer;
 		static std::vector<DirectX::XMFLOAT3> SphereVerticies;
 		static std::vector<unsigned int> SphereIndicies;
+
+		// camera
+		std::vector<DirectX::XMMATRIX> cameraInstances;
+		unsigned int cameraInstanceCount = 0;
+		VertexBufferIndexInstanced<DirectX::XMFLOAT3, D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINELIST> cameraVBuffer;
+		ID3D11Buffer* cameraPtrInstancesBuffer;
+		static std::vector<DirectX::XMFLOAT3> CameraVerticies;
+		static std::vector<unsigned int> CameraIndicies;
 	};
 }

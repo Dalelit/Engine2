@@ -16,7 +16,8 @@ namespace Engine2
 	Gizmos::Gizmos() :
 		psCB(0),
 		axisVBuffer(AxisVerticies, AxisIndicies),
-		sphereVBuffer(SphereVerticies, SphereIndicies)
+		sphereVBuffer(SphereVerticies, SphereIndicies),
+		cameraVBuffer(CameraVerticies, CameraIndicies)
 	{
 		std::vector<D3D11_INPUT_ELEMENT_DESC> vsLayout = {
 			{"Position",      0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
@@ -41,12 +42,16 @@ namespace Engine2
 
 		sphereInstances.resize(E2_GIZMOZ_MAXINSTANCES);
 		spherePtrInstancesBuffer = sphereVBuffer.AddInstances(sphereInstances, true);
+
+		cameraInstances.resize(E2_GIZMOZ_MAXINSTANCES); // to do: make sense having this many?
+		cameraPtrInstancesBuffer = cameraVBuffer.AddInstances(cameraInstances, true);
 	}
 
 	void Gizmos::NewFrame()
 	{
 		axisInstanceCount = 0;
 		sphereInstanceCount = 0;
+		cameraInstanceCount = 0;
 	}
 
 	void Gizmos::Render()
@@ -82,6 +87,12 @@ namespace Engine2
 			DXDevice::UpdateBuffer(spherePtrInstancesBuffer, sphereInstances, sphereInstanceCount);
 			sphereVBuffer.SetInstanceCount(sphereInstanceCount);
 		}
+
+		if (cameraInstanceCount > 0)
+		{
+			DXDevice::UpdateBuffer(cameraPtrInstancesBuffer, cameraInstances, cameraInstanceCount);
+			cameraVBuffer.SetInstanceCount(cameraInstanceCount);
+		}
 	}
 
 	void Gizmos::Draw()
@@ -97,6 +108,12 @@ namespace Engine2
 			sphereVBuffer.Bind();
 			sphereVBuffer.Draw();
 		}
+
+		if (cameraInstanceCount > 0)
+		{
+			cameraVBuffer.Bind();
+			cameraVBuffer.Draw();
+		}
 	}
 
 	void Gizmos::OnImgui()
@@ -104,10 +121,14 @@ namespace Engine2
 		if (ImGui::TreeNode("Gizmos"))
 		{
 			ImGui::Checkbox("Active", &active);
-			ImGui::ColorEdit4("Visible", visibleColor.m128_f32);
-			ImGui::ColorEdit4("Hidden", hiddenColor.m128_f32);
-			ImGui::Text("Axis   %i", axisInstanceCount);
-			ImGui::Text("Sphere %i", sphereInstanceCount);
+			if (active)
+			{
+				ImGui::ColorEdit4("Visible", visibleColor.m128_f32);
+				ImGui::ColorEdit4("Hidden", hiddenColor.m128_f32);
+				ImGui::Text("Axis   %i", axisInstanceCount);
+				ImGui::Text("Sphere %i", sphereInstanceCount);
+				ImGui::Text("Camera %i", cameraInstanceCount);
+			}
 			ImGui::TreePop();
 		}
 	}
@@ -124,6 +145,13 @@ namespace Engine2
 		E2_GIZMOZ_CHECKINSTANCES(sphereInstanceCount, sphereInstances);
 
 		sphereInstances[sphereInstanceCount++] = XMMatrixTranspose(instance);
+	}
+
+	void Gizmos::DrawCamera(DirectX::XMMATRIX instance)
+	{
+		E2_GIZMOZ_CHECKINSTANCES(cameraInstanceCount, cameraInstances);
+
+		cameraInstances[cameraInstanceCount++] = XMMatrixTranspose(instance);
 	}
 
 	std::vector<XMFLOAT3> Gizmos::AxisVerticies = {
@@ -168,5 +196,22 @@ namespace Engine2
 	std::vector<unsigned int> Gizmos::SphereIndicies = {
 		0,1, 1,2, 2,3, 3,4, 4,5, 5,6, 6,7, 7,8, 8,9, 9,10, 10,11, 11,0,
 		12,13, 13,14, 14,15, 15,16, 16,17, 17,18, 18,19, 19,20, 20,21, 21,22, 22,23, 23,12,
+	};
+
+	std::vector<XMFLOAT3> Gizmos::CameraVerticies = {
+		{  0.0f,  0.0f,  0.0f},
+		{  0.5f, -0.28f, 1.0f},
+		{  0.5f,  0.28f, 1.0f},
+		{ -0.5f,  0.28f, 1.0f},
+		{ -0.5f, -0.28f, 1.0f},
+		{ -0.4f,  0.3f,  1.0f},
+		{  0.0f,  0.4f,  1.0f},
+		{  0.4f,  0.3f,  1.0f},
+	};
+
+	std::vector<unsigned int> Gizmos::CameraIndicies = {
+		0,1, 0,2, 0,3, 0,4,
+		1,2, 2,3, 3,4, 4,1,
+		5,6, 6,7, 7,5
 	};
 }

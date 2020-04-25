@@ -25,11 +25,12 @@ namespace Engine2 {
 
 		InputController inputController;
 
-		Camera* CurrentCamera() { return currentCamera; }
+		inline Camera* CurrentCamera() { return currentCamera; }
+		inline std::vector<std::unique_ptr<Camera>>& GetCameras() { return instance->cameras; }
 		unsigned int AddCamera(std::string name);
 		void SetCurrentCamera(unsigned int indx);
 		Camera* GetCamera(unsigned int indx);
-		Camera* AddGetCamera(std::string name) { return GetCamera(AddCamera(name)); }
+		inline Camera* AddGetCamera(std::string name) { return GetCamera(AddCamera(name)); }
 
 		void DoFrame(float deltaTime); // does update then render
 		void Update(float deltaTime);
