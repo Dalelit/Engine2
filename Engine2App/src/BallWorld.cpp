@@ -2,6 +2,7 @@
 #include "BallWorld.h"
 #include "Primatives.h"
 #include "VertexBufferInstanced.h"
+#include "Engine2.h"
 
 using namespace Engine2;
 using namespace DirectX;
@@ -34,29 +35,19 @@ void BallWorld::OnUpdate(float dt)
 		v++;
 	}
 
-	Engine::UpdateBuffer(positionsBufferPtr, positions);
+	DXDevice::UpdateBuffer(positionsBufferPtr, positions);
 }
 
 void BallWorld::OnRender()
 {
-	gizmos.NewFrame();
-
 	scene.OnRender();
 
-	gizmos.DrawAxis({ 0.0f, 0.0f, 0.0f, 1.0f });
-
-	gizmos.DrawSphere(scene.pointLights[0].GetPosition());
-
 	for (auto& m : models) if (m->IsActive()) m->Draw();
-
-	gizmos.Draw();
 }
 
 void BallWorld::OnImgui()
 {
-	ImGui::Checkbox("Active", &active);
 	scene.OnImgui();
-	gizmos.OnImgui();
 	for (auto& m : models) m->OnImgui();
 }
 

@@ -13,6 +13,7 @@ namespace Engine2
 		void LoadViewProjectionMatrixT(DirectX::XMMATRIX& vpMatrix);
 
 		void OnImugui();
+		//void OnGizmos();
 
 		inline void Translate(float x, float y, float z)   { position.m128_f32[0] += x; position.m128_f32[1] += y; position.m128_f32[2] += z; }
 		inline void SetPosition(float x, float y, float z) { position = {x, y, z, 1.0f}; }
@@ -47,5 +48,7 @@ namespace Engine2
 
 		inline void ClampPitch() { pitch = std::clamp(pitch, -pitchBound, pitchBound); }
 		inline void WrapYaw() { yaw = fmodf((float)yaw, DirectX::XM_2PI); if (yaw < 0.0f) yaw += DirectX::XM_2PI; }
+
+		bool showGizmos = true;
 	};
 }

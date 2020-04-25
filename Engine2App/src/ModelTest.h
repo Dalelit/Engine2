@@ -19,7 +19,5 @@ protected:
 	Engine2::Scene scene;
 
 	std::vector<Engine2::Model*> models;
-
-	void AddModel(std::shared_ptr<Engine2::AssetLoaders::ObjLoader>& loadedModel, std::string objectName, Engine2::Model* pModel);
 };
 

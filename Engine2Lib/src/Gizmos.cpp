@@ -2,59 +2,69 @@
 #include "Gizmos.h"
 #include "Common.h"
 
-#define MAXVERTICIES 20000
-#define E2_GIZMO_CHECK(num) E2_ASSERT(vertexCount + num < MAXVERTICIES, "Exceeded gizmos line buffer");
+//#define MAXVERTICIES 20000
+//#define E2_GIZMO_CHECK(num) E2_ASSERT(vertexCount + num < MAXVERTICIES, "Exceeded gizmos line buffer");
+
+#define E2_GIZMOZ_MAXINSTANCES 1000
+#define E2_GIZMOZ_CHECKINSTANCES(num, instBuffer) E2_ASSERT(num + 1 <= instBuffer.size(), "Exceeded gizmoz buffer size");
 
 using namespace DirectX;
 
 namespace Engine2
 {
 
-	Gizmos::Gizmos() : lineBuffer(MAXVERTICIES), vertexBuffer(MAXVERTICIES)
+	Gizmos::Gizmos() :
+		axisVBuffer(AxisVerticies, AxisIndicies),
+		sphereVBuffer(SphereVerticies, SphereIndicies)
 	{
-		VertexLayoutSimple::VertexShaderLayout vsLayout = { {"Position", DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT} };
-		auto layout = VertexLayoutSimple::ToDescriptor(vsLayout);
+		std::vector<D3D11_INPUT_ELEMENT_DESC> vsLayout = {
+			{"Position",      0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"InstTransform", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_INSTANCE_DATA, 1},
+			{"InstTransform", 1, DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_INSTANCE_DATA, 1},
+			{"InstTransform", 2, DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_INSTANCE_DATA, 1},
+			{"InstTransform", 3, DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_INSTANCE_DATA, 1},
+		};
+
 		std::string vsFileName = Config::directories["ShaderCompiledDir"] + "GizmosVS.cso";
-		pVS = VertexShader::CreateFromCompiledFile(vsFileName, layout);
+		pVS = VertexShader::CreateFromCompiledFile(vsFileName, vsLayout);
 
 		std::string psFileName = Config::directories["ShaderCompiledDir"] + "GizmosPS.cso";
 		pPS = PixelShader::CreateFromCompiledFile(psFileName);
+
+		axisInstances.resize(E2_GIZMOZ_MAXINSTANCES);
+		axisPtrInstancesBuffer = axisVBuffer.AddInstances(axisInstances, true);
+
+		sphereInstances.resize(E2_GIZMOZ_MAXINSTANCES);
+		spherePtrInstancesBuffer = sphereVBuffer.AddInstances(sphereInstances, true);
 	}
 
 	void Gizmos::NewFrame()
 	{
-		next = lineBuffer.begin();
-		vertexCount = 0;
+		axisInstanceCount = 0;
+		sphereInstanceCount = 0;
 	}
 
-	void Gizmos::DrawLine(DirectX::XMVECTOR p0, DirectX::XMVECTOR p1)
+	void Gizmos::Render()
 	{
-		E2_GIZMO_CHECK(2);
-
-		*next++ = p0;
-		*next++ = p1;
-		vertexCount += 2;
-	}
-
-	void Gizmos::AddLines(DirectX::XMVECTOR pos, std::vector<DirectX::XMVECTOR>& points)
-	{
-		E2_GIZMO_CHECK(points.size());
-
-		for (auto& p : points) *next++ = pos + p;
-		vertexCount += (unsigned int)points.size();
-	}
-
-	void Gizmos::Draw()
-	{
-		if (!active) return;
-
-		vertexBuffer.Update(lineBuffer.data(), vertexCount);
-
 		// Note: Assuming the scene has already bound the camera matrix to VS constant buffer 0
 		pVS->Bind();
 		pPS->Bind();
-		vertexBuffer.Bind();
-		vertexBuffer.Draw();
+
+		if (axisInstanceCount > 0)
+		{
+			DXDevice::UpdateBuffer(axisPtrInstancesBuffer, axisInstances, axisInstanceCount);
+			axisVBuffer.SetInstanceCount(axisInstanceCount);
+			axisVBuffer.Bind();
+			axisVBuffer.Draw();
+		}
+
+		if (sphereInstanceCount > 0)
+		{
+			DXDevice::UpdateBuffer(spherePtrInstancesBuffer, sphereInstances, sphereInstanceCount);
+			sphereVBuffer.SetInstanceCount(sphereInstanceCount);
+			sphereVBuffer.Bind();
+			sphereVBuffer.Draw();
+		}
 	}
 
 	void Gizmos::OnImgui()
@@ -62,41 +72,67 @@ namespace Engine2
 		if (ImGui::TreeNode("Gizmos"))
 		{
 			ImGui::Checkbox("Active", &active);
-			ImGui::Text("Vertex count %i", vertexCount);
+			ImGui::Text("Axis instances %i", axisInstanceCount);
+			ImGui::Text("Sphere instances %i", sphereInstanceCount);
 			ImGui::TreePop();
 		}
 	}
 
-	std::vector<XMVECTOR> Gizmos::AxisWireframe = {
-		{0.0f, 0.0f, 0.0f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f},
-		{0.0f, 0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f, 1.0f},
-		{0.0f, 0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f, 1.0f},
+	void Gizmos::DrawAxis(DirectX::XMMATRIX instance)
+	{
+		E2_GIZMOZ_CHECKINSTANCES(axisInstanceCount, axisInstances);
+
+		axisInstances[axisInstanceCount++] = XMMatrixTranspose(instance);
+	}
+
+	void Gizmos::DrawSphere(DirectX::XMMATRIX instance)
+	{
+		E2_GIZMOZ_CHECKINSTANCES(sphereInstanceCount, sphereInstances);
+
+		sphereInstances[sphereInstanceCount++] = XMMatrixTranspose(instance);
+	}
+
+	std::vector<XMFLOAT3> Gizmos::AxisVerticies = {
+		{0.0f, 0.0f, 0.0f},
+		{1.0f, 0.0f, 0.0f},
+		{0.0f, 1.0f, 0.0f},
+		{0.0f, 0.0f, 1.0f},
 	};
 
-	std::vector<XMVECTOR> Gizmos::SphereWireframe = {
-		{0.500f, 0.0f, 0.000f, 1.0f},{0.433f, 0.0f, 0.250f, 1.0f},
-		{0.433f, 0.0f, 0.250f, 1.0f},{0.250f, 0.0f, 0.433f, 1.0f},
-		{0.250f, 0.0f, 0.433f, 1.0f},{0.000f, 0.0f, 0.500f, 1.0f},
-		{0.000f, 0.0f, 0.500f, 1.0f},{-0.250f, 0.0f, 0.433f, 1.0f},
-		{-0.250f, 0.0f, 0.433f, 1.0f},{-0.433f, 0.0f, 0.250f, 1.0f},
-		{-0.433f, 0.0f, 0.250f, 1.0f},{-0.500f, 0.0f, 0.000f, 1.0f},
-		{-0.500f, 0.0f, 0.000f, 1.0f},{-0.433f, 0.0f, -0.250f, 1.0f},
-		{-0.433f, 0.0f, -0.250f, 1.0f},{-0.250f, 0.0f, -0.433f, 1.0f},
-		{-0.250f, 0.0f, -0.433f, 1.0f},{0.000f, 0.0f, -0.500f, 1.0f},
-		{0.000f, 0.0f, -0.500f, 1.0f},{0.250f, 0.0f, -0.433f, 1.0f},
-		{0.250f, 0.0f, -0.433f, 1.0f},{0.433f, 0.0f, -0.250f, 1.0f},
-		{0.433f, 0.0f, -0.250f, 1.0f},{0.500f, 0.0f, 0.000f, 1.0f},
-		{0.0f, 0.000f, 0.500f, 1.0f},{0.0f, 0.250f, 0.433f, 1.0f},
-		{0.0f, 0.250f, 0.433f, 1.0f},{0.0f, 0.433f, 0.250f, 1.0f},
-		{0.0f, 0.433f, 0.250f, 1.0f},{0.0f, 0.500f, 0.000f, 1.0f},
-		{0.0f, 0.500f, 0.000f, 1.0f},{0.0f, 0.433f, -0.250f, 1.0f},
-		{0.0f, 0.433f, -0.250f, 1.0f},{0.0f, 0.250f, -0.433f, 1.0f},
-		{0.0f, 0.250f, -0.433f, 1.0f},{0.0f, 0.000f, -0.500f, 1.0f},
-		{0.0f, 0.000f, -0.500f, 1.0f},{0.0f, -0.250f, -0.433f, 1.0f},
-		{0.0f, -0.250f, -0.433f, 1.0f},{0.0f, -0.433f, -0.250f, 1.0f},
-		{0.0f, -0.433f, -0.250f, 1.0f},{0.0f, -0.500f, 0.000f, 1.0f},
-		{0.0f, -0.500f, 0.000f, 1.0f},{0.0f, -0.433f, 0.250f, 1.0f},
-		{0.0f, -0.433f, 0.250f, 1.0f},{0.0f, -0.250f, 0.433f, 1.0f},
-		{0.0f, -0.250f, 0.433f, 1.0f},{0.0f, 0.000f, 0.500f, 1.0f},
+	std::vector<unsigned int> Gizmos::AxisIndicies = {
+		0,1, 0,2, 0,3
+	};
+
+	std::vector<XMFLOAT3> Gizmos::SphereVerticies = {
+		{0.500f, 0.0f, 0.000f},
+		{0.433f, 0.0f, 0.250f},
+		{0.250f, 0.0f, 0.433f},
+		{0.000f, 0.0f, 0.500f},
+		{-0.250f, 0.0f, 0.433f},
+		{-0.433f, 0.0f, 0.250f},
+		{-0.500f, 0.0f, 0.000f},
+		{-0.433f, 0.0f, -0.250f},
+		{-0.250f, 0.0f, -0.433f},
+		{0.000f, 0.0f, -0.500f},
+		{0.250f, 0.0f, -0.433f},
+		{0.433f, 0.0f, -0.250f},
+
+		{0.0f, 0.000f, 0.500f},
+		{0.0f, 0.250f, 0.433f},
+		{0.0f, 0.433f, 0.250f},
+		{0.0f, 0.500f, 0.000f},
+		{0.0f, 0.433f, -0.250f},
+		{0.0f, 0.250f, -0.433f},
+		{0.0f, 0.000f, -0.500f},
+		{0.0f, -0.250f, -0.433f},
+		{0.0f, -0.433f, -0.250f},
+		{0.0f, -0.500f, 0.000f},
+		{0.0f, -0.433f, 0.250f},
+		{0.0f, -0.250f, 0.433f},
+	};
+
+	std::vector<unsigned int> Gizmos::SphereIndicies = {
+		0,1, 1,2, 2,3, 3,4, 4,5, 5,6, 6,7, 7,8, 8,9, 9,10, 10,11, 11,0,
+		12,13, 13,14, 14,15, 15,16, 16,17, 17,18, 18,19, 19,20, 20,21, 21,22, 22,23, 23,12,
 	};
 }

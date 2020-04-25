@@ -17,21 +17,8 @@ namespace Engine2 {
 	public:
 
 		static void CreateEngine(HWND hwnd);
-		inline static Engine& Get() { return *instance.get(); }
-		inline static DXDevice& GetDX() { return instance->device; }
-		inline static ID3D11Device3& GetDevice() { return instance->device.GetDevice(); }
-		inline static ID3D11DeviceContext3& GetContext() { return instance->device.GetContext(); }
+		inline static Engine& Get() { return *instance; }
 		inline static Camera& GetActiveCamera() { return *instance->CurrentCamera(); }
-
-		// helper function to update a buffer
-		template <typename T>
-		static void UpdateBuffer(ID3D11Buffer* pBuffer, std::vector<T>& source) {
-			D3D11_MAPPED_SUBRESOURCE mappedSubResource;
-			GetContext().Map(pBuffer, 0u, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubResource);
-			memcpy(mappedSubResource.pData, source.data(), sizeof(T) * source.size());
-			GetContext().Unmap(pBuffer, 0);
-		}
-
 
 		Engine(HWND hwnd);
 		~Engine();
@@ -45,8 +32,8 @@ namespace Engine2 {
 		Camera* AddGetCamera(std::string name) { return GetCamera(AddCamera(name)); }
 
 		void DoFrame(float deltaTime); // does update then render
-		void OnUpdate(float deltaTime);
-		void OnRender();
+		void Update(float deltaTime);
+		void Render();
 
 		// Engine will own the layer and delete at the end.
 		void AttachLayer(Layer* layer) { layers.push_back(layer); }
@@ -61,7 +48,7 @@ namespace Engine2 {
 	private:
 		static std::unique_ptr<Engine> instance;
 
-		DXDevice device;
+		DXDevice& device;
 		DXImgui imgui;
 		std::vector<Layer*> layers;
 		bool minimised = false;

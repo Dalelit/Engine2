@@ -1,13 +1,14 @@
 #include "pch.h"
 #include "ModelTest.h"
 #include "Shader.h"
+#include "Engine2.h"
 
 using namespace Engine2;
 using namespace DirectX;
 
 ModelTest::ModelTest() : Engine2::Layer("ModelTest")
 {
-	Engine::GetActiveCamera().SetPosition(0.5f, 0.7f, -1.0f);
+	Engine::GetActiveCamera().SetPosition(17.5f, 19.7f, -25.0f);
 	Engine::GetActiveCamera().LookAt(0.0f, 0.0f, 0.0f);
 
 	Camera* camera = Engine::Get().AddGetCamera("back");
@@ -29,8 +30,8 @@ ModelTest::ModelTest() : Engine2::Layer("ModelTest")
 		{"Color",       0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
 	};
 
-	auto loadedModel = AssetLoaders::ObjLoader::Load(Engine2::Config::directories["ModelsDir"] + "PicaPica.obj");
-	//auto loadedModel = AssetLoaders::ObjLoader::Load(Engine2::Config::directories["ModelsDir"] + "torusSmooth.obj");
+	//auto loadedModel = AssetLoaders::ObjLoader::Load(Engine2::Config::directories["ModelsDir"] + "PicaPica.obj");
+	auto loadedModel = AssetLoaders::ObjLoader::Load(Engine2::Config::directories["ModelsDir"] + "torusSmooth.obj");
 
 	auto model = new Model(loadedModel->filename);
 	models.push_back(model);
@@ -82,11 +83,16 @@ void ModelTest::OnRender()
 	scene.OnRender();
 
 	for (auto& m : models) if (m->IsActive()) m->Draw();
+
+	gizmos.DrawAxis(XMMatrixIdentity());
+	gizmos.DrawSphere(XMMatrixTranslation(2.0f, 0.0f, 0.0f));
+	gizmos.DrawSphere(XMMatrixTranslation(-2.0f, 0.0f, 0.0f));
+	gizmos.DrawSphere(XMMatrixScaling(3.0f, 3.0f, 3.0f) * XMMatrixRotationRollPitchYaw(0.785f, 0.785f, 0.785f) * XMMatrixTranslation(0.0f, 2.0f, 0.0f));
+	gizmos.DrawSphere(XMMatrixScaling(3.0f, 3.0f, 3.0f) * XMMatrixTranslation(0.0f, -2.0f, -1.0f));
 }
 
 void ModelTest::OnImgui()
 {
-	ImGui::Checkbox("Active", &active);
 	scene.OnImgui();
 	for (auto& m : models) m->OnImgui();
 }

@@ -26,7 +26,7 @@ namespace Engine2
 		data.SysMemPitch = surface.GetPitch();
 		data.SysMemSlicePitch = surface.GetSlicePitch();
 
-		hr = Engine::GetDevice().CreateTexture2D1(&texDesc, &data, &pTexture);
+		hr = DXDevice::GetDevice().CreateTexture2D1(&texDesc, &data, &pTexture);
 
 		E2_ASSERT_HR(hr, "CreateTexture2D1 failed");
 
@@ -36,7 +36,7 @@ namespace Engine2
 		srvDesc.Texture2D.MostDetailedMip = 0;
 		srvDesc.Texture2D.MipLevels = 1;
 
-		hr = Engine::GetDevice().CreateShaderResourceView(pTexture.Get(), &srvDesc, &pSRView);
+		hr = DXDevice::GetDevice().CreateShaderResourceView(pTexture.Get(), &srvDesc, &pSRView);
 
 		E2_ASSERT_HR(hr, "CreateShaderResourceView failed");
 
@@ -62,7 +62,7 @@ namespace Engine2
 		srvDesc.Texture2D.MostDetailedMip = 0;
 		srvDesc.Texture2D.MipLevels = 1;
 
-		hr = Engine::GetDevice().CreateShaderResourceView(pTexture.Get(), &srvDesc, &pSRView);
+		hr = DXDevice::GetDevice().CreateShaderResourceView(pTexture.Get(), &srvDesc, &pSRView);
 
 		E2_ASSERT_HR(hr, "CreateShaderResourceView failed");
 
@@ -72,15 +72,15 @@ namespace Engine2
 
 	void Texture::Bind()
 	{
-		Engine::GetContext().PSSetShaderResources(slot, 1u, pSRView.GetAddressOf());
-		Engine::GetContext().PSSetSamplers(slot, 1u, pSampler->GetSamplerState().GetAddressOf());
+		DXDevice::GetContext().PSSetShaderResources(slot, 1u, pSRView.GetAddressOf());
+		DXDevice::GetContext().PSSetSamplers(slot, 1u, pSampler->GetSamplerState().GetAddressOf());
 	}
 
 	void Texture::Unbind()
 	{
 		ID3D11ShaderResourceView* const srv[1] = { nullptr };
-		Engine::GetContext().PSSetShaderResources(slot, 1u, srv);
-		Engine::GetContext().PSSetSamplers(slot, 0u, nullptr);
+		DXDevice::GetContext().PSSetShaderResources(slot, 1u, srv);
+		DXDevice::GetContext().PSSetSamplers(slot, 0u, nullptr);
 	}
 
 	void Texture::OnImgui()
@@ -101,7 +101,7 @@ namespace Engine2
 		sampDesc.AddressV = addressMode;
 		sampDesc.AddressW = addressMode;
 
-		HRESULT hr = Engine::GetDevice().CreateSamplerState(&sampDesc, &pSamplerState);
+		HRESULT hr = DXDevice::GetDevice().CreateSamplerState(&sampDesc, &pSamplerState);
 
 		E2_ASSERT_HR(hr, "CreateSamplerState failed");
 	}

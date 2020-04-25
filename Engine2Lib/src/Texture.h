@@ -1,6 +1,7 @@
 #pragma once
 #include "pch.h"
-#include "Engine2.h"
+#include "DXDevice.h"
+#include "Resources.h"
 #include "Surface.h"
 
 namespace Engine2

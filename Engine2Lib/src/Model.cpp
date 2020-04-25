@@ -46,11 +46,11 @@ namespace Engine2
 
 	void Model::Draw()
 	{
-		if (wireframe) Engine::GetDX().SetWireframeRenderState();
+		if (wireframe) DXDevice::Get().SetWireframeRenderState();
 
 		for (auto& n : nodes) n->Render();
 
-		if (wireframe) Engine::GetDX().SetDefaultRenderState();
+		if (wireframe) DXDevice::Get().SetDefaultRenderState();
 	}
 
 	void Model::OnImgui()
@@ -66,6 +66,8 @@ namespace Engine2
 
 	void ModelEntities::Draw()
 	{
+		if (wireframe) DXDevice::Get().SetWireframeRenderState();
+
 		for (auto& e : entities.instances)
 		{
 			if (e.IsActive())
@@ -75,6 +77,8 @@ namespace Engine2
 				for (auto& n : nodes) n->Render();
 			}
 		}
+
+		if (wireframe) DXDevice::Get().SetDefaultRenderState();
 	}
 
 	void ModelEntities::OnImgui()
@@ -82,6 +86,7 @@ namespace Engine2
 		if (ImGui::TreeNode(name.c_str()))
 		{
 			ImGui::Checkbox("Active", &active);
+			ImGui::Checkbox("Wireframe", &wireframe);
 			for (auto& n : nodes) n->OnImgui();
 
 			if (ImGui::TreeNode("Entities"))

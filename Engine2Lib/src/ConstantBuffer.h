@@ -1,7 +1,8 @@
 #pragma once
 #include "Common.h"
+#include "DXDevice.h"
 #include "Resources.h"
-#include "Engine2.h"
+#include "Instrumentation.h"
 
 namespace Engine2
 {
@@ -28,7 +29,7 @@ namespace Engine2
 			//bufferDesc.MiscFlags = 0;
 			//bufferDesc.StructureByteStride = 0; // sizeof(T);
 
-			HRESULT hr = Engine::GetDevice().CreateBuffer(&bufferDesc, &constBufferData, &pConstantBuffer);
+			HRESULT hr = DXDevice::GetDevice().CreateBuffer(&bufferDesc, &constBufferData, &pConstantBuffer);
 
 			E2_ASSERT_HR(hr, "ConstantBuffer CreateBuffer failed");
 		}
@@ -39,7 +40,7 @@ namespace Engine2
 
 			HRESULT hr;
 
-			auto& context = Engine::GetContext();
+			auto& context = DXDevice::GetContext();
 			auto ptrBuffer = pConstantBuffer.Get();
 
 			D3D11_MAPPED_SUBRESOURCE mappedSubResource = {};
@@ -77,10 +78,10 @@ namespace Engine2
 		{
 			E2_STATS_PSCB_BIND;
 			this->UpdateBuffer();
-			Engine::GetContext().PSSetConstantBuffers(this->slot, 1u, this->pConstantBuffer.GetAddressOf());
+			DXDevice::GetContext().PSSetConstantBuffers(this->slot, 1u, this->pConstantBuffer.GetAddressOf());
 		}
 
-		void Unbind() { Engine::GetContext().PSSetConstantBuffers(this->slot, 0u, nullptr); }
+		void Unbind() { DXDevice::GetContext().PSSetConstantBuffers(this->slot, 0u, nullptr); }
 	};
 
 	template <typename T>
@@ -93,10 +94,10 @@ namespace Engine2
 		{
 			E2_STATS_VSCB_BIND;
 			this->UpdateBuffer();
-			Engine::GetContext().VSSetConstantBuffers(this->slot, 1u, this->pConstantBuffer.GetAddressOf());
+			DXDevice::GetContext().VSSetConstantBuffers(this->slot, 1u, this->pConstantBuffer.GetAddressOf());
 		}
 
-		void Unbind() { Engine::GetContext().VSSetConstantBuffers(this->slot, 0u, nullptr); }
+		void Unbind() { DXDevice::GetContext().VSSetConstantBuffers(this->slot, 0u, nullptr); }
 	};
 
 	template <typename T>
@@ -109,10 +110,10 @@ namespace Engine2
 		{
 			E2_STATS_GSCB_BIND;
 			this->UpdateBuffer();
-			Engine::GetContext().GSSetConstantBuffers(this->slot, 1u, this->pConstantBuffer.GetAddressOf());
+			DXDevice::GetContext().GSSetConstantBuffers(this->slot, 1u, this->pConstantBuffer.GetAddressOf());
 		}
 
-		void Unbind() { Engine::GetContext().GSSetConstantBuffers(this->slot, 0u, nullptr); }
+		void Unbind() { DXDevice::GetContext().GSSetConstantBuffers(this->slot, 0u, nullptr); }
 	};
 
 }

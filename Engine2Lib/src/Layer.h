@@ -2,10 +2,10 @@
 #include "pch.h"
 #include "Common.h"
 #include "Events.h"
+#include "Gizmos.h"
 
 namespace Engine2
 {
-
 	class Layer
 	{
 	public:
@@ -23,13 +23,32 @@ namespace Engine2
 		virtual void OnApplicationEvent(ApplicationEvent& event) {}
 		virtual void OnImgui() {}; // override this as the imgui window content for the layer
 
+		void Render()
+		{
+			gizmos.NewFrame();
+			OnRender();
+			if (gizmos.IsActive()) gizmos.Render();
+		}
+
 		// called from the engine
-		void ImguiWindow() { if (imguiOpen) { ImGui::Begin(name.c_str(), &imguiOpen); OnImgui(); ImGui::End(); } }
 		bool imguiOpen = true;
+		void ImguiWindow()
+		{
+			if (imguiOpen)
+			{
+				ImGui::Begin(name.c_str(), &imguiOpen);
+				ImGui::Checkbox("Active", &active);
+				gizmos.OnImgui();
+				OnImgui();
+				ImGui::End();
+			}
+		}
 
 	protected:
 		std::string name;
 		bool active = true;
+
+		Gizmos gizmos;
 	};
 
 }

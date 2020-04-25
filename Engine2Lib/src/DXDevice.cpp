@@ -10,6 +10,17 @@
 
 namespace Engine2
 {
+	std::unique_ptr<DXDevice> DXDevice::instance = nullptr;
+
+	DXDevice& DXDevice::CreateDevice(HWND hwnd)
+	{
+		E2_ASSERT(instance == nullptr, "DXDevice instance already exists");
+
+		instance = std::make_unique<DXDevice>(hwnd);
+
+		return *instance.get();
+	}
+
 	DXDevice::DXDevice(HWND hwnd) :
 		hwnd(hwnd)
 	{

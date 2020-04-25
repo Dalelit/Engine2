@@ -2,7 +2,9 @@
 
 #include "pch.h"
 #include "Common.h"
-#include "Engine2.h"
+#include "DXDevice.h"
+#include "Resources.h"
+#include "Instrumentation.h"
 
 namespace Engine2
 {
@@ -30,7 +32,7 @@ namespace Engine2
 			bufferDesc.MiscFlags = 0;
 			bufferDesc.StructureByteStride = sizeof(V);
 
-			HRESULT hr = Engine::GetDevice().CreateBuffer(&bufferDesc, &data, &pVertexBuffer);
+			HRESULT hr = DXDevice::GetDevice().CreateBuffer(&bufferDesc, &data, &pVertexBuffer);
 
 			E2_ASSERT_HR(hr, "VertexBuffer CreateBuffer failed");
 
@@ -40,17 +42,17 @@ namespace Engine2
 		virtual ~VertexBuffer() = default;
 
 		virtual void Bind() {
-			Engine::GetContext().IASetPrimitiveTopology(topology);
-			Engine::GetContext().IASetVertexBuffers(slot, numberOfBuffers, pVertexBuffer.GetAddressOf(), bufferStrides, bufferOffsets);
+			DXDevice::GetContext().IASetPrimitiveTopology(topology);
+			DXDevice::GetContext().IASetVertexBuffers(slot, numberOfBuffers, pVertexBuffer.GetAddressOf(), bufferStrides, bufferOffsets);
 		}
 
 		virtual void Unbind() {
-			Engine::GetContext().IASetVertexBuffers(slot, 0, nullptr, 0, 0);
+			DXDevice::GetContext().IASetVertexBuffers(slot, 0, nullptr, 0, 0);
 		}
 
 		virtual void Draw() {
 			E2_STATS_VERTEXDRAW(vertexCount);
-			Engine::GetContext().Draw(vertexCount, 0u);
+			DXDevice::GetContext().Draw(vertexCount, 0u);
 		}
 
 		virtual void OnImgui() { ImGui::Text(info.c_str()); }
@@ -95,7 +97,7 @@ namespace Engine2
 			bufferDesc.MiscFlags = 0;
 			bufferDesc.StructureByteStride = sizeof(unsigned int);
 
-			hr = Engine::GetDevice().CreateBuffer(&bufferDesc, &data, &pIndexBuffer);
+			hr = DXDevice::GetDevice().CreateBuffer(&bufferDesc, &data, &pIndexBuffer);
 
 			E2_ASSERT_HR(hr, "VertexBufferIndex CreateBuffer failed");
 
@@ -103,20 +105,20 @@ namespace Engine2
 		}
 
 		void Bind() {
-			Engine::GetContext().IASetPrimitiveTopology(this->topology);
-			Engine::GetContext().IASetVertexBuffers(this->slot, this->numberOfBuffers, this->pVertexBuffer.GetAddressOf(), this->bufferStrides, this->bufferOffsets);
-			Engine::GetContext().IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0u);
+			DXDevice::GetContext().IASetPrimitiveTopology(this->topology);
+			DXDevice::GetContext().IASetVertexBuffers(this->slot, this->numberOfBuffers, this->pVertexBuffer.GetAddressOf(), this->bufferStrides, this->bufferOffsets);
+			DXDevice::GetContext().IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0u);
 		}
 
 		void Unbind() {
 			// to do: untested
-			Engine::GetContext().IASetVertexBuffers(this->slot, 0, nullptr, 0, 0);
-			Engine::GetContext().IASetIndexBuffer(nullptr, DXGI_FORMAT_R32_UINT, 0u);
+			DXDevice::GetContext().IASetVertexBuffers(this->slot, 0, nullptr, 0, 0);
+			DXDevice::GetContext().IASetIndexBuffer(nullptr, DXGI_FORMAT_R32_UINT, 0u);
 		}
 
 		void Draw() {
 			E2_STATS_INDEXDRAW(indxCount);
-			Engine::GetContext().DrawIndexed(indxCount, 0u, 0u);
+			DXDevice::GetContext().DrawIndexed(indxCount, 0u, 0u);
 		}
 
 	protected:

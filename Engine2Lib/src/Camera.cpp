@@ -40,6 +40,25 @@ namespace Engine2
 		}
 	}
 
+	//void Camera::OnGizmos()
+	//{
+	//	std::vector<DirectX::XMVECTOR> verticies = {
+	//		{  0.0f,   0.0f, 0.0f, 1.0f},
+	//		{  0.5f,  -0.28f, 1.0f, 1.0f},
+	//		{  0.5f,   0.28f, 1.0f, 1.0f},
+	//		{ -0.5f,   0.28f, 1.0f, 1.0f},
+	//		{ -0.5f,  -0.28f, 1.0f, 1.0f},
+	//		{ -0.4f,   0.3f, 1.0f, 1.0f},
+	//		{  0.0f,   0.4f, 1.0f, 1.0f},
+	//		{  0.4f,   0.3f, 1.0f, 1.0f},
+	//	};
+	//	std::vector<unsigned int> indicies = {
+	//		0,1, 0,2, 0,3, 0,4,
+	//		1,2, 2,3, 3,4, 4,1,
+	//		5,6, 6,7, 7,5
+	//	};
+	//}
+
 	void Camera::Move(float forwardDist, float rightDist, float upDist)
 	{
 		position += forwardDist * direction;

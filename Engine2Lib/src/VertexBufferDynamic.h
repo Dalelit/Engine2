@@ -2,7 +2,7 @@
 
 #include "pch.h"
 #include "Common.h"
-#include "Engine2.h"
+#include "DXDevice.h"
 
 namespace Engine2
 {
@@ -25,7 +25,7 @@ namespace Engine2
 			bufferDesc.MiscFlags = 0;
 			bufferDesc.StructureByteStride = sizeof(V);
 
-			HRESULT hr = Engine::GetDevice().CreateBuffer(&bufferDesc, nullptr, &pVertexBuffer);
+			HRESULT hr = DXDevice::GetDevice().CreateBuffer(&bufferDesc, nullptr, &pVertexBuffer);
 
 			E2_ASSERT_HR(hr, "VertexBufferDynamic CreateBuffer failed");
 
@@ -35,17 +35,17 @@ namespace Engine2
 		virtual ~VertexBufferDynamic() = default;
 
 		virtual void Bind() {
-			Engine::GetContext().IASetPrimitiveTopology(topology);
-			Engine::GetContext().IASetVertexBuffers(slot, numberOfBuffers, pVertexBuffer.GetAddressOf(), bufferStrides, bufferOffsets);
+			DXDevice::GetContext().IASetPrimitiveTopology(topology);
+			DXDevice::GetContext().IASetVertexBuffers(slot, numberOfBuffers, pVertexBuffer.GetAddressOf(), bufferStrides, bufferOffsets);
 		}
 
 		virtual void Unbind() {
-			Engine::GetContext().IASetVertexBuffers(slot, 0, nullptr, 0, 0);
+			DXDevice::GetContext().IASetVertexBuffers(slot, 0, nullptr, 0, 0);
 		}
 
 		virtual void Draw() {
 			E2_STATS_VERTEXDRAW(vertexCount);
-			Engine::GetContext().Draw(vertexCount, 0u);
+			DXDevice::GetContext().Draw(vertexCount, 0u);
 		}
 
 		virtual void Update(V* pData, unsigned int count) {
@@ -55,7 +55,7 @@ namespace Engine2
 
 			vertexCount = count;
 
-			auto& context = Engine::GetContext();
+			auto& context = DXDevice::GetContext();
 			auto ptrBuffer = pVertexBuffer.Get();
 
 			D3D11_MAPPED_SUBRESOURCE mappedSubResource;

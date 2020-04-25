@@ -1,6 +1,6 @@
 #pragma once
 #include "pch.h"
-#include "VertexBufferDynamic.h"
+#include "VertexBufferInstanced.h"
 #include "Shader.h"
 #include "Util.h"
 
@@ -9,34 +9,40 @@ namespace Engine2
 	class Gizmos
 	{
 	public:
+
 		Gizmos();
 		~Gizmos() = default;
 
 		void NewFrame();
-		void Draw();
+		void Render();
 		void OnImgui();
 
-		void DrawLine(DirectX::XMVECTOR p0, DirectX::XMVECTOR p1);
-		
-		void DrawAxis(DirectX::XMVECTOR pos) { AddLines(pos, AxisWireframe); }
+		void DrawAxis(DirectX::XMMATRIX instance);
 
-		void DrawSphere(DirectX::XMVECTOR pos) { AddLines(pos, SphereWireframe); }
+		void DrawSphere(DirectX::XMMATRIX instance);
 
 		inline bool IsActive() { return active; }
 
 	protected:
 		bool active = true;
-		std::vector<DirectX::XMVECTOR>::iterator next;
-		std::vector<DirectX::XMVECTOR> lineBuffer;
-		unsigned int vertexCount = 0;
 
-		LineBufferDynamic<DirectX::XMVECTOR> vertexBuffer;
 		std::shared_ptr<PixelShader> pPS;
 		std::shared_ptr<VertexShader> pVS;
 
-		void AddLines(DirectX::XMVECTOR pos, std::vector<DirectX::XMVECTOR>& points);
+		// axis
+		std::vector<DirectX::XMMATRIX> axisInstances;
+		unsigned int axisInstanceCount = 0;
+		VertexBufferIndexInstanced<DirectX::XMFLOAT3, D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINELIST> axisVBuffer;
+		ID3D11Buffer* axisPtrInstancesBuffer;
+		static std::vector<DirectX::XMFLOAT3> AxisVerticies;
+		static std::vector<unsigned int> AxisIndicies;
 
-		static std::vector<DirectX::XMVECTOR> AxisWireframe;
-		static std::vector<DirectX::XMVECTOR> SphereWireframe;
+		// sphere
+		std::vector<DirectX::XMMATRIX> sphereInstances;
+		unsigned int sphereInstanceCount = 0;
+		VertexBufferIndexInstanced<DirectX::XMFLOAT3, D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINELIST> sphereVBuffer;
+		ID3D11Buffer* spherePtrInstancesBuffer;
+		static std::vector<DirectX::XMFLOAT3> SphereVerticies;
+		static std::vector<unsigned int> SphereIndicies;
 	};
 }

@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Scene.h"
 #include "Camera.h"
+#include "Engine2.h"
 
 namespace Engine2
 {

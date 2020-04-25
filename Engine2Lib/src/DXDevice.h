@@ -31,6 +31,11 @@ namespace Engine2
 	class DXDevice
 	{
 	public:
+		static DXDevice& CreateDevice(HWND hwnd);
+		inline static DXDevice& Get() { return *instance; }
+		inline static ID3D11Device3& GetDevice() { return *instance->pDevice.Get(); }
+		inline static ID3D11DeviceContext3& GetContext() { return *instance->pImmediateContext.Get(); }
+
 		DXDevice(HWND hwnd);
 		~DXDevice() = default;
 
@@ -38,9 +43,6 @@ namespace Engine2
 		void PresentFrame();
 
 		void ScreenSizeChanged();
-
-		ID3D11Device3& GetDevice() { return *pDevice.Get(); }
-		ID3D11DeviceContext3& GetContext() { return *pImmediateContext.Get(); }
 
 		float GetAspectRatio() { return (float)backBufferDesc.Width / (float)backBufferDesc.Height; }
 
@@ -58,7 +60,28 @@ namespace Engine2
 
 		void LogDebugInfo();
 
+		// helper function to update a buffer
+		template <typename T>
+		static void UpdateBuffer(ID3D11Buffer* pBuffer, std::vector<T>& source) {
+			D3D11_MAPPED_SUBRESOURCE mappedSubResource;
+			GetContext().Map(pBuffer, 0u, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubResource);
+			memcpy(mappedSubResource.pData, source.data(), sizeof(T) * source.size());
+			GetContext().Unmap(pBuffer, 0);
+		}
+
+		// helper function to update a buffer, limiting the count
+		template <typename T>
+		static void UpdateBuffer(ID3D11Buffer* pBuffer, std::vector<T>& source, unsigned int count) {
+			E2_ASSERT(count <= source.size(), "Attempting to update count greater than source size");
+			D3D11_MAPPED_SUBRESOURCE mappedSubResource;
+			GetContext().Map(pBuffer, 0u, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubResource);
+			memcpy(mappedSubResource.pData, source.data(), sizeof(T) * count);
+			GetContext().Unmap(pBuffer, 0);
+		}
+
 	protected:
+		static std::unique_ptr<DXDevice> instance;
+
 		HWND hwnd;
 
 		float clearColor[4] = { 0.0f,0.0f,0.0f,1.0f };

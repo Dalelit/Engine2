@@ -14,8 +14,7 @@ namespace Engine2
 		instance = std::make_unique<Engine>(hwnd);
 	}
 
-	Engine::Engine(HWND hwnd) :
-		device(hwnd)
+	Engine::Engine(HWND hwnd) : device(DXDevice::CreateDevice(hwnd))
 	{
 		imgui.Initialise(hwnd, device);
 		imguiActive = true;
@@ -57,11 +56,11 @@ namespace Engine2
 	void Engine::DoFrame(float deltaTime)
 	{
 		Instrumentation::FrameReset();
-		OnUpdate(deltaTime);
-		OnRender();
+		Update(deltaTime);
+		Render();
 	}
 
-	void Engine::OnUpdate(float deltaTime)
+	void Engine::Update(float deltaTime)
 	{
 		updateMemory.Set();
 		frameTime.Set(); // Tick just before present frame
@@ -77,7 +76,7 @@ namespace Engine2
 		updateMemory.Tick();
 	}
 
-	void Engine::OnRender()
+	void Engine::Render()
 	{
 		renderMemory.Set();
 
@@ -91,7 +90,7 @@ namespace Engine2
 		{
 			for (auto& layer : layers)
 			{
-				if (layer->IsActive()) layer->OnRender();
+				if (layer->IsActive()) layer->Render();
 			}
 		}
 		renderLayersMemory.Tick();

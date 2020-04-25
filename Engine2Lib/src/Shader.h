@@ -2,7 +2,8 @@
 
 #include "pch.h"
 #include "Common.h"
-#include "Engine2.h"
+#include "DXDevice.h"
+#include "Resources.h"
 
 namespace Engine2
 {

@@ -2,7 +2,9 @@
 
 #include "pch.h"
 #include "Common.h"
-#include "Engine2.h"
+#include "Resources.h"
+#include "DXDevice.h"
+#include "Instrumentation.h"
 
 namespace Engine2
 {
@@ -28,7 +30,7 @@ namespace Engine2
 			bufferDesc.MiscFlags = 0;
 			bufferDesc.StructureByteStride = sizeof(unsigned int);
 
-			HRESULT hr = Engine::GetDevice().CreateBuffer(&bufferDesc, &data, &pIndexBuffer);
+			HRESULT hr = DXDevice::GetDevice().CreateBuffer(&bufferDesc, &data, &pIndexBuffer);
 
 			E2_ASSERT_HR(hr, "VertexBufferIndexInstanced CreateBuffer failed");
 
@@ -59,7 +61,7 @@ namespace Engine2
 			bufferDesc.StructureByteStride = sizeof(D);
 
 			wrl::ComPtr<ID3D11Buffer> pBuffer;
-			HRESULT hr = Engine::GetDevice().CreateBuffer(&bufferDesc, &data, &pBuffer);
+			HRESULT hr = DXDevice::GetDevice().CreateBuffer(&bufferDesc, &data, &pBuffer);
 
 			vertexBuffers.push_back(pBuffer);
 			vertexBufferPtrs.push_back(pBuffer.Get());
@@ -71,22 +73,22 @@ namespace Engine2
 		}
 
 		virtual void Bind() {
-			Engine::GetContext().IASetPrimitiveTopology(topology);
-			Engine::GetContext().IASetVertexBuffers(startSlot, (UINT)vertexBuffers.size(), vertexBufferPtrs.data(), bufferStrides.data(), bufferOffsets.data());
-			Engine::GetContext().IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0u);
+			DXDevice::GetContext().IASetPrimitiveTopology(topology);
+			DXDevice::GetContext().IASetVertexBuffers(startSlot, (UINT)vertexBuffers.size(), vertexBufferPtrs.data(), bufferStrides.data(), bufferOffsets.data());
+			DXDevice::GetContext().IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0u);
 		}
 
 		virtual void Unbind() {
 			// to do: untested
-			Engine::GetContext().IASetVertexBuffers(startSlot, 0, nullptr, 0, 0);
-			Engine::GetContext().IASetIndexBuffer(nullptr, DXGI_FORMAT_R32_UINT, 0u);
+			DXDevice::GetContext().IASetVertexBuffers(startSlot, 0, nullptr, 0, 0);
+			DXDevice::GetContext().IASetIndexBuffer(nullptr, DXGI_FORMAT_R32_UINT, 0u);
 		}
 
 		virtual void Draw() {
 			E2_ASSERT(instanceCount > 0, "Instance count should be greater than 0, need to AddInstances");
 
 			E2_STATS_INDEXINSTANCEDRAW(indxCount, instanceCount);
-			Engine::GetContext().DrawIndexedInstanced(indxCount, instanceCount, 0u, 0u, 0u);
+			DXDevice::GetContext().DrawIndexedInstanced(indxCount, instanceCount, 0u, 0u, 0u);
 		}
 
 		virtual void OnImgui() { ImGui::Text(info.c_str()); }

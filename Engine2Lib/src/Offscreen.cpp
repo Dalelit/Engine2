@@ -1,13 +1,13 @@
 #pragma once
 #include "pch.h"
 #include "Offscreen.h"
-#include "Engine2.h"
+#include "DXDevice.h"
 #include "VertexBuffer.h"
 
 namespace Engine2
 {
 	Offscreen::Offscreen(unsigned int slot) :
-		Offscreen(Engine::GetDX().CreateOffscreenRenderTarget(), slot)
+		Offscreen(DXDevice::Get().CreateOffscreenRenderTarget(), slot)
 	{
 	}
 
@@ -19,32 +19,32 @@ namespace Engine2
 
 	void Offscreen::Bind()
 	{
-		Engine::GetDX().BindRenderTargetAsResource(renderTargetId, slot);
+		DXDevice::Get().BindRenderTargetAsResource(renderTargetId, slot);
 	}
 
 	void Offscreen::Unbind()
 	{
-		Engine::GetDX().UnbindRenderTargetAsResource(renderTargetId, slot);
+		DXDevice::Get().UnbindRenderTargetAsResource(renderTargetId, slot);
 	}
 
 	void Offscreen::SetAsTarget()
 	{
-		Engine::GetDX().BindRenderTargetAsTarget(renderTargetId);
+		DXDevice::Get().BindRenderTargetAsTarget(renderTargetId);
 	}
 
 	void Offscreen::ClearAsTarget()
 	{
-		Engine::GetDX().BindBackbufferRenderTarget();
+		DXDevice::Get().BindBackbufferRenderTarget();
 	}
 
 	void Offscreen::Draw()
 	{
-		Draw(Engine::GetDX().GetBackbufferRenderTargetId());
+		Draw(DXDevice::Get().GetBackbufferRenderTargetId());
 	}
 
 	void Offscreen::Draw(unsigned int toRenderTargetId)
 	{
-		Engine::GetDX().BindRenderTargetAsTarget(toRenderTargetId);
+		DXDevice::Get().BindRenderTargetAsTarget(toRenderTargetId);
 
 		Bind(); // bind this as resource
 		pVS->Bind();

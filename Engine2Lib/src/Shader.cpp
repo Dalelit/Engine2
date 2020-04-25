@@ -40,7 +40,7 @@ namespace Engine2
 
 			HRESULT hr;
 
-		hr = Engine::GetDevice().CreateVertexShader(
+		hr = DXDevice::GetDevice().CreateVertexShader(
 			shaderBlob.GetBufferPointer(),
 			shaderBlob.GetBufferSize(),
 			nullptr,
@@ -48,7 +48,7 @@ namespace Engine2
 
 		E2_ASSERT_HR(hr, "VertexShader CreateVertexShader failed");
 
-		hr = Engine::GetDevice().CreateInputLayout(
+		hr = DXDevice::GetDevice().CreateInputLayout(
 			layout.data(),
 			(UINT)layout.size(),
 			shaderBlob.GetBufferPointer(),
@@ -60,14 +60,14 @@ namespace Engine2
 
 	void VertexShader::Bind()
 	{
-		Engine::GetContext().VSSetShader(pVertexShader.Get(), nullptr, 0u);
-		Engine::GetContext().IASetInputLayout(pInputLayout.Get());
+		DXDevice::GetContext().VSSetShader(pVertexShader.Get(), nullptr, 0u);
+		DXDevice::GetContext().IASetInputLayout(pInputLayout.Get());
 	}
 
 	void VertexShader::Unbind()
 	{
-		Engine::GetContext().VSSetShader(nullptr, nullptr, 0u);
-		Engine::GetContext().IASetInputLayout(nullptr);
+		DXDevice::GetContext().VSSetShader(nullptr, nullptr, 0u);
+		DXDevice::GetContext().IASetInputLayout(nullptr);
 	}
 
 	std::shared_ptr<VertexShader> VertexShader::CreateFromString(std::string& src, VertexShaderLayoutDesc& layout, std::string entryPoint, std::string target)
@@ -112,7 +112,7 @@ namespace Engine2
 		this->name = "PixelShader";
 		this->info = info;
 
-		HRESULT hr = Engine::GetDevice().CreatePixelShader(
+		HRESULT hr = DXDevice::GetDevice().CreatePixelShader(
 			shaderBlob.GetBufferPointer(),
 			shaderBlob.GetBufferSize(),
 			nullptr,
@@ -123,12 +123,12 @@ namespace Engine2
 
 	void PixelShader::Bind()
 	{
-		Engine::GetContext().PSSetShader(pPixelShader.Get(), nullptr, 0u);
+		DXDevice::GetContext().PSSetShader(pPixelShader.Get(), nullptr, 0u);
 	}
 
 	void PixelShader::Unbind()
 	{
-		Engine::GetContext().PSSetShader(nullptr, nullptr, 0u);
+		DXDevice::GetContext().PSSetShader(nullptr, nullptr, 0u);
 	}
 
 	std::shared_ptr<PixelShader> PixelShader::CreateFromString(std::string& src, std::string entryPoint, std::string target)
@@ -174,7 +174,7 @@ namespace Engine2
 		this->name = "GeometryShader";
 		this->info = info;
 
-		HRESULT hr = Engine::GetDevice().CreateGeometryShader(
+		HRESULT hr = DXDevice::GetDevice().CreateGeometryShader(
 			shaderBlob.GetBufferPointer(),
 			shaderBlob.GetBufferSize(),
 			nullptr,
@@ -185,12 +185,12 @@ namespace Engine2
 
 	void GeometryShader::Bind()
 	{
-		Engine::GetContext().GSSetShader(pGeometryShader.Get(), nullptr, 0u);
+		DXDevice::GetContext().GSSetShader(pGeometryShader.Get(), nullptr, 0u);
 	}
 
 	void GeometryShader::Unbind()
 	{
-		Engine::GetContext().GSSetShader(nullptr, nullptr, 0u);
+		DXDevice::GetContext().GSSetShader(nullptr, nullptr, 0u);
 	}
 
 	std::shared_ptr<GeometryShader> GeometryShader::CreateFromSourceFile(std::string& filename, std::string entryPoint, std::string target)
