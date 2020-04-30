@@ -21,6 +21,11 @@ namespace Engine2
 			return loader;
 		}
 
+		void ObjLoader::ScaleVerticies(float scale)
+		{
+			for (auto& v : verticies) v = { v.x * scale, v.y * scale, v.z * scale };
+		}
+
 		// # comment
 		// mtllib XXXX.mtl
 		// o XXXXObjectNameXXXX

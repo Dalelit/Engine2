@@ -69,5 +69,7 @@
   <ItemGroup>
     <FxCompile Include="Assets\Shaders\GizmosPS.hlsl" />
     <FxCompile Include="Assets\Shaders\GizmosVS.hlsl" />
+    <FxCompile Include="Assets\Shaders\OutlineVS.hlsl" />
+    <FxCompile Include="Assets\Shaders\OutlinePS.hlsl" />
   </ItemGroup>
 </Project>

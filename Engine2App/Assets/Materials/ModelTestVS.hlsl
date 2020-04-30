@@ -15,7 +15,7 @@ VSOut main(float3 pos : Position, float3 nor : Normal, float4 col : Color)
 {
 	VSOut vso;
 	
-	float4 pws = float4(pos * 10.0, 1.0f);
+	float4 pws = float4(pos, 1.0f);
 
 	vso.posWS = pws.xyz;
 	vso.norWS = nor;

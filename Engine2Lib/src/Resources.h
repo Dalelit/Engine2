@@ -17,6 +17,7 @@ namespace Engine2
 	{
 	public:
 		virtual void Draw() = 0;
+		virtual void BindAndDraw() { Bind(); Draw(); }
 	};
 
 	typedef std::vector<std::shared_ptr<Bindable>> BindableSharedPtrVector;

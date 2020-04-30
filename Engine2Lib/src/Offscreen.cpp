@@ -44,13 +44,16 @@ namespace Engine2
 
 	void Offscreen::Draw(unsigned int toRenderTargetId)
 	{
-		DXDevice::Get().BindRenderTargetAsTarget(toRenderTargetId);
+		//DXDevice::Get().BindRenderTargetAsTarget(toRenderTargetId);
+		DXDevice::Get().BindBackbufferNoDepthbuffer(); // to do: hack
 
 		Bind(); // bind this as resource
 		pVS->Bind();
 		pPS->Bind();
 		pDrawable->Bind();
 		pDrawable->Draw();
+		Unbind();
+		DXDevice::Get().BindBackbufferRenderTarget(); // to do: hack?
 	}
 
 	void Offscreen::CreateResources()

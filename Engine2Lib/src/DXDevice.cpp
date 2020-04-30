@@ -65,11 +65,12 @@ namespace Engine2
 		ConfigurePipeline();
 	}
 
-	unsigned int DXDevice::CreateOffscreenRenderTarget(bool withDepthBuffer)
+	unsigned int DXDevice::CreateOffscreenRenderTarget(bool withDepthBuffer, float ratioToFullscreen)
 	{
 		unsigned int indx = (unsigned int)renderTargets.size();
 		renderTargets.emplace_back();
 		renderTargets[indx].depthBuffer = withDepthBuffer;
+		renderTargets[indx].ratioToFullscreen = ratioToFullscreen;
 		ConfigureRenderTarget(indx);
 		return indx;
 	}
@@ -81,7 +82,7 @@ namespace Engine2
 		if (rt.depthBuffer)
 		{
 			pImmediateContext->OMSetRenderTargets(1u, rt.pTargetView.GetAddressOf(), rt.pDepthStencilView.Get());
-			pImmediateContext->OMSetDepthStencilState(rt.pDepthStencilState.Get(), 0u);
+			pImmediateContext->OMSetDepthStencilState(rt.pDepthStencilState.Get(), rt.stencilRef);
 		}
 		else
 		{
@@ -104,6 +105,12 @@ namespace Engine2
 		ID3D11ShaderResourceView* const srv[1] = { nullptr };
 		pImmediateContext->PSSetShaderResources(slot, 1u, srv);
 		pImmediateContext->PSSetSamplers(slot, 0u, nullptr);
+	}
+
+	void DXDevice::BindBackbufferNoDepthbuffer()
+	{
+		RenderTarget& rt = renderTargets[0];
+		pImmediateContext->OMSetRenderTargets(1u, rt.pTargetView.GetAddressOf(), nullptr);
 	}
 
 	void DXDevice::SetWireframeRenderState()
@@ -301,7 +308,13 @@ namespace Engine2
 		RenderTarget& rt = renderTargets[indx];
 
 		D3D11_TEXTURE2D_DESC texDesc = backBufferDesc; // default to the back buffer desc
-		texDesc.BindFlags = texDesc.BindFlags | D3D11_BIND_FLAG::D3D11_BIND_SHADER_RESOURCE;
+		texDesc.BindFlags = texDesc.BindFlags | D3D11_BIND_FLAG::D3D11_BIND_SHADER_RESOURCE; // change flags so it can be a source as well
+		// adjust size to the ratio
+		texDesc.Width = (UINT)((float)texDesc.Width * rt.ratioToFullscreen);
+		texDesc.Height = (UINT)((float)texDesc.Height * rt.ratioToFullscreen);
+
+		rt.width = texDesc.Width;
+		rt.height = texDesc.Height;
 
 		hr = pDevice->CreateTexture2D(&texDesc, nullptr, &rt.pBuffer);
 

@@ -16,6 +16,10 @@ namespace Engine2
 		wrl::ComPtr<ID3D11Texture2D> pDepthTexture = nullptr;
 		wrl::ComPtr<ID3D11DepthStencilState> pDepthStencilState = nullptr;
 		bool depthBuffer = true;
+		float ratioToFullscreen;
+		UINT stencilRef = 0;
+		UINT width;
+		UINT height;
 
 		void Reset() {
 			pBuffer.Reset();
@@ -46,7 +50,8 @@ namespace Engine2
 
 		float GetAspectRatio() { return (float)backBufferDesc.Width / (float)backBufferDesc.Height; }
 
-		unsigned int CreateOffscreenRenderTarget(bool withDepthBuffer = true);
+		unsigned int CreateOffscreenRenderTarget(bool withDepthBuffer = true, float ratioToFullscreen = 1.0f);
+		inline RenderTarget& GetRenderTarget(unsigned int id) { return renderTargets[id]; };
 
 		void BindRenderTargetAsTarget(unsigned int id);
 		void BindRenderTargetAsResource(unsigned int id, unsigned int slot);
@@ -55,6 +60,7 @@ namespace Engine2
 		unsigned int GetBackbufferRenderTargetId() { return 0; } // do this way in case the number should change for some reason
 		void BindBackbufferRenderTarget() { BindRenderTargetAsTarget(0); }
 		inline RenderTarget& GetBackbufferRenderTargetResource() { return renderTargets[GetBackbufferRenderTargetId()]; }
+		void BindBackbufferNoDepthbuffer(); // to do: hack to remove
 
 		void SetWireframeRenderState();
 		void SetDefaultRenderState();

@@ -7,5 +7,6 @@ namespace Engine2
 		{ "ShaderCompiledDir", "..\\x64\\Shaders\\" },
 		{ "ShaderSourceDir", "Assets\\Materials\\" },
 		{ "ModelsDir", "Assets\\Models\\" },
+		{ "EngineShaderSourceDir", "..\\Engine2Lib\\Assets\\Shaders\\" },
 	};
 }

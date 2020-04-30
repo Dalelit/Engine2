@@ -30,6 +30,8 @@ namespace Engine2
 		std::shared_ptr<VertexShader> pVS = nullptr;
 		std::shared_ptr<PixelShader> pPS = nullptr;
 
+		inline RenderTarget& GetRenderTarget() { return DXDevice::Get().GetRenderTarget(renderTargetId); }
+
 	protected:
 		unsigned int renderTargetId;
 		unsigned int slot;

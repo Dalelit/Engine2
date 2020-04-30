@@ -228,8 +228,8 @@ namespace Engine2
 				ImGui::EndCombo();
 			}
 			for (auto& c : cameras) c->OnImugui();
-			ImGui::End();
 		}
+		ImGui::End();
 	}
 
 	void Engine::ImguiStatsWindow(bool* pOpen)

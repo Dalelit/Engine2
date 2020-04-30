@@ -38,6 +38,8 @@ namespace Engine2
 			std::vector<DirectX::XMFLOAT3> normals;
 			std::vector<DirectX::XMFLOAT2> textureCoords;
 
+			void ScaleVerticies(float scale);
+
 		protected:
 			static void LoadObjects(ObjLoader& loader);
 			static void LoadMaterials(ObjLoader& loader, std::string matfilename);

@@ -24,9 +24,13 @@ namespace Engine2
 		}
 
 		inline void SetDrawable(std::shared_ptr<Drawable> d) { drawable = d; }
+		inline Drawable& GetDrawable() { return *drawable; }
+		inline bool HasDrawable() { return drawable != nullptr; }
 
 		bool IsActive() { return active; }
 		void SetActive(bool makeActive = true) { active = makeActive; }
+
+		void RenderDrawablesOnly() { if (drawable) drawable->BindAndDraw(); for (auto n : children) n->RenderDrawablesOnly(); }
 
 		void OnImgui();
 
@@ -46,10 +50,14 @@ namespace Engine2
 		virtual ~Model() { for (auto n : nodes) delete n; }
 
 		RenderNode* AddRenderNode(std::string name);
+		std::vector<RenderNode*>& GetRenderNodes() { return nodes; }
+
 		virtual void Draw();
 
 		bool IsActive() { return active; }
 		void SetActive(bool makeActive = true) { active = makeActive; }
+
+		void RenderDrawablesOnly() { for (auto n : nodes) n->RenderDrawablesOnly(); }
 
 		virtual void OnImgui();
 

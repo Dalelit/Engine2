@@ -22,6 +22,7 @@ namespace Engine2
 		void DrawCamera(DirectX::XMMATRIX instance);
 
 		inline bool IsActive() { return active; }
+		inline void SetActive(bool isActive = true) { active = isActive; }
 
 	protected:
 		bool active = true;
