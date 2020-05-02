@@ -5,33 +5,6 @@ namespace wrl = Microsoft::WRL;
 
 namespace Engine2
 {
-	struct RenderTarget
-	{
-	public:
-		wrl::ComPtr<ID3D11Texture2D> pBuffer = nullptr;
-		wrl::ComPtr<ID3D11RenderTargetView> pTargetView = nullptr;
-		wrl::ComPtr<ID3D11ShaderResourceView> pResourceView = nullptr;
-		wrl::ComPtr<ID3D11SamplerState> pSamplerState = nullptr;
-		wrl::ComPtr<ID3D11DepthStencilView> pDepthStencilView = nullptr;
-		wrl::ComPtr<ID3D11Texture2D> pDepthTexture = nullptr;
-		wrl::ComPtr<ID3D11DepthStencilState> pDepthStencilState = nullptr;
-		bool depthBuffer = true;
-		float ratioToFullscreen;
-		UINT stencilRef = 0;
-		UINT width;
-		UINT height;
-
-		void Reset() {
-			pBuffer.Reset();
-			pTargetView.Reset();
-			pResourceView.Reset();
-			pSamplerState.Reset();
-			pDepthStencilView.Reset();
-			pDepthTexture.Reset();
-			pDepthStencilState.Reset();
-		}
-	};
-
 	class DXDevice
 	{
 	public:
@@ -48,22 +21,17 @@ namespace Engine2
 
 		void ScreenSizeChanged();
 
-		float GetAspectRatio() { return (float)backBufferDesc.Width / (float)backBufferDesc.Height; }
+		inline float GetAspectRatio() { return (float)backBufferDesc.Width / (float)backBufferDesc.Height; }
+		inline D3D11_TEXTURE2D_DESC& GetBackBufferTextureDesc() { return backBufferDesc; }
 
-		unsigned int CreateOffscreenRenderTarget(bool withDepthBuffer = true, float ratioToFullscreen = 1.0f);
-		inline RenderTarget& GetRenderTarget(unsigned int id) { return renderTargets[id]; };
+		void SetBackBufferAsRenderTarget();
+		void SetBackBufferAsRenderTargetNoDepthCheck();
 
-		void BindRenderTargetAsTarget(unsigned int id);
-		void BindRenderTargetAsResource(unsigned int id, unsigned int slot);
-		void UnbindRenderTargetAsResource(unsigned int id, unsigned int slot);
+		inline void SetWireframeRenderState()     { pImmediateContext->RSSetState(pRSWireframe.Get()); }
+		inline void SetDefaultRenderState()       { pImmediateContext->RSSetState(pRSDefault.Get()); }
+		inline void SetDefaultDepthStencilState() { pImmediateContext->OMSetDepthStencilState(pDepthStencilState.Get(), 0); }
 
-		unsigned int GetBackbufferRenderTargetId() { return 0; } // do this way in case the number should change for some reason
-		void BindBackbufferRenderTarget() { BindRenderTargetAsTarget(0); }
-		inline RenderTarget& GetBackbufferRenderTargetResource() { return renderTargets[GetBackbufferRenderTargetId()]; }
-		void BindBackbufferNoDepthbuffer(); // to do: hack to remove
-
-		void SetWireframeRenderState();
-		void SetDefaultRenderState();
+		void ClearShaderResource(unsigned int slot);
 
 		void LogDebugInfo();
 
@@ -91,22 +59,24 @@ namespace Engine2
 
 		HWND hwnd;
 
-		float clearColor[4] = { 0.0f,0.0f,0.0f,1.0f };
-
-		wrl::ComPtr<IDXGISwapChain1> pSwapChain = nullptr;
-		wrl::ComPtr<ID3D11Device3> pDevice = nullptr;
+		// core device resources
+		wrl::ComPtr<IDXGISwapChain1>      pSwapChain = nullptr;
+		wrl::ComPtr<ID3D11Device3>        pDevice = nullptr;
 		wrl::ComPtr<ID3D11DeviceContext3> pImmediateContext = nullptr;
-		D3D11_TEXTURE2D_DESC backBufferDesc;
+
+		// back buffer
+		wrl::ComPtr<ID3D11Texture2D>        pBackBuffer = nullptr;
+		wrl::ComPtr<ID3D11RenderTargetView> pTargetView = nullptr;
+		D3D11_TEXTURE2D_DESC                backBufferDesc;
+
+		// depth buffer
+		wrl::ComPtr<ID3D11DepthStencilView>  pDepthStencilView = nullptr;
+		wrl::ComPtr<ID3D11Texture2D>         pDepthTexture = nullptr;
+		wrl::ComPtr<ID3D11DepthStencilState> pDepthStencilState = nullptr;
 
 		void CreateDeviceAndSwapchain();
-		void SetBackBuffer();
 		void ConfigurePipeline();
 		void ReleasePipeline();
-		void ConfigureRenderTarget(unsigned int indx);
-		void ConfigureDepthBuffer(unsigned int indx);
-
-		// back buffer is always at index 0 for the render targets
-		std::vector<RenderTarget> renderTargets;
 
 		// render states for resue
 		wrl::ComPtr<ID3D11RasterizerState> pRSDefault;

@@ -71,7 +71,7 @@ namespace Engine2
 		psCB.Bind();
 		Draw();
 
-		DXDevice::GetContext().OMSetDepthStencilState(DXDevice::Get().GetBackbufferRenderTargetResource().pDepthStencilState.Get(), 0); // revert back to default
+		DXDevice::Get().SetDefaultDepthStencilState(); // revert back to default
 	}
 
 	void Gizmos::UpdateBuffers()

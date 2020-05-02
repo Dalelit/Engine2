@@ -15,6 +15,7 @@ public:
 
 	void OnUpdate(float dt);
 	void OnRender();
+	void OnApplicationEvent(Engine2::ApplicationEvent& event);
 	void OnImgui();
 	void OnGizmos();
 

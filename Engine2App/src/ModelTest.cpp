@@ -85,11 +85,24 @@ void ModelTest::OnUpdate(float dt)
 
 void ModelTest::OnRender()
 {
+	stencil.Clear();
+	stencil.SetAsTarget();
+
 	scene.OnRender();
 
 	for (auto& m : models) if (m->IsActive()) m->Draw();
 
-	Outline();
+	stencil.DrawToBackBuffer();
+
+	//Outline();
+}
+
+void ModelTest::OnApplicationEvent(Engine2::ApplicationEvent& event)
+{
+	if (event.GetType() == Engine2::EventType::WindowResize)
+	{
+		stencil.Reconfigure();
+	}
 }
 
 void ModelTest::OnImgui()
@@ -120,33 +133,33 @@ void ModelTest::Outline()
 	if (!pSelectedModel) return;
 
 	//stencil.SetAsTarget();
-	float clearColor[4] = { 0.0f,0.0f,0.0f,0.0f };
-	DXDevice::GetContext().ClearRenderTargetView(stencil.GetRenderTarget().pTargetView.Get(), clearColor);
-	DXDevice::GetContext().ClearDepthStencilView(pDSVStencil.Get(), D3D11_CLEAR_FLAG::D3D11_CLEAR_DEPTH | D3D11_CLEAR_FLAG::D3D11_CLEAR_STENCIL, 1.0f, 0u);
+	//float clearColor[4] = { 0.0f,0.0f,0.0f,0.0f };
+	//DXDevice::GetContext().ClearRenderTargetView(stencil.GetRenderTarget().pTargetView.Get(), clearColor);
+	//DXDevice::GetContext().ClearDepthStencilView(pDSVStencil.Get(), D3D11_CLEAR_FLAG::D3D11_CLEAR_DEPTH | D3D11_CLEAR_FLAG::D3D11_CLEAR_STENCIL, 1.0f, 0u);
 
-	pVSOutline->Bind(); // used for both
+	//pVSOutline->Bind(); // used for both
 
-	vsOutlineCB.data.m128_f32[0] = 1.0f;
-	vsOutlineCB.Bind();
-	DXDevice::GetContext().PSSetShader(nullptr, nullptr, 0);
-	DXDevice::GetContext().OMSetRenderTargets(0u, nullptr, pDSVStencil.Get());
-	DXDevice::GetContext().OMSetDepthStencilState(pDSSWrite.Get(), 0xFF);
+	//vsOutlineCB.data.m128_f32[0] = 1.0f;
+	//vsOutlineCB.Bind();
+	//DXDevice::GetContext().PSSetShader(nullptr, nullptr, 0);
+	//DXDevice::GetContext().OMSetRenderTargets(0u, nullptr, pDSVStencil.Get());
+	//DXDevice::GetContext().OMSetDepthStencilState(pDSSWrite.Get(), 0xFF);
 
-	pSelectedModel->RenderDrawablesOnly();
+	//pSelectedModel->RenderDrawablesOnly();
 
-	vsOutlineCB.data.m128_f32[0] = outlineScale;
-	vsOutlineCB.Bind();
-	psOutlineCB.data = outlineColor;
-	psOutlineCB.Bind();
-	pPSOutline->Bind();
-	DXDevice::GetContext().OMSetRenderTargets(1u, stencil.GetRenderTarget().pTargetView.GetAddressOf(), pDSVStencil.Get());
-	DXDevice::GetContext().OMSetDepthStencilState(pDSSMask.Get(), 0xFF);
+	//vsOutlineCB.data.m128_f32[0] = outlineScale;
+	//vsOutlineCB.Bind();
+	//psOutlineCB.data = outlineColor;
+	//psOutlineCB.Bind();
+	//pPSOutline->Bind();
+	//DXDevice::GetContext().OMSetRenderTargets(1u, stencil.GetRenderTarget().pTargetView.GetAddressOf(), pDSVStencil.Get());
+	//DXDevice::GetContext().OMSetDepthStencilState(pDSSMask.Get(), 0xFF);
 
-	pSelectedModel->RenderDrawablesOnly();
+	//pSelectedModel->RenderDrawablesOnly();
 
-	DXDevice::GetContext().OMSetBlendState(pBlendState.Get(), nullptr, 0xffffffff);
-	stencil.Draw();
-	DXDevice::GetContext().OMSetBlendState(nullptr, nullptr, 0xffffffff);
+	//DXDevice::GetContext().OMSetBlendState(pBlendState.Get(), nullptr, 0xffffffff);
+	//stencil.Draw();
+	//DXDevice::GetContext().OMSetBlendState(nullptr, nullptr, 0xffffffff);
 }
 
 void ModelTest::CreateStencil()
@@ -190,8 +203,8 @@ void ModelTest::CreateStencil()
 	// Depth stencil
 
 	D3D11_TEXTURE2D_DESC dtDesc = {};
-	dtDesc.Width =  stencil.GetRenderTarget().width;
-	dtDesc.Height = stencil.GetRenderTarget().height;
+	dtDesc.Width =  DXDevice::Get().GetBackBufferTextureDesc().Width;
+	dtDesc.Height = DXDevice::Get().GetBackBufferTextureDesc().Height;
 	dtDesc.MipLevels = 1u;
 	dtDesc.ArraySize = 1u;
 	dtDesc.Format = DXGI_FORMAT::DXGI_FORMAT_D24_UNORM_S8_UINT;
