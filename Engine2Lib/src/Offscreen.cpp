@@ -25,63 +25,30 @@ namespace Engine2
 
 	void Offscreen::SetAsTarget()
 	{
-		if (pDepthStencilView) // has depth buffer
-		{
-			DXDevice::GetContext().OMSetRenderTargets(1u, pTargetView.GetAddressOf(), pDepthStencilView.Get());
-			DXDevice::GetContext().OMSetDepthStencilState(pDepthStencilState.Get(), stencilRef);
-		}
-		else // no depth buffer
-		{
-			DXDevice::GetContext().OMSetRenderTargets(1u, pTargetView.GetAddressOf(), nullptr);
-		}
-	}
-
-	void Offscreen::SetAsTargetNoDepthBuffer()
-	{
 		DXDevice::GetContext().OMSetRenderTargets(1u, pTargetView.GetAddressOf(), nullptr);
-	}
-
-	void Offscreen::RemoveAsTarget()
-	{
-		DXDevice::Get().SetBackBufferAsRenderTarget();
-	}
-
-	void Offscreen::Draw()
-	{
-		Bind(); // bind this as resource
-		pVS->Bind();
-		pPS->Bind();
-		pDrawable->Bind();
-		pDrawable->Draw();
-		Unbind();
 	}
 
 	void Offscreen::DrawToBackBuffer()
 	{
 		DXDevice::Get().SetBackBufferAsRenderTargetNoDepthCheck();
-		Draw();
+		Bind(); // bind this as resource
+		pVS->Bind();
+		pPS->Bind();
+		pDrawable->BindAndDraw();
+		Unbind();
 		DXDevice::Get().SetBackBufferAsRenderTarget();
 	}
 
 	void Offscreen::Clear()
 	{
-		constexpr float clearColor[4] = { 0.0f,0.0f,0.0f,1.0f };
+		constexpr float clearColor[4] = { 0.0f,0.0f,0.0f,0.0f };
 		DXDevice::GetContext().ClearRenderTargetView(pTargetView.Get(), clearColor);
-
-		if (pDepthStencilView)
-		{
-			DXDevice::GetContext().ClearDepthStencilView(pDepthStencilView.Get(), D3D11_CLEAR_FLAG::D3D11_CLEAR_DEPTH, 1.0f, 0u);
-		}
 	}
 
 	void Offscreen::Release()
 	{
 		pBuffer.Reset();
 		pTargetView.Reset();
-
-		pDepthStencilView.Reset();
-		pDepthTexture.Reset();
-		pDepthStencilState.Reset();
 
 		pResourceView.Reset();
 		pSamplerState.Reset();
@@ -92,9 +59,6 @@ namespace Engine2
 		if (ImGui::CollapsingHeader("Offscreen target"))
 		{
 			ImGui::Text("Slot %i", slot);
-
-			if (pDepthStencilView) ImGui::Text("Has depth buffer");
-			else ImGui::Text("No depth buffer");
 		}
 	}
 
@@ -169,13 +133,57 @@ namespace Engine2
 
 		E2_ASSERT_HR(hr, "CreateRenderTargetView for offscreen failed");
 
-		width = bufferTexureDesc.Width;
+		width  = bufferTexureDesc.Width;
 		height = bufferTexureDesc.Height;
 		format = bufferTexureDesc.Format;
 	}
 
+	void Offscreen::InitialiseShaderResources()
+	{
+		HRESULT hr;
 
-	void Offscreen::InitialiseDepthBuffer()
+		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+		srvDesc.Format = format;
+		srvDesc.ViewDimension = D3D11_SRV_DIMENSION::D3D11_SRV_DIMENSION_TEXTURE2D;
+		srvDesc.Texture2D.MostDetailedMip = 0;
+		srvDesc.Texture2D.MipLevels = 1;
+
+		hr = DXDevice::GetDevice().CreateShaderResourceView(pBuffer.Get(), &srvDesc, &pResourceView);
+
+		E2_ASSERT_HR(hr, "CreateShaderResourceView failed");
+
+		D3D11_SAMPLER_DESC sampDesc = {};
+		sampDesc.Filter = D3D11_FILTER::D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+		sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_CLAMP;
+		sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_CLAMP;
+		sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_CLAMP;
+
+		hr = DXDevice::GetDevice().CreateSamplerState(&sampDesc, &pSamplerState);
+
+		E2_ASSERT_HR(hr, "CreateSamplerState failed");
+	}
+
+	void OffscreenWithDepthBuffer::SetAsTarget()
+	{
+		DXDevice::GetContext().OMSetRenderTargets(1u, pTargetView.GetAddressOf(), pDepthStencilView.Get());
+		DXDevice::GetContext().OMSetDepthStencilState(pDepthStencilState.Get(), stencilRef);
+	}
+
+	void OffscreenWithDepthBuffer::Clear()
+	{
+		Offscreen::Clear();
+		DXDevice::GetContext().ClearDepthStencilView(pDepthStencilView.Get(), D3D11_CLEAR_FLAG::D3D11_CLEAR_DEPTH, 1.0f, 0u);
+	}
+
+	void OffscreenWithDepthBuffer::Release()
+	{
+		Offscreen::Release();
+		pDepthStencilView.Reset();
+		pDepthTexture.Reset();
+		pDepthStencilState.Reset();
+	}
+
+	void OffscreenWithDepthBuffer::InitialiseDepthBuffer()
 	{
 		HRESULT hr;
 
@@ -211,31 +219,6 @@ namespace Engine2
 		hr = DXDevice::GetDevice().CreateDepthStencilView(pDepthTexture.Get(), &dsvDesc, &pDepthStencilView);
 
 		E2_ASSERT_HR(hr, "CreateDepthStencilView failed for DepthStencil");
-	}
-
-	void Offscreen::InitialiseShaderResources()
-	{
-		HRESULT hr;
-
-		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-		srvDesc.Format = format;
-		srvDesc.ViewDimension = D3D11_SRV_DIMENSION::D3D11_SRV_DIMENSION_TEXTURE2D;
-		srvDesc.Texture2D.MostDetailedMip = 0;
-		srvDesc.Texture2D.MipLevels = 1;
-
-		hr = DXDevice::GetDevice().CreateShaderResourceView(pBuffer.Get(), &srvDesc, &pResourceView);
-
-		E2_ASSERT_HR(hr, "CreateShaderResourceView failed");
-
-		D3D11_SAMPLER_DESC sampDesc = {};
-		sampDesc.Filter = D3D11_FILTER::D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-		sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_CLAMP;
-		sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_CLAMP;
-		sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_CLAMP;
-
-		hr = DXDevice::GetDevice().CreateSamplerState(&sampDesc, &pSamplerState);
-
-		E2_ASSERT_HR(hr, "CreateSamplerState failed");
 	}
 
 }

@@ -30,6 +30,7 @@ namespace Engine2
 		inline void SetWireframeRenderState()     { pImmediateContext->RSSetState(pRSWireframe.Get()); }
 		inline void SetDefaultRenderState()       { pImmediateContext->RSSetState(pRSDefault.Get()); }
 		inline void SetDefaultDepthStencilState() { pImmediateContext->OMSetDepthStencilState(pDepthStencilState.Get(), 0); }
+		inline void SetDefaultBlendState()        { pImmediateContext->OMSetBlendState(nullptr, nullptr, 0xffffffff); }
 
 		void ClearShaderResource(unsigned int slot);
 
