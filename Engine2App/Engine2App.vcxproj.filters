@@ -5,12 +5,14 @@
     <ClCompile Include="src\pch.cpp" />
     <ClCompile Include="src\BallWorld.cpp" />
     <ClCompile Include="src\ModelTest.cpp" />
+    <ClCompile Include="src\ParticleTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h" />
     <ClInclude Include="src\Voxel.h" />
     <ClInclude Include="src\BallWorld.h" />
     <ClInclude Include="src\ModelTest.h" />
+    <ClInclude Include="src\ParticleTest.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Assets\Materials\SceneEntityCBVS.hlsl" />
@@ -26,5 +28,8 @@
     <FxCompile Include="Assets\Materials\BallWorld2VS.hlsl" />
     <FxCompile Include="Assets\Materials\ModelTestPS.hlsl" />
     <FxCompile Include="Assets\Materials\ModelTestVS.hlsl" />
+    <FxCompile Include="Assets\Materials\ParticleVS.hlsl" />
+    <FxCompile Include="Assets\Materials\ParticlePS.hlsl" />
+    <FxCompile Include="Assets\Materials\SceneCBVS.hlsl" />
   </ItemGroup>
 </Project>

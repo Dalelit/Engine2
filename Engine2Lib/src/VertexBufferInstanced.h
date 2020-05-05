@@ -8,12 +8,23 @@
 
 namespace Engine2
 {
+	class DrawableInstanced : public Drawable
+	{
+	public:
+		virtual void Draw() = 0;
+		virtual void Draw(UINT instances) { instanceCount = instances; Draw(); };
+		void SetInstanceCount(UINT instances) { instanceCount = instances; }
+
+	protected:
+		UINT instanceCount = 0;
+	};
+
 	template <typename V, D3D11_PRIMITIVE_TOPOLOGY TOP>
-	class VertexBufferIndexInstanced : public Drawable
+	class VertexBufferIndexInstanced : public DrawableInstanced
 	{
 	public:
 		VertexBufferIndexInstanced(std::vector<V>& verticies, std::vector<unsigned int>& indicies) :
-			vertexCount((UINT)verticies.size()), indxCount((UINT)indicies.size()), instanceCount(instanceCount)
+			vertexCount((UINT)verticies.size()), indxCount((UINT)indicies.size())
 		{
 			AddBuffer<V>(verticies);
 
@@ -63,10 +74,10 @@ namespace Engine2
 			wrl::ComPtr<ID3D11Buffer> pBuffer;
 			HRESULT hr = DXDevice::GetDevice().CreateBuffer(&bufferDesc, &data, &pBuffer);
 
+			E2_ASSERT_HR(hr, "VertexBufferIndexInstanced AddBuffer CreateBuffer failed");
+
 			vertexBuffers.push_back(pBuffer);
 			vertexBufferPtrs.push_back(pBuffer.Get());
-
-			E2_ASSERT_HR(hr, "VertexBufferIndexInstanced AddBuffer CreateBuffer failed");
 
 			bufferCount++;
 			return pBuffer.Get();
@@ -93,8 +104,6 @@ namespace Engine2
 
 		virtual void OnImgui() { ImGui::Text(info.c_str()); }
 
-		void SetInstanceCount(UINT count) { instanceCount = count; }
-
 		UINT startSlot = 0u;
 
 	protected:
@@ -105,7 +114,6 @@ namespace Engine2
 		wrl::ComPtr<ID3D11Buffer> pIndexBuffer = nullptr;
 		UINT vertexCount;
 		UINT indxCount;
-		UINT instanceCount = 0;
 
 		D3D11_PRIMITIVE_TOPOLOGY topology = TOP;
 
@@ -121,6 +129,8 @@ namespace Engine2
 		TriangleListIndexInstanced(std::vector<V>& verticies, std::vector<unsigned int>& indicies, std::vector<I>& instances) : VertexBufferIndexInstanced<V, D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST>(verticies, indicies) {
 			this->AddInstances(instances);
 		}
+
+		TriangleListIndexInstanced(std::vector<V>& verticies, std::vector<unsigned int>& indicies) : VertexBufferIndexInstanced<V, D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST>(verticies, indicies) {}
 	};
 
 }

@@ -158,6 +158,7 @@
     <ClInclude Include="src\Instrumentation.h" />
     <ClInclude Include="src\Lights.h" />
     <ClInclude Include="src\OffscreenOutliner.h" />
+    <ClInclude Include="src\Particles.h" />
     <ClInclude Include="src\Primatives.h" />
     <ClInclude Include="src\Offscreen.h" />
     <ClInclude Include="src\Resources.h" />
@@ -197,6 +198,7 @@
     <ClCompile Include="src\Instrumentation.cpp" />
     <ClCompile Include="src\Lights.cpp" />
     <ClCompile Include="src\OffscreenOutliner.cpp" />
+    <ClCompile Include="src\Particles.cpp" />
     <ClCompile Include="src\Primatives.cpp" />
     <ClCompile Include="src\Offscreen.cpp" />
     <ClCompile Include="src\Scene.cpp" />

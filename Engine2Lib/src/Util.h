@@ -15,7 +15,10 @@ namespace Engine2
 		public:
 			Random() : gen(rd()), dist(0.0f, 1.0f) {}
 			Random(float min, float max) : gen(rd()), dist(min, max) {}
-			float Next() { return dist(gen); }
+			inline float Next() { return dist(gen); }
+			inline DirectX::XMVECTOR NextXMVECTORXYZ0() { return { Next(), Next(), Next(), 0.0f }; }
+			inline DirectX::XMVECTOR NextXMVECTORXYZ1() { return { Next(), Next(), Next(), 1.0f }; }
+			inline DirectX::XMVECTOR NextXMVECTORXYZW() { return { Next(), Next(), Next(), Next() }; }
 
 		protected:
 			std::random_device rd;

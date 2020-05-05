@@ -1,7 +1,4 @@
-cbuffer sceneConst : register (b0)
-{
-	matrix cameraTransform;
-};
+#include "SceneCBVS.hlsl"
 
 cbuffer entityConst : register (b1)
 {

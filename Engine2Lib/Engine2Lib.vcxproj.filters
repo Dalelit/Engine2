@@ -38,6 +38,7 @@
     <ClInclude Include="src\VertexBufferInstanced.h" />
     <ClInclude Include="src\AssetLoaders\ObjLoader.h" />
     <ClInclude Include="src\OffscreenOutliner.h" />
+    <ClInclude Include="src\Particles.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\pch.cpp" />
@@ -67,6 +68,7 @@
     <ClCompile Include="src\Gizmos.cpp" />
     <ClCompile Include="src\AssetLoaders\ObjLoader.cpp" />
     <ClCompile Include="src\OffscreenOutliner.cpp" />
+    <ClCompile Include="src\Particles.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Assets\Shaders\GizmosPS.hlsl" />
