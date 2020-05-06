@@ -12,12 +12,17 @@ namespace Engine2
 
 		SetMeshAndVertexShader();
 		SetPixelShader();
+
+		D3D11_RASTERIZER_DESC rsDesc = CD3D11_RASTERIZER_DESC(CD3D11_DEFAULT());
+		rsDesc.CullMode = D3D11_CULL_MODE::D3D11_CULL_NONE;
+		DXDevice::GetDevice().CreateRasterizerState(&rsDesc, &pRSShowBackface);
 	}
 
 	void ParticleEmitter::OnUpdate(float dt)
 	{
 		velocityStartVar = velocityStartMax - velocityStartMin;
 		colorStartVar = colorStartMax - colorStartMin;
+		rotationSpeedStartVar = rotationSpeedStartMax - rotationSpeedStartMin;
 
 		timeSinceLastEmit += dt;
 
@@ -71,12 +76,14 @@ namespace Engine2
 	{
 		if (instanceCount > 0)
 		{
+			DXDevice::GetContext().RSSetState(pRSShowBackface.Get());
 			pVS->Bind();
 			pPS->Bind();
 
 			DXDevice::UpdateBuffer(instanceBuffer, instances, instanceCount);
 			pVB->Bind();
 			pVB->Draw(instanceCount);
+			DXDevice::Get().SetDefaultRenderState();
 		}
 	}
 
@@ -86,11 +93,16 @@ namespace Engine2
 		{
 			ImGui::DragFloat3("Position", position.m128_f32, 0.01f);
 			ImGui::DragFloat("Rate", &rate, 0.1f, 0.01f);
-			ImGui::DragFloat3("Start velocity min", velocityStartMin.m128_f32, 0.01f);
-			ImGui::DragFloat3("Start velocity max", velocityStartMax.m128_f32, 0.01f);
 			ImGui::DragFloat3("Force", force.m128_f32, 0.01f);
-			ImGui::ColorEdit3("Start color min", colorStartMin.m128_f32);
-			ImGui::ColorEdit3("Start color max", colorStartMax.m128_f32);
+			ImGui::Text("Emit start params");
+			ImGui::DragFloat("Lifespan", &lifeSpan, 0.1f, 0.01f);
+			ImGui::DragFloat3("Vel min", velocityStartMin.m128_f32, 0.01f);
+			ImGui::DragFloat3("Vel max", velocityStartMax.m128_f32, 0.01f);
+			ImGui::DragFloat3("Rot speed min", rotationSpeedStartMin.m128_f32, 0.01f);
+			ImGui::DragFloat3("Rot speed max", rotationSpeedStartMax.m128_f32, 0.01f);
+			ImGui::ColorEdit4("Col min", colorStartMin.m128_f32);
+			ImGui::ColorEdit4("Col max", colorStartMax.m128_f32);
+			ImGui::Text("Stats");
 			ImGui::Text("Active particles %i", activeCount);
 			ImGui::Text("Instances %i", instanceCount);
 			ImGui::Text("Buffer index %i", bufferIndex);
@@ -101,9 +113,11 @@ namespace Engine2
 	{
 		pParticle->position = position;
 		pParticle->color = colorStartMin + colorStartVar * rng.NextXMVECTORXYZ1(); // to do: sort out alpha
-		pParticle->life = 5.0f;
+		pParticle->life = lifeSpan;
 		pParticle->velocity = velocityStartMin + velocityStartVar * rng.NextXMVECTORXYZ0();
 		pParticle->scale = { 0.1f, 0.1f, 0.1f, 0.0f };
+		pParticle->rotation = rng.NextXMVECTORXYZ0();
+		pParticle->rotationSpeed = rotationSpeedStartMin + rotationSpeedStartVar * rng.NextXMVECTORXYZ0();
 	}
 
 	void ParticleEmitter::UpdateParticle(Particle* pParticle, float dt)
@@ -111,11 +125,12 @@ namespace Engine2
 		pParticle->life -= dt;
 		pParticle->position += pParticle->velocity * dt;
 		pParticle->velocity += force * dt;
+		pParticle->rotation += pParticle->rotationSpeed * dt;
 	}
 
 	void ParticleEmitter::InstanceParticle(Particle* pParticle, InstanceInfo* pInstance)
 	{
-		pInstance->transform = XMMatrixTranspose(XMMatrixScalingFromVector(pParticle->scale) * XMMatrixTranslationFromVector(pParticle->position));
+		pInstance->transform = XMMatrixTranspose(XMMatrixScalingFromVector(pParticle->scale) * XMMatrixRotationRollPitchYawFromVector(pParticle->rotation) * XMMatrixTranslationFromVector(pParticle->position));
 		pInstance->color = pParticle->color;
 	}
 

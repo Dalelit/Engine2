@@ -14,6 +14,8 @@ namespace Engine2
 		DirectX::XMVECTOR velocity;
 		DirectX::XMVECTOR color;
 		DirectX::XMVECTOR scale;
+		DirectX::XMVECTOR rotation;
+		DirectX::XMVECTOR rotationSpeed;
 		float life;
 	};
 
@@ -54,14 +56,21 @@ namespace Engine2
 		std::shared_ptr<DrawableInstanced> pVB;
 		std::shared_ptr<VertexShader> pVS;
 		std::shared_ptr<PixelShader> pPS;
+		wrl::ComPtr<ID3D11RasterizerState> pRSShowBackface;
 
 		Util::Random rng;
+
+		// start parameters
+		float lifeSpan = 5.0f;
 
 		DirectX::XMVECTOR velocityStartMin = { -0.5f, 1.0f, -0.5f, 0.0f };
 		DirectX::XMVECTOR velocityStartMax = {  0.5f, 2.0f,  0.5f, 0.0f };
 		DirectX::XMVECTOR velocityStartVar; // calculated in onupdate
-
 		DirectX::XMVECTOR force = { 0.0f, -0.3f, 0.0f, 0.0f };
+
+		DirectX::XMVECTOR rotationSpeedStartMin = { -1.0f, -1.0f, -1.0f, 0.0f };
+		DirectX::XMVECTOR rotationSpeedStartMax = { 1.0f, 1.0f,  1.0f, 0.0f };
+		DirectX::XMVECTOR rotationSpeedStartVar; // calculated in onupdate
 
 		DirectX::XMVECTOR colorStartMin = { 1.0f, 0.0f, 0.0f, 1.0f };
 		DirectX::XMVECTOR colorStartMax = { 1.0f, 1.0f, 0.0f, 1.0f };
