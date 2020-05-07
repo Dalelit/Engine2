@@ -35,7 +35,6 @@ namespace Engine2
 		wrl::ComPtr<ID3D11DepthStencilState> pDSSUseMask;
 		wrl::ComPtr<ID3D11DepthStencilView> pDSVStencil;
 		wrl::ComPtr<ID3D11Texture2D> pDTStencil;
-		wrl::ComPtr<ID3D11BlendState> pBlendState;
 
 		float outlineScale = 1.1f;
 		VSConstantBuffer<DirectX::XMVECTOR> vsOutlineCB;

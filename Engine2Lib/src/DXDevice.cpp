@@ -27,12 +27,35 @@ namespace Engine2
 		CreateDeviceAndSwapchain();
 		ConfigurePipeline();
 
-		// create the render states for future use
+		// create the states for future use
+		
+		HRESULT hr;
+
 		pRSDefault = nullptr;
 
+		// wireframe rasterizer
 		D3D11_RASTERIZER_DESC rsDesc = CD3D11_RASTERIZER_DESC(CD3D11_DEFAULT());
 		rsDesc.FillMode = D3D11_FILL_MODE::D3D11_FILL_WIREFRAME;
-		pDevice->CreateRasterizerState(&rsDesc, &pRSWireframe);
+		hr = pDevice->CreateRasterizerState(&rsDesc, &pRSWireframe);
+
+		E2_ASSERT_HR(hr, "CreateRasterizerState failed");
+
+		// no face culling
+		rsDesc = CD3D11_RASTERIZER_DESC(CD3D11_DEFAULT());
+		rsDesc.CullMode = D3D11_CULL_MODE::D3D11_CULL_NONE;
+		hr = pDevice->CreateRasterizerState(&rsDesc, &pRSNoFaceCulling);
+
+		E2_ASSERT_HR(hr, "CreateRasterizerState failed");
+
+		// alpha blend state
+		D3D11_BLEND_DESC bsDesc = CD3D11_BLEND_DESC(CD3D11_DEFAULT());
+		auto& bsrt = bsDesc.RenderTarget[0];
+		bsrt.BlendEnable = true;
+		bsrt.SrcBlend = D3D11_BLEND::D3D11_BLEND_SRC_ALPHA;
+		bsrt.DestBlend = D3D11_BLEND::D3D11_BLEND_INV_SRC_ALPHA;
+		hr = pDevice->CreateBlendState(&bsDesc, &pAlphaBlendState);
+
+		E2_ASSERT_HR(hr, "CreateBlendState failed");
 	}
 
 	void DXDevice::BeginFrame()

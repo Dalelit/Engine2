@@ -18,7 +18,7 @@ namespace Engine2
 
 	void OffscreenOutliner::DrawToBackBuffer()
 	{
-		DXDevice::GetContext().OMSetBlendState(pBlendState.Get(), nullptr, 0xffffffff);
+		DXDevice::Get().SetAlphaBlendState();
 		offscreen.DrawToBackBuffer();
 		DXDevice::Get().SetDefaultBlendState();
 	}
@@ -56,8 +56,6 @@ namespace Engine2
 
 	void OffscreenOutliner::Initialise()
 	{
-		HRESULT hr;
-
 		// shaders for outline
 		std::vector<D3D11_INPUT_ELEMENT_DESC> vsLayout = {
 			{"Position",    0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
@@ -68,16 +66,6 @@ namespace Engine2
 
 		std::string psFileName = Config::directories["ShaderCompiledDir"] + "OutlinePS.cso";
 		pPSOutline = PixelShaderDynamic::CreateFromCompiledFile(psFileName);
-
-		// blend state
-		D3D11_BLEND_DESC bsDesc = CD3D11_BLEND_DESC(CD3D11_DEFAULT());
-		auto& bsrt = bsDesc.RenderTarget[0];
-		bsrt.BlendEnable = true;
-		bsrt.SrcBlend = D3D11_BLEND::D3D11_BLEND_SRC_ALPHA;
-		bsrt.DestBlend = D3D11_BLEND::D3D11_BLEND_INV_SRC_ALPHA;
-		hr = DXDevice::GetDevice().CreateBlendState(&bsDesc, &pBlendState);
-
-		E2_ASSERT_HR(hr, "CreateBlendState failed");
 	}
 	
 	void OffscreenOutliner::Configure()

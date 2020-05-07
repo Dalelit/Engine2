@@ -27,10 +27,12 @@ namespace Engine2
 		void SetBackBufferAsRenderTarget();
 		void SetBackBufferAsRenderTargetNoDepthCheck();
 
-		inline void SetWireframeRenderState()     { pImmediateContext->RSSetState(pRSWireframe.Get()); }
 		inline void SetDefaultRenderState()       { pImmediateContext->RSSetState(pRSDefault.Get()); }
+		inline void SetWireframeRenderState()     { pImmediateContext->RSSetState(pRSWireframe.Get()); }
+		inline void SetNoFaceCullingRenderState() { pImmediateContext->RSSetState(pRSNoFaceCulling.Get()); }
 		inline void SetDefaultDepthStencilState() { pImmediateContext->OMSetDepthStencilState(pDepthStencilState.Get(), 0); }
 		inline void SetDefaultBlendState()        { pImmediateContext->OMSetBlendState(nullptr, nullptr, 0xffffffff); }
+		inline void SetAlphaBlendState()          { pImmediateContext->OMSetBlendState(pAlphaBlendState.Get(), nullptr, 0xffffffff); }
 
 		void ClearShaderResource(unsigned int slot);
 
@@ -79,9 +81,11 @@ namespace Engine2
 		void ConfigurePipeline();
 		void ReleasePipeline();
 
-		// render states for resue
+		// states for resue
 		wrl::ComPtr<ID3D11RasterizerState> pRSDefault;
 		wrl::ComPtr<ID3D11RasterizerState> pRSWireframe;
+		wrl::ComPtr<ID3D11RasterizerState> pRSNoFaceCulling;
+		wrl::ComPtr<ID3D11BlendState>      pAlphaBlendState;
 	};
 
 }
