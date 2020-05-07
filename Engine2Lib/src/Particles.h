@@ -37,7 +37,7 @@ namespace Engine2
 		inline bool IsActive() { return active; }
 		inline void SetActive(bool makeActive = true) { active = makeActive; }
 
-		void SetMeshAndVertexShader();
+		void SetMeshAndVertexShader(const std::string& meshName);
 		void SetPixelShader();
 
 	protected:
@@ -58,6 +58,9 @@ namespace Engine2
 		std::shared_ptr<DrawableInstanced> pVB;
 		std::shared_ptr<VertexShader> pVS;
 		std::shared_ptr<PixelShader> pPS;
+
+		std::vector<std::string> meshNames;
+		std::string currentMesh;
 
 		Util::Random rng;
 

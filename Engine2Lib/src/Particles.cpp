@@ -7,10 +7,13 @@ namespace Engine2
 {
 	ParticleEmitter::ParticleEmitter()
 	{
+		meshNames.emplace_back("Equilateral Triangle");
+		meshNames.emplace_back("Square");
+
 		particles.resize(maxParticles);
 		instances.resize(maxParticles);
 
-		SetMeshAndVertexShader();
+		SetMeshAndVertexShader(meshNames[0]);
 		SetPixelShader();
 	}
 
@@ -93,6 +96,16 @@ namespace Engine2
 			ImGui::DragFloat3("Position", position.m128_f32, 0.01f);
 			ImGui::DragFloat("Rate", &rate, 0.1f, 0.01f);
 			ImGui::DragFloat3("Force", force.m128_f32, 0.01f);
+			if (ImGui::BeginCombo("Mesh", currentMesh.c_str()))
+			{
+				for (size_t i = 0; i < meshNames.size(); i++)
+				{
+					bool isSelected = (meshNames[i] == currentMesh);
+					if (ImGui::Selectable(meshNames[i].c_str(), isSelected)) SetMeshAndVertexShader(meshNames[i]);
+					if (isSelected) ImGui::SetItemDefaultFocus();
+				}
+				ImGui::EndCombo();
+			}
 			ImGui::Text("Emit start params");
 			ImGui::DragFloat("Lifespan", &lifeSpan, 0.1f, 0.01f);
 			ImGui::DragFloat3("Vel min", velocityStartMin.m128_f32, 0.01f);
@@ -109,6 +122,7 @@ namespace Engine2
 			ImGui::Text("Active particles %i", activeCount);
 			ImGui::Text("Instances %i", instanceCount);
 			ImGui::Text("Buffer index %i", bufferIndex);
+			ImGui::Text("Mesh name %s", currentMesh);
 		}
 	}
 
@@ -141,7 +155,7 @@ namespace Engine2
 		pInstance->color = pParticle->color;
 	}
 
-	void ParticleEmitter::SetMeshAndVertexShader()
+	void ParticleEmitter::SetMeshAndVertexShader(const std::string& meshName)
 	{
 		struct Vertex {
 			XMFLOAT3 position;
@@ -157,24 +171,46 @@ namespace Engine2
 			{"InstanceColor"    , 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_INSTANCE_DATA, 1},
 		};
 
-		// equilater triangle, sides size 1.0
-		// sqrt (1 - sqr(0.5)) / 2 = 0.4330127018922193
-		std::vector<Vertex> verticies = {
-			{ { -0.5f, -0.4330127018922193f, 0.0f} },
-			{ {  0.0f,  0.4330127018922193f, 0.0f} },
-			{ {  0.5f, -0.4330127018922193f, 0.0f} },
-		};
+		std::vector<Vertex> verticies;
+		std::vector<unsigned int> indicies;
 
-		std::vector<unsigned int> indicies = {0, 1, 2};
+		if (meshName == "Equilateral Triangle")
+		{
+			// equilater triangle, sides size 1.0
+			// sqrt (1 - sqr(0.5)) / 2 = 0.4330127018922193
+			verticies = {
+				{ { -0.5f, -0.4330127018922193f, 0.0f} },
+				{ {  0.0f,  0.4330127018922193f, 0.0f} },
+				{ {  0.5f, -0.4330127018922193f, 0.0f} },
+			};
+
+			indicies = { 0, 1, 2 };
+		}
+		else if (meshName == "Square")
+		{
+			verticies = {
+				{ { -0.5f, -0.5f, 0.0f} },
+				{ { -0.5f,  0.5f, 0.0f} },
+				{ {  0.5f,  0.5f, 0.0f} },
+				{ {  0.5f, -0.5f, 0.0f} },
+			};
+
+			indicies = { 0, 1, 2, 0, 2, 3 };
+		}
+		else { E2_ASSERT(false, "Unknwon mesh name for partcile system"); }
+
+		currentMesh = meshName;
 
 		auto vb = std::make_shared<TriangleListIndexInstanced<Vertex, InstanceInfo>>(verticies, indicies);
 		instanceBuffer = vb->AddInstances(instances, true);
 		pVB = vb;
-		pVS = std::make_shared<VertexShaderDynamic>(Config::directories["ShaderSourceDir"] + "ParticleVS.hlsl", vsLayout);
+		//pVS = std::make_shared<VertexShaderDynamic>(Config::directories["ShaderSourceDir"] + "ParticleVS.hlsl", vsLayout);
+		pVS = VertexShader::CreateFromCompiledFile(Config::directories["ShaderCompiledDir"] + "ParticleVS.cso", vsLayout);
 	}
 
 	void ParticleEmitter::SetPixelShader()
 	{
-		pPS = std::make_shared<PixelShaderDynamic>(Config::directories["ShaderSourceDir"] + "ParticlePS.hlsl");
+		//pPS = std::make_shared<PixelShaderDynamic>(Config::directories["ShaderSourceDir"] + "ParticlePS.hlsl");
+		pPS = PixelShader::CreateFromCompiledFile(Config::directories["ShaderCompiledDir"] + "ParticlePS.cso");
 	}
 }

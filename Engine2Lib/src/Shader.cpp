@@ -70,7 +70,7 @@ namespace Engine2
 		DXDevice::GetContext().IASetInputLayout(nullptr);
 	}
 
-	std::shared_ptr<VertexShader> VertexShader::CreateFromString(std::string& src, VertexShaderLayoutDesc& layout, std::string entryPoint, std::string target)
+	std::shared_ptr<VertexShader> VertexShader::CreateFromString(const std::string& src, VertexShaderLayoutDesc& layout, const std::string entryPoint, const std::string target)
 	{
 		wrl::ComPtr<ID3DBlob> pBlob;
 		wrl::ComPtr<ID3DBlob> pErrBlob;
@@ -82,7 +82,7 @@ namespace Engine2
 		return std::make_shared<VertexShader>(*pBlob.Get(), layout, entryPoint + " " + target + "\nSource string\n" + src);
 	}
 
-	std::shared_ptr<VertexShader> VertexShader::CreateFromCompiledFile(std::string& filename, VertexShaderLayoutDesc& layout)
+	std::shared_ptr<VertexShader> VertexShader::CreateFromCompiledFile(const std::string& filename, VertexShaderLayoutDesc& layout)
 	{
 		wrl::ComPtr<ID3DBlob> pBlob;
 
@@ -93,7 +93,7 @@ namespace Engine2
 		return std::make_shared<VertexShader>(*pBlob.Get(), layout, "Compiled file: " + filename);
 	}
 
-	std::shared_ptr<VertexShader> VertexShader::CreateFromSourceFile(std::string& filename, VertexShaderLayoutDesc& layout, std::string entryPoint, std::string target)
+	std::shared_ptr<VertexShader> VertexShader::CreateFromSourceFile(const std::string& filename, VertexShaderLayoutDesc& layout, const std::string entryPoint, const std::string target)
 	{
 		wrl::ComPtr<ID3DBlob> pBlob;
 		wrl::ComPtr<ID3DBlob> pErrBlob;
@@ -107,7 +107,7 @@ namespace Engine2
 
 	///////////////// Pixel shaders /////////////////
 
-	PixelShader::PixelShader(ID3DBlob& shaderBlob, std::string info)
+	PixelShader::PixelShader(ID3DBlob& shaderBlob, const std::string info)
 	{
 		this->name = "PixelShader";
 		this->info = info;
@@ -131,7 +131,7 @@ namespace Engine2
 		DXDevice::GetContext().PSSetShader(nullptr, nullptr, 0u);
 	}
 
-	std::shared_ptr<PixelShader> PixelShader::CreateFromString(std::string& src, std::string entryPoint, std::string target)
+	std::shared_ptr<PixelShader> PixelShader::CreateFromString(const std::string& src, const std::string entryPoint, const std::string target)
 	{
 		wrl::ComPtr<ID3DBlob> pBlob;
 		wrl::ComPtr<ID3DBlob> pErrBlob;
@@ -143,7 +143,7 @@ namespace Engine2
 		return std::make_shared<PixelShader>(*pBlob.Get(), entryPoint + " " + target + "\nSource\n" + src);
 	}
 
-	std::shared_ptr<PixelShader> PixelShader::CreateFromCompiledFile(std::string& filename)
+	std::shared_ptr<PixelShader> PixelShader::CreateFromCompiledFile(const std::string& filename)
 	{
 		wrl::ComPtr<ID3DBlob> pBlob;
 
@@ -154,7 +154,7 @@ namespace Engine2
 		return std::make_shared<PixelShader>(*pBlob.Get(), "Compiled file: " + filename);
 	}
 
-	std::shared_ptr<PixelShader> PixelShader::CreateFromSourceFile(std::string& filename, std::string entryPoint, std::string target)
+	std::shared_ptr<PixelShader> PixelShader::CreateFromSourceFile(const std::string& filename, const std::string entryPoint, const std::string target)
 	{
 		wrl::ComPtr<ID3DBlob> pBlob;
 		wrl::ComPtr<ID3DBlob> pErrBlob;
@@ -169,7 +169,7 @@ namespace Engine2
 	///////////////// Geometry shaders /////////////////
 
 
-	GeometryShader::GeometryShader(ID3DBlob& shaderBlob, std::string info)
+	GeometryShader::GeometryShader(ID3DBlob& shaderBlob, const std::string info)
 	{
 		this->name = "GeometryShader";
 		this->info = info;
@@ -193,7 +193,7 @@ namespace Engine2
 		DXDevice::GetContext().GSSetShader(nullptr, nullptr, 0u);
 	}
 
-	std::shared_ptr<GeometryShader> GeometryShader::CreateFromSourceFile(std::string& filename, std::string entryPoint, std::string target)
+	std::shared_ptr<GeometryShader> GeometryShader::CreateFromSourceFile(const std::string& filename, const std::string entryPoint, const std::string target)
 	{
 		wrl::ComPtr<ID3DBlob> pBlob;
 		wrl::ComPtr<ID3DBlob> pErrBlob;

@@ -47,16 +47,16 @@ namespace Engine2
 		void Bind();
 		void Unbind();
 
-		static std::shared_ptr<VertexShader> CreateFromString(std::string& src, VertexShaderLayoutDesc& layout, std::string entryPoint = "main", std::string target = "vs_5_0");
-		static std::shared_ptr<VertexShader> CreateFromCompiledFile(std::string& filename, VertexShaderLayoutDesc& layout);
-		static std::shared_ptr<VertexShader> CreateFromSourceFile(std::string& filename, VertexShaderLayoutDesc& layout, std::string entryPoint = "main", std::string target = "vs_5_0");
+		static std::shared_ptr<VertexShader> CreateFromString(const std::string& src, VertexShaderLayoutDesc& layout, const std::string entryPoint = "main", const std::string target = "vs_5_0");
+		static std::shared_ptr<VertexShader> CreateFromCompiledFile(const std::string& filename, VertexShaderLayoutDesc& layout);
+		static std::shared_ptr<VertexShader> CreateFromSourceFile(const std::string& filename, VertexShaderLayoutDesc& layout, const std::string entryPoint = "main", const std::string target = "vs_5_0");
 
 	protected:
 		VertexShader() = default;
 		wrl::ComPtr<ID3D11VertexShader> pVertexShader = nullptr;
 		wrl::ComPtr<ID3D11InputLayout> pInputLayout = nullptr;
 
-		void CreateVertexShader(ID3DBlob& shaderBlob, std::vector<D3D11_INPUT_ELEMENT_DESC>& layout, std::string info);
+		void CreateVertexShader(ID3DBlob& shaderBlob, std::vector<D3D11_INPUT_ELEMENT_DESC>& layout, const std::string info);
 	};
 
 	/////////////////// pixel shader ///////////////////
@@ -68,9 +68,9 @@ namespace Engine2
 		void Bind();
 		void Unbind();
 
-		static std::shared_ptr<PixelShader> CreateFromString(std::string& src, std::string entryPoint = "main", std::string target = "ps_5_0");
-		static std::shared_ptr<PixelShader> CreateFromCompiledFile(std::string& filename);
-		static std::shared_ptr<PixelShader> CreateFromSourceFile(std::string& filename, std::string entryPoint = "main", std::string target = "ps_5_0");
+		static std::shared_ptr<PixelShader> CreateFromString(const std::string& src, const std::string entryPoint = "main", const std::string target = "ps_5_0");
+		static std::shared_ptr<PixelShader> CreateFromCompiledFile(const std::string& filename);
+		static std::shared_ptr<PixelShader> CreateFromSourceFile(const std::string& filename, const std::string entryPoint = "main", const std::string target = "ps_5_0");
 
 	protected:
 		PixelShader() = default;
@@ -86,7 +86,7 @@ namespace Engine2
 		void Bind();
 		void Unbind();
 
-		static std::shared_ptr<GeometryShader> CreateFromSourceFile(std::string& filename, std::string entryPoint = "main", std::string target = "gs_5_0");
+		static std::shared_ptr<GeometryShader> CreateFromSourceFile(const std::string& filename, const std::string entryPoint = "main", const std::string target = "gs_5_0");
 
 	protected:
 		GeometryShader() = default;
@@ -187,12 +187,12 @@ namespace Engine2
 	{
 	public:
 		// wrap an existing shader
-		GeometryShaderDynamic(std::string filename, std::shared_ptr<GeometryShader> shader) :
+		GeometryShaderDynamic(const std::string filename, std::shared_ptr<GeometryShader> shader) :
 			shader(shader), fileWatcher(filename)
 		{}
 
 		// create and wrap a shader
-		GeometryShaderDynamic(std::string filename) :
+		GeometryShaderDynamic(const std::string filename) :
 			fileWatcher(filename)
 		{
 			shader = GeometryShader::CreateFromSourceFile(filename);
