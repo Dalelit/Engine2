@@ -28,8 +28,7 @@
     <FxCompile Include="Assets\Materials\BallWorld2VS.hlsl" />
     <FxCompile Include="Assets\Materials\ModelTestPS.hlsl" />
     <FxCompile Include="Assets\Materials\ModelTestVS.hlsl" />
-    <FxCompile Include="Assets\Materials\ParticleVS.hlsl" />
-    <FxCompile Include="Assets\Materials\ParticlePS.hlsl" />
     <FxCompile Include="Assets\Materials\SceneCBVS.hlsl" />
+    <FxCompile Include="Assets\Materials\ParticlePSTest.hlsl" />
   </ItemGroup>
 </Project>

@@ -38,10 +38,11 @@ namespace Engine2
 		inline void SetActive(bool makeActive = true) { active = makeActive; }
 
 		void SetMeshAndVertexShader(const std::string& meshName);
-		void SetPixelShader();
+		void SetPixelShader(const std::string& shaderName = "");
 
 	protected:
 		bool active = true;
+		bool freeze = false;
 		float timeSinceLastEmit = 0.0f;
 		std::vector<Particle> particles;
 		UINT activeCount = 0;
@@ -59,6 +60,8 @@ namespace Engine2
 		std::shared_ptr<VertexShader> pVS;
 		std::shared_ptr<PixelShader> pPS;
 
+		std::vector<std::string> pixelShaderNames;
+		std::string currentPixelShader;
 		std::vector<std::string> meshNames;
 		std::string currentMesh;
 

@@ -60,7 +60,7 @@ namespace Engine2
 
 	void DXDevice::BeginFrame()
 	{
-		constexpr float clearColor[4] = { 0.0f,0.0f,0.0f,1.0f };
+		constexpr float clearColor[4] = { 0.0f,0.0f,0.0f,0.0f };
 		pImmediateContext->ClearRenderTargetView(pTargetView.Get(), clearColor);
 		pImmediateContext->ClearDepthStencilView(pDepthStencilView.Get(), D3D11_CLEAR_FLAG::D3D11_CLEAR_DEPTH, 1.0f, 0u);
 
