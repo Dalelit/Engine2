@@ -208,9 +208,10 @@ int WINAPI WinMain(
 	OnApplicationEventFunc = [](Engine2::ApplicationEvent& event) { Engine2::Engine::Get().OnApplicationEvent(event); };
 	OnInputEventFunc = [](Engine2::InputEvent& event) { Engine2::Engine::Get().OnInputEvent(event); };
 
+	// reminder: camera position is set by last layer
+	Engine2::Engine::Get().AttachLayer(new ModelTest(), false);
+	Engine2::Engine::Get().AttachLayer(new BallWorld(), false);
 	Engine2::Engine::Get().AttachLayer(new ParticleTest());
-	//Engine2::Engine::Get().AttachLayer(new ModelTest());
-	//Engine2::Engine::Get().AttachLayer(new BallWorld());
 
 	clock_t lastTime = clock();
 

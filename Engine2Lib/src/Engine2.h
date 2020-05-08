@@ -37,7 +37,7 @@ namespace Engine2 {
 		void Render();
 
 		// Engine will own the layer and delete at the end.
-		void AttachLayer(Layer* layer) { layers.push_back(layer); }
+		void AttachLayer(Layer* layer, bool active = true) { layers.push_back(layer); if (!active) { layer->SetActive(false); layer->imguiOpen = false; } }
 		Layer& GetLayer(unsigned int indx) { return *layers[indx]; }
 
 		void OnApplicationEvent(ApplicationEvent& event);
