@@ -7,12 +7,12 @@
 class BlockWorld : public Engine2::Layer
 {
 public:
-	enum BlockState : unsigned char {
-		empty, ground,
+	enum BlockType : unsigned char {
+		empty, selected, ground, grass
 	};
 
 	struct Block {
-		unsigned char state;
+		BlockType type;
 	};
 
 	BlockWorld();
@@ -22,7 +22,7 @@ public:
 	void OnRender();
 	void OnImgui();
 
-	bool RayHit(Engine2::Ray& ray, float** distance, Block** block);
+	Block* RayHit(Engine2::Ray& ray, float& distance);
 
 protected:
 	Engine2::Scene scene;
@@ -41,8 +41,10 @@ protected:
 	void InitialiseBlocks();
 
 	struct InstanceInfo {
-		DirectX::XMVECTOR location;
+		DirectX::XMFLOAT3 location;
+		UINT32 type;
 	};
+	bool instancesDirty = true; // flag to update the buffer
 	std::vector<InstanceInfo> instances;
 	UINT32 instanceCount;
 	void UpdateInstances();
@@ -50,11 +52,14 @@ protected:
 	std::shared_ptr<Engine2::VertexShaderDynamic> pVS;
 	std::shared_ptr<Engine2::PixelShaderDynamic> pPS;
 	std::shared_ptr<Engine2::DrawableInstanced> pVB;
+	ID3D11Buffer* instanceBuffer;
 	void CreateVertexBuffer();
 	
-	// temp
-	Engine2::Ray ray;
-	bool hit = false;
+	// manage the selected block
 	float hitDistance;
-	DirectX::XMVECTOR hitLocation;
+	Block* pHitBlock = nullptr;
+	BlockType hitBlockType;
+
+	// stats
+	unsigned long instanceUpdateCount = 0;
 };

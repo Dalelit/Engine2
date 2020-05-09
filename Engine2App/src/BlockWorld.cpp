@@ -19,7 +19,6 @@ BlockWorld::BlockWorld() : Layer("BlockWorld")
 	segment.bounds.Extents = center;
 
 	InitialiseBlocks();
-	UpdateInstances();
 
 	CreateVertexBuffer();
 
@@ -36,18 +35,47 @@ void BlockWorld::OnUpdate(float dt)
 {
 	scene.OnUpdate(dt);
 
-	ray = Engine::Get().inputController.GetRayFromMouse();
+	Ray ray = Engine::Get().inputController.GetRayFromMouse();
 
-	hit = segment.bounds.Intersects(ray.origin, ray.direction, hitDistance);
-	if (hit)
+	Block* pNewHitBlock = RayHit(ray, hitDistance);
+	
+	if (pNewHitBlock) // if hit
 	{
-		hitLocation = ray.origin + ray.direction * hitDistance;
+		if (pNewHitBlock != pHitBlock) // and it is a different or new block
+		{
+			if (pHitBlock) // if we had a previously hit one, revert it
+			{
+				pHitBlock->type = hitBlockType;
+			}
+
+			pHitBlock = pNewHitBlock;
+			hitBlockType = pHitBlock->type;
+			pHitBlock->type = BlockType::selected;
+			instancesDirty = true;
+		}
+	}
+	else
+	{
+		if (pHitBlock) // nothing hit, and if we had a previously hit one revert it
+		{
+			pHitBlock->type = hitBlockType;
+			pHitBlock = nullptr;
+			instancesDirty = true;
+		}
 	}
 }
 
 void BlockWorld::OnRender()
 {
 	scene.OnRender();
+
+	if (instancesDirty) // only update the buffer if something changed
+	{
+		UpdateInstances();
+		DXDevice::UpdateBuffer(instanceBuffer, instances, instanceCount);
+		instanceUpdateCount++;
+		instancesDirty = false;
+	}
 
 	pVS->Bind();
 	pPS->Bind();
@@ -57,27 +85,86 @@ void BlockWorld::OnRender()
 
 void BlockWorld::OnImgui()
 {
-	ImGui::InputFloat3("Ray origin", ray.origin.m128_f32);
-	ImGui::InputFloat3("Ray direction", ray.direction.m128_f32);
-	if (hit)
+	if (pHitBlock)
 	{
 		ImGui::Text("Ray hit. Distance %.3f", hitDistance);
-		ImGui::InputFloat3("Hit location", hitLocation.m128_f32);
 	}
 	else
 	{
 		ImGui::Text("Ray miss");
 	}
+	ImGui::Text("Instance updates %i", instanceUpdateCount);
 }
 
-bool BlockWorld::RayHit(Ray& ray, float** distance, Block** block)
+BlockWorld::Block* BlockWorld::RayHit(Engine2::Ray& ray, float& distance)
 {
-	return false;
+	// If the segment is hit, then check each box in the segment.
+	// To do:
+	//  - Can improve speed by putting in sub-segments?
+	//  - have a structure that doesn't have the empty blocks?
+	float segHitDist;
+	if (segment.bounds.Intersects(ray.origin, ray.direction, segHitDist))
+	{
+		// results
+		Block* pHitBlock = nullptr;
+		distance = INFINITY;
+
+		// blocks bounding box, updated in the loop
+		BoundingBox aabb;
+		float halfSize = segment.cubeSize / 2.0f;
+		aabb.Extents = { halfSize, halfSize, halfSize };
+		// aabb.Center is update in the loop
+
+		// block data
+		Block* pBlock = blocks.data();
+
+		// go through all the blocks
+		aabb.Center.z = halfSize;
+		for (UINT32 z = 0; z < segment.deep; z++)
+		{
+			aabb.Center.y = halfSize;
+			for (UINT32 y = 0; y < segment.high; y++)
+			{
+				aabb.Center.x = halfSize;
+				for (UINT32 x = 0; x < segment.wide; x++)
+				{
+					if (pBlock->type != BlockType::empty)
+					{
+						float newHitDist;
+
+						if (aabb.Intersects(ray.origin, ray.direction, newHitDist))
+						{
+							if (newHitDist < distance)
+							{
+								// closer hit block
+								pHitBlock = pBlock;
+								distance = newHitDist;
+
+								// break if this hit dist is the segment hit as that's closest
+								if (newHitDist == segHitDist) return pHitBlock;
+							}
+						}
+					}
+
+					aabb.Center.x += segment.cubeSize;
+					pBlock++;
+				}
+				aabb.Center.y += segment.cubeSize;
+			}
+			aabb.Center.z += segment.cubeSize;
+		}
+
+		return pHitBlock;
+	}
+	
+	return nullptr;
 }
 
 void BlockWorld::InitialiseBlocks()
 {
 	blocks.resize(segment.total);
+
+	Util::Random rng;
 
 	Block* pBlock = blocks.data();
 	float xpos, ypos, zpos;
@@ -94,10 +181,23 @@ void BlockWorld::InitialiseBlocks()
 			for (UINT32 x = 0; x < segment.wide; x++)
 			{
 				//pBlock->location = { xpos, ypos, zpos };
+
 				float dist = xpos * xpos + ypos * ypos + zpos * zpos;
-				//if (dist <= distBound) pBlock->state = BlockState::ground;
-				//else pBlock->state = BlockState::empty;
-				pBlock->state = BlockState::ground;
+				if (dist <= distBound) pBlock->type = (rng.Next() < 0.5f ? BlockType::ground : BlockType::grass);
+				else pBlock->type = BlockType::empty;
+
+				//switch (UINT(rng.Next() * 3.0f))
+				//{
+				//case 0:
+				//	pBlock->type = BlockType::ground;
+				//	break;
+				//case 1:
+				//	pBlock->type = BlockType::grass;
+				//	break;
+				//default:
+				//	pBlock->type = BlockType::empty;
+				//	break;
+				//}
 
 				xpos += segment.cubeSize;
 				pBlock++;
@@ -125,9 +225,10 @@ void BlockWorld::UpdateInstances()
 			xpos = 0.0f;
 			for (UINT32 x = 0; x < segment.wide; x++)
 			{
-				if (pBlock->state != BlockState::empty)
+				if (pBlock->type != BlockType::empty)
 				{
 					pInfo->location = { xpos, ypos, zpos };
+					pInfo->type = pBlock->type;
 					pInfo++;
 					instanceCount++;
 				}
@@ -150,8 +251,9 @@ void BlockWorld::CreateVertexBuffer()
 
 	std::vector<D3D11_INPUT_ELEMENT_DESC> vsLayout = {
 		{"Position", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"Normal",   0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"Normal", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"InstanceLocation", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_INSTANCE_DATA, 1},
+		{"BlockType", 0, DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_INSTANCE_DATA, 1},
 	};
 
 	std::vector<Vertex> verticies = {
@@ -199,6 +301,6 @@ void BlockWorld::CreateVertexBuffer()
 	pVS = std::make_shared<VertexShaderDynamic>(Config::directories["ShaderSourceDir"] + "BlockWorldVS.hlsl", vsLayout);
 	pPS = std::make_shared<PixelShaderDynamic>(Config::directories["ShaderSourceDir"] + "BlockWorldPS.hlsl");
 	auto pVBI = std::make_shared<TriangleListIndexInstanced<Vertex, InstanceInfo>>(verticies, indicies);
-	pVBI->AddInstances(instances, true);
+	instanceBuffer = pVBI->AddInstances(instances, true);
 	pVB = pVBI;
 }
