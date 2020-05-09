@@ -4,13 +4,22 @@
 
 namespace Engine2
 {
+	class Ray
+	{
+	public:
+		DirectX::XMVECTOR origin;
+		DirectX::XMVECTOR direction;
+	};
+
 	class Camera
 	{
 	public:
 		Camera(std::string name) : name(name) {}
 		virtual ~Camera() = default;
 
-		void LoadViewProjectionMatrixT(DirectX::XMMATRIX& vpMatrix);
+		void Update(); // called once by the input control to calc the data once per frame
+
+		void LoadViewProjectionMatrixT(DirectX::XMMATRIX& vpMatrix) { vpMatrix = DirectX::XMMatrixTranspose(viewProjectionMatrix); }; // transpose for DX.
 
 		void OnImugui();
 
@@ -30,7 +39,10 @@ namespace Engine2
 		inline DirectX::XMVECTOR GetPosition() { return position; }
 		inline std::string& GetName() { return name; }
 
-		DirectX::XMMATRIX GetTransform();
+		DirectX::XMMATRIX GetTransform() { return transform; }
+
+		// Origin is the relative point on the screen (0,0) to (1,1). NDC have top left as origin.
+		Ray ScreenCoordToRay(float x, float y);
 
 	protected:
 		std::string name;
@@ -42,10 +54,15 @@ namespace Engine2
 
 		DirectX::XMVECTOR position = {};
 		DirectX::XMVECTOR direction = {};
+		DirectX::XMMATRIX transform;
 
 		float yaw = 0.0f;
 		float pitch = 0.0f;
 		float pitchBound = DirectX::XM_PIDIV2 - 0.001f;
+
+		DirectX::XMMATRIX viewMatrix;
+		DirectX::XMMATRIX projectionMatrix;
+		DirectX::XMMATRIX viewProjectionMatrix;
 
 		inline void ClampPitch() { pitch = std::clamp(pitch, -pitchBound, pitchBound); }
 		inline void WrapYaw() { yaw = fmodf((float)yaw, DirectX::XM_2PI); if (yaw < 0.0f) yaw += DirectX::XM_2PI; }

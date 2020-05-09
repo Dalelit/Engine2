@@ -3,6 +3,7 @@
 #include "BallWorld.h"
 #include "ModelTest.h"
 #include "ParticleTest.h"
+#include "BlockWorld.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -211,7 +212,8 @@ int WINAPI WinMain(
 	// reminder: camera position is set by last layer
 	Engine2::Engine::Get().AttachLayer(new ModelTest(), false);
 	Engine2::Engine::Get().AttachLayer(new BallWorld(), false);
-	Engine2::Engine::Get().AttachLayer(new ParticleTest());
+	Engine2::Engine::Get().AttachLayer(new ParticleTest(), false);
+	Engine2::Engine::Get().AttachLayer(new BlockWorld());
 
 	clock_t lastTime = clock();
 

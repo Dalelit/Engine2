@@ -7,22 +7,17 @@ namespace Engine2
 {
 	using namespace DirectX;
 
-	void Camera::LoadViewProjectionMatrixT(DirectX::XMMATRIX& vpMatrix)
+	void Camera::Update()
 	{
-		XMMATRIX viewMatrix;
-		XMMATRIX projectionMatrix;
-
 		// view matrix
 		XMMATRIX rot = XMMatrixRotationRollPitchYaw(-pitch, yaw, 0.0f);
+		transform = rot * XMMatrixTranslationFromVector(position);
 		direction = XMVector3Transform({ 0.0f, 0.0f, 1.0f, 1.0f }, rot); // rotate from the default forward direciton 0,0,1
+
 		// note: XMMatrixLookToLH normalises the direction vector
 		viewMatrix = XMMatrixLookToLH(position, direction, { 0.0f, 1.0f, 0.0f, 1.0f }); // default up 0,1,0
-
-		// projection matrix
 		projectionMatrix = XMMatrixPerspectiveFovLH(fov, aspectRatio, nearZ, farZ);
-
-		// view projection matrix
-		vpMatrix = XMMatrixTranspose(viewMatrix * projectionMatrix); // transpose for DX.
+		viewProjectionMatrix = viewMatrix * projectionMatrix;
 	}
 
 	void Camera::OnImugui()
@@ -59,8 +54,32 @@ namespace Engine2
 		yaw = atan2f(lookAtDir.m128_f32[0], lookAtDir.m128_f32[2]);
 	}
 
-	XMMATRIX Camera::GetTransform()
+	Ray Camera::ScreenCoordToRay(float x, float y)
 	{
-		return XMMatrixRotationRollPitchYaw(-pitch, yaw, 0.0f) * XMMatrixTranslationFromVector(position);
+		Ray ray;
+
+		// get screen distances
+		float ydist = tanf(fov / 2.0f) * nearZ;
+		float xdist = ydist * aspectRatio;
+
+		// move coorindates to be center of the screen
+		x = x * 2.0f - 1.0f;
+		y = y * 2.0f - 1.0f;
+
+		// move origin at the centre of the screen
+		ray.origin = position + nearZ * direction;
+
+		// move to the x coordinate
+		XMVECTOR right = XMVector3Normalize(XMVector3Cross({ 0.0f, 1.0f, 0.0f, 1.0f }, direction));
+		ray.origin += right * x * xdist;
+
+		// move to the y coordinate. Invert direction as NDC top left is 0,0
+		XMVECTOR up = XMVector3Normalize(XMVector3Cross(direction, right));
+		ray.origin -= up * y * ydist;
+
+		// direction of ray is from position to the point
+		ray.direction = XMVector3Normalize(ray.origin - position);
+
+		return ray;
 	}
 }

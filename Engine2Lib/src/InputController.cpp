@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "InputController.h"
+#include "DXDevice.h"
 #include <Windows.h>
 
 namespace Engine2
@@ -21,6 +22,15 @@ namespace Engine2
 		if (IsKeyPressed(KeyboardConfiguration.down))    up      = -speed;
 		
 		if (forward != 0.0f || right != 0.0f || up != 0.0f) pCamera->Move(forward, right, up);
+
+		pCamera->Update(); // called once per frame for internal calcs
+
+		POINT mpos;
+		GetCursorPos(&mpos);
+		State.MouseOffScreen = DXDevice::Get().ScreenToClientClamped(mpos);
+		State.MouseClientPosition.x = mpos.x;
+		State.MouseClientPosition.y = mpos.y;
+		DXDevice::Get().NormaliseCoordinates(mpos, State.MouseNormaliseCoordinates.x, State.MouseNormaliseCoordinates.y);
 	}
 
 	void InputController::OnInputEvent(InputEvent& event)
@@ -102,6 +112,9 @@ namespace Engine2
 				if (State.LeftMouseDown)  ImGui::Text("Left Mousebutton down"); else  ImGui::Text("Left Mousebutton up");
 				if (State.RightMouseDown) ImGui::Text("Right Mousebutton down"); else  ImGui::Text("Right Mousebutton up");
 				if (State.WindowFocused)  ImGui::Text("Window active"); else  ImGui::Text("Window inactive");
+				ImGui::Text("Mouse client position: (%i, %i)", State.MouseClientPosition.x, State.MouseClientPosition.y);
+				ImGui::Text("Mouse client normalised: (%.3f, %.3f)", State.MouseNormaliseCoordinates.x, State.MouseNormaliseCoordinates.y);
+				if (State.MouseOffScreen) ImGui::Text("Mouse is off screen"); else ImGui::Text("Mouse is on screen");
 			}
 		}
 		ImGui::End();
@@ -111,5 +124,4 @@ namespace Engine2
 	{
 		return GetKeyState(vKeyCode) & 0x8000;
 	}
-
 }

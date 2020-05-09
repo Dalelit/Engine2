@@ -36,6 +36,9 @@ namespace Engine2
 			bool LeftMouseDown  = false;
 			bool RightMouseDown = false;
 			bool WindowFocused  = true;
+			struct { UINT32 x, y; } MouseClientPosition;
+			struct { float x, y; }  MouseNormaliseCoordinates;
+			bool MouseOffScreen;
 		} State;
 
 		void OnUpdate(float dt);
@@ -43,7 +46,8 @@ namespace Engine2
 		void OnApplicationEvent(ApplicationEvent& event);
 		void ImguiWindow(bool* pOpen);
 
-		void SetCamera(Camera* ptr) { pCamera = ptr; }
+		inline void SetCamera(Camera* ptr) { pCamera = ptr; }
+		inline Ray GetRayFromMouse() { return pCamera->ScreenCoordToRay(State.MouseNormaliseCoordinates.x, State.MouseNormaliseCoordinates.y); }
 
 		bool IsKeyPressed(int vKeyCode);
 

@@ -138,6 +138,45 @@ namespace Engine2
 		//pDebug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
 	}
 
+	bool DXDevice::ScreenToClientClamped(POINT& point)
+	{
+		bool isClamped = false;
+
+		// convert
+		ScreenToClient(hwnd, &point);
+
+		// clamp it to the client area
+		if (point.x < 0)
+		{
+			point.x = 0;
+			isClamped = true;
+		}
+		else if (point.x > (LONG)backBufferDesc.Width)
+		{
+			point.x = (LONG)backBufferDesc.Width;
+			isClamped = true;
+		}
+
+		if (point.y < 0)
+		{
+			point.y = 0;
+			isClamped = true;
+		}
+		else if (point.y > (LONG)backBufferDesc.Height)
+		{
+			isClamped = true;
+			point.y = (LONG)backBufferDesc.Height;
+		}
+
+		return isClamped;
+	}
+
+	void DXDevice::NormaliseCoordinates(POINT& point, float& x, float& y)
+	{
+		x = (float)point.x / (float)backBufferDesc.Width;
+		y = (float)point.y / (float)backBufferDesc.Height;
+	}
+
 	void DXDevice::CreateDeviceAndSwapchain()
 	{
 		HRESULT hr;

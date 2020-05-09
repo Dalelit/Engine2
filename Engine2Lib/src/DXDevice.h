@@ -38,6 +38,13 @@ namespace Engine2
 
 		void LogDebugInfo();
 
+		inline HWND GetWindowHandle() { return hwnd; }
+		inline UINT GetWidth()        { return backBufferDesc.Width; }
+		inline UINT GetHeight()       { return backBufferDesc.Height; }
+
+		bool ScreenToClientClamped(POINT& point); // returns true if the point was clamped to the client area
+		void NormaliseCoordinates(POINT& point, float& x, float& y); // convert to NDC
+
 		// helper function to update a buffer
 		template <typename T>
 		static void UpdateBuffer(ID3D11Buffer* pBuffer, std::vector<T>& source) {
