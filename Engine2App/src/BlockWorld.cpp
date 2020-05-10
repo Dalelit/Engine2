@@ -41,24 +41,24 @@ void BlockWorld::OnUpdate(float dt)
 	
 	if (pNewHitBlock) // if hit
 	{
+		hitLocation = ray.origin + ray.direction * hitDistance;
+
+		hitBlockIndx.x = (INT)hitBlockCentre.x;
+		hitBlockIndx.y = (INT)hitBlockCentre.y;
+		hitBlockIndx.z = (INT)hitBlockCentre.z;
+
 		if (pNewHitBlock != pHitBlock) // and it is a different or new block
 		{
-			if (pHitBlock) // if we had a previously hit one, revert it
-			{
-				pHitBlock->type = hitBlockType;
-			}
-
 			pHitBlock = pNewHitBlock;
-			hitBlockType = pHitBlock->type;
-			pHitBlock->type = BlockType::selected;
 			instancesDirty = true;
 		}
+
+		SetNextBlockIndx();
 	}
 	else
 	{
 		if (pHitBlock) // nothing hit, and if we had a previously hit one revert it
 		{
-			pHitBlock->type = hitBlockType;
 			pHitBlock = nullptr;
 			instancesDirty = true;
 		}
@@ -83,11 +83,22 @@ void BlockWorld::OnRender()
 	pVB->Draw(instanceCount);
 }
 
+void BlockWorld::OnInputEvent(InputEvent& event)
+{
+	EventDispatcher dispatcher(event);
+
+	dispatcher.Dispatch<MouseButtonReleasedEvent>(E2_BIND_EVENT_FUNC(BlockWorld::MouseButtonReleased));
+}
+
 void BlockWorld::OnImgui()
 {
 	if (pHitBlock)
 	{
 		ImGui::Text("Ray hit. Distance %.3f", hitDistance);
+		ImGui::InputInt3("Hit block index", &hitBlockIndx.x);
+		ImGui::InputInt3("New block", &nextBlockIndx.x);
+		ImGui::InputFloat3("Hit location", hitLocation.m128_f32);
+		ImGui::InputFloat3("Hit block centre", &hitBlockCentre.x);
 	}
 	else
 	{
@@ -120,13 +131,13 @@ BlockWorld::Block* BlockWorld::RayHit(Engine2::Ray& ray, float& distance)
 
 		// go through all the blocks
 		aabb.Center.z = halfSize;
-		for (UINT32 z = 0; z < segment.deep; z++)
+		for (INT32 z = 0; z < segment.deep; z++)
 		{
 			aabb.Center.y = halfSize;
-			for (UINT32 y = 0; y < segment.high; y++)
+			for (INT32 y = 0; y < segment.high; y++)
 			{
 				aabb.Center.x = halfSize;
-				for (UINT32 x = 0; x < segment.wide; x++)
+				for (INT32 x = 0; x < segment.wide; x++)
 				{
 					if (pBlock->type != BlockType::empty)
 					{
@@ -139,6 +150,7 @@ BlockWorld::Block* BlockWorld::RayHit(Engine2::Ray& ray, float& distance)
 								// closer hit block
 								pHitBlock = pBlock;
 								distance = newHitDist;
+								hitBlockCentre = aabb.Center;
 
 								// break if this hit dist is the segment hit as that's closest
 								if (newHitDist == segHitDist) return pHitBlock;
@@ -160,6 +172,51 @@ BlockWorld::Block* BlockWorld::RayHit(Engine2::Ray& ray, float& distance)
 	return nullptr;
 }
 
+void BlockWorld::SetNextBlockIndx()
+{
+	XMFLOAT3 diff = { hitLocation.m128_f32[0] - hitBlockCentre.x, hitLocation.m128_f32[1] - hitBlockCentre.y, hitLocation.m128_f32[2] - hitBlockCentre.z };
+	nextBlockIndx = hitBlockIndx;
+
+	// Depending on the diff, determine the direciton of the newBlock.
+	// Note: 0.5f isn't always the number, so use 0.499999523 instead
+	if (diff.x >= 0.499999523f) nextBlockIndx.x++;
+	else if (diff.x <= -0.499999523f) nextBlockIndx.x--;
+	else if (diff.y >= 0.499999523f) nextBlockIndx.y++;
+	else if (diff.y <= -0.499999523f) nextBlockIndx.y--;
+	else if (diff.z >= 0.499999523f) nextBlockIndx.z++;
+	else if (diff.z <= -0.499999523f) nextBlockIndx.z--;
+}
+
+void BlockWorld::AddNextBlock()
+{
+	Block* pBlock = GetBlock(nextBlockIndx);
+
+	if (pBlock)
+	{
+		E2_ASSERT(pBlock->type == BlockType::empty, "Expected the next block to be empty");
+
+		pBlock->type = BlockType::grass;
+		instancesDirty = true;
+		pHitBlock = nullptr;
+	}
+}
+
+BlockWorld::Block* BlockWorld::GetBlock(DirectX::XMINT3& index)
+{
+	if (index.x < 0 || index.y < 0 || index.z < 0) return nullptr;
+	if (index.x >= segment.wide || index.y >= segment.high || index.z >= segment.deep) return nullptr;
+
+	return &blocks[index.z * segment.slice + index.y * segment.stride + index.x];
+}
+
+void BlockWorld::MouseButtonReleased(Engine2::MouseButtonReleasedEvent& event)
+{
+	if (event.Right() && pHitBlock)
+	{
+		AddNextBlock();
+	}
+}
+
 void BlockWorld::InitialiseBlocks()
 {
 	blocks.resize(segment.total);
@@ -172,13 +229,13 @@ void BlockWorld::InitialiseBlocks()
 	float distBound = pow(( segment.stride * 0.75f ), 2.0f); // temp hack
 
 	zpos = 0.0f;
-	for (UINT32 z = 0; z < segment.deep; z++)
+	for (INT32 z = 0; z < segment.deep; z++)
 	{
 		ypos = 0.0f;
-		for (UINT32 y = 0; y < segment.high; y++)
+		for (INT32 y = 0; y < segment.high; y++)
 		{
 			xpos = 0.0f;
-			for (UINT32 x = 0; x < segment.wide; x++)
+			for (INT32 x = 0; x < segment.wide; x++)
 			{
 				//pBlock->location = { xpos, ypos, zpos };
 
@@ -217,13 +274,13 @@ void BlockWorld::UpdateInstances()
 
 
 	zpos = 0.0f;
-	for (UINT32 z = 0; z < segment.deep; z++)
+	for (INT32 z = 0; z < segment.deep; z++)
 	{
 		ypos = 0.0f;
-		for (UINT32 y = 0; y < segment.high; y++)
+		for (INT32 y = 0; y < segment.high; y++)
 		{
 			xpos = 0.0f;
-			for (UINT32 x = 0; x < segment.wide; x++)
+			for (INT32 x = 0; x < segment.wide; x++)
 			{
 				if (pBlock->type != BlockType::empty)
 				{

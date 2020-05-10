@@ -8,7 +8,7 @@ class BlockWorld : public Engine2::Layer
 {
 public:
 	enum BlockType : unsigned char {
-		empty, selected, ground, grass
+		empty, ground, grass
 	};
 
 	struct Block {
@@ -20,18 +20,20 @@ public:
 
 	void OnUpdate(float dt);
 	void OnRender();
+	void OnInputEvent(Engine2::InputEvent& event);
 	void OnImgui();
 
 	Block* RayHit(Engine2::Ray& ray, float& distance);
 
 protected:
 	Engine2::Scene scene;
+	void MouseButtonReleased(Engine2::MouseButtonReleasedEvent& event);
 
 	struct {
-		UINT32 wide = 10;
-		UINT32 high = 10;
-		UINT32 deep = 10;
-		UINT32 total, stride, slice;
+		INT32 wide = 10;
+		INT32 high = 10;
+		INT32 deep = 10;
+		INT32 total, stride, slice;
 		float cubeSize = 1.0f;
 		DirectX::BoundingBox bounds;
 	} segment;
@@ -58,7 +60,14 @@ protected:
 	// manage the selected block
 	float hitDistance;
 	Block* pHitBlock = nullptr;
-	BlockType hitBlockType;
+	DirectX::XMVECTOR hitLocation;
+	DirectX::XMFLOAT3 hitBlockCentre;
+	DirectX::XMINT3   hitBlockIndx;
+	DirectX::XMINT3   nextBlockIndx;
+
+	void SetNextBlockIndx();
+	void AddNextBlock();
+	Block* GetBlock(DirectX::XMINT3& index);
 
 	// stats
 	unsigned long instanceUpdateCount = 0;
