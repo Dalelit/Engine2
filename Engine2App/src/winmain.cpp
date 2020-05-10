@@ -121,9 +121,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			if (wParam == VK_ESCAPE) PostQuitMessage(0); // to do: put exit controls into the engine
 
-			//Engine2::KeyPressedEvent event(wParam, (UINT32)(lParam & 0x00ff));
-			//E2_OUTPUT_DEBUG(event.ToString().c_str());
-			//OnInputEventFunc(event);
+			Engine2::KeyPressedEvent event((UINT32)wParam, (UINT32)(lParam & 0x00ff));
+			OnInputEventFunc(event);
 			break;
 		}
 
@@ -155,25 +154,37 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		}
 		case WM_LBUTTONDOWN:
 		{
-			Engine2::MouseButtonPressedEvent event(true, false, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+			Engine2::MouseButtonPressedEvent event(true, false, false, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 			OnInputEventFunc(event);
 			break;
 		}
 		case WM_LBUTTONUP:
 		{
-			Engine2::MouseButtonReleasedEvent event(true, false, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+			Engine2::MouseButtonReleasedEvent event(true, false, false, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 			OnInputEventFunc(event);
 			break;
 		}
 		case WM_RBUTTONDOWN:
 		{
-			Engine2::MouseButtonPressedEvent event(false, true, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+			Engine2::MouseButtonPressedEvent event(false, true, false, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 			OnInputEventFunc(event);
 			break;
 		}
 		case WM_RBUTTONUP:
 		{
-			Engine2::MouseButtonReleasedEvent event(false, true, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+			Engine2::MouseButtonReleasedEvent event(false, true, false, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+			OnInputEventFunc(event);
+			break;
+		}
+		case WM_MBUTTONDOWN:
+		{
+			Engine2::MouseButtonPressedEvent event(false, false, true, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+			OnInputEventFunc(event);
+			break;
+		}
+		case WM_MBUTTONUP:
+		{
+			Engine2::MouseButtonReleasedEvent event(false, false, true, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 			OnInputEventFunc(event);
 			break;
 		}

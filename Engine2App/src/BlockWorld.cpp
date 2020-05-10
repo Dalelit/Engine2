@@ -25,6 +25,8 @@ BlockWorld::BlockWorld() : Layer("BlockWorld")
 	Engine::GetActiveCamera().SetPosition(10.0f, 12.0f, -5.0f);
 	Engine::GetActiveCamera().LookAt((float)segment.stride / 2.0f, (float)segment.stride / 2.0f, (float)segment.stride / 2.0f);
 	//Engine::GetActiveCamera().LookAt(0.0f, 0.0f, 0.0f);
+
+	Engine::Get().inputController.State.MouseLook = true;
 }
 
 BlockWorld::~BlockWorld()
@@ -35,7 +37,11 @@ void BlockWorld::OnUpdate(float dt)
 {
 	scene.OnUpdate(dt);
 
-	Ray ray = Engine::Get().inputController.GetRayFromMouse();
+	Ray ray;
+	if (Engine::Get().inputController.State.MouseLook)
+		ray = Engine::Get().inputController.GetRayForward();
+	else
+		ray = Engine::Get().inputController.GetRayFromMouse();
 
 	Block* pNewHitBlock = RayHit(ray, hitDistance);
 	
@@ -88,6 +94,7 @@ void BlockWorld::OnInputEvent(InputEvent& event)
 	EventDispatcher dispatcher(event);
 
 	dispatcher.Dispatch<MouseButtonReleasedEvent>(E2_BIND_EVENT_FUNC(BlockWorld::MouseButtonReleased));
+	dispatcher.Dispatch<KeyPressedEvent>(E2_BIND_EVENT_FUNC(BlockWorld::KeyPressed));
 }
 
 void BlockWorld::OnImgui()
@@ -215,6 +222,11 @@ void BlockWorld::MouseButtonReleased(Engine2::MouseButtonReleasedEvent& event)
 	{
 		AddNextBlock();
 	}
+}
+
+void BlockWorld::KeyPressed(Engine2::KeyPressedEvent& event)
+{
+	if (event.GetKey() == 'M') Engine::Get().inputController.State.MouseLook = !Engine::Get().inputController.State.MouseLook;
 }
 
 void BlockWorld::InitialiseBlocks()

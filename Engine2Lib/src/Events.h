@@ -76,7 +76,7 @@ namespace Engine2
 	class MouseButtonPressedEvent : public InputEvent
 	{
 	public:
-		MouseButtonPressedEvent(bool left, bool right, UINT32 x, UINT32 y) : left(left), right(right), x(x), y(y) {}
+		MouseButtonPressedEvent(bool left, bool right, bool middle, UINT32 x, UINT32 y) : left(left), right(right), middle(middle), x(x), y(y) {}
 		EventType GetType() override { return GetStaticType(); }
 		EventGroup GetGroup() override { return EventGroup::Mouse; }
 		static EventType GetStaticType() { return EventType::MouseButtonPressed; }
@@ -84,20 +84,21 @@ namespace Engine2
 
 		bool Left() { return left; }
 		bool Right() { return right; }
+		bool Middle() { return middle; }
 		int GetX() { return x; }
 		int GetY() { return y; }
 
 		std::string ToString() const { std::stringstream ss; ss << "MouseButtonPressed " << (left ? "left " : "") << (right ? "right " : "") << x << "," << y; return ss.str(); }
 
 	protected:
-		bool left, right;
+		bool left, right, middle;
 		int x, y;
 	};
 
 	class MouseButtonReleasedEvent : public InputEvent
 	{
 	public:
-		MouseButtonReleasedEvent(bool left, bool right, UINT32 x, UINT32 y) : left(left), right(right), x(x), y(y) {}
+		MouseButtonReleasedEvent(bool left, bool right, bool middle, UINT32 x, UINT32 y) : left(left), right(right), middle(middle), x(x), y(y) {}
 		EventType GetType() override { return GetStaticType(); }
 		EventGroup GetGroup() override { return EventGroup::Mouse; }
 		static EventType GetStaticType() { return EventType::MouseButtonReleased; }
@@ -105,13 +106,14 @@ namespace Engine2
 
 		bool Left() { return left; }
 		bool Right() { return right; }
+		bool Middle() { return middle; }
 		int GetX() { return x; }
 		int GetY() { return y; }
 
 		std::string ToString() const { std::stringstream ss; ss << "MouseButtonReleased " << (left ? "left " : "") << (right ? "right " : "") << x << "," << y; return ss.str(); }
 
 	protected:
-		bool left, right;
+		bool left, right, middle;
 		int x, y;
 	};
 
@@ -143,6 +145,8 @@ namespace Engine2
 		EventGroup GetGroup() override { return EventGroup::Keyboard; }
 		static EventType GetStaticType() { return EventType::KeyPressed; }
 		const char* GetName() const override { return "KeyPressed"; }
+
+		inline UINT32 GetKey() { return key; }
 
 		std::string ToString() const { std::stringstream ss; ss << "KeyPressed " << (char)key << " repeat " << repeat; return ss.str(); }
 

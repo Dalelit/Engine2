@@ -52,20 +52,22 @@ namespace Engine2
 
 	void InputController::OnMouseMove(MouseMoveEvent& event)
 	{
-		if (State.LeftMouseDown)  pCamera->Rotate((float)event.GetX() * MovementConfiguration.yawSpeed, (float)event.GetY() * MovementConfiguration.pitchSpeed);
-		if (State.RightMouseDown) pCamera->Move(0.0f, (float)event.GetX() * -MovementConfiguration.mouseMoveSpeed, (float)event.GetY() * MovementConfiguration.mouseMoveSpeed);
+		if (State.MouseLook || State.LeftMouseDown)  pCamera->Rotate((float)event.GetX() * MovementConfiguration.yawSpeed, (float)event.GetY() * MovementConfiguration.pitchSpeed);
+		if (State.MiddleMouseDown) pCamera->Move(0.0f, (float)event.GetX() * MovementConfiguration.mouseMoveSpeedX, (float)event.GetY() * MovementConfiguration.mouseMoveSpeedY);
 	}
 
 	void InputController::OnMouseButtonPressed(MouseButtonPressedEvent& event)
 	{
 		if (event.Left()) State.LeftMouseDown = true;
 		if (event.Right()) State.RightMouseDown = true;
+		if (event.Middle()) State.MiddleMouseDown = true;
 	}
 
 	void InputController::OnMouseButtonReleased(MouseButtonReleasedEvent& event)
 	{
 		if (event.Left()) State.LeftMouseDown = false;
 		if (event.Right()) State.RightMouseDown = false;
+		if (event.Middle()) State.MiddleMouseDown = false;
 	}
 
 	void InputController::OnMouseScroll(MouseScrollEvent& event)
@@ -92,15 +94,17 @@ namespace Engine2
 				ImGui::Text("Down   : %c", KeyboardConfiguration.down);
 				ImGui::Text("Quit   : ESC");
 				ImGui::Text("Run    : Hold Shift");
-				ImGui::Text("Right mouse hold: look");
-				ImGui::Text("Left  mouse hold: pan");
+				ImGui::Checkbox("Mouse look", &State.MouseLook);
+				if (!State.MouseLook) ImGui::Text("Right mouse hold: look");
+				ImGui::Text("Middle mouse hold: pan");
 				ImGui::Text("Mouse scroll: move Forward/Back");
 			}
 
 			if (ImGui::CollapsingHeader("Movement configuration"))
 			{
 				ImGui::DragFloat("Move speed", &MovementConfiguration.moveSpeed);
-				ImGui::DragFloat("Mouse move speed", &MovementConfiguration.mouseMoveSpeed);
+				ImGui::DragFloat("Mouse move speed x", &MovementConfiguration.mouseMoveSpeedX);
+				ImGui::DragFloat("Mouse move speed y", &MovementConfiguration.mouseMoveSpeedY);
 				ImGui::DragFloat("Mouse scroll speed", &MovementConfiguration.mouseScrollSpeed);
 				ImGui::DragFloat("Run multiplier", &MovementConfiguration.runMultiplier);
 				ImGui::DragFloat("Yaw speed", &MovementConfiguration.yawSpeed);
@@ -109,9 +113,10 @@ namespace Engine2
 
 			if (ImGui::CollapsingHeader("Input State"))
 			{
-				if (State.LeftMouseDown)  ImGui::Text("Left Mousebutton down"); else  ImGui::Text("Left Mousebutton up");
-				if (State.RightMouseDown) ImGui::Text("Right Mousebutton down"); else  ImGui::Text("Right Mousebutton up");
-				if (State.WindowFocused)  ImGui::Text("Window active"); else  ImGui::Text("Window inactive");
+				if (State.LeftMouseDown)   ImGui::Text("Left Mousebutton down"); else  ImGui::Text("Left Mousebutton up");
+				if (State.RightMouseDown)  ImGui::Text("Right Mousebutton down"); else  ImGui::Text("Right Mousebutton up");
+				if (State.MiddleMouseDown) ImGui::Text("Middle Mousebutton down"); else  ImGui::Text("Middle Mousebutton up");
+				if (State.WindowFocused)   ImGui::Text("Window active"); else  ImGui::Text("Window inactive");
 				ImGui::Text("Mouse client position: (%i, %i)", State.MouseClientPosition.x, State.MouseClientPosition.y);
 				ImGui::Text("Mouse client normalised: (%.3f, %.3f)", State.MouseNormaliseCoordinates.x, State.MouseNormaliseCoordinates.y);
 				if (State.MouseOffScreen) ImGui::Text("Mouse is off screen"); else ImGui::Text("Mouse is on screen");

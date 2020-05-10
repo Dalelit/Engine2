@@ -28,6 +28,7 @@ public:
 protected:
 	Engine2::Scene scene;
 	void MouseButtonReleased(Engine2::MouseButtonReleasedEvent& event);
+	void KeyPressed(Engine2::KeyPressedEvent& event);
 
 	struct {
 		INT32 wide = 10;

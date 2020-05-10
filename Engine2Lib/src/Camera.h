@@ -44,6 +44,8 @@ namespace Engine2
 		// Origin is the relative point on the screen (0,0) to (1,1). NDC have top left as origin.
 		Ray ScreenCoordToRay(float x, float y);
 
+		Ray ForwardDirectionRay();
+
 	protected:
 		std::string name;
 		float aspectRatio = 1.0f;

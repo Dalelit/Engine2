@@ -82,4 +82,9 @@ namespace Engine2
 
 		return ray;
 	}
+
+	Ray Camera::ForwardDirectionRay()
+	{
+		return { position + nearZ * direction, direction };
+	}
 }

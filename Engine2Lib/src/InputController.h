@@ -25,7 +25,8 @@ namespace Engine2
 
 		struct {
 			float moveSpeed = 1.0f;
-			float mouseMoveSpeed = 0.01f;
+			float mouseMoveSpeedX = -0.01f;
+			float mouseMoveSpeedY = -0.01f;
 			float mouseScrollSpeed = 0.5f;
 			float runMultiplier = 3.0f;
 			float yawSpeed = 0.001f;
@@ -35,7 +36,9 @@ namespace Engine2
 		struct {
 			bool LeftMouseDown  = false;
 			bool RightMouseDown = false;
+			bool MiddleMouseDown = false;
 			bool WindowFocused  = true;
+			bool MouseLook = false;
 			struct { UINT32 x, y; } MouseClientPosition;
 			struct { float x, y; }  MouseNormaliseCoordinates;
 			bool MouseOffScreen;
@@ -48,6 +51,7 @@ namespace Engine2
 
 		inline void SetCamera(Camera* ptr) { pCamera = ptr; }
 		inline Ray GetRayFromMouse() { return pCamera->ScreenCoordToRay(State.MouseNormaliseCoordinates.x, State.MouseNormaliseCoordinates.y); }
+		inline Ray GetRayForward()   { return pCamera->ForwardDirectionRay(); }
 
 		bool IsKeyPressed(int vKeyCode);
 
