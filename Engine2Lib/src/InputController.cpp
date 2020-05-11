@@ -80,6 +80,23 @@ namespace Engine2
 		State.WindowFocused = event.IsActive();
 	}
 
+	// to do : need to support window move and size change to update the clip rect
+	// to do : need to fix the clip rect going over the title bar
+	void InputController::UpdateCursorClipping()
+	{
+		if (State.ClipCursor)
+		{
+			HWND hwnd = DXDevice::Get().GetWindowHandle();
+			RECT rect;
+			GetClientRect(hwnd, &rect);
+			ClipCursor(&rect);
+		}
+		else
+		{
+			ClipCursor(nullptr);
+		}
+	}
+
 	void InputController::ImguiWindow(bool* pOpen)
 	{
 		if (ImGui::Begin("Input Controller", pOpen))
@@ -95,6 +112,7 @@ namespace Engine2
 				ImGui::Text("Quit   : ESC");
 				ImGui::Text("Run    : Hold Shift");
 				ImGui::Checkbox("Mouse look", &State.MouseLook);
+				if (ImGui::Checkbox("Clip cursor", &State.ClipCursor)) UpdateCursorClipping();
 				if (!State.MouseLook) ImGui::Text("Right mouse hold: look");
 				ImGui::Text("Middle mouse hold: pan");
 				ImGui::Text("Mouse scroll: move Forward/Back");

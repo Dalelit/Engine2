@@ -36,5 +36,7 @@
     <FxCompile Include="Assets\Materials\ParticlePSTest.hlsl" />
     <FxCompile Include="Assets\Materials\BlockWorldPS.hlsl" />
     <FxCompile Include="Assets\Materials\BlockWorldVS.hlsl" />
+    <FxCompile Include="Assets\Materials\BlockWorldHighlightPS.hlsl" />
+    <FxCompile Include="Assets\Materials\BlockWorldHighlightVS.hlsl" />
   </ItemGroup>
 </Project>

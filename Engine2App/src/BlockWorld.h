@@ -57,6 +57,19 @@ protected:
 	std::shared_ptr<Engine2::DrawableInstanced> pVB;
 	ID3D11Buffer* instanceBuffer;
 	void CreateVertexBuffer();
+
+	struct {
+		std::shared_ptr<Engine2::VertexShaderDynamic> pVS;
+		std::shared_ptr<Engine2::PixelShaderDynamic> pPS;
+		std::shared_ptr<Engine2::Drawable> pVB;
+		std::shared_ptr<Engine2::VSConstantBuffer<DirectX::XMVECTOR>> pVSCB;
+		std::shared_ptr<Engine2::PSConstantBuffer<DirectX::XMVECTOR>> pPSCB;
+		wrl::ComPtr<ID3D11DepthStencilState> pBackDrawDSS;
+		DirectX::XMVECTOR color = { 1.0f, 1.0f, 0.0f, 1.0f };
+		DirectX::XMVECTOR hiddenColor = { 0.3f, 0.3f, 0.0f, 1.0f };
+		DirectX::XMVECTOR nextColor = { 0.8f, 0.8f, 0.8f, 1.0f };
+	} highlighter;
+	void CreateVertexBufferHighlight();
 	
 	// manage the selected block
 	float hitDistance;
@@ -65,9 +78,11 @@ protected:
 	DirectX::XMFLOAT3 hitBlockCentre;
 	DirectX::XMINT3   hitBlockIndx;
 	DirectX::XMINT3   nextBlockIndx;
+	DirectX::XMFLOAT3 nextBlockCentre;
 
 	void SetNextBlockIndx();
 	void AddNextBlock();
+	void RemoveBlock();
 	Block* GetBlock(DirectX::XMINT3& index);
 
 	// stats

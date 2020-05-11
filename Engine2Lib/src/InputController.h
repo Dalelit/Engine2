@@ -39,6 +39,7 @@ namespace Engine2
 			bool MiddleMouseDown = false;
 			bool WindowFocused  = true;
 			bool MouseLook = false;
+			bool ClipCursor = false; // note: call method rather than update directly
 			struct { UINT32 x, y; } MouseClientPosition;
 			struct { float x, y; }  MouseNormaliseCoordinates;
 			bool MouseOffScreen;
@@ -55,6 +56,8 @@ namespace Engine2
 
 		bool IsKeyPressed(int vKeyCode);
 
+		void SetCursorClipping(bool clipped) { State.ClipCursor = clipped; UpdateCursorClipping(); }
+
 	protected:
 		Camera* pCamera;
 
@@ -63,5 +66,7 @@ namespace Engine2
 		void OnMouseButtonReleased(MouseButtonReleasedEvent& event);
 		void OnMouseScroll(MouseScrollEvent& event);
 		void OnWindowFocus(WindowFocusEvent& event);
+
+		void UpdateCursorClipping();
 	};
 }

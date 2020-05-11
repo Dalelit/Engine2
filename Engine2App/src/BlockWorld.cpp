@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "BlockWorld.h"
 #include "Engine2.h"
+#include "VertexBuffer.h"
 
 using namespace Engine2;
 using namespace DirectX;
@@ -21,12 +22,14 @@ BlockWorld::BlockWorld() : Layer("BlockWorld")
 	InitialiseBlocks();
 
 	CreateVertexBuffer();
+	CreateVertexBufferHighlight();
 
 	Engine::GetActiveCamera().SetPosition(10.0f, 12.0f, -5.0f);
 	Engine::GetActiveCamera().LookAt((float)segment.stride / 2.0f, (float)segment.stride / 2.0f, (float)segment.stride / 2.0f);
 	//Engine::GetActiveCamera().LookAt(0.0f, 0.0f, 0.0f);
 
 	Engine::Get().inputController.State.MouseLook = true;
+	Engine::Get().inputController.MovementConfiguration.moveSpeed = 10.0f;
 }
 
 BlockWorld::~BlockWorld()
@@ -87,6 +90,30 @@ void BlockWorld::OnRender()
 	pPS->Bind();
 	pVB->Bind();
 	pVB->Draw(instanceCount);
+
+	if (pHitBlock)
+	{
+		highlighter.pVSCB->data = XMLoadFloat3(&hitBlockCentre);
+		highlighter.pVSCB->Bind();
+		highlighter.pVS->Bind();
+		highlighter.pPSCB->data = highlighter.color;
+		highlighter.pPSCB->Bind();
+		highlighter.pPS->Bind();
+		highlighter.pVB->BindAndDraw();
+
+		DXDevice::GetContext().OMSetDepthStencilState(highlighter.pBackDrawDSS.Get(), 0);
+		highlighter.pPSCB->data = highlighter.hiddenColor;
+		highlighter.pPSCB->Bind();
+		highlighter.pVB->Draw();
+
+		DXDevice::Get().SetDefaultDepthStencilState(); // revert back to default
+
+		highlighter.pVSCB->data = XMLoadFloat3(&nextBlockCentre);
+		highlighter.pVSCB->Bind();
+		highlighter.pPSCB->data = highlighter.nextColor;
+		highlighter.pPSCB->Bind();
+		highlighter.pVB->Draw();
+	}
 }
 
 void BlockWorld::OnInputEvent(InputEvent& event)
@@ -183,15 +210,43 @@ void BlockWorld::SetNextBlockIndx()
 {
 	XMFLOAT3 diff = { hitLocation.m128_f32[0] - hitBlockCentre.x, hitLocation.m128_f32[1] - hitBlockCentre.y, hitLocation.m128_f32[2] - hitBlockCentre.z };
 	nextBlockIndx = hitBlockIndx;
+	nextBlockCentre = hitBlockCentre;
 
-	// Depending on the diff, determine the direciton of the newBlock.
-	// Note: 0.5f isn't always the number, so use 0.499999523 instead
-	if (diff.x >= 0.499999523f) nextBlockIndx.x++;
-	else if (diff.x <= -0.499999523f) nextBlockIndx.x--;
-	else if (diff.y >= 0.499999523f) nextBlockIndx.y++;
-	else if (diff.y <= -0.499999523f) nextBlockIndx.y--;
-	else if (diff.z >= 0.499999523f) nextBlockIndx.z++;
-	else if (diff.z <= -0.499999523f) nextBlockIndx.z--;
+	float xabs = fabsf(diff.x);
+	float yabs = fabsf(diff.y);
+	float zabs = fabsf(diff.z);
+
+	if (xabs > yabs)
+	{
+		if (xabs > zabs)
+		{
+			// x biggest diff
+			if (diff.x > 0.0f) { nextBlockIndx.x++; nextBlockCentre.x += segment.cubeSize; }
+			else               { nextBlockIndx.x--; nextBlockCentre.x -= segment.cubeSize; }
+		}
+		else
+		{
+			// z biggest diff
+			if (diff.z > 0.0f) { nextBlockIndx.z++; nextBlockCentre.z += segment.cubeSize; }
+			else { nextBlockIndx.z--; nextBlockCentre.z -= segment.cubeSize; }
+		}
+	}
+	else // y > x
+	{
+		if (yabs > zabs)
+		{
+			// y biggest diff
+			if (diff.y > 0.0f) { nextBlockIndx.y++; nextBlockCentre.y += segment.cubeSize; }
+			else               { nextBlockIndx.y--; nextBlockCentre.y -= segment.cubeSize; }
+		}
+		else
+		{
+			// z biggest diff
+			if (diff.z > 0.0f) { nextBlockIndx.z++; nextBlockCentre.z += segment.cubeSize; }
+			else               { nextBlockIndx.z--; nextBlockCentre.z -= segment.cubeSize; }
+		}
+	}
+
 }
 
 void BlockWorld::AddNextBlock()
@@ -208,6 +263,11 @@ void BlockWorld::AddNextBlock()
 	}
 }
 
+void BlockWorld::RemoveBlock()
+{
+	pHitBlock->type = BlockType::empty;
+}
+
 BlockWorld::Block* BlockWorld::GetBlock(DirectX::XMINT3& index)
 {
 	if (index.x < 0 || index.y < 0 || index.z < 0) return nullptr;
@@ -218,15 +278,35 @@ BlockWorld::Block* BlockWorld::GetBlock(DirectX::XMINT3& index)
 
 void BlockWorld::MouseButtonReleased(Engine2::MouseButtonReleasedEvent& event)
 {
-	if (event.Right() && pHitBlock)
+	if (pHitBlock)
 	{
-		AddNextBlock();
+		if (event.Right())
+		{
+			AddNextBlock();
+		}
+		else if (event.Left())
+		{
+			RemoveBlock();
+		}
 	}
 }
 
 void BlockWorld::KeyPressed(Engine2::KeyPressedEvent& event)
 {
-	if (event.GetKey() == 'M') Engine::Get().inputController.State.MouseLook = !Engine::Get().inputController.State.MouseLook;
+	if (event.GetKey() == 'M')
+	{
+		auto& ic = Engine::Get().inputController;
+		if (ic.State.MouseLook)
+		{
+			ic.State.MouseLook = false;
+			ic.SetCursorClipping(false);
+		}
+		else
+		{
+			ic.State.MouseLook = true;
+			ic.SetCursorClipping(true);
+		}
+	}
 }
 
 void BlockWorld::InitialiseBlocks()
@@ -372,4 +452,40 @@ void BlockWorld::CreateVertexBuffer()
 	auto pVBI = std::make_shared<TriangleListIndexInstanced<Vertex, InstanceInfo>>(verticies, indicies);
 	instanceBuffer = pVBI->AddInstances(instances, true);
 	pVB = pVBI;
+
+}
+
+void BlockWorld::CreateVertexBufferHighlight()
+{
+	std::vector<D3D11_INPUT_ELEMENT_DESC> vsLayout = {
+		{"Position", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
+	};
+
+	float extents = 0.501f;
+	std::vector<XMFLOAT3> verticies = {
+		{-extents, -extents, -extents},
+		{extents, -extents, -extents},
+		{extents, extents, -extents},
+		{-extents, extents, -extents},
+		{-extents, -extents, extents},
+		{extents, -extents, extents},
+		{extents, extents, extents},
+		{-extents, extents, extents},
+	};
+
+	std::vector<unsigned int> indicies = {
+		0,1,1,2,2,3,3,0,
+		4,5,5,6,6,7,7,4,
+		0,4,1,5,2,6,3,7,
+	};
+
+	highlighter.pVS = std::make_shared<VertexShaderDynamic>(Config::directories["ShaderSourceDir"] + "BlockWorldHighlightVS.hlsl", vsLayout);
+	highlighter.pPS = std::make_shared<PixelShaderDynamic>(Config::directories["ShaderSourceDir"] + "BlockWorldHighlightPS.hlsl");
+	highlighter.pVB = std::make_shared<WireframeIndexList<XMFLOAT3>>(verticies, indicies);
+	highlighter.pVSCB = std::make_shared<VSConstantBuffer<XMVECTOR>>(1);
+	highlighter.pPSCB = std::make_shared<PSConstantBuffer<XMVECTOR>>(0);
+
+	D3D11_DEPTH_STENCIL_DESC desc = CD3D11_DEPTH_STENCIL_DESC(CD3D11_DEFAULT());
+	desc.DepthFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_GREATER;
+	DXDevice::GetDevice().CreateDepthStencilState(&desc, &highlighter.pBackDrawDSS);
 }
