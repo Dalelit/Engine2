@@ -1,10 +1,15 @@
 #include "pch.h"
 #include "InputController.h"
-#include "DXDevice.h"
 #include <Windows.h>
 
 namespace Engine2
 {
+
+	InputController::InputController()
+	{
+		UpdateRects();
+	}
+
 	void InputController::OnUpdate(float dt)
 	{
 		if (!State.WindowFocused) return; // ignore input when window is not focused
@@ -47,6 +52,8 @@ namespace Engine2
 	{
 		EventDispatcher dispatcher(event);
 
+		dispatcher.Dispatch<WindowMoveEvent>(E2_BIND_EVENT_FUNC(InputController::OnWindowMove));
+		dispatcher.Dispatch<WindowResizeEvent>(E2_BIND_EVENT_FUNC(InputController::OnWindowResize));
 		dispatcher.Dispatch<WindowFocusEvent>(E2_BIND_EVENT_FUNC(InputController::OnWindowFocus));
 	}
 
@@ -75,6 +82,18 @@ namespace Engine2
 		pCamera->Move((float)event.GetDelta() * MovementConfiguration.mouseScrollSpeed, 0.0f, 0.0f);
 	}
 
+	void InputController::OnWindowMove(WindowMoveEvent& event)
+	{
+		UpdateRects();
+		UpdateCursorClipping();
+	}
+
+	void InputController::OnWindowResize(WindowResizeEvent& event)
+	{
+		UpdateRects();
+		UpdateCursorClipping();
+	}
+
 	void InputController::OnWindowFocus(WindowFocusEvent& event)
 	{
 		State.WindowFocused = event.IsActive();
@@ -86,15 +105,21 @@ namespace Engine2
 	{
 		if (State.ClipCursor)
 		{
-			HWND hwnd = DXDevice::Get().GetWindowHandle();
-			RECT rect;
-			GetClientRect(hwnd, &rect);
-			ClipCursor(&rect);
+			ClipCursor(&State.clientRect);
 		}
 		else
 		{
 			ClipCursor(nullptr);
 		}
+	}
+
+	void InputController::UpdateRects()
+	{
+		HWND hwnd = DXDevice::Get().GetWindowHandle();
+		GetClientRect(hwnd, &State.clientRect);
+
+		ClientToScreen(hwnd, reinterpret_cast<POINT*>(&State.clientRect.left)); // convert top-left
+		ClientToScreen(hwnd, reinterpret_cast<POINT*>(&State.clientRect.right)); // convert bottom-right
 	}
 
 	void InputController::ImguiWindow(bool* pOpen)
@@ -113,6 +138,7 @@ namespace Engine2
 				ImGui::Text("Run    : Hold Shift");
 				ImGui::Checkbox("Mouse look", &State.MouseLook);
 				if (ImGui::Checkbox("Clip cursor", &State.ClipCursor)) UpdateCursorClipping();
+				ImGui::Text("Screen client rect (%i,%i),(%i,%i)", State.clientRect.left, State.clientRect.top, State.clientRect.right, State.clientRect.bottom);
 				if (!State.MouseLook) ImGui::Text("Right mouse hold: look");
 				ImGui::Text("Middle mouse hold: pan");
 				ImGui::Text("Mouse scroll: move Forward/Back");

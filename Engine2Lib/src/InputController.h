@@ -4,12 +4,14 @@
 #include "Common.h"
 #include "Events.h"
 #include "Camera.h"
+#include "DXDevice.h"
 
 namespace Engine2
 {
 	class InputController
 	{
 	public:
+		InputController();
 		~InputController() = default;
 
 		struct {
@@ -40,6 +42,7 @@ namespace Engine2
 			bool WindowFocused  = true;
 			bool MouseLook = false;
 			bool ClipCursor = false; // note: call method rather than update directly
+			RECT clientRect; // client rect in screen coordinates
 			struct { UINT32 x, y; } MouseClientPosition;
 			struct { float x, y; }  MouseNormaliseCoordinates;
 			bool MouseOffScreen;
@@ -65,8 +68,11 @@ namespace Engine2
 		void OnMouseButtonPressed(MouseButtonPressedEvent& event);
 		void OnMouseButtonReleased(MouseButtonReleasedEvent& event);
 		void OnMouseScroll(MouseScrollEvent& event);
+		void OnWindowMove(WindowMoveEvent& event);
+		void OnWindowResize(WindowResizeEvent& event);
 		void OnWindowFocus(WindowFocusEvent& event);
 
 		void UpdateCursorClipping();
+		void UpdateRects();
 	};
 }

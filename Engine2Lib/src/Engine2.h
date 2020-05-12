@@ -19,11 +19,12 @@ namespace Engine2 {
 		static void CreateEngine(HWND hwnd);
 		inline static Engine& Get() { return *instance; }
 		inline static Camera& GetActiveCamera() { return *instance->CurrentCamera(); }
+		inline static InputController& GetInputController() { return *instance->pInputController; }
 
 		Engine(HWND hwnd);
 		~Engine();
 
-		InputController inputController;
+		std::unique_ptr<InputController> pInputController;
 
 		inline Camera* CurrentCamera() { return currentCamera; }
 		inline std::vector<std::unique_ptr<Camera>>& GetCameras() { return instance->cameras; }

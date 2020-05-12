@@ -19,6 +19,8 @@ namespace Engine2
 		imgui.Initialise(hwnd, device);
 		imguiActive = true;
 
+		pInputController = std::make_unique<InputController>();
+
 		// creates the main camera at 0, and sets the input control to use it
 		SetCurrentCamera(AddCamera("main"));
 	}
@@ -44,7 +46,7 @@ namespace Engine2
 		E2_ASSERT(indx >= 0 && indx < cameras.size(), "Trying to set camera indx past number of cameras");
 		currentCamera = cameras[indx].get();
 		currentCameraIndx = indx;
-		inputController.SetCamera(currentCamera);
+		pInputController->SetCamera(currentCamera);
 	}
 
 	Camera* Engine::GetCamera(unsigned int indx)
@@ -65,7 +67,7 @@ namespace Engine2
 		updateMemory.Set();
 		frameTime.Set(); // Tick just before present frame
 
-		inputController.OnUpdate(deltaTime);
+		pInputController->OnUpdate(deltaTime);
 
 		// update layers
 		for (auto layer : layers)
@@ -125,7 +127,7 @@ namespace Engine2
 
 	void Engine::OnApplicationEvent(ApplicationEvent& event)
 	{
-		inputController.OnApplicationEvent(event);
+		pInputController->OnApplicationEvent(event);
 
 		EventDispatcher dispacher(event);
 
@@ -143,7 +145,7 @@ namespace Engine2
 		if (event.GetGroup() == EventGroup::Mouse && ImGui::GetIO().WantCaptureMouse) return;
 		if (event.GetGroup() == EventGroup::Keyboard && ImGui::GetIO().WantCaptureKeyboard) return;
 
-		inputController.OnInputEvent(event);
+		pInputController->OnInputEvent(event);
 
 		//EventDispatcher dispacher(event);
 
@@ -184,7 +186,7 @@ namespace Engine2
 		if (drawStatsOpen) Instrumentation::Drawing::ImguiWindow(&drawStatsOpen);
 
 		static bool inputControllerOpen = true;
-		if (inputControllerOpen) inputController.ImguiWindow(&inputControllerOpen);
+		if (inputControllerOpen) pInputController->ImguiWindow(&inputControllerOpen);
 
 		static bool cameraOpen = true;
 		if (cameraOpen) ImuguiCameraWindow(&cameraOpen);

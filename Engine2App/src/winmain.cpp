@@ -109,6 +109,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			OnApplicationEventFunc(event);
 			break;
 		}
+		case WM_MOVE:
+		{
+			Engine2::WindowMoveEvent event((int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam));
+			OnApplicationEventFunc(event);
+			break;
+		}
 		case WM_ACTIVATE:
 		{
 			Engine2::WindowFocusEvent event(wParam != WA_INACTIVE, wParam == WA_CLICKACTIVE);

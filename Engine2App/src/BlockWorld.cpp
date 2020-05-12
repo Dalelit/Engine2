@@ -28,8 +28,8 @@ BlockWorld::BlockWorld() : Layer("BlockWorld")
 	Engine::GetActiveCamera().LookAt((float)segment.stride / 2.0f, (float)segment.stride / 2.0f, (float)segment.stride / 2.0f);
 	//Engine::GetActiveCamera().LookAt(0.0f, 0.0f, 0.0f);
 
-	Engine::Get().inputController.State.MouseLook = true;
-	Engine::Get().inputController.MovementConfiguration.moveSpeed = 10.0f;
+	Engine::GetInputController().State.MouseLook = true;
+	Engine::GetInputController().MovementConfiguration.moveSpeed = 10.0f;
 }
 
 BlockWorld::~BlockWorld()
@@ -41,10 +41,10 @@ void BlockWorld::OnUpdate(float dt)
 	scene.OnUpdate(dt);
 
 	Ray ray;
-	if (Engine::Get().inputController.State.MouseLook)
-		ray = Engine::Get().inputController.GetRayForward();
+	if (Engine::GetInputController().State.MouseLook)
+		ray = Engine::GetInputController().GetRayForward();
 	else
-		ray = Engine::Get().inputController.GetRayFromMouse();
+		ray = Engine::GetInputController().GetRayFromMouse();
 
 	Block* pNewHitBlock = RayHit(ray, hitDistance);
 	
@@ -126,6 +126,7 @@ void BlockWorld::OnInputEvent(InputEvent& event)
 
 void BlockWorld::OnImgui()
 {
+	ImGui::Text("Press 'M' to toggle mouse look and cursor clipping on/off.");
 	if (pHitBlock)
 	{
 		ImGui::Text("Ray hit. Distance %.3f", hitDistance);
@@ -295,7 +296,7 @@ void BlockWorld::KeyPressed(Engine2::KeyPressedEvent& event)
 {
 	if (event.GetKey() == 'M')
 	{
-		auto& ic = Engine::Get().inputController;
+		auto& ic = Engine::GetInputController();
 		if (ic.State.MouseLook)
 		{
 			ic.State.MouseLook = false;
