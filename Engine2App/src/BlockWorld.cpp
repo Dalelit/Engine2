@@ -76,6 +76,9 @@ void BlockWorld::OnUpdate(float dt)
 
 void BlockWorld::OnRender()
 {
+	offscreen.Clear();
+	offscreen.SetAsTarget();
+
 	scene.OnRender();
 
 	if (instancesDirty) // only update the buffer if something changed
@@ -114,6 +117,11 @@ void BlockWorld::OnRender()
 		highlighter.pPSCB->Bind();
 		highlighter.pVB->Draw();
 	}
+
+	offscreen.DrawToBackBuffer();
+
+	offscreen.ShowSubDisplayRenderTarget();
+	offscreen.ShowSubDisplayDepthBuffer();
 }
 
 void BlockWorld::OnInputEvent(InputEvent& event)
@@ -124,9 +132,15 @@ void BlockWorld::OnInputEvent(InputEvent& event)
 	dispatcher.Dispatch<KeyPressedEvent>(E2_BIND_EVENT_FUNC(BlockWorld::KeyPressed));
 }
 
+void BlockWorld::OnApplicationEvent(ApplicationEvent& event)
+{
+	if (event.GetType() == EventType::WindowResize) offscreen.Reconfigure();
+}
+
 void BlockWorld::OnImgui()
 {
 	ImGui::Text("Press 'M' to toggle mouse look and cursor clipping on/off.");
+	offscreen.OnImgui();
 	if (pHitBlock)
 	{
 		ImGui::Text("Ray hit. Distance %.3f", hitDistance);

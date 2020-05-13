@@ -3,6 +3,7 @@
 #include "Layer.h"
 #include "Scene.h"
 #include "Camera.h"
+#include "Offscreen.h"
 
 class BlockWorld : public Engine2::Layer
 {
@@ -21,6 +22,7 @@ public:
 	void OnUpdate(float dt);
 	void OnRender();
 	void OnInputEvent(Engine2::InputEvent& event);
+	void OnApplicationEvent(Engine2::ApplicationEvent& event);
 	void OnImgui();
 
 	Block* RayHit(Engine2::Ray& ray, float& distance);
@@ -87,4 +89,6 @@ protected:
 
 	// stats
 	unsigned long instanceUpdateCount = 0;
+
+	Engine2::OffscreenWithDepthBuffer offscreen;
 };

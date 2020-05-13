@@ -43,7 +43,8 @@ namespace Engine2
 		inline UINT GetHeight() { return height; }
 		inline wrl::ComPtr<ID3D11RenderTargetView>& GetRenderTargetView() { return pTargetView; }
 
-		void OnImgui();
+		void OnImgui(bool subNode = false); // subNode true when being called by the depth buffer version
+		void ShowSubDisplayRenderTarget();
 
 	protected:
 		std::shared_ptr<Drawable> pDrawable = nullptr;
@@ -67,19 +68,28 @@ namespace Engine2
 		std::shared_ptr<PixelShader> pPS = nullptr;
 
 		virtual void InitialiseDrawResources();
-		
 		virtual void InitialiseBuffer();
 		virtual void InitialiseShaderResources();
+
+		std::shared_ptr<Drawable> CreateVertexBuffer(float left, float top, float right, float bottom);
+
+		// subwindow display of render target
+		struct {
+			bool show = true;
+			float leftTop[2] = { 0.5f, -0.5f };
+			float size = 0.5f;
+			std::shared_ptr<VertexShader> pVS;
+			std::shared_ptr<PixelShader>  pPS;
+			std::shared_ptr<Drawable>     pVB;
+		} subDisplay;
+		void InitialiseSubDisplayVB();
 	};
 
 	class OffscreenWithDepthBuffer : public Offscreen
 	{
 	public:
 
-		OffscreenWithDepthBuffer(unsigned int slot = 0) : Offscreen(slot)
-		{
-			InitialiseDepthBuffer();
-		}
+		OffscreenWithDepthBuffer(unsigned int slot = 0);
 
 		void SetAsTarget();
 		void Clear();
@@ -92,6 +102,9 @@ namespace Engine2
 			InitialiseShaderResources();
 		}
 
+		void OnImgui();
+		void ShowSubDisplayDepthBuffer();
+
 	protected:
 		// depth buffer
 		wrl::ComPtr<ID3D11DepthStencilView> pDepthStencilView = nullptr;
@@ -100,5 +113,17 @@ namespace Engine2
 		UINT stencilRef = 0;
 
 		virtual void InitialiseDepthBuffer();
+
+		// subwindow display of depth buffer
+		struct {
+			bool show = true;
+			float leftTop[2] = { 0.5f, 0.0f };
+			float size = 0.5f;
+			std::shared_ptr<VertexShader> pVS;
+			std::shared_ptr<PixelShader>  pPS;
+			std::shared_ptr<Drawable>     pVB;
+			wrl::ComPtr<ID3D11ShaderResourceView> pDTRV;
+		} subDisplayDepthBuffer;
+		void InitialiseSubDisplayDepthBufferVB();
 	};
 }
