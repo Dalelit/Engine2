@@ -43,8 +43,12 @@ namespace Engine2
 		inline UINT GetHeight() { return height; }
 		inline wrl::ComPtr<ID3D11RenderTargetView>& GetRenderTargetView() { return pTargetView; }
 
-		void OnImgui(bool subNode = false); // subNode true when being called by the depth buffer version
+		inline void SetPixelShader(std::shared_ptr<PixelShader> pNewPixelShader) { pPS = pNewPixelShader; }
+
+		void OnImgui();
 		void ShowSubDisplayRenderTarget();
+
+		std::map<std::string, std::shared_ptr<PixelShader>> pixelShaders; // Public so can add to this. Populated with AddSampleFilters on constructuion.
 
 	protected:
 		std::shared_ptr<Drawable> pDrawable = nullptr;
@@ -66,10 +70,13 @@ namespace Engine2
 		// Default to copy. Could replace pixel shader with blur for example.
 		std::shared_ptr<VertexShader> pVS = nullptr;
 		std::shared_ptr<PixelShader> pPS = nullptr;
+		std::string pixelShaderName;
+		void AddSampleFilters();
 
 		virtual void InitialiseDrawResources();
 		virtual void InitialiseBuffer();
 		virtual void InitialiseShaderResources();
+		virtual void OnImguiSubDisplayNode();
 
 		std::shared_ptr<Drawable> CreateVertexBuffer(float left, float top, float right, float bottom);
 
@@ -102,7 +109,6 @@ namespace Engine2
 			InitialiseShaderResources();
 		}
 
-		void OnImgui();
 		void ShowSubDisplayDepthBuffer();
 
 	protected:
@@ -113,6 +119,7 @@ namespace Engine2
 		UINT stencilRef = 0;
 
 		virtual void InitialiseDepthBuffer();
+		void OnImguiSubDisplayNode();
 
 		// subwindow display of depth buffer
 		struct {

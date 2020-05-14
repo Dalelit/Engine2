@@ -15,6 +15,8 @@ namespace Engine2
 		// sub display uses these simple version that may get overridden
 		subDisplay.pVS = pVS;
 		subDisplay.pPS = pPS;
+
+		AddSampleFilters();
 	}
 
 	void Offscreen::Bind()
@@ -59,22 +61,39 @@ namespace Engine2
 		pSamplerState.Reset();
 	}
 
-	void Offscreen::OnImgui(bool subNode)
+	void Offscreen::OnImgui()
 	{
-		if (subNode || ImGui::TreeNode("Offscreen target")) // skip the tree node if a subnode (i.e. depth buffer version called this)
+		if (ImGui::TreeNode("Offscreen target"))
 		{
 			ImGui::Text("Slot %i", slot);
-			if (ImGui::TreeNode("Render target"))
+
+			if (ImGui::BeginCombo("Filter", pixelShaderName.c_str()))
 			{
-				ImGui::Checkbox("Show", &subDisplay.show);
-				if (ImGui::DragFloat2("Left,Top", subDisplay.leftTop, 0.05f, -1.0f, 1.0f)) InitialiseSubDisplayVB();
-				if (ImGui::DragFloat("Size", &subDisplay.size, 0.05f, 0.1f)) InitialiseSubDisplayVB();
-				ImGui::TreePop();
+				for (auto& kv : pixelShaders)
+				{
+					bool isSelected = (pixelShaderName == kv.first);
+					if (ImGui::Selectable(kv.first.c_str(), isSelected)) { pPS = kv.second; pixelShaderName = kv.first; }
+					if (isSelected) ImGui::SetItemDefaultFocus();
+				}
+				ImGui::EndCombo();
 			}
 
-			if (!subNode) ImGui::TreePop();
+			OnImguiSubDisplayNode();
+			ImGui::TreePop();
 		}
 	}
+
+	void Offscreen::OnImguiSubDisplayNode()
+	{
+		if (ImGui::TreeNode("Render target"))
+		{
+			ImGui::Checkbox("Show", &subDisplay.show);
+			if (ImGui::DragFloat2("Left,Top", subDisplay.leftTop, 0.05f, -1.0f, 1.0f)) InitialiseSubDisplayVB();
+			if (ImGui::DragFloat("Size", &subDisplay.size, 0.05f, 0.1f)) InitialiseSubDisplayVB();
+			ImGui::TreePop();
+		}
+	}
+
 
 	void Offscreen::InitialiseDrawResources()
 	{
@@ -115,6 +134,10 @@ namespace Engine2
 		pVS = VertexShader::CreateFromString(VSsrc, layout);
 		pPS = PixelShader::CreateFromString(PSsrc);
 		pDrawable = CreateVertexBuffer(-1.0f, 1.0f, 1.0f, -1.0f);
+
+		// default starting pixel shader is the copy
+		pixelShaderName = "Copy";
+		pixelShaders[pixelShaderName] = pPS;
 	}
 
 	void Offscreen::InitialiseBuffer()
@@ -246,22 +269,6 @@ namespace Engine2
 		pDepthStencilState.Reset();
 	}
 
-	void OffscreenWithDepthBuffer::OnImgui()
-	{
-		if (ImGui::TreeNode("Offscreen target"))
-		{
-			Offscreen::OnImgui(true);
-			if (ImGui::TreeNode("Depth buffer"))
-			{
-				ImGui::Checkbox("Show", &subDisplayDepthBuffer.show);
-				if (ImGui::DragFloat2("Left,Top", subDisplayDepthBuffer.leftTop, 0.05f, -1.0f, 1.0f)) InitialiseSubDisplayDepthBufferVB();
-				if (ImGui::DragFloat("Size", &subDisplayDepthBuffer.size, 0.05f, 0.1f)) InitialiseSubDisplayDepthBufferVB();
-				ImGui::TreePop();
-			}
-			ImGui::TreePop();
-		}
-	}
-
 	void OffscreenWithDepthBuffer::ShowSubDisplayDepthBuffer()
 	{
 		if (subDisplayDepthBuffer.show)
@@ -329,6 +336,18 @@ namespace Engine2
 		E2_ASSERT_HR(hr, "CreateShaderResourceView failed");
 	}
 
+	void OffscreenWithDepthBuffer::OnImguiSubDisplayNode()
+	{
+		Offscreen::OnImguiSubDisplayNode();
+		if (ImGui::TreeNode("Depth buffer"))
+		{
+			ImGui::Checkbox("Show", &subDisplayDepthBuffer.show);
+			if (ImGui::DragFloat2("Left,Top", subDisplayDepthBuffer.leftTop, 0.05f, -1.0f, 1.0f)) InitialiseSubDisplayDepthBufferVB();
+			if (ImGui::DragFloat("Size", &subDisplayDepthBuffer.size, 0.05f, 0.1f)) InitialiseSubDisplayDepthBufferVB();
+			ImGui::TreePop();
+		}
+	}
+
 	void OffscreenWithDepthBuffer::InitialiseSubDisplayDepthBufferVB()
 	{
 		float left = subDisplayDepthBuffer.leftTop[0];
@@ -339,4 +358,213 @@ namespace Engine2
 		subDisplayDepthBuffer.pVB = CreateVertexBuffer(left, top, right, bottom);
 	}
 
+	// Creates some sample filters to use
+	// Note: would pass in pixel width/height as a parameter if using seriously
+	void Offscreen::AddSampleFilters()
+	{
+		std::string PSsrc = R"(
+			Texture2D tex;
+			SamplerState smplr;
+
+			float4 main(float2 texCoord : TexCoord) : SV_TARGET
+			{
+				uint width, height;
+				tex.GetDimensions(width, height);
+				float pw = 1.0 / (float)width;
+				float ph = 1.0 / (float)height;
+
+				float4 col = 8.0 * tex.Sample(smplr, texCoord);
+				col -= tex.Sample(smplr, texCoord + float2(-pw, 0.0));
+				col -= tex.Sample(smplr, texCoord + float2(-pw, ph));
+				col -= tex.Sample(smplr, texCoord + float2(0.0, ph));
+				col -= tex.Sample(smplr, texCoord + float2(pw, ph));
+				col -= tex.Sample(smplr, texCoord + float2(pw, 0.0));
+				col -= tex.Sample(smplr, texCoord + float2(pw, -ph));
+				col -= tex.Sample(smplr, texCoord + float2(0.0, -ph));
+				col -= tex.Sample(smplr, texCoord + float2(-pw, -ph));
+				return col;
+			}
+		)";
+
+		pixelShaders["Edge detection"] = PixelShader::CreateFromString(PSsrc);
+
+		PSsrc = R"(
+			Texture2D tex;
+			SamplerState smplr;
+
+			float4 main(float2 texCoord : TexCoord) : SV_TARGET
+			{
+				uint width, height;
+				tex.GetDimensions(width, height);
+				float pw = 1.0 / (float)width;
+				float ph = 1.0 / (float)height;
+
+				float4 col = 5.0 * tex.Sample(smplr, texCoord);
+				col -= tex.Sample(smplr, texCoord + float2(-pw, 0.0));
+				col -= tex.Sample(smplr, texCoord + float2(0.0, ph));
+				col -= tex.Sample(smplr, texCoord + float2(pw, 0.0));
+				col -= tex.Sample(smplr, texCoord + float2(0.0, -ph));
+				return col;
+			}
+		)";
+
+		pixelShaders["Sharpen"] = PixelShader::CreateFromString(PSsrc);
+
+		PSsrc = R"(
+			Texture2D tex;
+			SamplerState smplr;
+
+			float4 main(float2 texCoord : TexCoord) : SV_TARGET
+			{
+				uint width, height;
+				tex.GetDimensions(width, height);
+				float pw = 1.0 / (float)width;
+				float ph = 1.0 / (float)height;
+
+				float4 col = tex.Sample(smplr, texCoord);
+				col += tex.Sample(smplr, texCoord + float2(-pw, 0.0));
+				col += tex.Sample(smplr, texCoord + float2(-pw, ph));
+				col += tex.Sample(smplr, texCoord + float2(0.0, ph));
+				col += tex.Sample(smplr, texCoord + float2(pw, ph));
+				col += tex.Sample(smplr, texCoord + float2(pw, 0.0));
+				col += tex.Sample(smplr, texCoord + float2(pw, -ph));
+				col += tex.Sample(smplr, texCoord + float2(0.0, -ph));
+				col += tex.Sample(smplr, texCoord + float2(-pw, -ph));
+				col /= 9.0;
+				return col;
+			}
+		)";
+
+		pixelShaders["Box blur 3x3"] = PixelShader::CreateFromString(PSsrc);
+
+		PSsrc = R"(
+			Texture2D tex;
+			SamplerState smplr;
+
+			float4 main(float2 texCoord : TexCoord) : SV_TARGET
+			{
+				uint width, height;
+				tex.GetDimensions(width, height);
+				float pw = 1.0 / (float)width;
+				float ph = 1.0 / (float)height;
+
+				float4 col = 4.0 * tex.Sample(smplr, texCoord);
+				col += 2.0 * tex.Sample(smplr, texCoord + float2(-pw, 0.0));
+				col += tex.Sample(smplr, texCoord + float2(-pw, ph));
+				col += 2.0 * tex.Sample(smplr, texCoord + float2(0.0, ph));
+				col += tex.Sample(smplr, texCoord + float2(pw, ph));
+				col += 2.0 * tex.Sample(smplr, texCoord + float2(pw, 0.0));
+				col += tex.Sample(smplr, texCoord + float2(pw, -ph));
+				col += 2.0 * tex.Sample(smplr, texCoord + float2(0.0, -ph));
+				col += tex.Sample(smplr, texCoord + float2(-pw, -ph));
+				col /= 16.0;
+				return col;
+			}
+		)";
+
+		pixelShaders["Gaussian blur 3x3"] = PixelShader::CreateFromString(PSsrc);
+
+		PSsrc = R"(
+			Texture2D tex;
+			SamplerState smplr;
+
+			float4 main(float2 texCoord : TexCoord) : SV_TARGET
+			{
+				uint width, height;
+				tex.GetDimensions(width, height);
+				float pw = 1.0 / (float)width;
+				float ph = 1.0 / (float)height;
+
+				float4 col = 0.0;
+				col -= tex.Sample(smplr, texCoord + float2(0.0, ph));
+				col -= tex.Sample(smplr, texCoord + float2(-pw, ph));
+				col -= tex.Sample(smplr, texCoord + float2(-pw, 0.0));
+				col += tex.Sample(smplr, texCoord + float2(pw, 0.0));
+				col += tex.Sample(smplr, texCoord + float2(pw, -ph));
+				col += tex.Sample(smplr, texCoord + float2(0.0, -ph));
+				return col;
+			}
+		)";
+
+		pixelShaders["Emboss 3x3"] = PixelShader::CreateFromString(PSsrc);
+
+		PSsrc = R"(
+			Texture2D tex;
+			SamplerState smplr;
+
+			float4 main(float2 texCoord : TexCoord) : SV_TARGET
+			{
+				uint width, height;
+				tex.GetDimensions(width, height);
+				float pw = 1.0 / (float)width;
+				float ph = 1.0 / (float)height;
+
+				float4 col = tex.Sample(smplr, texCoord);
+				col += tex.Sample(smplr, texCoord + float2(-pw, ph));
+				col += tex.Sample(smplr, texCoord + float2(pw, -ph));
+				col += tex.Sample(smplr, texCoord + float2(-pw * 2, ph));
+				col += tex.Sample(smplr, texCoord + float2(pw * 2, -ph));
+				col += tex.Sample(smplr, texCoord + float2(-pw * 3, ph));
+				col += tex.Sample(smplr, texCoord + float2(pw * 3, -ph));
+				return col / 7.0;
+			}
+		)";
+
+		pixelShaders["Motion blur"] = PixelShader::CreateFromString(PSsrc);
+
+		PSsrc = R"(
+			Texture2D tex;
+			SamplerState smplr;
+
+			float4 main(float2 texCoord : TexCoord) : SV_TARGET
+			{
+				float3 col = tex.Sample(smplr, texCoord).xyz;
+				float grey = (col.x + col.y + col.z) / 3.0;
+				return float4(grey, grey, grey, 1.0);
+			}
+		)";
+
+		pixelShaders["Greyscale 1/3"] = PixelShader::CreateFromString(PSsrc);
+
+		PSsrc = R"(
+			Texture2D tex;
+			SamplerState smplr;
+
+			float4 main(float2 texCoord : TexCoord) : SV_TARGET
+			{
+				float4 col = tex.Sample(smplr, texCoord);
+				float grey = (col.r * 0.2126, col.g * 0.7152, col.b * 0.0722);
+				grey = pow(grey, 1.0/2.2);
+				return float4(grey, grey, grey, 1.0);
+			}
+		)";
+
+		pixelShaders["Greyscale luma gamma corrected"] = PixelShader::CreateFromString(PSsrc);
+
+		PSsrc = R"(
+			Texture2D tex;
+			SamplerState smplr;
+
+			float4 main(float2 texCoord : TexCoord) : SV_TARGET
+			{
+				float3 col = pow(tex.Sample(smplr, texCoord).xyz, 1.0/2.2);
+				return float4(col, 1.0);
+			}
+		)";
+
+		pixelShaders["Gamma correction"] = PixelShader::CreateFromString(PSsrc);
+
+		PSsrc = R"(
+			Texture2D tex;
+			SamplerState smplr;
+
+			float4 main(float2 texCoord : TexCoord) : SV_TARGET
+			{
+				float4 col = tex.Sample(smplr, texCoord);
+				return float4(1.0 - col.xyz, 1.0);
+			}
+		)";
+
+		pixelShaders["Invert"] = PixelShader::CreateFromString(PSsrc);
+	}
 }
