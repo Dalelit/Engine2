@@ -164,6 +164,7 @@
   <ItemGroup>
     <ClCompile Include="src\BallWorld.cpp" />
     <ClCompile Include="src\BlockWorld.cpp" />
+    <ClCompile Include="src\BlockWorldChunk.cpp" />
     <ClCompile Include="src\Empty.cpp" />
     <ClCompile Include="src\ModelTest.cpp" />
     <ClCompile Include="src\ParticleTest.cpp" />
@@ -176,6 +177,7 @@
   <ItemGroup>
     <ClInclude Include="src\BallWorld.h" />
     <ClInclude Include="src\BlockWorld.h" />
+    <ClInclude Include="src\BlockWorldChunk.h" />
     <ClInclude Include="src\Empty.h" />
     <ClInclude Include="src\ModelTest.h" />
     <ClInclude Include="src\ParticleTest.h" />
@@ -203,6 +205,14 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Assets\Materials\BlockWorld2VS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="Assets\Materials\BlockWorldHighlightPS.hlsl">

@@ -12,7 +12,7 @@ namespace Engine2
 	class VertexBuffer : public Drawable
 	{
 	public:
-		VertexBuffer(std::vector<V>& verticies) {
+		VertexBuffer(std::vector<V>& verticies, bool updatableVerticies = false) {
 
 			bufferStrides[0] = sizeof(V);
 			bufferOffsets[0] = 0;
@@ -28,7 +28,7 @@ namespace Engine2
 			bufferDesc.ByteWidth = sizeof(V) * vertexCount;
 			bufferDesc.Usage = D3D11_USAGE::D3D11_USAGE_DEFAULT;
 			bufferDesc.BindFlags = D3D11_BIND_FLAG::D3D11_BIND_VERTEX_BUFFER;
-			bufferDesc.CPUAccessFlags = 0;
+			bufferDesc.CPUAccessFlags = (updatableVerticies ? D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE : 0);
 			bufferDesc.MiscFlags = 0;
 			bufferDesc.StructureByteStride = sizeof(V);
 
@@ -77,8 +77,8 @@ namespace Engine2
 	class VertexBufferIndex : public VertexBuffer<V, TOP>
 	{
 	public:
-		VertexBufferIndex(std::vector<V>& verticies, std::vector<unsigned int>& indicies) :
-			VertexBuffer<V, TOP>(verticies)
+		VertexBufferIndex(std::vector<V>& verticies, std::vector<unsigned int>& indicies, bool updatableVerticies = false, bool updatableIndicies = false) :
+			VertexBuffer<V, TOP>(verticies, updatableVerticies)
 		{
 			HRESULT hr;
 
@@ -93,7 +93,7 @@ namespace Engine2
 			bufferDesc.ByteWidth = sizeof(unsigned int) * indxCount;
 			bufferDesc.Usage = D3D11_USAGE::D3D11_USAGE_DEFAULT;
 			bufferDesc.BindFlags = D3D11_BIND_FLAG::D3D11_BIND_INDEX_BUFFER;
-			bufferDesc.CPUAccessFlags = 0;
+			bufferDesc.CPUAccessFlags = (updatableIndicies ? D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE : 0);
 			bufferDesc.MiscFlags = 0;
 			bufferDesc.StructureByteStride = sizeof(unsigned int);
 

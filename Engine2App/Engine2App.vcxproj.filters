@@ -8,6 +8,7 @@
     <ClCompile Include="src\ParticleTest.cpp" />
     <ClCompile Include="src\Empty.cpp" />
     <ClCompile Include="src\BlockWorld.cpp" />
+    <ClCompile Include="src\BlockWorldChunk.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h" />
@@ -17,6 +18,7 @@
     <ClInclude Include="src\ParticleTest.h" />
     <ClInclude Include="src\Empty.h" />
     <ClInclude Include="src\BlockWorld.h" />
+    <ClInclude Include="src\BlockWorldChunk.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Assets\Materials\SceneEntityCBVS.hlsl" />
@@ -38,5 +40,6 @@
     <FxCompile Include="Assets\Materials\BlockWorldVS.hlsl" />
     <FxCompile Include="Assets\Materials\BlockWorldHighlightPS.hlsl" />
     <FxCompile Include="Assets\Materials\BlockWorldHighlightVS.hlsl" />
+    <FxCompile Include="Assets\Materials\BlockWorld2VS.hlsl" />
   </ItemGroup>
 </Project>

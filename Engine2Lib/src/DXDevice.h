@@ -28,11 +28,11 @@ namespace Engine2
 		void SetBackBufferAsRenderTargetNoDepthCheck();
 
 		inline void SetDefaultRenderState()       { pImmediateContext->RSSetState(pRSDefault.Get()); }
-		inline void SetWireframeRenderState()     { pImmediateContext->RSSetState(pRSWireframe.Get()); }
 		inline void SetNoFaceCullingRenderState() { pImmediateContext->RSSetState(pRSNoFaceCulling.Get()); }
 		inline void SetDefaultDepthStencilState() { pImmediateContext->OMSetDepthStencilState(pDepthStencilState.Get(), 0); }
 		inline void SetDefaultBlendState()        { pImmediateContext->OMSetBlendState(nullptr, nullptr, 0xffffffff); }
 		inline void SetAlphaBlendState()          { pImmediateContext->OMSetBlendState(pAlphaBlendState.Get(), nullptr, 0xffffffff); }
+		inline void SetWireframeRenderState(bool faceCulling = true) { if (faceCulling) pImmediateContext->RSSetState(pRSWireframe.Get()); else pImmediateContext->RSSetState(pRSWireframeNoFaceCulling.Get()); }
 
 		void ClearShaderResource(unsigned int slot);
 
@@ -91,6 +91,7 @@ namespace Engine2
 		// states for resue
 		wrl::ComPtr<ID3D11RasterizerState> pRSDefault;
 		wrl::ComPtr<ID3D11RasterizerState> pRSWireframe;
+		wrl::ComPtr<ID3D11RasterizerState> pRSWireframeNoFaceCulling;
 		wrl::ComPtr<ID3D11RasterizerState> pRSNoFaceCulling;
 		wrl::ComPtr<ID3D11BlendState>      pAlphaBlendState;
 	};

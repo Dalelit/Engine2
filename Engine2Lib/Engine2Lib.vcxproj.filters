@@ -39,6 +39,7 @@
     <ClInclude Include="src\AssetLoaders\ObjLoader.h" />
     <ClInclude Include="src\OffscreenOutliner.h" />
     <ClInclude Include="src\Particles.h" />
+    <ClInclude Include="src\UtilMath.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\pch.cpp" />

@@ -241,7 +241,7 @@ namespace Engine2
 
 			float4 main(float2 texCoord : TexCoord) : SV_TARGET
 			{
-				float depth = 1.0 - tex.Sample(smplr, texCoord);
+				float depth = 0.01 / ( 1.01 - tex.Sample(smplr, texCoord) );
 				return float4(depth, depth, depth, 1.0);
 			}
 		)";

@@ -230,7 +230,7 @@ int WINAPI WinMain(
 	Engine2::Engine::Get().AttachLayer(new ModelTest(), false);
 	Engine2::Engine::Get().AttachLayer(new BallWorld(), false);
 	Engine2::Engine::Get().AttachLayer(new ParticleTest(), false);
-	Engine2::Engine::Get().AttachLayer(new BlockWorld());
+	Engine2::Engine::Get().AttachLayer(new BlockWorld::BlockWorld());
 
 	clock_t lastTime = clock();
 

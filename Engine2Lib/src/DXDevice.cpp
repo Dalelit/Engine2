@@ -40,6 +40,14 @@ namespace Engine2
 
 		E2_ASSERT_HR(hr, "CreateRasterizerState failed");
 
+		// wireframe rasterizer
+		rsDesc = CD3D11_RASTERIZER_DESC(CD3D11_DEFAULT());
+		rsDesc.FillMode = D3D11_FILL_MODE::D3D11_FILL_WIREFRAME;
+		rsDesc.CullMode = D3D11_CULL_MODE::D3D11_CULL_NONE;
+		hr = pDevice->CreateRasterizerState(&rsDesc, &pRSWireframeNoFaceCulling);
+
+		E2_ASSERT_HR(hr, "CreateRasterizerState failed");
+
 		// no face culling
 		rsDesc = CD3D11_RASTERIZER_DESC(CD3D11_DEFAULT());
 		rsDesc.CullMode = D3D11_CULL_MODE::D3D11_CULL_NONE;
