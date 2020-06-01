@@ -11,8 +11,8 @@ namespace BlockWorld
 	{
 		Initialise();
 		InitialiseChunks();
-		InitialiseBlockFaces();
 
+		for (auto& chunk : Chunks()) InitialiseBlockFaces(&chunk);
 		for (auto& chunk : Chunks()) SetVertexBuffer(&chunk);
 
 		VertexData vd;
@@ -81,6 +81,7 @@ namespace BlockWorld
 							{
 								if (newHitDist < hitInfo.distance)
 								{
+									hitInfo.blockIndex = { x, y, z };
 									hitInfo.pBlock = pBlock;
 									hitInfo.pChunk = pChunk;
 									hitInfo.centre = box.Center;
@@ -105,6 +106,176 @@ namespace BlockWorld
 
 		if (hitInfo.pBlock) return true;
 		else return false;
+	}
+
+	void ChunkManager::RemoveBlock(HitInfo& hitInfo)
+	{
+		E2_ASSERT(hitInfo.pBlock != nullptr && hitInfo.pChunk != nullptr, "Remove block expected pointer to block and chunk");
+		E2_ASSERT(hitInfo.pBlock->type != BlockType::BlockTypeEmpty, "Remove block expected to point to an non-empty block");
+
+		hitInfo.pBlock->type = BlockType::BlockTypeEmpty;
+		//hitInfo.pBlock->faceMask = FaceMask::FaceMaskNone;
+
+		InitialiseBlockFaces(hitInfo.pChunk);
+		SetVertexBuffer(hitInfo.pChunk);
+
+		// check if at edges.
+		std::vector<Chunk*> neighbours;
+		GetNeighbours(hitInfo, neighbours);
+		if (neighbours.size() > 0)
+		{
+			for (auto pN : neighbours)
+			{
+				InitialiseBlockFaces(pN);
+				SetVertexBuffer(pN);
+			}
+		}
+	}
+
+	void ChunkManager::AddBlock(HitInfo& hitInfo, DirectX::XMVECTOR& hitLocation)
+	{
+		E2_ASSERT(hitInfo.pBlock != nullptr && hitInfo.pChunk != nullptr, "Add block expected pointer to block and chunk");
+		E2_ASSERT(hitInfo.pBlock->type != BlockType::BlockTypeEmpty, "Remove block expected to point to an non-empty block");
+
+		Block* pNextBlock = nullptr;
+
+		float xdist = hitLocation.m128_f32[0] - hitInfo.centre.x;
+		float ydist = hitLocation.m128_f32[1] - hitInfo.centre.y;
+		float zdist = hitLocation.m128_f32[2] - hitInfo.centre.z;
+
+		float xabs = fabsf(xdist);
+		float yabs = fabsf(ydist);
+		float zabs = fabsf(zdist);
+
+		float maxdist = max(max(xabs, yabs), zabs);
+
+		if (xabs == maxdist)
+		{
+			if (xdist > 0) pNextBlock = GetBlockNextX(hitInfo.pChunk, hitInfo.blockIndex);
+			else pNextBlock = GetBlockPrevX(hitInfo.pChunk, hitInfo.blockIndex);
+		}
+		else if (yabs == maxdist)
+		{
+			if (ydist > 0) pNextBlock = GetBlockNextY(hitInfo.pChunk, hitInfo.blockIndex);
+			else pNextBlock = GetBlockPrevY(hitInfo.pChunk, hitInfo.blockIndex);
+		}
+		else // zabs == maxdist
+		{
+			if (zdist > 0) pNextBlock = GetBlockNextZ(hitInfo.pChunk, hitInfo.blockIndex);
+			else pNextBlock = GetBlockPrevZ(hitInfo.pChunk, hitInfo.blockIndex);
+		}
+
+		if (pNextBlock)
+		{
+			pNextBlock->type = BlockType::BlockTypeDirt;
+			InitialiseBlockFaces(hitInfo.pChunk);
+			SetVertexBuffer(hitInfo.pChunk);
+
+			// check if at edges.
+			std::vector<Chunk*> neighbours;
+			GetNeighbours(hitInfo, neighbours);
+			if (neighbours.size() > 0)
+			{
+				for (auto pN : neighbours)
+				{
+					InitialiseBlockFaces(pN);
+					SetVertexBuffer(pN);
+				}
+			}
+		}
+	}
+
+	void ChunkManager::GetNeighbours(HitInfo& hitInfo, std::vector<Chunk*>& neighbours)
+	{
+		XMINT3& ci = hitInfo.pChunk->index;
+		XMINT3& bi = hitInfo.blockIndex;
+
+		if (bi.x == 0 && ci.x != 0) neighbours.push_back(GetChunk(ci.x - 1, ci.y, ci.z));
+		else if (bi.x == ChunkSpecs.wide - 1 && ci.x != WorldSpecs.wide - 1) neighbours.push_back(GetChunk(ci.x + 1, ci.y, ci.z));
+
+		if (bi.y == 0 && ci.y != 0) neighbours.push_back(GetChunk(ci.x, ci.y - 1, ci.z));
+		else if (bi.y == ChunkSpecs.high - 1 && ci.y != WorldSpecs.high - 1) neighbours.push_back(GetChunk(ci.x, ci.y + 1, ci.z));
+
+		if (bi.z == 0 && ci.z != 0) neighbours.push_back(GetChunk(ci.x, ci.y, ci.z - 1));
+		else if (bi.z == ChunkSpecs.deep - 1 && ci.z != WorldSpecs.deep - 1) neighbours.push_back(GetChunk(ci.x, ci.y, ci.z + 1));
+	}
+
+	Block* ChunkManager::GetBlockPrevX(Chunk* pChunk, DirectX::XMINT3& blockIndx)
+	{
+		if (blockIndx.x > 0) return GetBlock(pChunk, blockIndx.x - 1, blockIndx.y, blockIndx.z);
+
+		if (pChunk->index.x > 0)
+		{
+			Chunk* pPrevChunk = GetChunk(pChunk->index.x - 1, pChunk->index.y, pChunk->index.z);
+			return GetBlock(pPrevChunk, ChunkSpecs.wide - 1, blockIndx.y, blockIndx.z);
+		}
+
+		return nullptr;
+	}
+
+	Block* ChunkManager::GetBlockNextX(Chunk* pChunk, DirectX::XMINT3& blockIndx)
+	{
+		if (blockIndx.x < ChunkSpecs.wide - 1) return GetBlock(pChunk, blockIndx.x + 1, blockIndx.y, blockIndx.z);
+
+		if (pChunk->index.x < WorldSpecs.wide - 1)
+		{
+			Chunk* pNextChunk = GetChunk(pChunk->index.x + 1, pChunk->index.y, pChunk->index.z);
+			return GetBlock(pNextChunk, 0, blockIndx.y, blockIndx.z);
+		}
+
+		return nullptr;
+	}
+
+	Block* ChunkManager::GetBlockPrevY(Chunk* pChunk, DirectX::XMINT3& blockIndx)
+	{
+		if (blockIndx.y > 0) return GetBlock(pChunk, blockIndx.x, blockIndx.y - 1, blockIndx.z);
+
+		if (pChunk->index.y > 0)
+		{
+			Chunk* pPrevChunk = GetChunk(pChunk->index.x, pChunk->index.y - 1, pChunk->index.z);
+			return GetBlock(pPrevChunk, blockIndx.x, ChunkSpecs.high - 1, blockIndx.z);
+		}
+
+		return nullptr;
+	}
+
+	Block* ChunkManager::GetBlockNextY(Chunk* pChunk, DirectX::XMINT3& blockIndx)
+	{
+		if (blockIndx.y < ChunkSpecs.high - 1) return GetBlock(pChunk, blockIndx.x, blockIndx.y + 1, blockIndx.z);
+
+		if (pChunk->index.y < WorldSpecs.high - 1)
+		{
+			Chunk* pNextChunk = GetChunk(pChunk->index.x, pChunk->index.y + 1, pChunk->index.z);
+			return GetBlock(pNextChunk, blockIndx.x, 0, blockIndx.z);
+		}
+
+		return nullptr;
+	}
+
+	Block* ChunkManager::GetBlockPrevZ(Chunk* pChunk, DirectX::XMINT3& blockIndx)
+	{
+		if (blockIndx.z > 0) return GetBlock(pChunk, blockIndx.x, blockIndx.y, blockIndx.z - 1);
+
+		if (pChunk->index.z > 0)
+		{
+			Chunk* pPrevChunk = GetChunk(pChunk->index.x, pChunk->index.y, pChunk->index.z - 1);
+			return GetBlock(pPrevChunk, blockIndx.x, blockIndx.y, ChunkSpecs.deep - 1);
+		}
+
+		return nullptr;
+	}
+
+	Block* ChunkManager::GetBlockNextZ(Chunk* pChunk, DirectX::XMINT3& blockIndx)
+	{
+		if (blockIndx.z < ChunkSpecs.deep - 1) return GetBlock(pChunk, blockIndx.x, blockIndx.y, blockIndx.z + 1);
+
+		if (pChunk->index.z < WorldSpecs.deep - 1)
+		{
+			Chunk* pNextChunk = GetChunk(pChunk->index.x, pChunk->index.y, pChunk->index.z + 1);
+			return GetBlock(pNextChunk, blockIndx.x, blockIndx.y, 0);
+		}
+
+		return nullptr;
 	}
 
 	void ChunkManager::OnImgui()
@@ -240,91 +411,88 @@ namespace BlockWorld
 		}
 	}
 
-	void ChunkManager::InitialiseBlockFaces()
+	void ChunkManager::InitialiseBlockFaces(Chunk* pChunk)
 	{
-		for (auto& chunk : Chunks())
+		Block* pBlock = pChunk->blocks;
+
+		for (INT32 z = 0; z < ChunkSpecs.deep; z++)
 		{
-			Block* pBlock = chunk.blocks;
-
-			for (INT32 z = 0; z < ChunkSpecs.deep; z++)
+			for (INT32 y = 0; y < ChunkSpecs.high; y++)
 			{
-				for (INT32 y = 0; y < ChunkSpecs.high; y++)
+				for (INT32 x = 0; x < ChunkSpecs.wide; x++)
 				{
-					for (INT32 x = 0; x < ChunkSpecs.wide; x++)
+					if (pBlock->type != BlockType::BlockTypeEmpty)
 					{
-						if (pBlock->type != BlockType::BlockTypeEmpty)
+						// check if...
+						//  at the edge of the chunk
+						//  and chunks is at the edge of the world
+						//  or no neighbour
+
+						int mask = FaceMask::FaceMaskNone;
+
+						if (x == 0)
 						{
-							// check if...
-							//  at the edge of the chunk
-							//  and chunks is at the edge of the world
-							//  or no neighbour
-
-							int mask = FaceMask::FaceMaskNone;
-
-							if (x == 0)
-							{
-								if (chunk.index.x == 0) mask |= FaceMask::FaceMaskLeft;
-								else {
-									Block* pBlockNeighbour = GetBlock(GetRelativeChunk(&chunk, -1, 0, 0), ChunkSpecs.wide - 1, y, z);
-									if (pBlockNeighbour->type == BlockType::BlockTypeEmpty) mask |= FaceMask::FaceMaskLeft;
-								}
+							if (pChunk->index.x == 0) mask |= FaceMask::FaceMaskLeft;
+							else {
+								Block* pBlockNeighbour = GetBlock(GetRelativeChunk(pChunk, -1, 0, 0), ChunkSpecs.wide - 1, y, z);
+								if (pBlockNeighbour->type == BlockType::BlockTypeEmpty) mask |= FaceMask::FaceMaskLeft;
 							}
-							else if ((pBlock - 1)->type == BlockType::BlockTypeEmpty) mask |= FaceMask::FaceMaskLeft;
-							
-							if (x == ChunkSpecs.wide - 1)
-							{
-								if (chunk.index.x == WorldSpecs.wide - 1) mask |= FaceMask::FaceMaskRight;
-								else {
-									Block* pBlockNeighbour = GetBlock(GetRelativeChunk(&chunk, 1, 0, 0), 0, y, z);
-									if (pBlockNeighbour->type == BlockType::BlockTypeEmpty) mask |= FaceMask::FaceMaskRight;
-								}
-							}
-							else if ((pBlock + 1)->type == BlockType::BlockTypeEmpty) mask |= FaceMask::FaceMaskRight;
-
-							if (y == 0)
-							{
-								if (chunk.index.y == 0) mask |= FaceMask::FaceMaskBottom;
-								else {
-									Block* pBlockNeighbour = GetBlock(GetRelativeChunk(&chunk, 0, -1, 0), x, ChunkSpecs.high - 1, z);
-									if (pBlockNeighbour->type == BlockType::BlockTypeEmpty) mask |= FaceMask::FaceMaskBottom;
-								}
-							}
-							else if ((pBlock - ChunkSpecs.blocksStride)->type == BlockType::BlockTypeEmpty) mask |= FaceMask::FaceMaskBottom;
-
-							if (y == ChunkSpecs.high - 1)
-							{
-								if (chunk.index.y == WorldSpecs.high - 1) mask |= FaceMask::FaceMaskTop;
-								else {
-									Block* pBlockNeighbour = GetBlock(GetRelativeChunk(&chunk, 0, 1, 0), x, 0, z);
-									if (pBlockNeighbour->type == BlockType::BlockTypeEmpty) mask |= FaceMask::FaceMaskTop;
-								}
-							}
-							else if ((pBlock + ChunkSpecs.blocksStride)->type == BlockType::BlockTypeEmpty) mask |= FaceMask::FaceMaskTop;
-
-							if (z == 0)
-							{
-								if (chunk.index.z == 0) mask |= FaceMask::FaceMaskFront;
-								else {
-									Block* pBlockNeighbour = GetBlock(GetRelativeChunk(&chunk, 0, 0, -1), x, y, ChunkSpecs.deep - 1);
-									if (pBlockNeighbour->type == BlockType::BlockTypeEmpty) mask |= FaceMask::FaceMaskFront;
-								}
-							}
-							else if ((pBlock - ChunkSpecs.blocksSlice)->type == BlockType::BlockTypeEmpty) mask |= FaceMask::FaceMaskFront;
-
-							if (z == ChunkSpecs.deep - 1)
-							{
-								if (chunk.index.z == WorldSpecs.deep - 1) mask |= FaceMask::FaceMaskBack;
-								else {
-									Block* pBlockNeighbour = GetBlock(GetRelativeChunk(&chunk, 0, 0, 1), x, y, 0);
-									if (pBlockNeighbour->type == BlockType::BlockTypeEmpty) mask |= FaceMask::FaceMaskBack;
-								}
-							}
-							else if ((pBlock + ChunkSpecs.blocksSlice)->type == BlockType::BlockTypeEmpty) mask |= FaceMask::FaceMaskBack;
-
-							pBlock->faceMask = (FaceMask)mask;
 						}
-						pBlock++;
+						else if ((pBlock - 1)->type == BlockType::BlockTypeEmpty) mask |= FaceMask::FaceMaskLeft;
+							
+						if (x == ChunkSpecs.wide - 1)
+						{
+							if (pChunk->index.x == WorldSpecs.wide - 1) mask |= FaceMask::FaceMaskRight;
+							else {
+								Block* pBlockNeighbour = GetBlock(GetRelativeChunk(pChunk, 1, 0, 0), 0, y, z);
+								if (pBlockNeighbour->type == BlockType::BlockTypeEmpty) mask |= FaceMask::FaceMaskRight;
+							}
+						}
+						else if ((pBlock + 1)->type == BlockType::BlockTypeEmpty) mask |= FaceMask::FaceMaskRight;
+
+						if (y == 0)
+						{
+							if (pChunk->index.y == 0) mask |= FaceMask::FaceMaskBottom;
+							else {
+								Block* pBlockNeighbour = GetBlock(GetRelativeChunk(pChunk, 0, -1, 0), x, ChunkSpecs.high - 1, z);
+								if (pBlockNeighbour->type == BlockType::BlockTypeEmpty) mask |= FaceMask::FaceMaskBottom;
+							}
+						}
+						else if ((pBlock - ChunkSpecs.blocksStride)->type == BlockType::BlockTypeEmpty) mask |= FaceMask::FaceMaskBottom;
+
+						if (y == ChunkSpecs.high - 1)
+						{
+							if (pChunk->index.y == WorldSpecs.high - 1) mask |= FaceMask::FaceMaskTop;
+							else {
+								Block* pBlockNeighbour = GetBlock(GetRelativeChunk(pChunk, 0, 1, 0), x, 0, z);
+								if (pBlockNeighbour->type == BlockType::BlockTypeEmpty) mask |= FaceMask::FaceMaskTop;
+							}
+						}
+						else if ((pBlock + ChunkSpecs.blocksStride)->type == BlockType::BlockTypeEmpty) mask |= FaceMask::FaceMaskTop;
+
+						if (z == 0)
+						{
+							if (pChunk->index.z == 0) mask |= FaceMask::FaceMaskFront;
+							else {
+								Block* pBlockNeighbour = GetBlock(GetRelativeChunk(pChunk, 0, 0, -1), x, y, ChunkSpecs.deep - 1);
+								if (pBlockNeighbour->type == BlockType::BlockTypeEmpty) mask |= FaceMask::FaceMaskFront;
+							}
+						}
+						else if ((pBlock - ChunkSpecs.blocksSlice)->type == BlockType::BlockTypeEmpty) mask |= FaceMask::FaceMaskFront;
+
+						if (z == ChunkSpecs.deep - 1)
+						{
+							if (pChunk->index.z == WorldSpecs.deep - 1) mask |= FaceMask::FaceMaskBack;
+							else {
+								Block* pBlockNeighbour = GetBlock(GetRelativeChunk(pChunk, 0, 0, 1), x, y, 0);
+								if (pBlockNeighbour->type == BlockType::BlockTypeEmpty) mask |= FaceMask::FaceMaskBack;
+							}
+						}
+						else if ((pBlock + ChunkSpecs.blocksSlice)->type == BlockType::BlockTypeEmpty) mask |= FaceMask::FaceMaskBack;
+
+						pBlock->faceMask = (FaceMask)mask;
 					}
+					pBlock++;
 				}
 			}
 		}

@@ -57,8 +57,9 @@ namespace BlockWorld
 	{
 		Chunk* pChunk;
 		Block* pBlock;
-		float  distance;
+		DirectX::XMINT3 blockIndex;
 		DirectX::XMFLOAT3 centre;
+		float  distance;
 	};
 
 	class ChunkManager
@@ -85,9 +86,9 @@ namespace BlockWorld
 		} ChunkSpecs;
 
 		struct {
-			INT32 wide = 3; // 4;
-			INT32 high = 3; // 6;
-			INT32 deep = 3;
+			INT32 wide = 12;
+			INT32 high = 3;
+			INT32 deep = 12;
 			DirectX::XMVECTOR origin = { 0.0f, 0.0f, 0.0f, 0.0f };
 
 			// calculated in initialise
@@ -105,6 +106,18 @@ namespace BlockWorld
 
 		bool Intersects(DirectX::XMVECTOR rayOrigin, DirectX::XMVECTOR rayDirection, HitInfo& hitInfo);
 
+		void RemoveBlock(HitInfo& hitInfo);
+		void AddBlock(HitInfo& hitInfo, DirectX::XMVECTOR& hitLocation);
+
+		void GetNeighbours(HitInfo& hitInfo, std::vector<Chunk*>& neighbours);
+
+		Block* GetBlockPrevX(Chunk* pChunk, DirectX::XMINT3& blockIndx);
+		Block* GetBlockNextX(Chunk* pChunk, DirectX::XMINT3& blockIndx);
+		Block* GetBlockPrevY(Chunk* pChunk, DirectX::XMINT3& blockIndx);
+		Block* GetBlockNextY(Chunk* pChunk, DirectX::XMINT3& blockIndx);
+		Block* GetBlockPrevZ(Chunk* pChunk, DirectX::XMINT3& blockIndx);
+		Block* GetBlockNextZ(Chunk* pChunk, DirectX::XMINT3& blockIndx);
+
 		std::shared_ptr<Engine2::VertexShaderDynamic> pVS;
 		std::shared_ptr<Engine2::PixelShaderDynamic>  pPS;
 
@@ -119,7 +132,7 @@ namespace BlockWorld
 		void Initialise();
 		void InitialiseChunks();
 		void InitialiseBlocks(Chunk* pChunk);
-		void InitialiseBlockFaces();
+		void InitialiseBlockFaces(Chunk* pChunk);
 		void SetVertexBuffer(Chunk* pChunk);
 
 		struct {

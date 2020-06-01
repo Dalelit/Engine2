@@ -45,10 +45,10 @@ namespace BlockWorld
 		scene.OnUpdate(dt);
 
 		Ray ray;
-		//if (Engine::GetInputController().State.MouseLook)
-		//	ray = Engine::GetInputController().GetRayForward();
-		//else
-		ray = Engine::GetInputController().GetRayFromMouse();
+		if (Engine::GetInputController().State.MouseLook)
+			ray = Engine::GetInputController().GetRayForward();
+		else
+			ray = Engine::GetInputController().GetRayFromMouse();
 
 		blockHit = chunkMgr.Intersects(ray.origin, ray.direction, hitInfo);
 
@@ -350,17 +350,19 @@ namespace BlockWorld
 
 	void BlockWorld::MouseButtonReleased(Engine2::MouseButtonReleasedEvent& event)
 	{
-		//if (pHitBlock)
-		//{
-		//	if (event.Right())
-		//	{
-		//		AddNextBlock();
-		//	}
-		//	else if (event.Left())
-		//	{
-		//		RemoveBlock();
-		//	}
-		//}
+		if (blockHit)
+		{
+			if (event.Right())
+			{
+				//AddNextBlock();
+				chunkMgr.AddBlock(hitInfo, hitLocation);
+			}
+			else if (event.Left())
+			{
+				//RemoveBlock();
+				chunkMgr.RemoveBlock(hitInfo);
+			}
+		}
 	}
 
 	void BlockWorld::KeyPressed(Engine2::KeyPressedEvent& event)
