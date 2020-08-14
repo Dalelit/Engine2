@@ -19,6 +19,7 @@ namespace Engine2
 
 		void DrawAxis(DirectX::XMMATRIX instance);
 		void DrawSphere(DirectX::XMMATRIX instance);
+		void DrawCube(DirectX::XMMATRIX instance);
 		void DrawCamera(DirectX::XMMATRIX instance);
 
 		inline bool IsActive() { return active; }
@@ -52,6 +53,14 @@ namespace Engine2
 		ID3D11Buffer* spherePtrInstancesBuffer;
 		static std::vector<DirectX::XMFLOAT3> SphereVerticies;
 		static std::vector<unsigned int> SphereIndicies;
+
+		// cube
+		std::vector<DirectX::XMMATRIX> cubeInstances;
+		unsigned int cubeInstanceCount = 0;
+		VertexBufferIndexInstanced<DirectX::XMFLOAT3, D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINELIST> cubeVBuffer;
+		ID3D11Buffer* cubePtrInstancesBuffer;
+		static std::vector<DirectX::XMFLOAT3> CubeVerticies;
+		static std::vector<unsigned int> CubeIndicies;
 
 		// camera
 		std::vector<DirectX::XMMATRIX> cameraInstances;

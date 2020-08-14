@@ -93,12 +93,18 @@ namespace BlockWorld
 
 			// calculated in initialise
 			INT32 chunksTotal, chunksStride, chunksSlice, blocksWorldTotal;
+			DirectX::XMFLOAT3 dimensions;
 		} WorldSpecs;
 
 		inline Chunk* GetChunk(INT32 x, INT32 y, INT32 z) { return ChunksBegin() + (z * WorldSpecs.chunksSlice + y * WorldSpecs.chunksStride + x); }
+		inline Chunk* GetChunk(DirectX::XMINT3 index)     { return GetChunk(index.x, index.y, index.z); }
+		
 		inline Chunk* GetRelativeChunk(Chunk* pChunk, INT32 dx, INT32 dy, INT32 dz) { return ChunksBegin() + ((pChunk->index.z + dz) * WorldSpecs.chunksSlice + (pChunk->index.y + dy) * WorldSpecs.chunksStride + (pChunk->index.x + dx)); }
 		
 		inline Block* GetBlock(Chunk* pChunk, INT32 x, INT32 y, INT32 z) { return pChunk->blocks + (z * ChunkSpecs.blocksSlice + y * ChunkSpecs.blocksStride + x); }
+		inline Block* GetBlock(Chunk* pChunk, DirectX::XMINT3 index)     { return GetBlock(pChunk, index.x, index.y, index.z); }
+
+		DirectX::XMFLOAT3 GetBlockCentre(Chunk* pChunk, DirectX::XMINT3 index) { return { (float)index.x + BlockSpecs.halfSize + pChunk->origin.m128_f32[0], (float)index.y + BlockSpecs.halfSize + pChunk->origin.m128_f32[1], (float)index.z + BlockSpecs.halfSize + pChunk->origin.m128_f32[2] }; }
 
 		inline std::vector<Chunk>& Chunks() { return *pChunksVector; }
 		inline Chunk* ChunksBegin()         { return chunks; }
@@ -118,6 +124,14 @@ namespace BlockWorld
 		Block* GetBlockPrevZ(Chunk* pChunk, DirectX::XMINT3& blockIndx);
 		Block* GetBlockNextZ(Chunk* pChunk, DirectX::XMINT3& blockIndx);
 
+		DirectX::XMINT3 GetChunkIndex(DirectX::XMVECTOR& position);
+		DirectX::XMINT3 GetBlockIndex(Chunk* pChunk, DirectX::XMVECTOR& position);
+		
+		bool IsPositionInWorld(DirectX::XMVECTOR& position);
+		bool IsValidChunkIndex(DirectX::XMINT3 index) { return index.x >= 0 && index.y >= 0 && index.z >= 0 && index.x < WorldSpecs.wide && index.y < WorldSpecs.high && index.z < WorldSpecs.deep; }
+		bool IsValidBlockIndex(DirectX::XMINT3 index) { return index.x >= 0 && index.y >= 0 && index.z >= 0 && index.x < ChunkSpecs.wide && index.y < ChunkSpecs.high && index.z < ChunkSpecs.deep; }
+
+
 		std::shared_ptr<Engine2::VertexShaderDynamic> pVS;
 		std::shared_ptr<Engine2::PixelShaderDynamic>  pPS;
 
@@ -135,11 +149,6 @@ namespace BlockWorld
 		void InitialiseBlockFaces(Chunk* pChunk);
 		void SetVertexBuffer(Chunk* pChunk);
 
-		struct {
-			int chunksChecked;
-			int chunkBlocksChecked;
-			int blocksChecked;
-			std::map<float, Chunk*> hitChunks;
-		} SearchStats;
+		DirectX::BoundingBox worldBounds;
 	};
 }

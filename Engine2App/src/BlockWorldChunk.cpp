@@ -27,85 +27,80 @@ namespace BlockWorld
 
 	bool ChunkManager::Intersects(DirectX::XMVECTOR rayOrigin, DirectX::XMVECTOR rayDirection, HitInfo& hitInfo)
 	{
-		float chunkHitDist;
-
-		SearchStats.chunksChecked = 0;
-		SearchStats.chunkBlocksChecked = 0;
-		SearchStats.blocksChecked = 0;
-		SearchStats.hitChunks.clear();
-
-		// find all the chunks hit by the ray, and sort them by hit distance
-		for (auto& chunk : Chunks())
-		{
-			SearchStats.chunksChecked++;
-
-			if (chunk.bounds.Intersects(rayOrigin, rayDirection, chunkHitDist))
-			{
-				SearchStats.hitChunks[chunkHitDist] = &chunk;
-			}
-		}
-
-		// missed if no chunks hit
-		if (SearchStats.hitChunks.size() == 0) return false;
-
 		hitInfo.pBlock = nullptr;
 		hitInfo.pChunk = nullptr;
 		hitInfo.distance = INFINITY;
+		float hitDist;
 
-		// starting with the closest chunk, find a hit block
-		for (auto [hitDist, pChunk] : SearchStats.hitChunks)
+		XMVECTOR rayDirSmallInc = rayDirection * 0.0001f;
+		BoundingBox blockBoundingBox;
+		blockBoundingBox.Extents = { BlockSpecs.halfSize, BlockSpecs.halfSize, BlockSpecs.halfSize };
+
+		bool intersected = false;
+
+		if (worldBounds.Contains(rayOrigin))
 		{
-			SearchStats.chunkBlocksChecked++;
-
-			Block* pBlock = pChunk->blocks;
-
-			BoundingBox box;
-			box.Extents = {BlockSpecs.halfSize, BlockSpecs.halfSize , BlockSpecs.halfSize };
-
-			box.Center.z = pChunk->origin.m128_f32[2] + BlockSpecs.halfSize;
-			for (INT32 z = 0; z < ChunkSpecs.deep; z++)
-			{
-				box.Center.y = pChunk->origin.m128_f32[1] + BlockSpecs.halfSize;
-				for (INT32 y = 0; y < ChunkSpecs.high; y++)
-				{
-					box.Center.x = pChunk->origin.m128_f32[0] + BlockSpecs.halfSize;
-					for (INT32 x = 0; x < ChunkSpecs.wide; x++)
-					{
-						SearchStats.blocksChecked++;
-
-						if (pBlock->type != BlockType::BlockTypeEmpty)
-						{
-							float newHitDist;
-
-							if (box.Intersects(rayOrigin, rayDirection, newHitDist))
-							{
-								if (newHitDist < hitInfo.distance)
-								{
-									hitInfo.blockIndex = { x, y, z };
-									hitInfo.pBlock = pBlock;
-									hitInfo.pChunk = pChunk;
-									hitInfo.centre = box.Center;
-									hitInfo.distance = newHitDist;
-
-									// break if this hit dist is the segment hit as that's closest
-									//if (newHitDist == hitDist) return ;
-								}
-							}
-						}
-
-						box.Center.x += BlockSpecs.size;
-						pBlock++;
-					}
-					box.Center.y += BlockSpecs.size;
-				}
-				box.Center.z += BlockSpecs.size;
-			}
-
-			if (hitInfo.pBlock) break; // going through the chunks in distance order, so if hit something don't keep searching through the chunks
+			intersected = true;
+			hitDist = 0.0f;
+		}
+		else if (worldBounds.Intersects(rayOrigin, rayDirection, hitDist))
+		{
+			intersected = true;
 		}
 
-		if (hitInfo.pBlock) return true;
-		else return false;
+		while (intersected)
+		{
+			XMVECTOR hitPosition = rayOrigin + rayDirection * hitDist;
+			XMVECTOR nextOrigin = hitPosition + rayDirSmallInc;
+
+			if (!worldBounds.Contains(nextOrigin)) return false;
+
+			XMINT3 chunkIndx = GetChunkIndex(nextOrigin);
+
+			Chunk* pChunk = GetChunk(chunkIndx);
+			XMINT3 blockIndx = GetBlockIndex(pChunk, nextOrigin);
+
+			Block* pBlock = GetBlock(pChunk, blockIndx);
+			blockBoundingBox.Center = GetBlockCentre(pChunk, blockIndx);
+
+			if (pBlock->type != BlockType::BlockTypeEmpty)
+			{
+				hitInfo.blockIndex = blockIndx;
+				hitInfo.pBlock = pBlock;
+				hitInfo.pChunk = pChunk;
+				hitInfo.centre = blockBoundingBox.Center;
+				hitInfo.distance = hitDist;
+				return true;
+			}
+
+			// calculate next hitDist
+			{
+				XMVECTOR floorDist = XMVectorFloor(nextOrigin);
+				XMVECTOR ceilingDist = XMVectorCeiling(nextOrigin);
+
+				floorDist -= rayOrigin;
+				ceilingDist -= rayOrigin;
+
+				// depending on direction of the ray, get either the floor or ceiling dist
+				XMVECTOR t;
+				if (rayDirection.m128_f32[0] > 0.0f) t.m128_f32[0] = ceilingDist.m128_f32[0];
+				else t.m128_f32[0] = floorDist.m128_f32[0];
+				if (rayDirection.m128_f32[1] > 0.0f) t.m128_f32[1] = ceilingDist.m128_f32[1];
+				else t.m128_f32[1] = floorDist.m128_f32[1];
+				if (rayDirection.m128_f32[2] > 0.0f) t.m128_f32[2] = ceilingDist.m128_f32[2];
+				else t.m128_f32[2] = floorDist.m128_f32[2];
+
+				// set to be a ratio of the direction
+				t /= rayDirection;
+				t = XMVectorAbs(t);
+
+				// find the smallest t for the hitDist
+				hitDist = (t.m128_f32[0] < t.m128_f32[1] ? t.m128_f32[0] : t.m128_f32[1]);
+				if (t.m128_f32[2] < hitDist) hitDist = t.m128_f32[2];
+			}
+		}
+
+		return false;
 	}
 
 	void ChunkManager::RemoveBlock(HitInfo& hitInfo)
@@ -278,6 +273,37 @@ namespace BlockWorld
 		return nullptr;
 	}
 
+	XMINT3 ChunkManager::GetChunkIndex(XMVECTOR& position)
+	{
+		XMVECTOR index = position / ChunkSpecs.dimensions;
+		return {
+			(INT)(index.m128_f32[0]),
+			(INT)(index.m128_f32[1]),
+			(INT)(index.m128_f32[2])
+		};
+	}
+
+	XMINT3 ChunkManager::GetBlockIndex(Chunk* pChunk, XMVECTOR& position)
+	{
+		XMVECTOR index = (position - pChunk->origin) / BlockSpecs.size;
+
+		return {
+			(INT)(index.m128_f32[0]),
+			(INT)(index.m128_f32[1]),
+			(INT)(index.m128_f32[2])
+		};
+	}
+
+	bool ChunkManager::IsPositionInWorld(DirectX::XMVECTOR& position)
+	{
+		return position.m128_f32[0] >= 0.0f &&
+			position.m128_f32[1] >= 0.0f &&
+			position.m128_f32[2] >= 0.0f&&
+			position.m128_f32[0] <= WorldSpecs.dimensions.x &&
+			position.m128_f32[1] <= WorldSpecs.dimensions.y &&
+			position.m128_f32[2] <= WorldSpecs.dimensions.z;
+	}
+
 	void ChunkManager::OnImgui()
 	{
 		if (ImGui::CollapsingHeader("Specs"))
@@ -299,17 +325,7 @@ namespace BlockWorld
 			ImGui::Text("Chunk stride %i", WorldSpecs.chunksStride);
 			ImGui::Text("Chunk slice %i", WorldSpecs.chunksSlice);
 			ImGui::Text("Total blocks %i", WorldSpecs.blocksWorldTotal);
-		}
-		{
-			ImGui::Text("Chunks tested for intersection %i", SearchStats.chunksChecked);
-			ImGui::Text("Chunks tested for block intersection %i", SearchStats.chunkBlocksChecked);
-			ImGui::Text("Blocks tested for intersection %i", SearchStats.blocksChecked);
-			ImGui::Text("Chunks intersected %i", SearchStats.hitChunks.size());
-			for (auto& kv : SearchStats.hitChunks)
-			{
-				ImGui::Text("Chunk hit %.3f at %i,%i,%i", kv.first, kv.second->index.x, kv.second->index.y, kv.second->index.z);
-			}
-
+			ImGui::Text("Dimensions %.1f, %.1f, %.1f", WorldSpecs.dimensions.x, WorldSpecs.dimensions.y, WorldSpecs.dimensions.z);
 		}
 	}
 
@@ -326,8 +342,14 @@ namespace BlockWorld
 		WorldSpecs.chunksSlice = WorldSpecs.chunksStride * WorldSpecs.high;
 		WorldSpecs.chunksTotal = WorldSpecs.chunksSlice * WorldSpecs.deep;
 		WorldSpecs.blocksWorldTotal = WorldSpecs.chunksTotal * ChunkSpecs.blocksTotal;
-		
-		//WorldSpecs.origin = (-ChunkSpecs.dimensions / 2.0f) * XMVECTOR({ (float)WorldSpecs.wide, (float)WorldSpecs.high, (float)WorldSpecs.deep, 1.0f });
+		WorldSpecs.dimensions = { WorldSpecs.wide * ChunkSpecs.dimensions.m128_f32[0], WorldSpecs.high * ChunkSpecs.dimensions.m128_f32[1], WorldSpecs.deep * ChunkSpecs.dimensions.m128_f32[2]};
+
+		worldBounds.Extents.x = WorldSpecs.dimensions.x / 2.0f;
+		worldBounds.Extents.y = WorldSpecs.dimensions.y / 2.0f;
+		worldBounds.Extents.z = WorldSpecs.dimensions.z / 2.0f;
+		worldBounds.Center.x = worldBounds.Extents.x + WorldSpecs.origin.m128_f32[0];
+		worldBounds.Center.y = worldBounds.Extents.y + WorldSpecs.origin.m128_f32[1];
+		worldBounds.Center.z = worldBounds.Extents.z + WorldSpecs.origin.m128_f32[2];
 
 		pChunksVector = std::make_unique<std::vector<Chunk>>(WorldSpecs.chunksTotal);
 		pBlocksVector = std::make_unique<std::vector<Block>>(WorldSpecs.blocksWorldTotal);

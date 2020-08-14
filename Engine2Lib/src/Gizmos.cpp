@@ -17,6 +17,7 @@ namespace Engine2
 		psCB(0),
 		axisVBuffer(AxisVerticies, AxisIndicies),
 		sphereVBuffer(SphereVerticies, SphereIndicies),
+		cubeVBuffer(CubeVerticies, CubeIndicies),
 		cameraVBuffer(CameraVerticies, CameraIndicies)
 	{
 		std::vector<D3D11_INPUT_ELEMENT_DESC> vsLayout = {
@@ -43,6 +44,9 @@ namespace Engine2
 		sphereInstances.resize(E2_GIZMOZ_MAXINSTANCES);
 		spherePtrInstancesBuffer = sphereVBuffer.AddInstances(sphereInstances, true);
 
+		cubeInstances.resize(E2_GIZMOZ_MAXINSTANCES);
+		cubePtrInstancesBuffer = cubeVBuffer.AddInstances(cubeInstances, true);
+
 		cameraInstances.resize(E2_GIZMOZ_MAXINSTANCES); // to do: make sense having this many?
 		cameraPtrInstancesBuffer = cameraVBuffer.AddInstances(cameraInstances, true);
 	}
@@ -51,6 +55,7 @@ namespace Engine2
 	{
 		axisInstanceCount = 0;
 		sphereInstanceCount = 0;
+		cubeInstanceCount = 0;
 		cameraInstanceCount = 0;
 	}
 
@@ -88,6 +93,12 @@ namespace Engine2
 			sphereVBuffer.SetInstanceCount(sphereInstanceCount);
 		}
 
+		if (cubeInstanceCount > 0)
+		{
+			DXDevice::UpdateBuffer(cubePtrInstancesBuffer, cubeInstances, cubeInstanceCount);
+			cubeVBuffer.SetInstanceCount(cubeInstanceCount);
+		}
+
 		if (cameraInstanceCount > 0)
 		{
 			DXDevice::UpdateBuffer(cameraPtrInstancesBuffer, cameraInstances, cameraInstanceCount);
@@ -109,6 +120,12 @@ namespace Engine2
 			sphereVBuffer.Draw();
 		}
 
+		if (cubeInstanceCount > 0)
+		{
+			cubeVBuffer.Bind();
+			cubeVBuffer.Draw();
+		}
+
 		if (cameraInstanceCount > 0)
 		{
 			cameraVBuffer.Bind();
@@ -127,6 +144,7 @@ namespace Engine2
 				ImGui::ColorEdit4("Hidden", hiddenColor.m128_f32);
 				ImGui::Text("Axis   %i", axisInstanceCount);
 				ImGui::Text("Sphere %i", sphereInstanceCount);
+				ImGui::Text("Cube   %i", cubeInstanceCount);
 				ImGui::Text("Camera %i", cameraInstanceCount);
 			}
 			ImGui::TreePop();
@@ -145,6 +163,13 @@ namespace Engine2
 		E2_GIZMOZ_CHECKINSTANCES(sphereInstanceCount, sphereInstances);
 
 		sphereInstances[sphereInstanceCount++] = XMMatrixTranspose(instance);
+	}
+
+	void Gizmos::DrawCube(DirectX::XMMATRIX instance)
+	{
+		E2_GIZMOZ_CHECKINSTANCES(cubeInstanceCount, cubeInstances);
+
+		cubeInstances[cubeInstanceCount++] = XMMatrixTranspose(instance);
 	}
 
 	void Gizmos::DrawCamera(DirectX::XMMATRIX instance)
@@ -166,36 +191,67 @@ namespace Engine2
 	};
 
 	std::vector<XMFLOAT3> Gizmos::SphereVerticies = {
-		{0.500f, 0.0f, 0.000f},
-		{0.433f, 0.0f, 0.250f},
-		{0.250f, 0.0f, 0.433f},
-		{0.000f, 0.0f, 0.500f},
+		{0.500f,  0.0f, 0.000f},
+		{0.433f,  0.0f, 0.250f},
+		{0.250f,  0.0f, 0.433f},
+		{0.000f,  0.0f, 0.500f},
 		{-0.250f, 0.0f, 0.433f},
 		{-0.433f, 0.0f, 0.250f},
 		{-0.500f, 0.0f, 0.000f},
 		{-0.433f, 0.0f, -0.250f},
 		{-0.250f, 0.0f, -0.433f},
-		{0.000f, 0.0f, -0.500f},
-		{0.250f, 0.0f, -0.433f},
-		{0.433f, 0.0f, -0.250f},
+		{0.000f,  0.0f, -0.500f},
+		{0.250f,  0.0f, -0.433f},
+		{0.433f,  0.0f, -0.250f},
 
-		{0.0f, 0.000f, 0.500f},
-		{0.0f, 0.250f, 0.433f},
-		{0.0f, 0.433f, 0.250f},
-		{0.0f, 0.500f, 0.000f},
-		{0.0f, 0.433f, -0.250f},
-		{0.0f, 0.250f, -0.433f},
-		{0.0f, 0.000f, -0.500f},
+		{0.0f,  0.000f, 0.500f},
+		{0.0f,  0.250f, 0.433f},
+		{0.0f,  0.433f, 0.250f},
+		{0.0f,  0.500f, 0.000f},
+		{0.0f,  0.433f, -0.250f},
+		{0.0f,  0.250f, -0.433f},
+		{0.0f,  0.000f, -0.500f},
 		{0.0f, -0.250f, -0.433f},
 		{0.0f, -0.433f, -0.250f},
 		{0.0f, -0.500f, 0.000f},
 		{0.0f, -0.433f, 0.250f},
 		{0.0f, -0.250f, 0.433f},
+
+		{0.000f,   0.500f, 0.0f},
+		{0.250f,   0.433f, 0.0f},
+		{0.433f,   0.250f, 0.0f},
+		{0.500f,   0.000f, 0.0f},
+		{0.433f,  -0.250f, 0.0f},
+		{0.250f,  -0.433f, 0.0f},
+		{0.000f,  -0.500f, 0.0f},
+		{-0.250f, -0.433f, 0.0f},
+		{-0.433f, -0.250f, 0.0f},
+		{-0.500f,  0.000f, 0.0f},
+		{-0.433f,  0.250f, 0.0f},
+		{-0.250f,  0.433f, 0.0f},
 	};
 
 	std::vector<unsigned int> Gizmos::SphereIndicies = {
 		0,1, 1,2, 2,3, 3,4, 4,5, 5,6, 6,7, 7,8, 8,9, 9,10, 10,11, 11,0,
 		12,13, 13,14, 14,15, 15,16, 16,17, 17,18, 18,19, 19,20, 20,21, 21,22, 22,23, 23,12,
+		24,25, 25,26, 26,27, 27,28, 28,29, 29,30, 30,31, 31,32, 32,33, 33,34, 34,35, 35,24,
+	};
+
+	std::vector<XMFLOAT3> Gizmos::CubeVerticies = {
+		{-0.5f, -0.5f, -0.5f},
+		{-0.5f,  0.5f, -0.5f},
+		{ 0.5f,  0.5f, -0.5f},
+		{ 0.5f, -0.5f, -0.5f},
+		{-0.5f, -0.5f,  0.5f},
+		{-0.5f,  0.5f,  0.5f},
+		{ 0.5f,  0.5f,  0.5f},
+		{ 0.5f, -0.5f,  0.5f},
+	};
+
+	std::vector<unsigned int> Gizmos::CubeIndicies = {
+		0,1, 1,2, 2,3 ,3,0,
+		4,5, 5,6, 6,7, 7,4,
+		0,4, 1,5, 2,6, 3,7,
 	};
 
 	std::vector<XMFLOAT3> Gizmos::CameraVerticies = {
