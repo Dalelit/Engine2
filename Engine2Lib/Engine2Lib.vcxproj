@@ -150,6 +150,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\ECS.h" />
     <ClInclude Include="src\UtilMath.h" />
     <ClInclude Include="src\AssetLoaders\ObjLoader.h" />
     <ClInclude Include="src\Config.h" />

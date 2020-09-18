@@ -165,6 +165,7 @@
     <ClCompile Include="src\BallWorld.cpp" />
     <ClCompile Include="src\BlockWorld.cpp" />
     <ClCompile Include="src\BlockWorldChunk.cpp" />
+    <ClCompile Include="src\ECSTest.cpp" />
     <ClCompile Include="src\Empty.cpp" />
     <ClCompile Include="src\ModelTest.cpp" />
     <ClCompile Include="src\ParticleTest.cpp" />
@@ -178,6 +179,7 @@
     <ClInclude Include="src\BallWorld.h" />
     <ClInclude Include="src\BlockWorld.h" />
     <ClInclude Include="src\BlockWorldChunk.h" />
+    <ClInclude Include="src\ECSTest.h" />
     <ClInclude Include="src\Empty.h" />
     <ClInclude Include="src\ModelTest.h" />
     <ClInclude Include="src\ParticleTest.h" />

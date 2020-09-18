@@ -4,6 +4,7 @@
 #include "ModelTest.h"
 #include "ParticleTest.h"
 #include "BlockWorld.h"
+#include "ECSTest.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -230,7 +231,8 @@ int WINAPI WinMain(
 	Engine2::Engine::Get().AttachLayer(new ModelTest(), false);
 	Engine2::Engine::Get().AttachLayer(new BallWorld(), false);
 	Engine2::Engine::Get().AttachLayer(new ParticleTest(), false);
-	Engine2::Engine::Get().AttachLayer(new BlockWorld::BlockWorld());
+	Engine2::Engine::Get().AttachLayer(new BlockWorld::BlockWorld(), false);
+	Engine2::Engine::Get().AttachLayer(new ECSTest());
 
 	clock_t lastTime = clock();
 

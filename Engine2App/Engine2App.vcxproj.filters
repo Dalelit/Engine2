@@ -9,6 +9,7 @@
     <ClCompile Include="src\Empty.cpp" />
     <ClCompile Include="src\BlockWorld.cpp" />
     <ClCompile Include="src\BlockWorldChunk.cpp" />
+    <ClCompile Include="src\ECSTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h" />
@@ -19,6 +20,7 @@
     <ClInclude Include="src\Empty.h" />
     <ClInclude Include="src\BlockWorld.h" />
     <ClInclude Include="src\BlockWorldChunk.h" />
+    <ClInclude Include="src\ECSTest.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Assets\Materials\SceneEntityCBVS.hlsl" />
