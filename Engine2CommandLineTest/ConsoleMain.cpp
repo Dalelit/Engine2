@@ -50,9 +50,6 @@ private:
 int main()
 {
 	std::cout << "Starting..." << std::endl;
-	std::cout << "Max entities " << MAXENTITIES << std::endl;
-	std::cout << "Max components " << (uint32_t)MAXCOMPONENTS << std::endl;
-	std::cout << "---------" << std::endl;
 
 	Coordinator coord;
 	std::cout << coord << std::endl;

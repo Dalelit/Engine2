@@ -27,7 +27,6 @@
 namespace EngineECS
 {
 	using EntityId_t = uint32_t;
-	constexpr EntityId_t MAXENTITIES = 1000000;
 
 	using ComponentId_t = uint32_t;
 	constexpr ComponentId_t MAXCOMPONENTS = 32;
@@ -137,9 +136,9 @@ namespace EngineECS
 	class Coordinator
 	{
 	public:
-		Coordinator()
+		Coordinator(EntityId_t maxEntities = 1000) : maxEntities(maxEntities)
 		{
-			entitySignatures = new Signature[MAXENTITIES];
+			entitySignatures = new Signature[maxEntities];
 
 			memset(componentStores, 0, sizeof(componentStores));
 			memset(componentNames, 0, sizeof(componentNames));
@@ -163,6 +162,7 @@ namespace EngineECS
 		}
 
 		EntityId_t GetEntityCount() const { return entityCounter; }
+		EntityId_t GetMaxEntities() const { return maxEntities; }
 
 		bool TestEntity(Signature signature, EntityId_t id) { return (entitySignatures[id] & signature) == signature; }
 
@@ -238,6 +238,7 @@ namespace EngineECS
 		}
 
 	private:
+		EntityId_t maxEntities;
 		EntityId_t entityCounter = 0;
 		Signature* entitySignatures = nullptr;
 
@@ -254,7 +255,7 @@ namespace EngineECS
 
 			if (pStore == nullptr)
 			{
-				pStore = new ComponentStorage<T>(id, MAXENTITIES);
+				pStore = new ComponentStorage<T>(id, maxEntities);
 				componentStores[id] = pStore;
 				componentNames[id] = typeid(T).name();
 			}
@@ -305,7 +306,7 @@ namespace EngineECS
 			SetSignature<T...>();
 
 			ComponentId_t componentIds[] = { pCoord->GetComponentId<T>()... };
-			ComponentIndex_t componentCount = MAXENTITIES;
+			ComponentIndex_t componentCount = coord.GetMaxEntities();
 
 			// find the shortest component list to base the view on
 			for (int i = 0; i < sizeof...(T); i++)
