@@ -12,7 +12,7 @@ namespace Engine2
 		Layer(std::string name) : name(name) {}
 		virtual ~Layer() = default;
 
-		inline std::string GetName() const { return name; }
+		inline const std::string& GetName() const { return name; }
 
 		inline bool IsActive() const { return active; }
 		inline void SetActive(bool makeActive = true) { active = makeActive; }

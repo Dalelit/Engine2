@@ -3,7 +3,7 @@
 #include "pch.h"
 #include "Common.h"
 #include "VertexBuffer.h"
-#include "Entity.h"
+#include "Instances.h"
 
 namespace Engine2
 {
@@ -78,6 +78,6 @@ namespace Engine2
 		void Draw() override;
 		void OnImgui() override;
 
-		EntityInstances entities;
+		Instances instances;
 	};
 }

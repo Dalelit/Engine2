@@ -98,7 +98,7 @@ void BallWorld::CreateCube()
 	rn->AddBindable(std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout));
 	rn->AddBindable(std::make_shared<PixelShaderDynamic>(psfilename));
 
-	model->entities.instances.emplace_back(1.0f, 0.0f, 0.0f);
+	model->instances.instances.emplace_back(1.0f, 0.0f, 0.0f);
 
 	models.push_back(model);
 }

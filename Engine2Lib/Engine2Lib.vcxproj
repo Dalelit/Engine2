@@ -150,7 +150,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Components.h" />
     <ClInclude Include="src\ECS.h" />
+    <ClInclude Include="src\Instances.h" />
     <ClInclude Include="src\UtilMath.h" />
     <ClInclude Include="src\AssetLoaders\ObjLoader.h" />
     <ClInclude Include="src\Config.h" />
@@ -193,10 +195,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AssetLoaders\ObjLoader.cpp" />
+    <ClCompile Include="src\Components.cpp" />
     <ClCompile Include="src\Config.cpp" />
     <ClCompile Include="src\Entity.cpp" />
     <ClCompile Include="src\Gizmos.cpp" />
     <ClCompile Include="src\InputController.cpp" />
+    <ClCompile Include="src\Instances.cpp" />
     <ClCompile Include="src\Instrumentation.cpp" />
     <ClCompile Include="src\Lights.cpp" />
     <ClCompile Include="src\OffscreenOutliner.cpp" />

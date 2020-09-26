@@ -2,8 +2,11 @@
 #include "ECSTest.h"
 #include "Primatives.h"
 #include "Engine2.h"
+#include "VertexBuffer.h"
+#include "Components.h"
 
 using namespace Engine2;
+using namespace EngineECS;
 using namespace DirectX;
 
 ECSTest::ECSTest() : Layer("ECSTest")
@@ -25,14 +28,11 @@ void ECSTest::OnUpdate(float dt)
 void ECSTest::OnRender()
 {
 	scene.OnRender();
-
-	for (auto& m : models) if (m->IsActive()) m->Draw();
 }
 
 void ECSTest::OnImgui()
 {
 	scene.OnImgui();
-	for (auto& m : models) m->OnImgui();
 }
 
 void ECSTest::CreateCube()
@@ -52,16 +52,17 @@ void ECSTest::CreateCube()
 	std::vector<Vertex> verticies(Primatives::Cube::verticies.size());
 	Primatives::CopyPositionNormalColor(verticies, Primatives::Cube::verticies);
 
-	std::string vsfilename = Config::directories["ShaderSourceDir"] + "ModelTestVS.hlsl";
-	std::string psfilename = Config::directories["ShaderSourceDir"] + "ModelTestPS.hlsl";
+	std::string vsfilename = Config::directories["ShaderSourceDir"] + "StandardPosNorColVS.hlsl";
+	std::string psfilename = Config::directories["ShaderSourceDir"] + "StandardPosNorColPS.hlsl";
 
-	auto model = std::make_shared<ModelEntities>("Cube");
-	auto rn = model->AddRenderNode("RN1");
-	rn->SetDrawable(std::make_shared<MeshTriangleIndexList<Vertex>>(verticies, Primatives::Cube::indicies));
-	rn->AddBindable(std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout));
-	rn->AddBindable(std::make_shared<PixelShaderDynamic>(psfilename));
+	auto e = scene.CreateEntity();
+	auto mesh = e.AddComponent<Mesh>();
+	mesh->drawable = std::make_shared<MeshTriangleIndexList<Vertex>>(verticies, Primatives::Cube::indicies);
+	mesh->vertexShaderCB = std::make_shared<VSConstantBuffer<Transform>>(1);
+	mesh->vertexShader = std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout);
+	mesh->pixelShader = std::make_shared<PixelShaderDynamic>(psfilename);
 
-	model->entities.instances.emplace_back(1.0f, 0.0f, 0.0f);
-
-	models.push_back(model);
+	auto e2 = scene.CreateEntity();
+	*e2.AddComponent<Mesh>() = *mesh;
+	e2.GetComponent<Transform>()->Set(3.0f, 0.0f, 0.0f, 1.5f, 1.5f, 1.5f, 15.0f, 30.0f, 45.0f);
 }

@@ -7,11 +7,11 @@
 
 using namespace EngineECS;
 
-struct Transform
+struct TransformTest
 {
 	DirectX::XMVECTOR position;
 
-	Transform()
+	TransformTest()
 	{
 		position.m128_f32[0] = 0.1f;
 		position.m128_f32[1] = 1.0f;
@@ -19,27 +19,27 @@ struct Transform
 		position.m128_f32[3] = 3.0f;
 	}
 
-	friend std::ostream& operator<<(std::ostream& out, Transform* t)
+	friend std::ostream& operator<<(std::ostream& out, TransformTest* t)
 	{
 		if (t)
 			out << t->position.m128_f32[0] << "," << t->position.m128_f32[1] << "," << t->position.m128_f32[2] << "," << t->position.m128_f32[3];
 		return out;
 	}
 
-	friend std::ostream& operator<<(std::ostream& out, Transform& t)
+	friend std::ostream& operator<<(std::ostream& out, TransformTest& t)
 	{
 		out << t.position.m128_f32[0] << "," << t.position.m128_f32[1] << "," << t.position.m128_f32[2] << "," << t.position.m128_f32[3];
 		return out;
 	}
 };
 
-class RigidBody
+class RigidBodyTest
 {
 public:
 	DirectX::XMVECTOR velocity;
 };
 
-class Mesh
+class MeshTest
 {
 public:
 private:
@@ -59,48 +59,48 @@ int main()
 	std::cout << "---------" << std::endl;
 
 	EntityId_t e1 = coord.CreateEntity();
-	coord.AddComponent<Transform>(e1);
+	coord.AddComponent<TransformTest>(e1);
 
 	EntityId_t e2 = coord.CreateEntity();
-	coord.AddComponent<Transform>(e2);
-	coord.AddComponent<RigidBody>(e2);
+	coord.AddComponent<TransformTest>(e2);
+	coord.AddComponent<RigidBodyTest>(e2);
 
-	std::cout << "e2 has RigidBody " << coord.HasComponent<RigidBody>(e2) << std::endl;
-	std::cout << "e2 has Mesh " << coord.HasComponent<Mesh>(e2) << std::endl;
+	std::cout << "e2 has RigidBodyTest " << coord.HasComponent<RigidBodyTest>(e2) << std::endl;
+	std::cout << "e2 has MeshTest " << coord.HasComponent<MeshTest>(e2) << std::endl;
 
 	for (int i = 0; i < 15; i++)
 	{
 		EntityId_t eid = coord.CreateEntity();
 
-		if (i > 5) coord.AddComponent<Transform>(eid);
-		if (i > 10) coord.AddComponent<RigidBody>(eid);
-		if (i > 13) coord.AddComponent<Mesh>(eid);
+		if (i > 5) coord.AddComponent<TransformTest>(eid);
+		if (i > 10) coord.AddComponent<RigidBodyTest>(eid);
+		if (i > 13) coord.AddComponent<MeshTest>(eid);
 	}
 
-	coord.AddComponent<RigidBody>(coord.CreateEntity());
+	coord.AddComponent<RigidBodyTest>(coord.CreateEntity());
 
 	std::cout << coord << std::endl;
 
 	std::cout << "---------" << std::endl;
-	coord.GetComponent<Transform>(e2)->position.m128_f32[0] = 666.0f;
-	std::cout << coord.GetComponent<Transform>(e1) << std::endl;
-	std::cout << coord.GetComponent<Transform>(e2) << std::endl;
+	coord.GetComponent<TransformTest>(e2)->position.m128_f32[0] = 666.0f;
+	std::cout << coord.GetComponent<TransformTest>(e1) << std::endl;
+	std::cout << coord.GetComponent<TransformTest>(e2) << std::endl;
 	std::cout << "---------" << std::endl;
 
 	{
-		EntityView<Transform> v(coord);
+		EntityView<TransformTest> v(coord);
 		std::cout << v << std::endl;
 		for (auto t : v) std::cout << " " << t << std::endl;
 		std::cout << "---------" << std::endl;
 	}
 	{
-		View<Transform, RigidBody> v(coord);
+		View<TransformTest, RigidBodyTest> v(coord);
 		std::cout << v << std::endl;
 		for (auto t : v) std::cout << " " << t << std::endl;
 		std::cout << "---------" << std::endl;
 	}
 	{
-		EntityView<RigidBody> v(coord);
+		EntityView<RigidBodyTest> v(coord);
 		std::cout << v << std::endl;
 		for (auto t : v) std::cout << " " << t << std::endl;
 		std::cout << "---------" << std::endl;
@@ -113,26 +113,26 @@ int main()
 	}
 
 	{
-		std::cout << coord.GetComponents<Transform>() << std::endl;
-		for (auto& c : coord.GetComponents<Transform>()) std::cout << " " << c << std::endl;
+		std::cout << coord.GetComponents<TransformTest>() << std::endl;
+		for (auto& c : coord.GetComponents<TransformTest>()) std::cout << " " << c << std::endl;
 		std::cout << "---------" << std::endl;
 	}
 
 	{
-		View<RigidBody> v(coord);
+		View<RigidBodyTest> v(coord);
 		std::cout << v << std::endl;
 		for (auto t : v) std::cout << " " << t << std::endl;
 		std::cout << "---------" << std::endl;
 	}
 
 	{
-		EntityView<Mesh> v(coord);
+		EntityView<MeshTest> v(coord);
 		std::cout << v << std::endl;
 		for (auto t : v) std::cout << " " << t << std::endl;
 		std::cout << "---------" << std::endl;
 	}
 	{
-		View<Mesh> v(coord);
+		View<MeshTest> v(coord);
 		std::cout << v << std::endl;
 		for (auto t : v) std::cout << " " << t << std::endl;
 		std::cout << "---------" << std::endl;

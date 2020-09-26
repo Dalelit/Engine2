@@ -68,12 +68,12 @@ namespace Engine2
 	{
 		if (wireframe) DXDevice::Get().SetWireframeRenderState();
 
-		for (auto& e : entities.instances)
+		for (auto& e : instances.instances)
 		{
 			if (e.IsActive())
 			{
-				e.LoadTransformT(entities.vsConstantBuffer.data.entityTransform, entities.vsConstantBuffer.data.entityTransformRotation);
-				entities.vsConstantBuffer.Bind();
+				e.LoadTransformT(instances.vsConstantBuffer.data.transform, instances.vsConstantBuffer.data.transformRotation);
+				instances.vsConstantBuffer.Bind();
 				for (auto& n : nodes) n->Render();
 			}
 		}
@@ -91,7 +91,7 @@ namespace Engine2
 
 			if (ImGui::TreeNode("Entities"))
 			{
-				for (auto& e : entities.instances) e.OnImgui();
+				for (auto& e : instances.instances) e.OnImgui();
 				ImGui::TreePop();
 			}
 

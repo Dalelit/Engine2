@@ -2,6 +2,8 @@
 #include "pch.h"
 #include "ConstantBuffer.h"
 #include "Lights.h"
+#include "ECS.h"
+#include "Entity.h"
 
 namespace Engine2
 {
@@ -15,6 +17,8 @@ namespace Engine2
 
 		void OnUpdate(float dt) {}
 		void OnRender();
+
+		Entity CreateEntity();
 
 		void OnImgui();
 
@@ -36,6 +40,8 @@ namespace Engine2
 		PSConstantBuffer<PSSceneData> psConstBuffer;
 
 	protected:
+		EngineECS::Coordinator coordinator;
+
 		void UpdateVSConstBuffer();
 		void UpdatePSConstBuffer();
 	};

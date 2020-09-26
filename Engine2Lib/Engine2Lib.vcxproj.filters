@@ -41,6 +41,8 @@
     <ClInclude Include="src\Particles.h" />
     <ClInclude Include="src\UtilMath.h" />
     <ClInclude Include="src\ECS.h" />
+    <ClInclude Include="src\Components.h" />
+    <ClInclude Include="src\Instances.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\pch.cpp" />
@@ -71,6 +73,8 @@
     <ClCompile Include="src\AssetLoaders\ObjLoader.cpp" />
     <ClCompile Include="src\OffscreenOutliner.cpp" />
     <ClCompile Include="src\Particles.cpp" />
+    <ClCompile Include="src\Components.cpp" />
+    <ClCompile Include="src\Instances.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Assets\Shaders\GizmosPS.hlsl" />

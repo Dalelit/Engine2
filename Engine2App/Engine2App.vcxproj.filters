@@ -43,5 +43,7 @@
     <FxCompile Include="Assets\Materials\BlockWorldHighlightPS.hlsl" />
     <FxCompile Include="Assets\Materials\BlockWorldHighlightVS.hlsl" />
     <FxCompile Include="Assets\Materials\BlockWorld2VS.hlsl" />
+    <FxCompile Include="Assets\Materials\StandardPosNorColVS.hlsl" />
+    <FxCompile Include="Assets\Materials\StandardPosNorColPS.hlsl" />
   </ItemGroup>
 </Project>
