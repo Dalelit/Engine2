@@ -43,6 +43,8 @@ namespace Engine2
 		std::shared_ptr<PixelShader> pixelShader;
 
 		void OnImgui();
+
+		bool IsValid() { return drawable && vertexShader && vertexShaderCB && pixelShader; }
 	};
 
 	class Components
@@ -53,6 +55,14 @@ namespace Engine2
 			if (coord.HasComponent<EntityInfo>(id)) coord.GetComponent<EntityInfo>(id)->OnImgui();
 			if (coord.HasComponent<Transform>(id)) coord.GetComponent<Transform>(id)->OnImgui();
 			if (coord.HasComponent<Mesh>(id)) coord.GetComponent<Mesh>(id)->OnImgui();
+
+			if (ImGui::BeginCombo("Add Component", ""))
+			{
+				if (!coord.HasComponent<Mesh>(id) && ImGui::Selectable("Mesh")) coord.AddComponent<Mesh>(id);
+				ImGui::Selectable("Test");
+
+				ImGui::EndCombo();
+			}
 		}
 	};
 }

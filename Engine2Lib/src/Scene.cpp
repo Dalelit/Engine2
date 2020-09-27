@@ -22,14 +22,17 @@ namespace Engine2
 		{
 			const auto& mesh = coordinator.GetComponent<Mesh>(e);
 
-			mesh->vertexShaderCB->data = *coordinator.GetComponent<Transform>(e);
-			mesh->vertexShaderCB->UpdateBuffer();
-			mesh->vertexShaderCB->Bind();
+			if (mesh->IsValid())
+			{
+				mesh->vertexShaderCB->data = *coordinator.GetComponent<Transform>(e);
+				mesh->vertexShaderCB->UpdateBuffer();
+				mesh->vertexShaderCB->Bind();
 
-			mesh->vertexShader->Bind();
-			mesh->pixelShader->Bind();
-			
-			mesh->drawable->BindAndDraw();
+				mesh->vertexShader->Bind();
+				mesh->pixelShader->Bind();
+
+				mesh->drawable->BindAndDraw();
+			}
 		}
 	}
 
@@ -63,6 +66,11 @@ namespace Engine2
 					Components::OnImgui(allInfo.GetEntity(indx), coordinator);
 					ImGui::TreePop();
 				}
+			}
+			
+			if (ImGui::Button("Add Entity"))
+			{
+				CreateEntity();
 			}
 
 			ImGui::TreePop();

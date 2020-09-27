@@ -63,9 +63,18 @@ namespace Engine2
 	{
 		if (ImGui::TreeNode("Mesh"))
 		{
-			drawable->OnImgui();
-			vertexShader->OnImgui();
-			pixelShader->OnImgui();
+			if (drawable) drawable->OnImgui();
+			else ImGui::Text("Drawable null");
+
+			if (vertexShaderCB) vertexShaderCB->OnImgui();
+			else ImGui::Text("vertexShaderCB null");
+
+			if (vertexShader) vertexShader->OnImgui();
+			else ImGui::Text("vertexShader null");
+
+			if (pixelShader) pixelShader->OnImgui();
+			else ImGui::Text("pixelShader null");
+
 			ImGui::TreePop();
 		}
 	}
