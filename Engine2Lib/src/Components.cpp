@@ -78,4 +78,30 @@ namespace Engine2
 			ImGui::TreePop();
 		}
 	}
+
+	void Gizmo::OnImgui()
+	{
+		if (ImGui::TreeNode("Gizmo"))
+		{
+			const char* selected = "";
+
+			switch (type)
+			{
+				case Types::Axis: selected = "Axis"; break;
+				case Types::Cube: selected = "Cube"; break;
+				case Types::Sphere: selected = "Sphere"; break;
+				case Types::Camera: selected = "Camera"; break;
+			}
+
+			if (ImGui::BeginCombo("Type", selected))
+			{
+				if (ImGui::Selectable("Axis",   type == Types::Axis)) type = Types::Axis;
+				if (ImGui::Selectable("Cube",   type == Types::Cube)) type = Types::Cube;
+				if (ImGui::Selectable("Sphere", type == Types::Sphere)) type = Types::Sphere;
+				if (ImGui::Selectable("Camera", type == Types::Camera)) type = Types::Camera;
+				ImGui::EndCombo();
+			}
+			ImGui::TreePop();
+		}
+	}
 }

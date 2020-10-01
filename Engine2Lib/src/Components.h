@@ -47,6 +47,14 @@ namespace Engine2
 		bool IsValid() { return drawable && vertexShader && vertexShaderCB && pixelShader; }
 	};
 
+	struct Gizmo
+	{
+		enum Types {Axis, Cube, Sphere, Camera};
+		Types type = Types::Sphere;
+
+		void OnImgui();
+	};
+
 	class Components
 	{
 	public:
@@ -55,11 +63,12 @@ namespace Engine2
 			if (coord.HasComponent<EntityInfo>(id)) coord.GetComponent<EntityInfo>(id)->OnImgui();
 			if (coord.HasComponent<Transform>(id)) coord.GetComponent<Transform>(id)->OnImgui();
 			if (coord.HasComponent<Mesh>(id)) coord.GetComponent<Mesh>(id)->OnImgui();
+			if (coord.HasComponent<Gizmo>(id)) coord.GetComponent<Gizmo>(id)->OnImgui();
 
 			if (ImGui::BeginCombo("Add Component", ""))
 			{
 				if (!coord.HasComponent<Mesh>(id) && ImGui::Selectable("Mesh")) coord.AddComponent<Mesh>(id);
-				ImGui::Selectable("Test");
+				if (!coord.HasComponent<Gizmo>(id) && ImGui::Selectable("Gizmo")) coord.AddComponent<Gizmo>(id);
 
 				ImGui::EndCombo();
 			}

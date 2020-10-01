@@ -4,6 +4,7 @@
 #include "Lights.h"
 #include "ECS.h"
 #include "Entity.h"
+#include "Gizmos.h"
 
 namespace Engine2
 {
@@ -41,6 +42,8 @@ namespace Engine2
 
 	protected:
 		EngineECS::Coordinator coordinator;
+
+		Gizmos gizmosRender;
 
 		void UpdateVSConstBuffer();
 		void UpdatePSConstBuffer();

@@ -280,7 +280,6 @@ namespace EngineECS
 	protected:
 		Coordinator* pCoord = nullptr;
 		Signature signature;
-		bool all = false;
 
 		template <typename... T>
 		void SetSignature()
@@ -312,7 +311,13 @@ namespace EngineECS
 			for (int i = 0; i < sizeof...(T); i++)
 			{
 				Storage* store = coord.GetComponentStore(componentIds[i]);
-				if (componentCount > store->Count())
+				if (store == nullptr) // scenario where a component has not created it's store (i.e. when component has not been used)
+				{
+					componentStore = nullptr;
+					componentCount = 0;
+					return;
+				}
+				else if (componentCount > store->Count())
 				{
 					componentStore = store;
 					componentCount = store->Count();
@@ -356,15 +361,28 @@ namespace EngineECS
 
 		const Iterator begin() const
 		{
-			Iterator iter(pCoord, signature, componentStore->EntitiesBegin(), componentStore->EntitiesEnd());
-			iter.CheckForNext();
-
-			return iter;
+			if (componentStore)
+			{
+				Iterator iter(pCoord, signature, componentStore->EntitiesBegin(), componentStore->EntitiesEnd());
+				iter.CheckForNext();
+				return iter;
+			}
+			else
+			{
+				return Iterator(pCoord, signature, nullptr, nullptr);
+			}
 		}
 
 		const Iterator end() const
 		{
-			return Iterator(pCoord, signature, componentStore->EntitiesEnd(), componentStore->EntitiesEnd());
+			if (componentStore)
+			{
+				return Iterator(pCoord, signature, componentStore->EntitiesEnd(), componentStore->EntitiesEnd());
+			}
+			else
+			{
+				return Iterator(pCoord, signature, nullptr, nullptr);
+			}
 		}
 
 		void Print(std::ostream& out)

@@ -17,22 +17,45 @@ namespace Engine2
 		UpdateVSConstBuffer();
 		UpdatePSConstBuffer();
 
-		View<Mesh, Transform> entities(coordinator);
-		for (auto e : entities)
+		// draw mesh entities
 		{
-			const auto& mesh = coordinator.GetComponent<Mesh>(e);
-
-			if (mesh->IsValid())
+			View<Mesh, Transform> entities(coordinator);
+			for (auto e : entities)
 			{
-				mesh->vertexShaderCB->data = *coordinator.GetComponent<Transform>(e);
-				mesh->vertexShaderCB->UpdateBuffer();
-				mesh->vertexShaderCB->Bind();
+				const auto& mesh = coordinator.GetComponent<Mesh>(e);
 
-				mesh->vertexShader->Bind();
-				mesh->pixelShader->Bind();
+				if (mesh->IsValid())
+				{
+					mesh->vertexShaderCB->data = *coordinator.GetComponent<Transform>(e);
+					mesh->vertexShaderCB->UpdateBuffer();
+					mesh->vertexShaderCB->Bind();
 
-				mesh->drawable->BindAndDraw();
+					mesh->vertexShader->Bind();
+					mesh->pixelShader->Bind();
+
+					mesh->drawable->BindAndDraw();
+				}
 			}
+		}
+
+		// draw gizmos
+		{
+			View<Gizmo, Transform> entities(coordinator);
+			gizmosRender.NewFrame();
+			for (auto e : entities)
+			{
+				const auto& gizmo = coordinator.GetComponent<Gizmo>(e);
+				const auto& trans = coordinator.GetComponent<Transform>(e);
+
+				switch (gizmo->type)
+				{
+					case Gizmo::Types::Axis:   gizmosRender.DrawAxis(DirectX::XMMatrixTranspose(trans->transform)); break;
+					case Gizmo::Types::Cube:   gizmosRender.DrawCube(DirectX::XMMatrixTranspose(trans->transform)); break;
+					case Gizmo::Types::Sphere: gizmosRender.DrawSphere(DirectX::XMMatrixTranspose(trans->transform)); break;
+					case Gizmo::Types::Camera: gizmosRender.DrawCamera(DirectX::XMMatrixTranspose(trans->transform)); break;
+				}
+			}
+			gizmosRender.Render();
 		}
 	}
 
