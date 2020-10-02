@@ -11,7 +11,7 @@ namespace Engine2
 		using GizmoVBType = VertexBufferIndexInstanced<DirectX::XMFLOAT3, D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINELIST>;
 	public:
 
-		GizmoRender();
+		GizmoRender(size_t maxGizmos = 50);
 		~GizmoRender() = default;
 
 		void NewFrame();
@@ -23,36 +23,34 @@ namespace Engine2
 		void DrawCamera(DirectX::XMMATRIX instance);
 
 	protected:
+		size_t maxGizmos;
 		std::shared_ptr<PixelShader> pPS;
 		std::shared_ptr<VertexShader> pVS;
 		PSConstantBuffer<DirectX::XMVECTOR> psCB;
 		DirectX::XMVECTOR visibleColor = { 0.2f, 0.8f, 0.2f, 1.0f };
 		DirectX::XMVECTOR hiddenColor = { 0.05f, 0.2f, 0.05f, 1.0f };
 		wrl::ComPtr<ID3D11DepthStencilState> pBackDrawDSS;
+		wrl::ComPtr<ID3D11Buffer> instanceBuffer;
+		using InstanceInfoType = DirectX::XMMATRIX;
 
 		void CreateVertexBuffers();
 
-		void UpdateBuffers();
 		void Draw();
 
 		// axis
-		std::vector<DirectX::XMMATRIX> axisInstances;
+		std::vector<InstanceInfoType> axisInstances;
 		std::unique_ptr<GizmoVBType> axisVBuffer;
-		ID3D11Buffer* axisPtrInstancesBuffer;
 
 		// sphere
-		std::vector<DirectX::XMMATRIX> sphereInstances;
+		std::vector<InstanceInfoType> sphereInstances;
 		std::unique_ptr<GizmoVBType> sphereVBuffer;
-		ID3D11Buffer* spherePtrInstancesBuffer;
 
 		// cube
-		std::vector<DirectX::XMMATRIX> cubeInstances;
+		std::vector<InstanceInfoType> cubeInstances;
 		std::unique_ptr<GizmoVBType> cubeVBuffer;
-		ID3D11Buffer* cubePtrInstancesBuffer;
 
 		// camera
-		std::vector<DirectX::XMMATRIX> cameraInstances;
+		std::vector<InstanceInfoType> cameraInstances;
 		std::unique_ptr<GizmoVBType> cameraVBuffer;
-		ID3D11Buffer* cameraPtrInstancesBuffer;
 	};
 }

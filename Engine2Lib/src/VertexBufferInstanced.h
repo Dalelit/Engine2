@@ -53,11 +53,16 @@ namespace Engine2
 			return AddBuffer<D>(bufferData, dynamic);
 		}
 
+		// use this to reference an existing buffer managed elsewhere, rather the AddInstances/AddBuffer which also creates the buffer.
 		template <typename D>
-		ID3D11Buffer* AddBuffer(std::vector<D>& bufferData, bool dynamic = false) {
+		void ReferenceInstanceBuffer(ID3D11Buffer* pBuffer) {
 			bufferStrides.push_back(sizeof(D));
 			bufferOffsets.push_back(0);
+			vertexBuffersPtrs.push_back(pBuffer);
+		}
 
+		template <typename D>
+		ID3D11Buffer* AddBuffer(std::vector<D>& bufferData, bool dynamic = false) {
 			D3D11_SUBRESOURCE_DATA data = {};
 			data.SysMemPitch = 0;
 			data.SysMemSlicePitch = 0;
@@ -77,15 +82,14 @@ namespace Engine2
 			E2_ASSERT_HR(hr, "VertexBufferIndexInstanced AddBuffer CreateBuffer failed");
 
 			vertexBuffers.push_back(pBuffer);
-			vertexBufferPtrs.push_back(pBuffer.Get());
+			ReferenceInstanceBuffer<D>(pBuffer.Get());
 
-			bufferCount++;
 			return pBuffer.Get();
 		}
 
 		virtual void Bind() {
 			DXDevice::GetContext().IASetPrimitiveTopology(topology);
-			DXDevice::GetContext().IASetVertexBuffers(startSlot, (UINT)vertexBuffers.size(), vertexBufferPtrs.data(), bufferStrides.data(), bufferOffsets.data());
+			DXDevice::GetContext().IASetVertexBuffers(startSlot, (UINT)vertexBuffersPtrs.size(), vertexBuffersPtrs.data(), bufferStrides.data(), bufferOffsets.data());
 			DXDevice::GetContext().IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0u);
 		}
 
@@ -108,9 +112,8 @@ namespace Engine2
 
 	protected:
 		std::string info;
-		unsigned int bufferCount = 0;
 		std::vector<wrl::ComPtr<ID3D11Buffer>> vertexBuffers;
-		std::vector<ID3D11Buffer*> vertexBufferPtrs;
+		std::vector<ID3D11Buffer*> vertexBuffersPtrs;
 		wrl::ComPtr<ID3D11Buffer> pIndexBuffer = nullptr;
 		UINT vertexCount;
 		UINT indxCount;

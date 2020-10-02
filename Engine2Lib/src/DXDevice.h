@@ -1,5 +1,6 @@
 #pragma once
 #include "pch.h"
+#include "Common.h"
 
 namespace wrl = Microsoft::WRL;
 
@@ -44,6 +45,25 @@ namespace Engine2
 
 		bool ScreenToClientClamped(POINT& point); // returns true if the point was clamped to the client area
 		void NormaliseCoordinates(POINT& point, float& x, float& y); // convert to NDC
+
+		// function to create an empty buffer
+		template <typename T>
+		static wrl::ComPtr<ID3D11Buffer> CreateEmptyBuffer(size_t size, bool dynamic = false) {
+			D3D11_BUFFER_DESC bufferDesc = {};
+			bufferDesc.ByteWidth = sizeof(T) * (UINT)size;
+			bufferDesc.Usage = (dynamic ? D3D11_USAGE::D3D11_USAGE_DYNAMIC : D3D11_USAGE::D3D11_USAGE_DEFAULT);
+			bufferDesc.BindFlags = D3D11_BIND_FLAG::D3D11_BIND_VERTEX_BUFFER;
+			bufferDesc.CPUAccessFlags = (dynamic ? D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE : 0);
+			bufferDesc.MiscFlags = 0;
+			bufferDesc.StructureByteStride = sizeof(T);
+
+			wrl::ComPtr<ID3D11Buffer> pBuffer;
+			HRESULT hr = DXDevice::GetDevice().CreateBuffer(&bufferDesc, nullptr, &pBuffer);
+
+			E2_ASSERT_HR(hr, "CreateEmptyBuffer failed");
+
+			return pBuffer;
+		}
 
 		// helper function to update a buffer
 		template <typename T>

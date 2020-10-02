@@ -1,16 +1,13 @@
 #include "pch.h"
 #include "GizmoRender.h"
-
-// To Do's:
-// - use a single instance buffer
-// - work out the max gizmo size and do checking
+#include "Common.h"
 
 using namespace DirectX;
 
 namespace Engine2
 {
-	GizmoRender::GizmoRender() :
-		psCB(0)
+	GizmoRender::GizmoRender(size_t maxGizmos) :
+		maxGizmos(maxGizmos), psCB(0)
 	{
 		CreateVertexBuffers();
 
@@ -32,16 +29,12 @@ namespace Engine2
 		desc.DepthFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_GREATER;
 		DXDevice::GetDevice().CreateDepthStencilState(&desc, &pBackDrawDSS);
 
-		// To Do: hack. see notes for fixes
-		axisInstances.resize(50);
-		sphereInstances.resize(50);
-		cubeInstances.resize(50);
-		cameraInstances.resize(50);
+		instanceBuffer = DXDevice::CreateEmptyBuffer<InstanceInfoType>(maxGizmos, true);
 
-		axisPtrInstancesBuffer = axisVBuffer->AddInstances(axisInstances, true);
-		spherePtrInstancesBuffer = sphereVBuffer->AddInstances(sphereInstances, true);
-		cubePtrInstancesBuffer = cubeVBuffer->AddInstances(cubeInstances, true);
-		cameraPtrInstancesBuffer = cameraVBuffer->AddInstances(cameraInstances, true);
+		axisVBuffer->ReferenceInstanceBuffer<InstanceInfoType>(instanceBuffer.Get());
+		sphereVBuffer->ReferenceInstanceBuffer<InstanceInfoType>(instanceBuffer.Get());
+		cubeVBuffer->ReferenceInstanceBuffer<InstanceInfoType>(instanceBuffer.Get());
+		cameraVBuffer->ReferenceInstanceBuffer<InstanceInfoType>(instanceBuffer.Get());
 	}
 
 	void GizmoRender::NewFrame()
@@ -54,8 +47,6 @@ namespace Engine2
 
 	void GizmoRender::Render()
 	{
-		UpdateBuffers();
-
 		// Note: Assuming the scene has already bound the camera matrix to VS constant buffer 0
 		pVS->Bind();
 		pPS->Bind();
@@ -74,21 +65,25 @@ namespace Engine2
 
 	void GizmoRender::DrawAxis(DirectX::XMMATRIX instance)
 	{
+		E2_ASSERT(axisInstances.size() < maxGizmos, "Exceed gizmo count");
 		axisInstances.emplace_back(instance);
 	}
 
 	void GizmoRender::DrawSphere(DirectX::XMMATRIX instance)
 	{
+		E2_ASSERT(sphereInstances.size() < maxGizmos, "Exceed gizmo count");
 		sphereInstances.emplace_back(instance);
 	}
 
 	void GizmoRender::DrawCube(DirectX::XMMATRIX instance)
 	{
+		E2_ASSERT(cubeInstances.size() < maxGizmos, "Exceed gizmo count");
 		cubeInstances.emplace_back(instance);
 	}
 
 	void GizmoRender::DrawCamera(DirectX::XMMATRIX instance)
 	{
+		E2_ASSERT(cameraInstances.size() < maxGizmos, "Exceed gizmo count");
 		cameraInstances.emplace_back(instance);
 	}
 
@@ -200,39 +195,35 @@ namespace Engine2
 		}
 	}
 
-	void GizmoRender::UpdateBuffers()
+	void GizmoRender::Draw()
 	{
 		if (axisInstances.size() > 0)
 		{
-			DXDevice::UpdateBuffer(axisPtrInstancesBuffer, axisInstances, (UINT)axisInstances.size());
+			DXDevice::UpdateBuffer(instanceBuffer.Get(), axisInstances, (UINT)axisInstances.size());
 			axisVBuffer->SetInstanceCount((UINT)axisInstances.size());
+			axisVBuffer->BindAndDraw();
 		}
 
 		if (sphereInstances.size() > 0)
 		{
-			DXDevice::UpdateBuffer(spherePtrInstancesBuffer, sphereInstances, (UINT)sphereInstances.size());
+			DXDevice::UpdateBuffer(instanceBuffer.Get(), sphereInstances, (UINT)sphereInstances.size());
 			sphereVBuffer->SetInstanceCount((UINT)sphereInstances.size());
+			sphereVBuffer->BindAndDraw();
 		}
 
 		if (cubeInstances.size() > 0)
 		{
-			DXDevice::UpdateBuffer(cubePtrInstancesBuffer, cubeInstances, (UINT)cubeInstances.size());
+			DXDevice::UpdateBuffer(instanceBuffer.Get(), cubeInstances, (UINT)cubeInstances.size());
 			cubeVBuffer->SetInstanceCount((UINT)cubeInstances.size());
+			cubeVBuffer->BindAndDraw();
 		}
 
 		if (cameraInstances.size() > 0)
 		{
-			DXDevice::UpdateBuffer(cameraPtrInstancesBuffer, cameraInstances, (UINT)cameraInstances.size());
+			DXDevice::UpdateBuffer(instanceBuffer.Get(), cameraInstances, (UINT)cameraInstances.size());
 			cameraVBuffer->SetInstanceCount((UINT)cameraInstances.size());
+			cameraVBuffer->BindAndDraw();
 		}
-	}
-
-	void GizmoRender::Draw()
-	{
-		if (axisInstances.size() > 0) axisVBuffer->BindAndDraw();
-		if (sphereInstances.size() > 0) sphereVBuffer->BindAndDraw();
-		if (cubeInstances.size() > 0) cubeVBuffer->BindAndDraw();
-		if (cameraInstances.size() > 0) cameraVBuffer->BindAndDraw();
 	}
 
 }

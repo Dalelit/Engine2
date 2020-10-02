@@ -49,10 +49,10 @@ namespace Engine2
 
 				switch (gizmo->type)
 				{
-					case Gizmo::Types::Axis:   gizmoRender.DrawAxis(DirectX::XMMatrixTranspose(trans->transform)); break;
-					case Gizmo::Types::Cube:   gizmoRender.DrawCube(DirectX::XMMatrixTranspose(trans->transform)); break;
-					case Gizmo::Types::Sphere: gizmoRender.DrawSphere(DirectX::XMMatrixTranspose(trans->transform)); break;
-					case Gizmo::Types::Camera: gizmoRender.DrawCamera(DirectX::XMMatrixTranspose(trans->transform)); break;
+					case Gizmo::Types::Axis:   gizmoRender.DrawAxis(trans->transform); break;
+					case Gizmo::Types::Cube:   gizmoRender.DrawCube(trans->transform); break;
+					case Gizmo::Types::Sphere: gizmoRender.DrawSphere(trans->transform); break;
+					case Gizmo::Types::Camera: gizmoRender.DrawCamera(trans->transform); break;
 				}
 			}
 			gizmoRender.Render();
