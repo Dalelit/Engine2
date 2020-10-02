@@ -152,6 +152,7 @@
   <ItemGroup>
     <ClInclude Include="src\Components.h" />
     <ClInclude Include="src\ECS.h" />
+    <ClInclude Include="src\GizmoRender.h" />
     <ClInclude Include="src\Instances.h" />
     <ClInclude Include="src\UtilMath.h" />
     <ClInclude Include="src\AssetLoaders\ObjLoader.h" />
@@ -198,6 +199,7 @@
     <ClCompile Include="src\Components.cpp" />
     <ClCompile Include="src\Config.cpp" />
     <ClCompile Include="src\Entity.cpp" />
+    <ClCompile Include="src\GizmoRender.cpp" />
     <ClCompile Include="src\Gizmos.cpp" />
     <ClCompile Include="src\InputController.cpp" />
     <ClCompile Include="src\Instances.cpp" />

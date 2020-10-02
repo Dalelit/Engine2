@@ -41,7 +41,7 @@ namespace Engine2
 		// draw gizmos
 		{
 			View<Gizmo, Transform> entities(coordinator);
-			gizmosRender.NewFrame();
+			gizmoRender.NewFrame();
 			for (auto e : entities)
 			{
 				const auto& gizmo = coordinator.GetComponent<Gizmo>(e);
@@ -49,13 +49,13 @@ namespace Engine2
 
 				switch (gizmo->type)
 				{
-					case Gizmo::Types::Axis:   gizmosRender.DrawAxis(DirectX::XMMatrixTranspose(trans->transform)); break;
-					case Gizmo::Types::Cube:   gizmosRender.DrawCube(DirectX::XMMatrixTranspose(trans->transform)); break;
-					case Gizmo::Types::Sphere: gizmosRender.DrawSphere(DirectX::XMMatrixTranspose(trans->transform)); break;
-					case Gizmo::Types::Camera: gizmosRender.DrawCamera(DirectX::XMMatrixTranspose(trans->transform)); break;
+					case Gizmo::Types::Axis:   gizmoRender.DrawAxis(DirectX::XMMatrixTranspose(trans->transform)); break;
+					case Gizmo::Types::Cube:   gizmoRender.DrawCube(DirectX::XMMatrixTranspose(trans->transform)); break;
+					case Gizmo::Types::Sphere: gizmoRender.DrawSphere(DirectX::XMMatrixTranspose(trans->transform)); break;
+					case Gizmo::Types::Camera: gizmoRender.DrawCamera(DirectX::XMMatrixTranspose(trans->transform)); break;
 				}
 			}
-			gizmosRender.Render();
+			gizmoRender.Render();
 		}
 	}
 

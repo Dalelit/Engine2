@@ -4,7 +4,7 @@
 #include "Lights.h"
 #include "ECS.h"
 #include "Entity.h"
-#include "Gizmos.h"
+#include "GizmoRender.h"
 
 namespace Engine2
 {
@@ -43,7 +43,7 @@ namespace Engine2
 	protected:
 		EngineECS::Coordinator coordinator;
 
-		Gizmos gizmosRender;
+		GizmoRender gizmoRender;
 
 		void UpdateVSConstBuffer();
 		void UpdatePSConstBuffer();
