@@ -33,7 +33,6 @@
     <ClInclude Include="src\VertexBuffer.h" />
     <ClInclude Include="src\Primatives.h" />
     <ClInclude Include="src\Lights.h" />
-    <ClInclude Include="src\Gizmos.h" />
     <ClInclude Include="src\VertexBufferDynamic.h" />
     <ClInclude Include="src\VertexBufferInstanced.h" />
     <ClInclude Include="src\AssetLoaders\ObjLoader.h" />
@@ -44,6 +43,7 @@
     <ClInclude Include="src\Components.h" />
     <ClInclude Include="src\Instances.h" />
     <ClInclude Include="src\GizmoRender.h" />
+    <ClInclude Include="src\DXBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\pch.cpp" />
@@ -70,7 +70,6 @@
     <ClCompile Include="src\Offscreen.cpp" />
     <ClCompile Include="src\Primatives.cpp" />
     <ClCompile Include="src\Lights.cpp" />
-    <ClCompile Include="src\Gizmos.cpp" />
     <ClCompile Include="src\AssetLoaders\ObjLoader.cpp" />
     <ClCompile Include="src\OffscreenOutliner.cpp" />
     <ClCompile Include="src\Particles.cpp" />

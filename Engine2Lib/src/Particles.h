@@ -26,9 +26,8 @@ namespace Engine2
 	public:
 		DirectX::XMVECTOR position;
 		float rate = 100.0; // per second
-		size_t maxParticles = 1000000;
 
-		ParticleEmitter();
+		ParticleEmitter(size_t maxParticleCount = 10);
 
 		void OnUpdate(float dt);
 		void OnRender();
@@ -37,12 +36,16 @@ namespace Engine2
 		inline bool IsActive() { return active; }
 		inline void SetActive(bool makeActive = true) { active = makeActive; }
 
+		void SetMaxParticles(size_t maxParticleCount);
+		size_t GetMaxParticles() { return maxParticles; }
+
 		void SetMeshAndVertexShader(const std::string& meshName);
 		void SetPixelShader(const std::string& shaderName = "");
 
 	protected:
 		bool active = true;
 		bool freeze = false;
+		size_t maxParticles;
 		float timeSinceLastEmit = 0.0f;
 		std::vector<Particle> particles;
 		UINT activeCount = 0;
@@ -54,9 +57,8 @@ namespace Engine2
 		};
 		std::vector<InstanceInfo> instances;
 		UINT instanceCount = 0;
-		ID3D11Buffer* instanceBuffer;
 
-		std::shared_ptr<DrawableInstanced> pVB;
+		VertexBufferIndexInstanced VB;
 		std::shared_ptr<VertexShader> pVS;
 		std::shared_ptr<PixelShader> pPS;
 

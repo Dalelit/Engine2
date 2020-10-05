@@ -6,12 +6,13 @@
 #include "Resources.h"
 #include "ConstantBuffer.h"
 #include "Shader.h"
+#include "Particles.h"
 
 namespace Engine2
 {
 	struct EntityInfo
 	{
-		std::string tag; // To Do: a better name?
+		std::string tag;
 
 		void OnImgui();
 	};
@@ -58,20 +59,6 @@ namespace Engine2
 	class Components
 	{
 	public:
-		static void OnImgui(EngineECS::EntityId_t id, EngineECS::Coordinator& coord)
-		{
-			if (coord.HasComponent<EntityInfo>(id)) coord.GetComponent<EntityInfo>(id)->OnImgui();
-			if (coord.HasComponent<Transform>(id)) coord.GetComponent<Transform>(id)->OnImgui();
-			if (coord.HasComponent<Mesh>(id)) coord.GetComponent<Mesh>(id)->OnImgui();
-			if (coord.HasComponent<Gizmo>(id)) coord.GetComponent<Gizmo>(id)->OnImgui();
-
-			if (ImGui::BeginCombo("Add Component", ""))
-			{
-				if (!coord.HasComponent<Mesh>(id) && ImGui::Selectable("Mesh")) coord.AddComponent<Mesh>(id);
-				if (!coord.HasComponent<Gizmo>(id) && ImGui::Selectable("Gizmo")) coord.AddComponent<Gizmo>(id);
-
-				ImGui::EndCombo();
-			}
-		}
+		static void OnImgui(EngineECS::EntityId_t id, EngineECS::Coordinator& coord);
 	};
 }

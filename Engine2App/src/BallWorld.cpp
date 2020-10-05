@@ -94,7 +94,8 @@ void BallWorld::CreateCube()
 
 	auto model = std::make_shared<ModelEntities>("Cube");
 	auto rn = model->AddRenderNode("RN1");
-	rn->SetDrawable(std::make_shared<TriangleListIndexInstanced<Vertex, InstanceInfo>>(verticies, Primatives::Cube::indicies, instances));
+	//To do: fix
+	//rn->SetDrawable(std::make_shared<TriangleListIndexInstanced<Vertex, InstanceInfo>>(verticies, Primatives::Cube::indicies, instances));
 	rn->AddBindable(std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout));
 	rn->AddBindable(std::make_shared<PixelShaderDynamic>(psfilename));
 
@@ -140,9 +141,10 @@ void BallWorld::CreateSphere()
 
 	auto model = std::make_shared<Model>("IcoSphere");
 	auto rn = model->AddRenderNode("RN sphere");
-	auto vertBuffer = std::make_shared<TriangleListIndexInstanced<Vertex, XMFLOAT3>>(verticies, *sphereData.indicies, colors);
-	positionsBufferPtr = vertBuffer->AddBuffer<XMVECTOR>(positions, true);
-	rn->SetDrawable(vertBuffer);
+	// to do: fix
+	//auto vertBuffer = std::make_shared<TriangleListIndexInstanced<Vertex, XMFLOAT3>>(verticies, *sphereData.indicies, colors);
+	//positionsBufferPtr = vertBuffer->AddBuffer<XMVECTOR>(positions, true);
+	//rn->SetDrawable(vertBuffer);
 	rn->AddBindable(std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout));
 	rn->AddBindable(std::make_shared<PixelShaderDynamic>(psfilename));
 

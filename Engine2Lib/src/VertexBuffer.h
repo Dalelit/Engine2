@@ -3,6 +3,7 @@
 #include "pch.h"
 #include "Common.h"
 #include "DXDevice.h"
+#include "DXBuffer.h"
 #include "Resources.h"
 #include "Instrumentation.h"
 

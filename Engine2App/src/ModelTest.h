@@ -17,8 +17,6 @@ public:
 	void OnRender();
 	void OnApplicationEvent(Engine2::ApplicationEvent& event);
 	void OnImgui();
-	void OnGizmos();
-
 
 protected:
 	Engine2::Scene scene;

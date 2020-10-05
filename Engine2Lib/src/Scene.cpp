@@ -12,51 +12,19 @@ namespace Engine2
 	{
 	}
 
+	void Scene::OnUpdate(float dt)
+	{
+		UpdateParticles(dt);
+	}
+
 	void Scene::OnRender()
 	{
 		UpdateVSConstBuffer();
 		UpdatePSConstBuffer();
 
-		// draw mesh entities
-		{
-			View<Mesh, Transform> entities(coordinator);
-			for (auto e : entities)
-			{
-				const auto& mesh = coordinator.GetComponent<Mesh>(e);
-
-				if (mesh->IsValid())
-				{
-					mesh->vertexShaderCB->data = *coordinator.GetComponent<Transform>(e);
-					mesh->vertexShaderCB->UpdateBuffer();
-					mesh->vertexShaderCB->Bind();
-
-					mesh->vertexShader->Bind();
-					mesh->pixelShader->Bind();
-
-					mesh->drawable->BindAndDraw();
-				}
-			}
-		}
-
-		// draw gizmos
-		{
-			View<Gizmo, Transform> entities(coordinator);
-			gizmoRender.NewFrame();
-			for (auto e : entities)
-			{
-				const auto& gizmo = coordinator.GetComponent<Gizmo>(e);
-				const auto& trans = coordinator.GetComponent<Transform>(e);
-
-				switch (gizmo->type)
-				{
-					case Gizmo::Types::Axis:   gizmoRender.DrawAxis(trans->transform); break;
-					case Gizmo::Types::Cube:   gizmoRender.DrawCube(trans->transform); break;
-					case Gizmo::Types::Sphere: gizmoRender.DrawSphere(trans->transform); break;
-					case Gizmo::Types::Camera: gizmoRender.DrawCamera(trans->transform); break;
-				}
-			}
-			gizmoRender.Render();
-		}
+		RenderMeshes();
+		RenderParticles();
+		RenderGizmos();
 	}
 
 	Entity Scene::CreateEntity()
@@ -115,5 +83,66 @@ namespace Engine2
 			psConstBuffer.data.pointLightColor = pointLights[0].GetColor();
 		}
 		psConstBuffer.Bind();
+	}
+
+	void Scene::RenderMeshes()
+	{
+		View<Mesh, Transform> entities(coordinator);
+		for (auto e : entities)
+		{
+			const auto& mesh = coordinator.GetComponent<Mesh>(e);
+
+			if (mesh->IsValid())
+			{
+				mesh->vertexShaderCB->data = *coordinator.GetComponent<Transform>(e);
+				mesh->vertexShaderCB->UpdateBuffer();
+				mesh->vertexShaderCB->Bind();
+
+				mesh->vertexShader->Bind();
+				mesh->pixelShader->Bind();
+
+				mesh->drawable->BindAndDraw();
+			}
+		}
+	}
+
+	void Scene::RenderParticles()
+	{
+		View<ParticleEmitter, Transform> entities(coordinator);
+		for (auto e : entities)
+		{
+			const auto& emitter = coordinator.GetComponent<ParticleEmitter>(e);
+			emitter->OnRender();
+		}
+	}
+
+	void Scene::RenderGizmos()
+	{
+		View<Gizmo, Transform> entities(coordinator);
+		gizmoRender.NewFrame();
+		for (auto e : entities)
+		{
+			const auto& gizmo = coordinator.GetComponent<Gizmo>(e);
+			const auto& trans = coordinator.GetComponent<Transform>(e);
+
+			switch (gizmo->type)
+			{
+			case Gizmo::Types::Axis:   gizmoRender.DrawAxis(trans->transform); break;
+			case Gizmo::Types::Cube:   gizmoRender.DrawCube(trans->transform); break;
+			case Gizmo::Types::Sphere: gizmoRender.DrawSphere(trans->transform); break;
+			case Gizmo::Types::Camera: gizmoRender.DrawCamera(trans->transform); break;
+			}
+		}
+		gizmoRender.Render();
+	}
+
+	void Scene::UpdateParticles(float dt)
+	{
+		View<ParticleEmitter, Transform> entities(coordinator);
+		for (auto e : entities)
+		{
+			const auto& emitter = coordinator.GetComponent<ParticleEmitter>(e);
+			emitter->OnUpdate(dt);
+		}
 	}
 }

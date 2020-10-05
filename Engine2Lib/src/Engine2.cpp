@@ -95,7 +95,6 @@ namespace Engine2
 				if (layer->IsActive())
 				{
 					layer->Render();
-					layer->RenderGizmos();
 				}
 			}
 		}

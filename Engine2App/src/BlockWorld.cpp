@@ -208,8 +208,8 @@ namespace BlockWorld
 			blockOrigin.x -= chunkMgr.BlockSpecs.halfSize;
 			blockOrigin.y -= chunkMgr.BlockSpecs.halfSize;
 			blockOrigin.z -= chunkMgr.BlockSpecs.halfSize;
-			gizmos.DrawAxis(Math::TranslationMatrix(blockOrigin));
-			gizmos.DrawSphere(XMMatrixScaling(0.5f, 0.5f, 0.5f) * Math::TranslationMatrix(hitLocation));
+			//gizmos.DrawAxis(Math::TranslationMatrix(blockOrigin));
+			//gizmos.DrawSphere(XMMatrixScaling(0.5f, 0.5f, 0.5f) * Math::TranslationMatrix(hitLocation));
 		}
 	}
 

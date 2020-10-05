@@ -8,7 +8,6 @@ namespace Engine2
 {
 	class GizmoRender
 	{
-		using GizmoVBType = VertexBufferIndexInstanced<DirectX::XMFLOAT3, D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINELIST>;
 	public:
 
 		GizmoRender(size_t maxGizmos = 50);
@@ -39,18 +38,18 @@ namespace Engine2
 
 		// axis
 		std::vector<InstanceInfoType> axisInstances;
-		std::unique_ptr<GizmoVBType> axisVBuffer;
+		VertexBufferIndexInstanced axisVBuffer;
 
 		// sphere
 		std::vector<InstanceInfoType> sphereInstances;
-		std::unique_ptr<GizmoVBType> sphereVBuffer;
+		VertexBufferIndexInstanced sphereVBuffer;
 
 		// cube
 		std::vector<InstanceInfoType> cubeInstances;
-		std::unique_ptr<GizmoVBType> cubeVBuffer;
+		VertexBufferIndexInstanced cubeVBuffer;
 
 		// camera
 		std::vector<InstanceInfoType> cameraInstances;
-		std::unique_ptr<GizmoVBType> cameraVBuffer;
+		VertexBufferIndexInstanced cameraVBuffer;
 	};
 }

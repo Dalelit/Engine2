@@ -2,7 +2,6 @@
 #include "pch.h"
 #include "Common.h"
 #include "Events.h"
-#include "Gizmos.h"
 
 namespace Engine2
 {
@@ -22,21 +21,10 @@ namespace Engine2
 		virtual void OnInputEvent(InputEvent& event) {}             // handle input events
 		virtual void OnApplicationEvent(ApplicationEvent& event) {} // handle application events
 		virtual void OnImgui() {};                                  // override this as the imgui window content for the layer
-		virtual void OnGizmos() {};                                 // override this to draw any gizmos
 
 		// Below are called from the engine
 
 		inline void Render() { OnRender(); }
-
-		inline void RenderGizmos()
-		{
-			if (gizmos.IsActive())
-			{
-				gizmos.NewFrame();
-				OnGizmos();
-				gizmos.Render();
-			}
-		}
 
 		bool imguiOpen = true;
 		inline void ImguiWindow()
@@ -45,7 +33,6 @@ namespace Engine2
 			{
 				ImGui::Begin(name.c_str(), &imguiOpen);
 				ImGui::Checkbox("Active", &active);
-				gizmos.OnImgui();
 				OnImgui();
 				ImGui::End();
 			}
@@ -54,7 +41,6 @@ namespace Engine2
 	protected:
 		std::string name;
 		bool active = true;
-		Gizmos gizmos;
 	};
 
 }

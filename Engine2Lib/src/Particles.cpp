@@ -5,7 +5,7 @@ using namespace DirectX;
 
 namespace Engine2
 {
-	ParticleEmitter::ParticleEmitter()
+	ParticleEmitter::ParticleEmitter(size_t maxParticleCount)
 	{
 		meshNames.emplace_back("Equilateral Triangle");
 		meshNames.emplace_back("Square");
@@ -14,8 +14,7 @@ namespace Engine2
 		pixelShaderNames.emplace_back("Circle");
 		pixelShaderNames.emplace_back("Test");
 
-		particles.resize(maxParticles);
-		instances.resize(maxParticles);
+		SetMaxParticles(maxParticleCount);
 
 		SetMeshAndVertexShader(meshNames[1]);
 		SetPixelShader(pixelShaderNames[1]);
@@ -33,11 +32,17 @@ namespace Engine2
 		timeSinceLastEmit += dt;
 
 		UINT numberToEmit = (UINT)floorf(timeSinceLastEmit * rate); // given the elapsed time, how many need to be emitted
-		timeSinceLastEmit -= (float)numberToEmit / rate;            // accumulating any remaining time
+
+		if (activeCount + numberToEmit > maxParticles) // cannot emit more than the max
+		{
+			numberToEmit = (UINT)maxParticles - activeCount; // only emit up to the max particles
+		}
+
+		if (numberToEmit > 0) timeSinceLastEmit -= (float)numberToEmit / rate; // accumulating any remaining time if we are emitting something
 
 		UINT numberToUpdate = activeCount + numberToEmit; // we need to process the number of active particle plus the new ones
 
-		E2_ASSERT(numberToUpdate < particles.size(), "Number of particles exceeded the buffer");
+		E2_ASSERT(numberToUpdate <= particles.size(), "Number of particles exceeded the buffer");
 
 		Particle* pParticle = particles.data();
 		InstanceInfo* pInstance = instances.data();
@@ -87,9 +92,10 @@ namespace Engine2
 			pVS->Bind();
 			pPS->Bind();
 
-			DXDevice::UpdateBuffer(instanceBuffer, instances, instanceCount);
-			pVB->Bind();
-			pVB->Draw(instanceCount);
+			//DXDevice::UpdateBuffer(instanceBuffer.GetRawPointer(), instances, instanceCount);
+			VB.UpdateInstanceBuffer(instances, instanceCount);
+			VB.Bind();
+			VB.Draw(instanceCount);
 			DXDevice::Get().SetDefaultRenderState();
 			DXDevice::Get().SetDefaultBlendState();
 		}
@@ -101,6 +107,10 @@ namespace Engine2
 		{
 			ImGui::Checkbox("Freeze", &freeze);
 			ImGui::DragFloat3("Position", position.m128_f32, 0.01f);
+			
+			int maxP = (int)maxParticles;
+			if (ImGui::DragInt("Max Particles", &maxP, 1.0f, 0, 100000)) { SetMaxParticles(maxP); }
+			
 			ImGui::DragFloat("Rate", &rate, 0.1f, 0.01f);
 			ImGui::DragFloat3("Force", force.m128_f32, 0.01f);
 			if (ImGui::BeginCombo("Mesh", currentMesh.c_str()))
@@ -171,6 +181,15 @@ namespace Engine2
 		pInstance->color = pParticle->color;
 	}
 
+	void ParticleEmitter::SetMaxParticles(size_t maxParticleCount)
+	{
+		maxParticles = maxParticleCount;
+		particles.resize(maxParticles);
+		instances.resize(maxParticles);
+
+		VB.SetInstances<InstanceInfo>(maxParticles);
+	}
+
 	void ParticleEmitter::SetMeshAndVertexShader(const std::string& meshName)
 	{
 		struct Vertex {
@@ -219,9 +238,11 @@ namespace Engine2
 
 		currentMesh = meshName;
 
-		auto vb = std::make_shared<TriangleListIndexInstanced<Vertex, InstanceInfo>>(verticies, indicies);
-		instanceBuffer = vb->AddInstances(instances, true);
-		pVB = vb;
+		;
+		VB.Initialise<Vertex>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
+							  verticies, indicies);
+		VB.SetInstances<InstanceInfo>(maxParticles);
+
 		//pVS = std::make_shared<VertexShaderDynamic>(Config::directories["ShaderSourceDir"] + "ParticleVS.hlsl", vsLayout);
 		pVS = VertexShader::CreateFromCompiledFile(Config::directories["ShaderCompiledDir"] + "ParticleVS.cso", vsLayout);
 	}

@@ -108,21 +108,6 @@ void ModelTest::OnImgui()
 	for (auto& m : models) m->OnImgui();
 }
 
-void ModelTest::OnGizmos()
-{
-	gizmos.DrawAxis(XMMatrixIdentity());
-	for (auto& l : scene.pointLights) gizmos.DrawSphere(l.GetTransform());
-
-	auto currentCam = Engine::Get().CurrentCamera();
-	for (auto& pCam : Engine::Get().GetCameras())
-	{
-		if (currentCam != pCam.get())
-		{
-			gizmos.DrawCamera(pCam->GetTransform());
-		}
-	}
-}
-
 void ModelTest::Outline()
 {
 	if (!pSelectedModel) return;

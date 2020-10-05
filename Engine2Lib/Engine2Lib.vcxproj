@@ -151,6 +151,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\Components.h" />
+    <ClInclude Include="src\DXBuffer.h" />
     <ClInclude Include="src\ECS.h" />
     <ClInclude Include="src\GizmoRender.h" />
     <ClInclude Include="src\Instances.h" />
@@ -158,7 +159,6 @@
     <ClInclude Include="src\AssetLoaders\ObjLoader.h" />
     <ClInclude Include="src\Config.h" />
     <ClInclude Include="src\Entity.h" />
-    <ClInclude Include="src\Gizmos.h" />
     <ClInclude Include="src\InputController.h" />
     <ClInclude Include="src\Instrumentation.h" />
     <ClInclude Include="src\Lights.h" />
@@ -200,7 +200,6 @@
     <ClCompile Include="src\Config.cpp" />
     <ClCompile Include="src\Entity.cpp" />
     <ClCompile Include="src\GizmoRender.cpp" />
-    <ClCompile Include="src\Gizmos.cpp" />
     <ClCompile Include="src\InputController.cpp" />
     <ClCompile Include="src\Instances.cpp" />
     <ClCompile Include="src\Instrumentation.cpp" />

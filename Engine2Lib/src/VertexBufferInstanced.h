@@ -4,93 +4,63 @@
 #include "Common.h"
 #include "Resources.h"
 #include "DXDevice.h"
+#include "DXBuffer.h"
 #include "Instrumentation.h"
 
 namespace Engine2
 {
-	class DrawableInstanced : public Drawable
+	class VertexBufferIndexInstanced : public Drawable
 	{
 	public:
-		virtual void Draw() = 0;
-		virtual void Draw(UINT instances) { instanceCount = instances; Draw(); };
-		void SetInstanceCount(UINT instances) { instanceCount = instances; }
-
-	protected:
-		UINT instanceCount = 0;
-	};
-
-	template <typename V, D3D11_PRIMITIVE_TOPOLOGY TOP>
-	class VertexBufferIndexInstanced : public DrawableInstanced
-	{
-	public:
-		VertexBufferIndexInstanced(std::vector<V>& verticies, std::vector<unsigned int>& indicies) :
-			vertexCount((UINT)verticies.size()), indxCount((UINT)indicies.size())
+		VertexBufferIndexInstanced()
 		{
-			AddBuffer<V>(verticies);
+			info = "Uninitialised vertex buffer instanced";
+		}
 
-			D3D11_SUBRESOURCE_DATA data = {};
-			data.SysMemPitch = 0;
-			data.SysMemSlicePitch = 0;
-			data.pSysMem = indicies.data();
+		template <typename V>
+		void Initialise(D3D11_PRIMITIVE_TOPOLOGY topology, std::vector<V>& verticies, std::vector<unsigned int>& indicies) {
+			this->topology = topology;
+			vertexBuffer.InitBuffer<V, D3D11_BIND_FLAG::D3D11_BIND_VERTEX_BUFFER>(verticies);
+			vertexBuffersPtrs[0] = vertexBuffer.GetPtr();
+			bufferStrides[0] = sizeof(V);
+			bufferOffsets[0] = 0;
 
-			D3D11_BUFFER_DESC bufferDesc = {};
-			bufferDesc.ByteWidth = sizeof(unsigned int) * indxCount;
-			bufferDesc.Usage = D3D11_USAGE::D3D11_USAGE_DEFAULT;
-			bufferDesc.BindFlags = D3D11_BIND_FLAG::D3D11_BIND_INDEX_BUFFER;
-			bufferDesc.CPUAccessFlags = 0;
-			bufferDesc.MiscFlags = 0;
-			bufferDesc.StructureByteStride = sizeof(unsigned int);
+			indexBuffer.InitBuffer<UINT, D3D11_BIND_FLAG::D3D11_BIND_INDEX_BUFFER>(indicies);
 
-			HRESULT hr = DXDevice::GetDevice().CreateBuffer(&bufferDesc, &data, &pIndexBuffer);
-
-			E2_ASSERT_HR(hr, "VertexBufferIndexInstanced CreateBuffer failed");
-
+			vertexCount = (UINT)verticies.size();
+			indxCount = (UINT)indicies.size();
 			info = "VertexBufferIndexInstanced vertex count: " + std::to_string(vertexCount) + " index count: " + std::to_string(indxCount);
 		}
-		template <typename D>
-		ID3D11Buffer* AddInstances(std::vector<D>& bufferData, bool dynamic = false) {
+
+		template <typename I>
+		void SetInstances(std::vector<I>& bufferData) {
 			instanceCount = (UINT)bufferData.size();
-			return AddBuffer<D>(bufferData, dynamic);
+
+			instanceBuffer.InitBuffer<I, D3D11_BIND_FLAG::D3D11_BIND_VERTEX_BUFFER>(bufferData, true);
+			vertexBuffersPtrs[1] = instanceBuffer.GetPtr();
+			bufferStrides[1] = sizeof(I);
+			bufferOffsets[1] = 0;
 		}
 
-		// use this to reference an existing buffer managed elsewhere, rather the AddInstances/AddBuffer which also creates the buffer.
-		template <typename D>
-		void ReferenceInstanceBuffer(ID3D11Buffer* pBuffer) {
-			bufferStrides.push_back(sizeof(D));
-			bufferOffsets.push_back(0);
-			vertexBuffersPtrs.push_back(pBuffer);
+		template <typename I>
+		void SetInstances(size_t maxInstances) {
+			instanceCount = maxInstances;
+
+			instanceBuffer.InitBuffer<I, D3D11_BIND_FLAG::D3D11_BIND_VERTEX_BUFFER>(maxInstances, true);
+			vertexBuffersPtrs[1] = instanceBuffer.GetPtr();
+			bufferStrides[1] = sizeof(I);
+			bufferOffsets[1] = 0;
 		}
 
-		template <typename D>
-		ID3D11Buffer* AddBuffer(std::vector<D>& bufferData, bool dynamic = false) {
-			D3D11_SUBRESOURCE_DATA data = {};
-			data.SysMemPitch = 0;
-			data.SysMemSlicePitch = 0;
-			data.pSysMem = bufferData.data();
-
-			D3D11_BUFFER_DESC bufferDesc = {};
-			bufferDesc.ByteWidth = sizeof(D) * (UINT)bufferData.size();
-			bufferDesc.Usage = (dynamic ? D3D11_USAGE::D3D11_USAGE_DYNAMIC : D3D11_USAGE::D3D11_USAGE_DEFAULT);
-			bufferDesc.BindFlags = D3D11_BIND_FLAG::D3D11_BIND_VERTEX_BUFFER;
-			bufferDesc.CPUAccessFlags = (dynamic ? D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE : 0);
-			bufferDesc.MiscFlags = 0;
-			bufferDesc.StructureByteStride = sizeof(D);
-
-			wrl::ComPtr<ID3D11Buffer> pBuffer;
-			HRESULT hr = DXDevice::GetDevice().CreateBuffer(&bufferDesc, &data, &pBuffer);
-
-			E2_ASSERT_HR(hr, "VertexBufferIndexInstanced AddBuffer CreateBuffer failed");
-
-			vertexBuffers.push_back(pBuffer);
-			ReferenceInstanceBuffer<D>(pBuffer.Get());
-
-			return pBuffer.Get();
+		template <typename I>
+		void UpdateInstanceBuffer(std::vector<I>& source, size_t size) {
+			instanceBuffer.UpdateBuffer<I>(source, size);
 		}
 
 		virtual void Bind() {
 			DXDevice::GetContext().IASetPrimitiveTopology(topology);
-			DXDevice::GetContext().IASetVertexBuffers(startSlot, (UINT)vertexBuffersPtrs.size(), vertexBuffersPtrs.data(), bufferStrides.data(), bufferOffsets.data());
-			DXDevice::GetContext().IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0u);
+			DXDevice::GetContext().IASetVertexBuffers(startSlot, 2, vertexBuffersPtrs, bufferStrides, bufferOffsets);
+			DXDevice::GetContext().IASetIndexBuffer(indexBuffer.GetPtr(), DXGI_FORMAT_R32_UINT, 0u);
 		}
 
 		virtual void Unbind() {
@@ -99,11 +69,15 @@ namespace Engine2
 			DXDevice::GetContext().IASetIndexBuffer(nullptr, DXGI_FORMAT_R32_UINT, 0u);
 		}
 
-		virtual void Draw() {
+		void SetDrawCount(UINT instances) { instanceCount = instances; }
+
+		void Draw() { Draw(instanceCount); };
+
+		void Draw(UINT instances) {
 			E2_ASSERT(instanceCount > 0, "Instance count should be greater than 0, need to AddInstances");
 
 			E2_STATS_INDEXINSTANCEDRAW(indxCount, instanceCount);
-			DXDevice::GetContext().DrawIndexedInstanced(indxCount, instanceCount, 0u, 0u, 0u);
+			DXDevice::GetContext().DrawIndexedInstanced(indxCount, instances, 0u, 0u, 0u);
 		}
 
 		virtual void OnImgui() { ImGui::Text(info.c_str()); }
@@ -111,29 +85,21 @@ namespace Engine2
 		UINT startSlot = 0u;
 
 	protected:
+		UINT instanceCount = 0;
 		std::string info;
-		std::vector<wrl::ComPtr<ID3D11Buffer>> vertexBuffers;
-		std::vector<ID3D11Buffer*> vertexBuffersPtrs;
-		wrl::ComPtr<ID3D11Buffer> pIndexBuffer = nullptr;
+
+		DXBuffer vertexBuffer;
+		DXBuffer indexBuffer;
+		DXBuffer instanceBuffer;
+
+		ID3D11Buffer* vertexBuffersPtrs[2];
+		UINT bufferStrides[2];
+		UINT bufferOffsets[2];
+
 		UINT vertexCount;
 		UINT indxCount;
 
-		D3D11_PRIMITIVE_TOPOLOGY topology = TOP;
-
-		std::vector<UINT> bufferStrides;
-		std::vector<UINT> bufferOffsets;
-
-	};
-
-	template <typename V, typename I>
-	class TriangleListIndexInstanced : public VertexBufferIndexInstanced<V, D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST>
-	{
-	public:
-		TriangleListIndexInstanced(std::vector<V>& verticies, std::vector<unsigned int>& indicies, std::vector<I>& instances) : VertexBufferIndexInstanced<V, D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST>(verticies, indicies) {
-			this->AddInstances(instances);
-		}
-
-		TriangleListIndexInstanced(std::vector<V>& verticies, std::vector<unsigned int>& indicies) : VertexBufferIndexInstanced<V, D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST>(verticies, indicies) {}
+		D3D11_PRIMITIVE_TOPOLOGY topology;
 	};
 
 }

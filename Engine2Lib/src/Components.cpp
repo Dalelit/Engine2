@@ -104,4 +104,24 @@ namespace Engine2
 			ImGui::TreePop();
 		}
 	}
+
+	void Components::OnImgui(EngineECS::EntityId_t id, EngineECS::Coordinator& coord)
+	{
+		if (coord.HasComponent<EntityInfo>(id)) coord.GetComponent<EntityInfo>(id)->OnImgui();
+		if (coord.HasComponent<Transform>(id)) coord.GetComponent<Transform>(id)->OnImgui();
+		if (coord.HasComponent<Mesh>(id)) coord.GetComponent<Mesh>(id)->OnImgui();
+		if (coord.HasComponent<ParticleEmitter>(id)) coord.GetComponent<ParticleEmitter>(id)->OnImgui();
+		if (coord.HasComponent<Gizmo>(id)) coord.GetComponent<Gizmo>(id)->OnImgui();
+
+		if (ImGui::BeginCombo("Add Component", ""))
+		{
+			if (!coord.HasComponent<Mesh>(id) && ImGui::Selectable("Mesh")) coord.AddComponent<Mesh>(id);
+			if (!coord.HasComponent<ParticleEmitter>(id) && ImGui::Selectable("ParticleEmitter")) {
+				coord.AddComponent<ParticleEmitter>(id);
+			}
+			if (!coord.HasComponent<Gizmo>(id) && ImGui::Selectable("Gizmo")) coord.AddComponent<Gizmo>(id);
+
+			ImGui::EndCombo();
+		}
+	}
 }

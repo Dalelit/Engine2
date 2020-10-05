@@ -30,11 +30,6 @@ namespace Engine2
 		DXDevice::GetDevice().CreateDepthStencilState(&desc, &pBackDrawDSS);
 
 		instanceBuffer = DXDevice::CreateEmptyBuffer<InstanceInfoType>(maxGizmos, true);
-
-		axisVBuffer->ReferenceInstanceBuffer<InstanceInfoType>(instanceBuffer.Get());
-		sphereVBuffer->ReferenceInstanceBuffer<InstanceInfoType>(instanceBuffer.Get());
-		cubeVBuffer->ReferenceInstanceBuffer<InstanceInfoType>(instanceBuffer.Get());
-		cameraVBuffer->ReferenceInstanceBuffer<InstanceInfoType>(instanceBuffer.Get());
 	}
 
 	void GizmoRender::NewFrame()
@@ -101,7 +96,8 @@ namespace Engine2
 				0,1, 0,2, 0,3
 			};
 
-			axisVBuffer = std::make_unique<GizmoVBType>(AxisVerticies, AxisIndicies);
+			axisVBuffer.Initialise<XMFLOAT3>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINELIST,
+				AxisVerticies, AxisIndicies);
 		}
 		{
 			std::vector<XMFLOAT3> SphereVerticies = {
@@ -151,7 +147,8 @@ namespace Engine2
 				24,25, 25,26, 26,27, 27,28, 28,29, 29,30, 30,31, 31,32, 32,33, 33,34, 34,35, 35,24,
 			};
 
-			sphereVBuffer = std::make_unique<GizmoVBType>(SphereVerticies, SphereIndicies);
+			sphereVBuffer.Initialise<XMFLOAT3>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINELIST,
+				SphereVerticies, SphereIndicies);
 		}
 		{
 			std::vector<XMFLOAT3> CubeVerticies = {
@@ -171,7 +168,8 @@ namespace Engine2
 				0,4, 1,5, 2,6, 3,7,
 			};
 
-			cubeVBuffer = std::make_unique<GizmoVBType>(CubeVerticies, CubeIndicies);
+			cubeVBuffer.Initialise<XMFLOAT3>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINELIST,
+				CubeVerticies, CubeIndicies);
 		}
 		{
 			std::vector<XMFLOAT3> CameraVerticies = {
@@ -191,7 +189,8 @@ namespace Engine2
 				5,6, 6,7, 7,5
 			};
 
-			cameraVBuffer = std::make_unique<GizmoVBType>(CameraVerticies, CameraIndicies);
+			cameraVBuffer.Initialise<XMFLOAT3>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINELIST,
+				CameraVerticies, CameraIndicies);
 		}
 	}
 
@@ -200,29 +199,29 @@ namespace Engine2
 		if (axisInstances.size() > 0)
 		{
 			DXDevice::UpdateBuffer(instanceBuffer.Get(), axisInstances, (UINT)axisInstances.size());
-			axisVBuffer->SetInstanceCount((UINT)axisInstances.size());
-			axisVBuffer->BindAndDraw();
+			axisVBuffer.Bind();
+			axisVBuffer.Draw((UINT)axisInstances.size());
 		}
 
 		if (sphereInstances.size() > 0)
 		{
 			DXDevice::UpdateBuffer(instanceBuffer.Get(), sphereInstances, (UINT)sphereInstances.size());
-			sphereVBuffer->SetInstanceCount((UINT)sphereInstances.size());
-			sphereVBuffer->BindAndDraw();
+			sphereVBuffer.Bind();
+			sphereVBuffer.Draw((UINT)sphereInstances.size());
 		}
 
 		if (cubeInstances.size() > 0)
 		{
 			DXDevice::UpdateBuffer(instanceBuffer.Get(), cubeInstances, (UINT)cubeInstances.size());
-			cubeVBuffer->SetInstanceCount((UINT)cubeInstances.size());
-			cubeVBuffer->BindAndDraw();
+			cubeVBuffer.Bind();
+			cubeVBuffer.Draw((UINT)cubeInstances.size());
 		}
 
 		if (cameraInstances.size() > 0)
 		{
 			DXDevice::UpdateBuffer(instanceBuffer.Get(), cameraInstances, (UINT)cameraInstances.size());
-			cameraVBuffer->SetInstanceCount((UINT)cameraInstances.size());
-			cameraVBuffer->BindAndDraw();
+			cameraVBuffer.Bind();
+			cameraVBuffer.Draw((UINT)cameraInstances.size());
 		}
 	}
 

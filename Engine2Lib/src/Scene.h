@@ -16,7 +16,7 @@ namespace Engine2
 		Scene();
 		~Scene() = default;
 
-		void OnUpdate(float dt) {}
+		void OnUpdate(float dt);
 		void OnRender();
 
 		Entity CreateEntity();
@@ -47,6 +47,12 @@ namespace Engine2
 
 		void UpdateVSConstBuffer();
 		void UpdatePSConstBuffer();
+
+		void RenderMeshes();
+		void RenderParticles();
+		void RenderGizmos();
+
+		void UpdateParticles(float dt);
 	};
 
 }
