@@ -71,7 +71,7 @@ namespace EngineECS
 			this->name = typeid(T).name();
 			this->capacity = capacity;
 
-			data = new T[capacity];
+			data = malloc(sizeof(T) * capacity);
 			entityToIndexMap = new ComponentId_t[capacity];
 			indexToEntityMap = new EntityId_t[capacity];
 			Clear();
@@ -79,8 +79,13 @@ namespace EngineECS
 
 		~ComponentStorage()
 		{
-			for (ComponentIndex_t i = 0; i < count; i++) data[i].~T();
-			delete[] data;
+			T* ptr = (T*)data;
+			for (ComponentIndex_t i = 0; i < count; i++)
+			{
+				ptr->~T();
+				ptr++;
+			}
+			free(data);
 			delete[] entityToIndexMap;
 			delete[] indexToEntityMap;
 		}
@@ -103,22 +108,22 @@ namespace EngineECS
 
 		inline T* GetComponent(EntityId_t id)
 		{
-			return data + entityToIndexMap[id];
+			return (T*)data + entityToIndexMap[id];
 		}
 
-		inline T* begin() { return data; }
-		inline T* end() { return data + count; }
-		inline const T* begin() const { return data; }
-		inline const T* end() const { return data + count; }
+		inline T* begin() { return (T*)data; }
+		inline T* end() { return (T*)data + count; }
+		inline const T* begin() const { return (T*)data; }
+		inline const T* end() const { return (T*)data + count; }
 
-		inline T& operator[](ComponentIndex_t indx) { return data[indx]; }
-		inline const T& operator[](ComponentIndex_t indx) const { return data[indx]; }
+		inline T& operator[](ComponentIndex_t indx) { return *((T*)data + indx); }
+		inline const T& operator[](ComponentIndex_t indx) const { return *((T*)data + indx); }
 
 		void Clear()
 		{
 			memset(data, 0, sizeof(T) * capacity);
 			count = 0;
-			next = data;
+			next = (T*)data;
 			memset(entityToIndexMap, 0, sizeof(ComponentIndex_t) * capacity);
 			memset(indexToEntityMap, 0, sizeof(EntityId_t) * capacity);
 		}
@@ -129,7 +134,7 @@ namespace EngineECS
 		}
 
 	private:
-		T* data = nullptr;
+		void* data = nullptr;
 		T* next = nullptr;
 	};
 
@@ -163,6 +168,7 @@ namespace EngineECS
 
 		EntityId_t GetEntityCount() const { return entityCounter; }
 		EntityId_t GetMaxEntities() const { return maxEntities; }
+		ComponentId_t GetComponentCount() const { return componentIdCounter; }
 
 		bool TestEntity(Signature signature, EntityId_t id) { return (entitySignatures[id] & signature) == signature; }
 

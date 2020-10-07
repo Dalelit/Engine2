@@ -64,6 +64,21 @@ namespace Engine2
 				CreateEntity();
 			}
 
+			if (ImGui::TreeNodeEx("Stats", ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				ImGui::Text("Entities: %i/%i", coordinator.GetEntityCount(), coordinator.GetMaxEntities());
+				ImGui::Text("Components:");
+				for (uint32_t i = 0; i < coordinator.GetComponentCount(); i++)
+				{
+					auto* pStore = coordinator.GetComponentStore(i);
+					if (pStore)
+					{
+						ImGui::Text("%i %s: %i/%i", i, pStore->GetName().c_str(), pStore->Count(), pStore->Capacity());
+					}
+				}
+				ImGui::TreePop();
+			}
+
 			ImGui::TreePop();
 		}
 	}

@@ -29,7 +29,6 @@ namespace Engine2
 		DirectX::XMVECTOR visibleColor = { 0.2f, 0.8f, 0.2f, 1.0f };
 		DirectX::XMVECTOR hiddenColor = { 0.05f, 0.2f, 0.05f, 1.0f };
 		wrl::ComPtr<ID3D11DepthStencilState> pBackDrawDSS;
-		wrl::ComPtr<ID3D11Buffer> instanceBuffer;
 		using InstanceInfoType = DirectX::XMMATRIX;
 
 		void CreateVertexBuffers();

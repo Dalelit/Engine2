@@ -10,16 +10,19 @@ namespace Engine2
 	class DXBuffer
 	{
 	public:
-		// no initialised buffer
-		DXBuffer() {}
+		// uninitialised buffer
+		DXBuffer() = default;
+		//DXBuffer(DXBuffer&) = delete;
+		//DXBuffer(DXBuffer&&) = delete;
+		virtual ~DXBuffer() = default;
 
 		// initialised empty buffer
-		template <typename T, D3D11_BIND_FLAG BindFlags>
-		void InitBuffer(size_t size, bool dynamic) {
+		template <typename T>
+		void InitBuffer(size_t size, bool dynamic, D3D11_BIND_FLAG bindFlags) {
 			D3D11_BUFFER_DESC bufferDesc = {};
 			bufferDesc.ByteWidth = sizeof(T) * (UINT)size;
 			bufferDesc.Usage = (dynamic ? D3D11_USAGE::D3D11_USAGE_DYNAMIC : D3D11_USAGE::D3D11_USAGE_DEFAULT);
-			bufferDesc.BindFlags = BindFlags;
+			bufferDesc.BindFlags = bindFlags;
 			bufferDesc.CPUAccessFlags = (dynamic ? D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE : 0);
 			bufferDesc.MiscFlags = 0;
 			bufferDesc.StructureByteStride = sizeof(T);
@@ -34,8 +37,8 @@ namespace Engine2
 		}
 
 		// initialised buffer with multiple element content
-		template <typename T, D3D11_BIND_FLAG BindFlags>
-		void InitBuffer(std::vector<T>& source, bool dynamic = false) {
+		template <typename T>
+		void InitBuffer(std::vector<T>& source, bool dynamic, D3D11_BIND_FLAG bindFlags) {
 			D3D11_SUBRESOURCE_DATA data = {};
 			data.SysMemPitch = 0;
 			data.SysMemSlicePitch = 0;
@@ -44,7 +47,7 @@ namespace Engine2
 			D3D11_BUFFER_DESC bufferDesc = {};
 			bufferDesc.ByteWidth = sizeof(T) * (UINT)source.size();
 			bufferDesc.Usage = (dynamic ? D3D11_USAGE::D3D11_USAGE_DYNAMIC : D3D11_USAGE::D3D11_USAGE_DEFAULT);
-			bufferDesc.BindFlags = BindFlags;
+			bufferDesc.BindFlags = bindFlags;
 			bufferDesc.CPUAccessFlags = (dynamic ? D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE : 0);
 			bufferDesc.MiscFlags = 0;
 			bufferDesc.StructureByteStride = sizeof(T);
@@ -59,8 +62,8 @@ namespace Engine2
 		}
 
 		// initialised buffer with single element content
-		template <typename T, D3D11_BIND_FLAG BindFlags>
-		void InitBuffer(T& source, bool dynamic = false) {
+		template <typename T>
+		void InitBuffer(T& source, bool dynamic, D3D11_BIND_FLAG bindFlags) {
 			D3D11_SUBRESOURCE_DATA data = {};
 			data.SysMemPitch = 0;
 			data.SysMemSlicePitch = 0;
@@ -69,7 +72,7 @@ namespace Engine2
 			D3D11_BUFFER_DESC bufferDesc = {};
 			bufferDesc.ByteWidth = sizeof(T);
 			bufferDesc.Usage = (dynamic ? D3D11_USAGE::D3D11_USAGE_DYNAMIC : D3D11_USAGE::D3D11_USAGE_DEFAULT);
-			bufferDesc.BindFlags = BindFlags;
+			bufferDesc.BindFlags = bindFlags;
 			bufferDesc.CPUAccessFlags = (dynamic ? D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE : 0);
 			bufferDesc.MiscFlags = 0;
 			bufferDesc.StructureByteStride = sizeof(T);
@@ -108,8 +111,8 @@ namespace Engine2
 
 	protected:
 		wrl::ComPtr<ID3D11Buffer> comptrBuffer;
-		size_t capacity;
-		size_t elementSize;
-		bool isDynamic;
+		size_t capacity = 0;
+		size_t elementSize = 0;
+		bool isDynamic = false;
 	};
 }

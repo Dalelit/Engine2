@@ -25,9 +25,9 @@ namespace Engine2
 	{
 	public:
 		DirectX::XMVECTOR position;
-		float rate = 100.0; // per second
+		float rate = 10.0; // per second
 
-		ParticleEmitter(size_t maxParticleCount = 10);
+		ParticleEmitter(size_t maxParticleCount = 100);
 
 		void OnUpdate(float dt);
 		void OnRender();
@@ -70,7 +70,7 @@ namespace Engine2
 		Util::Random rng;
 
 		// start parameters
-		float lifeSpan = 5.0f;
+		float lifeSpan = 4.0f;
 
 		DirectX::XMVECTOR velocityStartMin = { -0.5f, 1.0f, -0.5f, 0.0f };
 		DirectX::XMVECTOR velocityStartMax = {  0.5f, 2.0f,  0.5f, 0.0f };

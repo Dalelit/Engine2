@@ -20,12 +20,12 @@ namespace Engine2
 		template <typename V>
 		void Initialise(D3D11_PRIMITIVE_TOPOLOGY topology, std::vector<V>& verticies, std::vector<unsigned int>& indicies) {
 			this->topology = topology;
-			vertexBuffer.InitBuffer<V, D3D11_BIND_FLAG::D3D11_BIND_VERTEX_BUFFER>(verticies);
+			vertexBuffer.InitBuffer<V>(verticies, false, D3D11_BIND_FLAG::D3D11_BIND_VERTEX_BUFFER);
 			vertexBuffersPtrs[0] = vertexBuffer.GetPtr();
 			bufferStrides[0] = sizeof(V);
 			bufferOffsets[0] = 0;
 
-			indexBuffer.InitBuffer<UINT, D3D11_BIND_FLAG::D3D11_BIND_INDEX_BUFFER>(indicies);
+			indexBuffer.InitBuffer<UINT>(indicies, false, D3D11_BIND_FLAG::D3D11_BIND_INDEX_BUFFER);
 
 			vertexCount = (UINT)verticies.size();
 			indxCount = (UINT)indicies.size();
@@ -36,7 +36,7 @@ namespace Engine2
 		void SetInstances(std::vector<I>& bufferData) {
 			instanceCount = (UINT)bufferData.size();
 
-			instanceBuffer.InitBuffer<I, D3D11_BIND_FLAG::D3D11_BIND_VERTEX_BUFFER>(bufferData, true);
+			instanceBuffer.InitBuffer<I>(bufferData, true, D3D11_BIND_FLAG::D3D11_BIND_VERTEX_BUFFER);
 			vertexBuffersPtrs[1] = instanceBuffer.GetPtr();
 			bufferStrides[1] = sizeof(I);
 			bufferOffsets[1] = 0;
@@ -44,9 +44,9 @@ namespace Engine2
 
 		template <typename I>
 		void SetInstances(size_t maxInstances) {
-			instanceCount = maxInstances;
+			instanceCount = (UINT)maxInstances;
 
-			instanceBuffer.InitBuffer<I, D3D11_BIND_FLAG::D3D11_BIND_VERTEX_BUFFER>(maxInstances, true);
+			instanceBuffer.InitBuffer<I>(maxInstances, true, D3D11_BIND_FLAG::D3D11_BIND_VERTEX_BUFFER);
 			vertexBuffersPtrs[1] = instanceBuffer.GetPtr();
 			bufferStrides[1] = sizeof(I);
 			bufferOffsets[1] = 0;
@@ -54,7 +54,7 @@ namespace Engine2
 
 		template <typename I>
 		void UpdateInstanceBuffer(std::vector<I>& source, size_t size) {
-			instanceBuffer.UpdateBuffer<I>(source, size);
+			instanceBuffer.UpdateBuffer(source, size);
 		}
 
 		virtual void Bind() {
@@ -74,9 +74,9 @@ namespace Engine2
 		void Draw() { Draw(instanceCount); };
 
 		void Draw(UINT instances) {
-			E2_ASSERT(instanceCount > 0, "Instance count should be greater than 0, need to AddInstances");
+			E2_ASSERT(instances > 0, "Instance count should be greater than 0, need to AddInstances");
 
-			E2_STATS_INDEXINSTANCEDRAW(indxCount, instanceCount);
+			E2_STATS_INDEXINSTANCEDRAW(indxCount, instances);
 			DXDevice::GetContext().DrawIndexedInstanced(indxCount, instances, 0u, 0u, 0u);
 		}
 

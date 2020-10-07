@@ -28,8 +28,6 @@ namespace Engine2
 		D3D11_DEPTH_STENCIL_DESC desc = CD3D11_DEPTH_STENCIL_DESC(CD3D11_DEFAULT());
 		desc.DepthFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_GREATER;
 		DXDevice::GetDevice().CreateDepthStencilState(&desc, &pBackDrawDSS);
-
-		instanceBuffer = DXDevice::CreateEmptyBuffer<InstanceInfoType>(maxGizmos, true);
 	}
 
 	void GizmoRender::NewFrame()
@@ -191,6 +189,13 @@ namespace Engine2
 
 			cameraVBuffer.Initialise<XMFLOAT3>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINELIST,
 				CameraVerticies, CameraIndicies);
+
+
+			// set the instance buffers on them
+			axisVBuffer.SetInstances<InstanceInfoType>(maxGizmos);
+			cubeVBuffer.SetInstances<InstanceInfoType>(maxGizmos);
+			sphereVBuffer.SetInstances<InstanceInfoType>(maxGizmos);
+			cameraVBuffer.SetInstances<InstanceInfoType>(maxGizmos);
 		}
 	}
 
@@ -198,28 +203,28 @@ namespace Engine2
 	{
 		if (axisInstances.size() > 0)
 		{
-			DXDevice::UpdateBuffer(instanceBuffer.Get(), axisInstances, (UINT)axisInstances.size());
+			axisVBuffer.UpdateInstanceBuffer(axisInstances, (UINT)axisInstances.size());
 			axisVBuffer.Bind();
 			axisVBuffer.Draw((UINT)axisInstances.size());
 		}
 
 		if (sphereInstances.size() > 0)
 		{
-			DXDevice::UpdateBuffer(instanceBuffer.Get(), sphereInstances, (UINT)sphereInstances.size());
+			sphereVBuffer.UpdateInstanceBuffer(sphereInstances, (UINT)sphereInstances.size());
 			sphereVBuffer.Bind();
 			sphereVBuffer.Draw((UINT)sphereInstances.size());
 		}
 
 		if (cubeInstances.size() > 0)
 		{
-			DXDevice::UpdateBuffer(instanceBuffer.Get(), cubeInstances, (UINT)cubeInstances.size());
+			cubeVBuffer.UpdateInstanceBuffer(cubeInstances, (UINT)cubeInstances.size());
 			cubeVBuffer.Bind();
 			cubeVBuffer.Draw((UINT)cubeInstances.size());
 		}
 
 		if (cameraInstances.size() > 0)
 		{
-			DXDevice::UpdateBuffer(instanceBuffer.Get(), cameraInstances, (UINT)cameraInstances.size());
+			cameraVBuffer.UpdateInstanceBuffer(cameraInstances, (UINT)cameraInstances.size());
 			cameraVBuffer.Bind();
 			cameraVBuffer.Draw((UINT)cameraInstances.size());
 		}
