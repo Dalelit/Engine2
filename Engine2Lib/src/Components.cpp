@@ -58,7 +58,31 @@ namespace Engine2
 			ImGui::TreePop();
 		}
 	}
+
+	DirectX::XMVECTOR RigidBody::gravity = { 0.0f, -9.8f, 0.0f, 1.0f };
 	
+	void RigidBody::OnUpdate(float dt, Transform* pTransform)
+	{
+		//XMVECTOR force = gravity;
+		//XMVECTOR acceleration = (force / mass) * dt;
+		//velocity += acceleration;
+
+		velocity += (gravity / mass) * dt;
+		pTransform->transform = XMMatrixTranspose(XMMatrixTranslationFromVector(velocity * dt)) * pTransform->transform;
+	}
+
+	void RigidBody::OnImgui()
+	{
+		if (ImGui::TreeNode("RigidBody"))
+		{
+			ImGui::DragFloat3("Velocity", velocity.m128_f32, 0.1f);
+			ImGui::DragFloat("Mass", &mass, 0.1f);
+			ImGui::DragFloat3("Common gravity", gravity.m128_f32, 0.1f);
+
+			ImGui::TreePop();
+		}
+	}
+
 	void Mesh::OnImgui()
 	{
 		if (ImGui::TreeNode("Mesh"))
@@ -109,12 +133,14 @@ namespace Engine2
 	{
 		if (coord.HasComponent<EntityInfo>(id)) coord.GetComponent<EntityInfo>(id)->OnImgui();
 		if (coord.HasComponent<Transform>(id)) coord.GetComponent<Transform>(id)->OnImgui();
+		if (coord.HasComponent<RigidBody>(id)) coord.GetComponent<RigidBody>(id)->OnImgui();
 		if (coord.HasComponent<Mesh>(id)) coord.GetComponent<Mesh>(id)->OnImgui();
 		if (coord.HasComponent<ParticleEmitter>(id)) coord.GetComponent<ParticleEmitter>(id)->OnImgui();
 		if (coord.HasComponent<Gizmo>(id)) coord.GetComponent<Gizmo>(id)->OnImgui();
 
 		if (ImGui::BeginCombo("Add Component", ""))
 		{
+			if (!coord.HasComponent<RigidBody>(id) && ImGui::Selectable("RigidBody")) coord.AddComponent<RigidBody>(id);
 			if (!coord.HasComponent<Mesh>(id) && ImGui::Selectable("Mesh")) coord.AddComponent<Mesh>(id);
 			if (!coord.HasComponent<ParticleEmitter>(id) && ImGui::Selectable("ParticleEmitter")) {
 				coord.AddComponent<ParticleEmitter>(id);

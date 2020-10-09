@@ -36,6 +36,18 @@ namespace Engine2
 		void OnImgui();
 	};
 
+	struct RigidBody
+	{
+		DirectX::XMVECTOR velocity = { 0.0f, 0.0f, 0.0f, 0.0f };
+		float mass = 1.0f;
+
+		static DirectX::XMVECTOR gravity;
+
+		void OnUpdate(float dt, Transform* pTransform);
+
+		void OnImgui();
+	};
+
 	struct Mesh
 	{
 		std::shared_ptr<Drawable> drawable;

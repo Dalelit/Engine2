@@ -52,6 +52,7 @@ namespace Engine2
 		void RenderParticles();
 		void RenderGizmos();
 
+		void UpdatePhysics(float dt);
 		void UpdateParticles(float dt);
 	};
 

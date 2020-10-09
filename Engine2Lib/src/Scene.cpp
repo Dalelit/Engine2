@@ -14,6 +14,7 @@ namespace Engine2
 
 	void Scene::OnUpdate(float dt)
 	{
+		UpdatePhysics(dt);
 		UpdateParticles(dt);
 	}
 
@@ -151,12 +152,23 @@ namespace Engine2
 		gizmoRender.Render();
 	}
 
+	void Scene::UpdatePhysics(float dt)
+	{
+		View<RigidBody, Transform> entities(coordinator);
+		for (auto e : entities)
+		{
+			auto* rb = coordinator.GetComponent<RigidBody>(e);
+			auto* tr = coordinator.GetComponent<Transform>(e);
+			rb->OnUpdate(dt, tr);
+		}
+	}
+
 	void Scene::UpdateParticles(float dt)
 	{
 		View<ParticleEmitter, Transform> entities(coordinator);
 		for (auto e : entities)
 		{
-			const auto& emitter = coordinator.GetComponent<ParticleEmitter>(e);
+			auto* emitter = coordinator.GetComponent<ParticleEmitter>(e);
 			emitter->OnUpdate(dt);
 		}
 	}
