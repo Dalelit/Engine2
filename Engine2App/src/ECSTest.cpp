@@ -18,6 +18,11 @@ ECSTest::ECSTest() : Layer("ECSTest")
 	//scene.pointLights.emplace_back(PointLight({ -1.0f, 4.0f, -2.0f, 1.0f }, { 0.8f, 0.8f, 0.8f, 1.0f }));
 
 	CreateCube();
+
+	auto e = scene.CreateEntity();
+	auto pe = e.AddComponent<ParticleEmitter>();
+	pe->SetMaxParticles(2000);
+	pe->SetRate(500.0f);
 }
 
 void ECSTest::OnUpdate(float dt)
@@ -56,6 +61,7 @@ void ECSTest::CreateCube()
 	std::string psfilename = Config::directories["ShaderSourceDir"] + "StandardPosNorColPS.hlsl";
 
 	auto e = scene.CreateEntity();
+	e.GetComponent<Transform>()->Set(-3.0f, 0.0f, 0.0f);
 	auto mesh = e.AddComponent<Mesh>();
 	mesh->drawable = std::make_shared<MeshTriangleIndexList<Vertex>>(verticies, Primatives::Cube::indicies);
 	mesh->vertexShaderCB = std::make_shared<VSConstantBuffer<Transform>>(1);

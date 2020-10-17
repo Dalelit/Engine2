@@ -76,7 +76,7 @@ private:
 			L"Engine2 App",
 			WS_OVERLAPPEDWINDOW | WS_VISIBLE,
 			0, 0,
-			2*800, 2*600,
+			3*800, 2*600,
 			0, // parent window
 			0, hInstance, NULL);
 	}

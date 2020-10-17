@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Particles.h"
+#include "UtilMath.h"
 
 using namespace DirectX;
 
@@ -18,16 +19,17 @@ namespace Engine2
 
 		SetMeshAndVertexShader(meshNames[1]);
 		SetPixelShader(pixelShaderNames[1]);
+
+		position = emitLocation = { 0.0f, 0.0f, 0.0f, 1.0f};
+
+		InitStartParameters();
 	}
 
 	void ParticleEmitter::OnUpdate(float dt)
 	{
-		if (freeze) return;
+		timerOnUpdate.Set();
 
-		velocityStartVar = velocityStartMax - velocityStartMin;
-		rotationSpeedStartVar = rotationSpeedStartMax - rotationSpeedStartMin;
-		colorStartVar = colorStartMax - colorStartMin;
-		colorEndVar = colorEndMax - colorEndMin;
+		if (freeze) return;
 
 		timeSinceLastEmit += dt;
 
@@ -81,10 +83,14 @@ namespace Engine2
 		// Just to help understand how the buffers are being used. Displayed in imgui.
 		instanceCount = (UINT)(pInstance - instances.data());
 		bufferIndex = (UINT)(pParticle - particles.data());
+
+		timerOnUpdate.Tick();
 	}
 
 	void ParticleEmitter::OnRender()
 	{
+		timerOnRender.Set();
+
 		if (instanceCount > 0)
 		{
 			DXDevice::Get().SetNoFaceCullingRenderState();
@@ -99,6 +105,8 @@ namespace Engine2
 			DXDevice::Get().SetDefaultRenderState();
 			DXDevice::Get().SetDefaultBlendState();
 		}
+
+		timerOnRender.Tick();
 	}
 
 	void ParticleEmitter::OnImgui()
@@ -109,9 +117,9 @@ namespace Engine2
 			ImGui::DragFloat3("Position", position.m128_f32, 0.01f);
 			
 			int maxP = (int)maxParticles;
-			if (ImGui::DragInt("Max Particles", &maxP, 1.0f, 0, 100000)) { SetMaxParticles(maxP); }
+			if (ImGui::DragInt("Max Particles", &maxP, 1.0f, 0, 100000)) { if (maxP > 0) SetMaxParticles(maxP); }
 			
-			ImGui::DragFloat("Rate", &rate, 0.1f, 0.01f);
+			if (ImGui::DragFloat("Rate", &rate, 0.1f)) { if (rate < 0.0f) rate = 0.0f; }
 			ImGui::DragFloat3("Force", force.m128_f32, 0.01f);
 			if (ImGui::BeginCombo("Mesh", currentMesh.c_str()))
 			{
@@ -134,28 +142,38 @@ namespace Engine2
 				ImGui::EndCombo();
 			}
 			ImGui::Text("Emit start params");
-			ImGui::DragFloat("Lifespan", &lifeSpan, 0.1f, 0.01f);
-			ImGui::DragFloat3("Vel min", velocityStartMin.m128_f32, 0.01f);
-			ImGui::DragFloat3("Vel max", velocityStartMax.m128_f32, 0.01f);
-			ImGui::DragFloat3("Rot speed min", rotationSpeedStartMin.m128_f32, 0.01f);
-			ImGui::DragFloat3("Rot speed max", rotationSpeedStartMax.m128_f32, 0.01f);
-			ImGui::DragFloat3("Scale start", scaleStart.m128_f32, 0.01f);
-			ImGui::DragFloat3("Scale end", scaleEnd.m128_f32, 0.01f);
-			ImGui::ColorEdit4("Col start min", colorStartMin.m128_f32);
-			ImGui::ColorEdit4("Col start max", colorStartMax.m128_f32);
-			ImGui::ColorEdit4("Col end min", colorEndMin.m128_f32);
-			ImGui::ColorEdit4("Col end max", colorEndMax.m128_f32);
+			if (ImGui::DragFloat("Lifespan", &lifeSpan, 0.1f)) { if (lifeSpan < 0.0f) lifeSpan = 0.0f; }
+			if (ImGui::DragFloat3("Vel min", velocityStartMin.m128_f32, 0.01f)) { InitStartParameters(); }
+			if (ImGui::DragFloat3("Vel max", velocityStartMax.m128_f32, 0.01f)) { InitStartParameters(); }
+			if (ImGui::DragFloat3("Rot speed min", rotationSpeedStartMin.m128_f32, 0.01f)) { InitStartParameters(); }
+			if (ImGui::DragFloat3("Rot speed max", rotationSpeedStartMax.m128_f32, 0.01f)) { InitStartParameters(); }
+			if (ImGui::DragFloat3("Scale start", scaleStart.m128_f32, 0.01f)) { InitStartParameters(); }
+			if (ImGui::DragFloat3("Scale end", scaleEnd.m128_f32, 0.01f)) { InitStartParameters(); }
+			if (ImGui::ColorEdit4("Col start min", colorStartMin.m128_f32)) { InitStartParameters(); }
+			if (ImGui::ColorEdit4("Col start max", colorStartMax.m128_f32)) { InitStartParameters(); }
+			if (ImGui::ColorEdit4("Col end min", colorEndMin.m128_f32)) { InitStartParameters(); }
+			if (ImGui::ColorEdit4("Col end max", colorEndMax.m128_f32)) { InitStartParameters(); }
 			ImGui::Text("Stats");
+			ImGui::Text("OnUpdate %fms", timerOnUpdate.Average());
+			ImGui::Text("OnRender %fms", timerOnRender.Average());
 			ImGui::Text("Active particles %i", activeCount);
 			ImGui::Text("Instances %i", instanceCount);
 			ImGui::Text("Buffer index %i", bufferIndex);
 		}
 	}
 
+	void ParticleEmitter::InitStartParameters()
+	{
+		velocityStartVar = velocityStartMax - velocityStartMin;
+		rotationSpeedStartVar = rotationSpeedStartMax - rotationSpeedStartMin;
+		colorStartVar = colorStartMax - colorStartMin;
+		colorEndVar = colorEndMax - colorEndMin;
+	}
+
 	void ParticleEmitter::CreateParticle(Particle* pParticle)
 	{
 		pParticle->life = lifeSpan;
-		pParticle->position = position;
+		pParticle->position = emitLocation;
 		pParticle->velocity = velocityStartMin + velocityStartVar * rng.NextXMVECTORXYZ0();
 		pParticle->scale = scaleStart;
 		pParticle->scaleDelta = (scaleEnd - scaleStart) / pParticle->life;
@@ -177,12 +195,14 @@ namespace Engine2
 
 	void ParticleEmitter::InstanceParticle(Particle* pParticle, InstanceInfo* pInstance)
 	{
-		pInstance->transform = XMMatrixTranspose(XMMatrixScalingFromVector(pParticle->scale) * XMMatrixRotationRollPitchYawFromVector(pParticle->rotation) * XMMatrixTranslationFromVector(pParticle->position));
+		pInstance->transform = XMMatrixTranspose(Math::TransformMatrixEuler(pParticle->position, pParticle->scale, pParticle->rotation));
 		pInstance->color = pParticle->color;
 	}
 
 	void ParticleEmitter::SetMaxParticles(size_t maxParticleCount)
 	{
+		E2_ASSERT(maxParticleCount > 0, "Do not set max particle count below 1");
+
 		maxParticles = maxParticleCount;
 		particles.resize(maxParticles);
 		instances.resize(maxParticles);

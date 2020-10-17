@@ -4,6 +4,7 @@
 #include "ConstantBuffer.h"
 #include "Shader.h"
 #include "Util.h"
+#include "Instrumentation.h"
 
 namespace Engine2
 {
@@ -24,9 +25,6 @@ namespace Engine2
 	class ParticleEmitter
 	{
 	public:
-		DirectX::XMVECTOR position;
-		float rate = 10.0; // per second
-
 		ParticleEmitter(size_t maxParticleCount = 100);
 
 		void OnUpdate(float dt);
@@ -36,8 +34,12 @@ namespace Engine2
 		inline bool IsActive() { return active; }
 		inline void SetActive(bool makeActive = true) { active = makeActive; }
 
+		inline void SetTransform(DirectX::XMMATRIX transform) { emitLocation = DirectX::XMVector3Transform(position, transform); }
+
 		void SetMaxParticles(size_t maxParticleCount);
 		size_t GetMaxParticles() { return maxParticles; }
+
+		void SetRate(float newRate) { rate = newRate; }
 
 		void SetMeshAndVertexShader(const std::string& meshName);
 		void SetPixelShader(const std::string& shaderName = "");
@@ -45,6 +47,9 @@ namespace Engine2
 	protected:
 		bool active = true;
 		bool freeze = false;
+		DirectX::XMVECTOR position;
+		DirectX::XMVECTOR emitLocation;
+		float rate = 10.0; // per second
 		size_t maxParticles;
 		float timeSinceLastEmit = 0.0f;
 		std::vector<Particle> particles;
@@ -69,6 +74,9 @@ namespace Engine2
 
 		Util::Random rng;
 
+		Instrumentation::Timer timerOnRender;
+		Instrumentation::Timer timerOnUpdate;
+
 		// start parameters
 		float lifeSpan = 4.0f;
 
@@ -91,6 +99,7 @@ namespace Engine2
 		DirectX::XMVECTOR scaleStart = { 0.25f, 0.25f, 0.25f, 1.0f };
 		DirectX::XMVECTOR scaleEnd   = { 0.01f, 0.01f, 0.01f, 1.0f };
 
+		void InitStartParameters();
 		void CreateParticle(Particle* pParticle);
 		void UpdateParticle(Particle* pParticle, float dt);
 		void InstanceParticle(Particle* pParticle, InstanceInfo* pInstance);

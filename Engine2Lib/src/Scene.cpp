@@ -48,7 +48,7 @@ namespace Engine2
 			}
 			ImGui::TreePop();
 		}
-		if (ImGui::TreeNode("Entities"))
+		if (ImGui::TreeNodeEx("Entities", ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			auto& allInfo = coordinator.GetComponents<EntityInfo>(); // Note: All entities when created through scene get an entityInfo component
 			for (EngineECS::ComponentIndex_t indx = 0; indx < allInfo.Count(); indx++)
@@ -169,6 +169,7 @@ namespace Engine2
 		for (auto e : entities)
 		{
 			auto* emitter = coordinator.GetComponent<ParticleEmitter>(e);
+			emitter->SetTransform( coordinator.GetComponent<Transform>(e)->GetTransformTranspose() );
 			emitter->OnUpdate(dt);
 		}
 	}

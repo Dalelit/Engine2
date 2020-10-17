@@ -28,7 +28,7 @@ namespace Engine2
 	{
 		// to do:
 		// - scale going negative gets messed up... assuming it's to do with the decompose?
-		if (ImGui::TreeNode("Transform"))
+		if (ImGui::TreeNodeEx("Transform", ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			XMVECTOR vScale, vRotQ, vTrans, vRotEulerDeg, vRotEulerDegNew;
 			XMMatrixDecompose(&vScale, &vRotQ, &vTrans, XMMatrixTranspose(transform));
@@ -70,7 +70,7 @@ namespace Engine2
 
 	void RigidBody::OnImgui()
 	{
-		if (ImGui::TreeNode("RigidBody"))
+		if (ImGui::TreeNodeEx("RigidBody", ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			ImGui::DragFloat3("Velocity", velocity.m128_f32, 0.1f);
 			ImGui::DragFloat("Mass", &mass, 0.1f);
@@ -82,7 +82,7 @@ namespace Engine2
 
 	void Mesh::OnImgui()
 	{
-		if (ImGui::TreeNode("Mesh"))
+		if (ImGui::TreeNodeEx("Mesh", ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			if (drawable) drawable->OnImgui();
 			else ImGui::Text("Drawable null");
@@ -102,7 +102,7 @@ namespace Engine2
 
 	void Gizmo::OnImgui()
 	{
-		if (ImGui::TreeNode("Gizmo"))
+		if (ImGui::TreeNodeEx("Gizmo", ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			const char* selected = "";
 

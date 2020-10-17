@@ -10,6 +10,32 @@ namespace Engine2
 		inline DirectX::XMMATRIX TranslationMatrix(DirectX::XMFLOAT3 position) { return DirectX::XMMatrixTranslation(position.x, position.y, position.z); }
 		inline DirectX::XMMATRIX TranslationMatrix(DirectX::XMVECTOR position) { return DirectX::XMMatrixTranslationFromVector(position); }
 
+		// More efficient way to create a transformation matrix. Assume translation.w = 1.0.
+		inline XMMATRIX TransformMatrixEuler(DirectX::XMVECTOR& translation, DirectX::XMVECTOR& scale, DirectX::XMVECTOR& eulerRotation)
+		{
+			// Same as XMMatrixScalingFromVector(scale) * XMMatrixRotationRollPitchYawFromVector(rotation) * XMMatrixTranslationFromVector(translation)
+
+			XMMATRIX transform = XMMatrixRotationRollPitchYawFromVector(eulerRotation);
+			transform.r[0] *= scale.m128_f32[0];
+			transform.r[1] *= scale.m128_f32[1];
+			transform.r[2] *= scale.m128_f32[2];
+			transform.r[3] = translation; //  = XMVectorSetW(pParticle->position, 1.0f); // if wanting to force w = 1.0
+			return transform;
+		}
+
+		// More efficient way to create a transformation matrix. Assume translation.w = 1.0.
+		inline XMMATRIX TransformMatrixQuat(DirectX::XMVECTOR& translation, DirectX::XMVECTOR& scale, DirectX::XMVECTOR& quaternion)
+		{
+			// Same as XMMatrixScalingFromVector(scale) * XMMatrixRotationQuaternion(quaternion) * XMMatrixTranslationFromVector(translation)
+
+			XMMATRIX transform = XMMatrixRotationQuaternion(quaternion);
+			transform.r[0] *= scale.m128_f32[0];
+			transform.r[1] *= scale.m128_f32[1];
+			transform.r[2] *= scale.m128_f32[2];
+			transform.r[3] = translation; //  = XMVectorSetW(pParticle->position, 1.0f); // if wanting to force w = 1.0
+			return transform;
+		}
+
 		// https://stackoverflow.com/questions/1996957/conversion-euler-to-matrix-and-matrix-to-euler
 		// Assume pure rotation matrix
 		inline XMVECTOR RotationMatrixDecomposeYawPitchRoll(XMMATRIX mat)

@@ -24,7 +24,11 @@ namespace Engine2
 										{ 0.0f, 0.0f, 1.0f, 0.0f },
 										{ 0.0f, 0.0f, 0.0f, 1.0f } };
 		
-		void Set(float positionX, float positionY, float positionZ, float scaleX, float scaleY, float scaleZ, float rollDeg, float pitchDeg, float yawDeg);
+		void Set(float positionX = 0.0f, float positionY = 0.0f, float positionZ = 0.0f,
+				 float scaleX = 1.0f, float scaleY = 1.0f, float scaleZ = 1.0f,
+				 float rollDeg = 0.0f, float pitchDeg = 0.0f, float yawDeg = 0.0f);
+
+		inline DirectX::XMMATRIX GetTransformTranspose() { return DirectX::XMMatrixTranspose(transform); }
 
 		inline Transform& Multiply(DirectX::XMMATRIX m) { transform = DirectX::XMMatrixMultiplyTranspose(DirectX::XMMatrixTranspose(transform), m); return *this; }
 		
