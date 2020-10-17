@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Components.h"
+#include "UtilMath.h"
 
 using namespace DirectX;
 
@@ -17,12 +18,8 @@ namespace Engine2
 
 	void Transform::Set(float positionX, float positionY, float positionZ, float scaleX, float scaleY, float scaleZ, float rollDeg, float pitchDeg, float yawDeg)
 	{
-		rotation.roll = rollDeg;
-		rotation.pitch = pitchDeg;
-		rotation.yaw = yawDeg;
-		
 		transform = XMMatrixScaling(scaleX, scaleY, scaleZ);
-		transform *= XMMatrixRotationRollPitchYaw(XMConvertToRadians(rotation.pitch), XMConvertToRadians(rotation.yaw), XMConvertToRadians(rotation.roll));
+		transform *= XMMatrixRotationRollPitchYaw(Math::DegToRad(pitchDeg), Math::DegToRad(yawDeg), Math::DegToRad(rollDeg));
 		transform *= XMMatrixTranslation(positionX, positionY, positionZ);
 		transform = XMMatrixTranspose(transform);
 	}
@@ -30,30 +27,30 @@ namespace Engine2
 	void Transform::OnImgui()
 	{
 		// to do:
-		// - is there a way to get human readable rotation out of the transform matrix?
 		// - scale going negative gets messed up... assuming it's to do with the decompose?
 		if (ImGui::TreeNode("Transform"))
 		{
-			XMVECTOR vScale, vRotQuat, vTrans;
-			XMMatrixDecompose(&vScale, &vRotQuat, &vTrans, XMMatrixTranspose(transform));
+			XMVECTOR vScale, vRotQ, vTrans, vRotEulerDeg, vRotEulerDegNew;
+			XMMatrixDecompose(&vScale, &vRotQ, &vTrans, XMMatrixTranspose(transform));
+			vRotEulerDegNew = vRotEulerDeg = Math::RadToDeg(Math::QuaternionToEuler(vRotQ));
 
 			auto MatrixCompose = [&]() {
-				//transform *= XMMatrixRotationQuaternion(vRotQuat);
 				transform = XMMatrixScalingFromVector(vScale);
-				transform *= XMMatrixRotationRollPitchYaw(XMConvertToRadians(rotation.pitch), XMConvertToRadians(rotation.yaw), XMConvertToRadians(rotation.roll));
+				transform *= XMMatrixRotationQuaternion(vRotQ);
 				transform *= XMMatrixTranslationFromVector(vTrans);
 				transform = XMMatrixTranspose(transform);
 			};
 
 			if (ImGui::DragFloat3("Position", vTrans.m128_f32, 0.1f)) MatrixCompose();
 			if (ImGui::DragFloat3("Scale", vScale.m128_f32, 0.1f))    MatrixCompose();
-			if (ImGui::DragFloat3("Roll/Pitch/Yaw", &rotation.roll, 1.0f)) MatrixCompose();
-			
-			if (ImGui::Button("Reset"))
+			if (ImGui::DragFloat3("Roll/Pitch/Yaw", vRotEulerDegNew.m128_f32, 0.5f))
 			{
-				transform = XMMatrixIdentity();
-				rotation.roll = rotation.pitch = rotation.yaw = 0.0f;
+				XMVECTOR qChange = XMQuaternionRotationRollPitchYawFromVector(Math::DegToRad(vRotEulerDegNew - vRotEulerDeg));
+				vRotQ = XMQuaternionMultiply(vRotQ, qChange);
+				MatrixCompose();
 			}
+			
+			if (ImGui::Button("Reset")) { transform = XMMatrixIdentity(); }
 
 			ImGui::TreePop();
 		}

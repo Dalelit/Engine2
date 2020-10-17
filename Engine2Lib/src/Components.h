@@ -24,11 +24,6 @@ namespace Engine2
 										{ 0.0f, 0.0f, 1.0f, 0.0f },
 										{ 0.0f, 0.0f, 0.0f, 1.0f } };
 		
-		// To do: remove this once I work out how to get degree rotation out of the transform
-		struct {
-			float roll = 0.0f, pitch = 0.0f, yaw = 0.0f;
-		} rotation; // degrees for display purposes
-
 		void Set(float positionX, float positionY, float positionZ, float scaleX, float scaleY, float scaleZ, float rollDeg, float pitchDeg, float yawDeg);
 
 		inline Transform& Multiply(DirectX::XMMATRIX m) { transform = DirectX::XMMatrixMultiplyTranspose(DirectX::XMMatrixTranspose(transform), m); return *this; }
