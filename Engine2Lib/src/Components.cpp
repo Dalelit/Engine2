@@ -1,6 +1,10 @@
 #include "pch.h"
 #include "Components.h"
+#include "submodules/imgui/imgui.h"
 #include "UtilMath.h"
+#include "Mesh.h"
+#include "RigidBody.h"
+#include "Particles.h"
 
 using namespace DirectX;
 
@@ -51,50 +55,6 @@ namespace Engine2
 			}
 			
 			if (ImGui::Button("Reset")) { transform = XMMatrixIdentity(); }
-
-			ImGui::TreePop();
-		}
-	}
-
-	DirectX::XMVECTOR RigidBody::gravity = { 0.0f, -9.8f, 0.0f, 1.0f };
-	
-	void RigidBody::OnUpdate(float dt, Transform* pTransform)
-	{
-		//XMVECTOR force = gravity;
-		//XMVECTOR acceleration = (force / mass) * dt;
-		//velocity += acceleration;
-
-		velocity += (gravity / mass) * dt;
-		pTransform->transform = XMMatrixTranspose(XMMatrixTranslationFromVector(velocity * dt)) * pTransform->transform;
-	}
-
-	void RigidBody::OnImgui()
-	{
-		if (ImGui::TreeNodeEx("RigidBody", ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			ImGui::DragFloat3("Velocity", velocity.m128_f32, 0.1f);
-			ImGui::DragFloat("Mass", &mass, 0.1f);
-			ImGui::DragFloat3("Common gravity", gravity.m128_f32, 0.1f);
-
-			ImGui::TreePop();
-		}
-	}
-
-	void Mesh::OnImgui()
-	{
-		if (ImGui::TreeNodeEx("Mesh", ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			if (drawable) drawable->OnImgui();
-			else ImGui::Text("Drawable null");
-
-			if (vertexShaderCB) vertexShaderCB->OnImgui();
-			else ImGui::Text("vertexShaderCB null");
-
-			if (vertexShader) vertexShader->OnImgui();
-			else ImGui::Text("vertexShader null");
-
-			if (pixelShader) pixelShader->OnImgui();
-			else ImGui::Text("pixelShader null");
 
 			ImGui::TreePop();
 		}

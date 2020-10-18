@@ -44,6 +44,8 @@
     <ClInclude Include="src\Instances.h" />
     <ClInclude Include="src\GizmoRender.h" />
     <ClInclude Include="src\DXBuffer.h" />
+    <ClInclude Include="src\RigidBody.h" />
+    <ClInclude Include="src\Mesh.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\pch.cpp" />
@@ -76,6 +78,8 @@
     <ClCompile Include="src\Components.cpp" />
     <ClCompile Include="src\Instances.cpp" />
     <ClCompile Include="src\GizmoRender.cpp" />
+    <ClCompile Include="src\RigidBody.cpp" />
+    <ClCompile Include="src\Mesh.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Assets\Shaders\GizmosPS.hlsl" />

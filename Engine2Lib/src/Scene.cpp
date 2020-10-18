@@ -3,6 +3,9 @@
 #include "Camera.h"
 #include "Engine2.h"
 #include "Components.h"
+#include "Mesh.h"
+#include "RigidBody.h"
+#include "Particles.h"
 
 using namespace EngineECS;
 

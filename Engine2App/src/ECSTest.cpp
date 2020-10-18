@@ -4,6 +4,9 @@
 #include "Engine2.h"
 #include "VertexBuffer.h"
 #include "Components.h"
+#include "Particles.h"
+#include "Mesh.h"
+#include "RigidBody.h"
 
 using namespace Engine2;
 using namespace EngineECS;
@@ -23,6 +26,7 @@ ECSTest::ECSTest() : Layer("ECSTest")
 	auto pe = e.AddComponent<ParticleEmitter>();
 	pe->SetMaxParticles(2000);
 	pe->SetRate(500.0f);
+	e.GetComponent<Transform>()->Set(-2.0f, 0.0f, 2.0f);
 }
 
 void ECSTest::OnUpdate(float dt)
@@ -68,7 +72,12 @@ void ECSTest::CreateCube()
 	mesh->vertexShader = std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout);
 	mesh->pixelShader = std::make_shared<PixelShaderDynamic>(psfilename);
 
+	RigidBody::gravity = g_XMZero;
+	auto rb = e.AddComponent<RigidBody>();
+	rb->angularVelocity = {0.5f , 0.0f, 0.0f, 0.0f};
+
 	auto e2 = scene.CreateEntity();
 	*e2.AddComponent<Mesh>() = *mesh;
 	e2.GetComponent<Transform>()->Set(3.0f, 0.0f, 0.0f, 1.5f, 1.5f, 1.5f, 15.0f, 30.0f, 45.0f);
+	e2.AddComponent<RigidBody>()->angularVelocity = { 0.0f , -0.8f, 0.3f, 0.0f };
 }
