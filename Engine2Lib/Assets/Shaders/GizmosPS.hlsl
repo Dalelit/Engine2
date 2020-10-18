@@ -3,7 +3,7 @@ cbuffer gizmoConst : register (b0)
 	float4 lineColor;
 };
 
-float4 main() : SV_TARGET
+float4 main(float4 col : Color) : SV_TARGET
 {
-	return lineColor;
+	return col * lineColor;
 }

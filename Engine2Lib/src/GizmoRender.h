@@ -26,8 +26,8 @@ namespace Engine2
 		std::shared_ptr<PixelShader> pPS;
 		std::shared_ptr<VertexShader> pVS;
 		PSConstantBuffer<DirectX::XMVECTOR> psCB;
-		DirectX::XMVECTOR visibleColor = { 0.2f, 0.8f, 0.2f, 1.0f };
-		DirectX::XMVECTOR hiddenColor = { 0.05f, 0.2f, 0.05f, 1.0f };
+		DirectX::XMVECTOR visibleColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+		DirectX::XMVECTOR hiddenColor = { 0.3f, 0.3f, 0.3f, 1.0f };
 		wrl::ComPtr<ID3D11DepthStencilState> pBackDrawDSS;
 		using InstanceInfoType = DirectX::XMMATRIX;
 

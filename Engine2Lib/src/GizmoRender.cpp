@@ -13,6 +13,7 @@ namespace Engine2
 
 		std::vector<D3D11_INPUT_ELEMENT_DESC> vsLayout = {
 			{"Position",      0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"Color",         0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
 			{"InstTransform", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_INSTANCE_DATA, 1},
 			{"InstTransform", 1, DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_INSTANCE_DATA, 1},
 			{"InstTransform", 2, DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_INSTANCE_DATA, 1},
@@ -82,61 +83,74 @@ namespace Engine2
 
 	void GizmoRender::CreateVertexBuffers()
 	{
+		struct Vertex {
+			XMFLOAT3 position;
+			XMFLOAT3 color;
+		};
+
+		constexpr XMFLOAT3 xAxisColor = { 1.0f, 0.0f, 0.0f };
+		constexpr XMFLOAT3 yAxisColor = { 0.0f, 1.0f, 0.0f };
+		constexpr XMFLOAT3 zAxisColor = { 0.0f, 0.0f, 1.0f };
+		constexpr XMFLOAT3 boundColor = { 1.0f, 1.0f, 1.0f };
+		constexpr XMFLOAT3 cameraColor = { 1.0f, 0.0f, 1.0f };
+
 		{
-			std::vector<XMFLOAT3> AxisVerticies = {
-				{0.0f, 0.0f, 0.0f},
-				{1.0f, 0.0f, 0.0f},
-				{0.0f, 1.0f, 0.0f},
-				{0.0f, 0.0f, 1.0f},
+			std::vector<Vertex> AxisVerticies = {
+				{{0.0f, 0.0f, 0.0f}, xAxisColor},
+				{{1.0f, 0.0f, 0.0f}, xAxisColor},
+				{{0.0f, 0.0f, 0.0f}, yAxisColor},
+				{{0.0f, 1.0f, 0.0f}, yAxisColor},
+				{{0.0f, 0.0f, 0.0f}, zAxisColor},
+				{{0.0f, 0.0f, 1.0f}, zAxisColor},
 			};
 
 			std::vector<uint32_t> AxisIndicies = {
-				0,1, 0,2, 0,3
+				0,1, 2,3, 4,5
 			};
 
-			axisVBuffer.Initialise<XMFLOAT3>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINELIST,
+			axisVBuffer.Initialise<Vertex>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINELIST,
 				AxisVerticies, AxisIndicies);
 		}
 		{
-			std::vector<XMFLOAT3> SphereVerticies = {
-				{0.500f,  0.0f, 0.000f},
-				{0.433f,  0.0f, 0.250f},
-				{0.250f,  0.0f, 0.433f},
-				{0.000f,  0.0f, 0.500f},
-				{-0.250f, 0.0f, 0.433f},
-				{-0.433f, 0.0f, 0.250f},
-				{-0.500f, 0.0f, 0.000f},
-				{-0.433f, 0.0f, -0.250f},
-				{-0.250f, 0.0f, -0.433f},
-				{0.000f,  0.0f, -0.500f},
-				{0.250f,  0.0f, -0.433f},
-				{0.433f,  0.0f, -0.250f},
+			std::vector<Vertex> SphereVerticies = {
+				{{0.500f,  0.0f, 0.000f}, yAxisColor},
+				{{0.433f,  0.0f, 0.250f}, yAxisColor},
+				{{0.250f,  0.0f, 0.433f}, yAxisColor},
+				{{0.000f,  0.0f, 0.500f}, yAxisColor},
+				{{-0.250f, 0.0f, 0.433f}, yAxisColor},
+				{{-0.433f, 0.0f, 0.250f}, yAxisColor},
+				{{-0.500f, 0.0f, 0.000f}, yAxisColor},
+				{{-0.433f, 0.0f, -0.250f}, yAxisColor},
+				{{-0.250f, 0.0f, -0.433f}, yAxisColor},
+				{{0.000f,  0.0f, -0.500f}, yAxisColor},
+				{{0.250f,  0.0f, -0.433f}, yAxisColor},
+				{{0.433f,  0.0f, -0.250f}, yAxisColor},
 
-				{0.0f,  0.000f, 0.500f},
-				{0.0f,  0.250f, 0.433f},
-				{0.0f,  0.433f, 0.250f},
-				{0.0f,  0.500f, 0.000f},
-				{0.0f,  0.433f, -0.250f},
-				{0.0f,  0.250f, -0.433f},
-				{0.0f,  0.000f, -0.500f},
-				{0.0f, -0.250f, -0.433f},
-				{0.0f, -0.433f, -0.250f},
-				{0.0f, -0.500f, 0.000f},
-				{0.0f, -0.433f, 0.250f},
-				{0.0f, -0.250f, 0.433f},
+				{{0.0f,  0.000f, 0.500f}, xAxisColor},
+				{{0.0f,  0.250f, 0.433f}, xAxisColor},
+				{{0.0f,  0.433f, 0.250f}, xAxisColor},
+				{{0.0f,  0.500f, 0.000f}, xAxisColor},
+				{{0.0f,  0.433f, -0.250f}, xAxisColor},
+				{{0.0f,  0.250f, -0.433f}, xAxisColor},
+				{{0.0f,  0.000f, -0.500f}, xAxisColor},
+				{{0.0f, -0.250f, -0.433f}, xAxisColor},
+				{{0.0f, -0.433f, -0.250f}, xAxisColor},
+				{{0.0f, -0.500f, 0.000f}, xAxisColor},
+				{{0.0f, -0.433f, 0.250f}, xAxisColor},
+				{{0.0f, -0.250f, 0.433f}, xAxisColor},
 
-				{0.000f,   0.500f, 0.0f},
-				{0.250f,   0.433f, 0.0f},
-				{0.433f,   0.250f, 0.0f},
-				{0.500f,   0.000f, 0.0f},
-				{0.433f,  -0.250f, 0.0f},
-				{0.250f,  -0.433f, 0.0f},
-				{0.000f,  -0.500f, 0.0f},
-				{-0.250f, -0.433f, 0.0f},
-				{-0.433f, -0.250f, 0.0f},
-				{-0.500f,  0.000f, 0.0f},
-				{-0.433f,  0.250f, 0.0f},
-				{-0.250f,  0.433f, 0.0f},
+				{{0.000f,   0.500f, 0.0f}, zAxisColor},
+				{{0.250f,   0.433f, 0.0f}, zAxisColor},
+				{{0.433f,   0.250f, 0.0f}, zAxisColor},
+				{{0.500f,   0.000f, 0.0f}, zAxisColor},
+				{{0.433f,  -0.250f, 0.0f}, zAxisColor},
+				{{0.250f,  -0.433f, 0.0f}, zAxisColor},
+				{{0.000f,  -0.500f, 0.0f}, zAxisColor},
+				{{-0.250f, -0.433f, 0.0f}, zAxisColor},
+				{{-0.433f, -0.250f, 0.0f}, zAxisColor},
+				{{-0.500f,  0.000f, 0.0f}, zAxisColor},
+				{{-0.433f,  0.250f, 0.0f}, zAxisColor},
+				{{-0.250f,  0.433f, 0.0f}, zAxisColor},
 			};
 
 			std::vector<uint32_t> SphereIndicies = {
@@ -145,19 +159,19 @@ namespace Engine2
 				24,25, 25,26, 26,27, 27,28, 28,29, 29,30, 30,31, 31,32, 32,33, 33,34, 34,35, 35,24,
 			};
 
-			sphereVBuffer.Initialise<XMFLOAT3>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINELIST,
+			sphereVBuffer.Initialise<Vertex>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINELIST,
 				SphereVerticies, SphereIndicies);
 		}
 		{
-			std::vector<XMFLOAT3> CubeVerticies = {
-				{-0.5f, -0.5f, -0.5f},
-				{-0.5f,  0.5f, -0.5f},
-				{ 0.5f,  0.5f, -0.5f},
-				{ 0.5f, -0.5f, -0.5f},
-				{-0.5f, -0.5f,  0.5f},
-				{-0.5f,  0.5f,  0.5f},
-				{ 0.5f,  0.5f,  0.5f},
-				{ 0.5f, -0.5f,  0.5f},
+			std::vector<Vertex> CubeVerticies = {
+				{{-0.5f, -0.5f, -0.5f}, boundColor},
+				{{-0.5f,  0.5f, -0.5f}, boundColor},
+				{{ 0.5f,  0.5f, -0.5f}, boundColor},
+				{{ 0.5f, -0.5f, -0.5f}, boundColor},
+				{{-0.5f, -0.5f,  0.5f}, boundColor},
+				{{-0.5f,  0.5f,  0.5f}, boundColor},
+				{{ 0.5f,  0.5f,  0.5f}, boundColor},
+				{{ 0.5f, -0.5f,  0.5f}, boundColor},
 			};
 
 			std::vector<uint32_t> CubeIndicies = {
@@ -166,19 +180,19 @@ namespace Engine2
 				0,4, 1,5, 2,6, 3,7,
 			};
 
-			cubeVBuffer.Initialise<XMFLOAT3>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINELIST,
+			cubeVBuffer.Initialise<Vertex>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINELIST,
 				CubeVerticies, CubeIndicies);
 		}
 		{
-			std::vector<XMFLOAT3> CameraVerticies = {
-				{  0.0f,  0.0f,  0.0f},
-				{  0.5f, -0.28f, 1.0f},
-				{  0.5f,  0.28f, 1.0f},
-				{ -0.5f,  0.28f, 1.0f},
-				{ -0.5f, -0.28f, 1.0f},
-				{ -0.4f,  0.3f,  1.0f},
-				{  0.0f,  0.4f,  1.0f},
-				{  0.4f,  0.3f,  1.0f},
+			std::vector<Vertex> CameraVerticies = {
+				{{  0.0f,  0.0f,  0.0f}, cameraColor},
+				{{  0.5f, -0.28f, 1.0f}, cameraColor},
+				{{  0.5f,  0.28f, 1.0f}, cameraColor},
+				{{ -0.5f,  0.28f, 1.0f}, cameraColor},
+				{{ -0.5f, -0.28f, 1.0f}, cameraColor},
+				{{ -0.4f,  0.3f,  1.0f}, cameraColor},
+				{{  0.0f,  0.4f,  1.0f}, cameraColor},
+				{{  0.4f,  0.3f,  1.0f}, cameraColor},
 			};
 
 			std::vector<uint32_t> CameraIndicies = {
@@ -187,7 +201,7 @@ namespace Engine2
 				5,6, 6,7, 7,5
 			};
 
-			cameraVBuffer.Initialise<XMFLOAT3>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINELIST,
+			cameraVBuffer.Initialise<Vertex>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINELIST,
 				CameraVerticies, CameraIndicies);
 
 
