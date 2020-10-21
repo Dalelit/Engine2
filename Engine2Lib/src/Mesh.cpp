@@ -3,21 +3,21 @@
 
 namespace Engine2
 {
-	void Mesh::OnImgui()
+	AssetStore<Mesh> Mesh::Assets;
+
+	void Mesh::BindAndDraw()
 	{
-		if (ImGui::TreeNodeEx("Mesh", ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_DefaultOpen))
+		drawable->BindAndDraw();
+	}
+
+	void Mesh::OnImgui(bool assetInfo)
+	{
+		if (ImGui::TreeNodeEx("Mesh", ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_DefaultOpen, "Mesh %s", name.c_str()))
 		{
+			if (assetInfo) ImGui::Text("Drawable references %i", drawable.use_count());
+
 			if (drawable) drawable->OnImgui();
 			else ImGui::Text("Drawable null");
-
-			if (vertexShaderCB) vertexShaderCB->OnImgui();
-			else ImGui::Text("vertexShaderCB null");
-
-			if (vertexShader) vertexShader->OnImgui();
-			else ImGui::Text("vertexShader null");
-
-			if (pixelShader) pixelShader->OnImgui();
-			else ImGui::Text("pixelShader null");
 
 			ImGui::TreePop();
 		}

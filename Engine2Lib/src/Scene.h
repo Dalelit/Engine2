@@ -12,7 +12,6 @@ namespace Engine2
 	class Scene
 	{
 	public:
-
 		Scene();
 		~Scene() = default;
 
@@ -45,8 +44,8 @@ namespace Engine2
 
 		GizmoRender gizmoRender;
 
-		void UpdateVSConstBuffer();
-		void UpdatePSConstBuffer();
+		void UpdateVSSceneConstBuffer();
+		void UpdatePSSceneConstBuffer();
 
 		void RenderMeshes();
 		void RenderParticles();

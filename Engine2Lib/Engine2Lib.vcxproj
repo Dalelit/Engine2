@@ -150,12 +150,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\AssetStore.h" />
     <ClInclude Include="src\Components.h" />
     <ClInclude Include="src\DXBuffer.h" />
     <ClInclude Include="src\ECS.h" />
     <ClInclude Include="src\GizmoRender.h" />
     <ClInclude Include="src\Instances.h" />
+    <ClInclude Include="src\Material.h" />
     <ClInclude Include="src\Mesh.h" />
+    <ClInclude Include="src\MeshRenderer.h" />
     <ClInclude Include="src\RigidBody.h" />
     <ClInclude Include="src\UtilMath.h" />
     <ClInclude Include="src\AssetLoaders\ObjLoader.h" />
@@ -206,7 +209,9 @@
     <ClCompile Include="src\Instances.cpp" />
     <ClCompile Include="src\Instrumentation.cpp" />
     <ClCompile Include="src\Lights.cpp" />
+    <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
+    <ClCompile Include="src\MeshRenderer.cpp" />
     <ClCompile Include="src\OffscreenOutliner.cpp" />
     <ClCompile Include="src\Particles.cpp" />
     <ClCompile Include="src\Primatives.cpp" />

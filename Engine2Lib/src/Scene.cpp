@@ -3,7 +3,7 @@
 #include "Camera.h"
 #include "Engine2.h"
 #include "Components.h"
-#include "Mesh.h"
+#include "MeshRenderer.h"
 #include "RigidBody.h"
 #include "Particles.h"
 
@@ -23,8 +23,8 @@ namespace Engine2
 
 	void Scene::OnRender()
 	{
-		UpdateVSConstBuffer();
-		UpdatePSConstBuffer();
+		UpdateVSSceneConstBuffer();
+		UpdatePSSceneConstBuffer();
 
 		RenderMeshes();
 		RenderParticles();
@@ -51,6 +51,7 @@ namespace Engine2
 			}
 			ImGui::TreePop();
 		}
+		ImGui::Separator();
 		if (ImGui::TreeNodeEx("Entities", ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			auto& allInfo = coordinator.GetComponents<EntityInfo>(); // Note: All entities when created through scene get an entityInfo component
@@ -61,13 +62,14 @@ namespace Engine2
 					Components::OnImgui(allInfo.GetEntity(indx), coordinator);
 					ImGui::TreePop();
 				}
+				ImGui::Separator();
 			}
 			
 			if (ImGui::Button("Add Entity"))
 			{
 				CreateEntity();
 			}
-
+			ImGui::Separator();
 			if (ImGui::TreeNodeEx("Stats", ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_DefaultOpen))
 			{
 				ImGui::Text("Entities: %i/%i", coordinator.GetEntityCount(), coordinator.GetMaxEntities());
@@ -85,15 +87,22 @@ namespace Engine2
 
 			ImGui::TreePop();
 		}
+		ImGui::Separator();
+		if (ImGui::TreeNode("Assets"))
+		{
+			Mesh::Assets.OnImGui();
+			Material::Assets.OnImGui();
+			ImGui::TreePop();
+		}
 	}
 
-	void Scene::UpdateVSConstBuffer()
+	void Scene::UpdateVSSceneConstBuffer()
 	{
 		Engine::GetActiveCamera().LoadViewProjectionMatrixT(vsConstBuffer.data.cameraTransform);
 		vsConstBuffer.Bind();
 	}
 
-	void Scene::UpdatePSConstBuffer()
+	void Scene::UpdatePSSceneConstBuffer()
 	{
 		psConstBuffer.data.CameraPosition = Engine::GetActiveCamera().GetPosition();
 		if (pointLights.size() > 0)
@@ -106,21 +115,15 @@ namespace Engine2
 
 	void Scene::RenderMeshes()
 	{
-		View<Mesh, Transform> entities(coordinator);
+		View<MeshRenderer, Transform> entities(coordinator);
 		for (auto e : entities)
 		{
-			const auto& mesh = coordinator.GetComponent<Mesh>(e);
+			const auto& mr = coordinator.GetComponent<MeshRenderer>(e);
 
-			if (mesh->IsValid())
+			if (mr->IsValid())
 			{
-				mesh->vertexShaderCB->data = *coordinator.GetComponent<Transform>(e);
-				mesh->vertexShaderCB->UpdateBuffer();
-				mesh->vertexShaderCB->Bind();
-
-				mesh->vertexShader->Bind();
-				mesh->pixelShader->Bind();
-
-				mesh->drawable->BindAndDraw();
+				mr->material->SetTransform(*coordinator.GetComponent<Transform>(e));
+				mr->BindAndDraw();
 			}
 		}
 	}
