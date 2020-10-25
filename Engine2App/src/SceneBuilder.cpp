@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "ECSTest.h"
+#include "SceneBuilder.h"
 #include "Primatives.h"
 #include "Engine2.h"
 #include "VertexBuffer.h"
@@ -15,65 +15,72 @@ using namespace Engine2;
 using namespace EngineECS;
 using namespace DirectX;
 
-ECSTest::ECSTest() : Layer("ECSTest")
+SceneBuilder::SceneBuilder() : Layer("SceneBuilder")
 {
 	Engine::GetActiveCamera().SetPosition(5.0f, 5.0f, -5.0f);
 	Engine::GetActiveCamera().LookAt(0.0f, 0.0f, 0.0f);
 
 	scene.psConstBuffer.data.ambientLight = { 0.2f, 0.2f, 0.2f, 1.0f };
 
-	auto e = scene.CreateEntity();
-	e.AddComponent<Gizmo>()->type = Gizmo::Types::Sphere;
-	e.AddComponent<PointLight>();
-
-	CreateCube();
-	CreateModel();
-
-	//auto e = scene.CreateEntity();
-	//auto pe = e.AddComponent<ParticleEmitter>();
-	//pe->SetMaxParticles(2000);
-	//pe->SetRate(500.0f);
-	//e.GetComponent<Transform>()->Set(-2.0f, 0.0f, 2.0f);
+	BuildTestScene();
 }
 
-void ECSTest::OnUpdate(float dt)
+void SceneBuilder::OnUpdate(float dt)
 {
 	scene.OnUpdate(dt);
 }
 
-void ECSTest::OnRender()
+void SceneBuilder::OnRender()
 {
 	scene.OnRender();
 }
 
-void ECSTest::OnApplicationEvent(Engine2::ApplicationEvent& event)
+void SceneBuilder::OnApplicationEvent(Engine2::ApplicationEvent& event)
 {
 	scene.OnApplicationEvent(event);
 }
 
-void ECSTest::OnImgui()
+void SceneBuilder::OnImgui()
 {
 	scene.OnImgui();
 }
 
-void ECSTest::CreateCube()
+void SceneBuilder::BuildTestScene()
 {
+	RigidBody::gravity = g_XMZero;
+
+	// add a light
+	{
+		auto e = scene.CreateEntity();
+		e.AddComponent<Gizmo>()->type = Gizmo::Types::Sphere;
+		e.AddComponent<PointLight>();
+	}
+
+	// add a particle emitter
+	{
+		//auto e = scene.CreateEntity();
+		//auto pe = e.AddComponent<ParticleEmitter>();
+		//pe->SetMaxParticles(2000);
+		//pe->SetRate(500.0f);
+		//e.GetComponent<Transform>()->Set(-2.0f, 0.0f, 2.0f);
+	}
+
+	// Create primatives
 	using Vertex = VertexLayout::PositionNormalColor::Vertex;
 	auto vsLayout = VertexLayout::PositionNormalColor::GetLayout();
 
-	std::string vsfilename = Config::directories["ShaderSourceDir"] + "StandardPosNorColVS.hlsl";
-	std::string psfilename = Config::directories["ShaderSourceDir"] + "StandardPosNorColPS.hlsl";
-
+	// sphere
 	{
 		auto ico = Primatives::IcoSphere::CreateIcoSphere(3);
-		std::vector<Vertex> v(ico.verticies->size());
-		Primatives::CopyPositionNormal(v, *ico.verticies);
-		for (auto& vi : v) vi.color = {0.3f, 0.6f, 0.7f, 1.0f};
+		std::vector<Vertex> verticies(ico.verticies->size());
+		Primatives::CopyPositionNormal(verticies, *ico.verticies);
+		for (auto& vi : verticies) vi.color = { 0.3f, 0.6f, 0.7f, 1.0f };
 
 		auto m = Mesh::Assets.CreateAsset("Icosphere3");
-		m->SetDrawable<MeshTriangleIndexList<Vertex>>(v, *ico.indicies);
+		m->SetDrawable<MeshTriangleIndexList<Vertex>>(verticies, *ico.indicies);
 	}
 
+	// cube
 	{
 		std::vector<Vertex> verticies(Primatives::Cube::verticies.size());
 		Primatives::CopyPositionNormalColor(verticies, Primatives::Cube::verticies);
@@ -82,14 +89,15 @@ void ECSTest::CreateCube()
 		m->SetDrawable<MeshTriangleIndexList<Vertex>>(verticies, Primatives::Cube::indicies);
 	}
 
+	// create material
 	{
+		std::string vsfilename = Config::directories["ShaderSourceDir"] + "StandardPosNorColVS.hlsl";
+		std::string psfilename = Config::directories["ShaderSourceDir"] + "StandardPosNorColPS.hlsl";
 		auto mat = Material::Assets.CreateAsset("forPrimatives");
 		mat->vertexShaderCB = std::make_shared<VSConstantBuffer<Transform>>(1);
 		mat->vertexShader = std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout);
 		mat->pixelShader = std::make_shared<PixelShaderDynamic>(psfilename);
 	}
-
-	RigidBody::gravity = g_XMZero;
 
 	{
 		auto e = scene.CreateEntity();
@@ -112,19 +120,19 @@ void ECSTest::CreateCube()
 		e2.AddComponent<RigidBody>()->angularVelocity = { 0.0f , -0.8f, 0.3f, 0.0f };
 		e2.AddComponent<Gizmo>()->type = Gizmo::Types::Axis;
 	}
-}
 
-void ECSTest::CreateModel()
-{
-	using Vertex = VertexLayout::PositionNormalColor::Vertex;
-	auto vsLayout = VertexLayout::PositionNormalColor::GetLayout();
+	// load a model
+	{
+		using Vertex = VertexLayout::PositionNormalColor::Vertex;
+		auto vsLayout = VertexLayout::PositionNormalColor::GetLayout();
 
-	auto loadedModel = AssetLoaders::ObjLoader::Load(Engine2::Config::directories["ModelsDir"] + "torusSmooth.obj");
+		auto loadedModel = AssetLoaders::ObjLoader::Load(Engine2::Config::directories["ModelsDir"] + "torusSmooth.obj");
 
-	auto assets = MeshAssetLoader::CreateMeshAsset(*loadedModel);
+		auto assets = MeshAssetLoader::CreateMeshAsset(*loadedModel);
 
-	auto e = scene.CreateEntity();
-	auto mr = e.AddComponent<MeshRenderer>();
-	mr->mesh = Mesh::Assets[assets[0]]; // to do: hack to the first one.
-	mr->material = Material::Assets["forPrimatives"];
+		auto e = scene.CreateEntity();
+		auto mr = e.AddComponent<MeshRenderer>();
+		mr->mesh = Mesh::Assets[assets[0]]; // to do: hack to the first one.
+		mr->material = Material::Assets["forPrimatives"];
+	}
 }

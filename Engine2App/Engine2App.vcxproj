@@ -162,25 +162,22 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\BallWorld.cpp" />
     <ClCompile Include="src\BlockWorld.cpp" />
     <ClCompile Include="src\BlockWorldChunk.cpp" />
-    <ClCompile Include="src\ECSTest.cpp" />
     <ClCompile Include="src\Empty.cpp" />
     <ClCompile Include="src\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\SceneBuilder.cpp" />
     <ClCompile Include="src\winmain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\BallWorld.h" />
     <ClInclude Include="src\BlockWorld.h" />
     <ClInclude Include="src\BlockWorldChunk.h" />
-    <ClInclude Include="src\ECSTest.h" />
     <ClInclude Include="src\Empty.h" />
     <ClInclude Include="src\pch.h" />
-    <ClInclude Include="src\Voxel.h" />
+    <ClInclude Include="src\SceneBuilder.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Assets\Materials\BallWorld1PS.hlsl">

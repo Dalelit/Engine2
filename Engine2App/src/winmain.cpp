@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "Engine2.h"
-#include "BlockWorld.h"
-#include "ECSTest.h"
+#include "SceneBuilder.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -225,8 +224,7 @@ int WINAPI WinMain(
 	OnInputEventFunc = [](Engine2::InputEvent& event) { Engine2::Engine::Get().OnInputEvent(event); };
 
 	// reminder: camera position is set by last layer
-	//Engine2::Engine::Get().AttachLayer(new BlockWorld::BlockWorld(), false);
-	Engine2::Engine::Get().AttachLayer(new ECSTest());
+	Engine2::Engine::Get().AttachLayer(new SceneBuilder());
 
 	clock_t lastTime = clock();
 

@@ -3,11 +3,11 @@
 #include "Layer.h"
 #include "Scene.h"
 
-class ECSTest : public Engine2::Layer
+class SceneBuilder : public Engine2::Layer
 {
 public:
-	ECSTest();
-	~ECSTest() = default;
+	SceneBuilder();
+	~SceneBuilder() = default;
 
 	void OnUpdate(float dt);
 	void OnRender();
@@ -17,6 +17,5 @@ public:
 protected:
 	Engine2::Scene scene;
 
-	void CreateCube();
-	void CreateModel();
+	void BuildTestScene();
 };
