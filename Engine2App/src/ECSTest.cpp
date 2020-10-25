@@ -7,6 +7,7 @@
 #include "Particles.h"
 #include "MeshRenderer.h"
 #include "RigidBody.h"
+#include "Lights.h"
 
 using namespace Engine2;
 using namespace EngineECS;
@@ -17,10 +18,11 @@ ECSTest::ECSTest() : Layer("ECSTest")
 	Engine::GetActiveCamera().SetPosition(5.0f, 5.0f, -5.0f);
 	Engine::GetActiveCamera().LookAt(0.0f, 0.0f, 0.0f);
 
-	scene.psConstBuffer.data.ambientLight = { 1.0f, 1.0f, 1.0f, 1.0f };
-	//scene.pointLights.emplace_back(PointLight({ -1.0f, 4.0f, -2.0f, 1.0f }, { 0.8f, 0.8f, 0.8f, 1.0f }));
+	scene.psConstBuffer.data.ambientLight = { 0.2f, 0.2f, 0.2f, 1.0f };
 
-	scene.CreateEntity().AddComponent<Gizmo>()->type = Gizmo::Types::Axis;
+	auto e = scene.CreateEntity();
+	e.AddComponent<Gizmo>()->type = Gizmo::Types::Sphere;
+	e.AddComponent<PointLight>();
 
 	CreateCube();
 

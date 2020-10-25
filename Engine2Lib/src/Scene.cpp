@@ -6,6 +6,7 @@
 #include "MeshRenderer.h"
 #include "RigidBody.h"
 #include "Particles.h"
+#include "Lights.h"
 
 using namespace EngineECS;
 
@@ -40,9 +41,15 @@ namespace Engine2
 	void Scene::UpdatePSSceneConstBuffer()
 	{
 		psConstBuffer.data.CameraPosition = Engine::GetActiveCamera().GetPosition();
-		if (pointLights.size() > 0)
+
+		Coordinator& coordinator = hierarchy.GetECSCoordinator();
+		auto& pointLights = coordinator.GetComponents<PointLight>();
+
+		if (pointLights.Count() > 0)
 		{
-			psConstBuffer.data.pointLightPosition = pointLights[0].GetPosition();
+			
+			auto position = coordinator.GetComponent<Transform>(pointLights.GetEntity(0))->GetTranslation();
+			psConstBuffer.data.pointLightPosition = position;
 			psConstBuffer.data.pointLightColor = pointLights[0].GetColor();
 		}
 		psConstBuffer.Bind();
@@ -132,6 +139,9 @@ namespace Engine2
 		static bool sceneOpen = true;
 		if (ImGui::Begin("Scene", &sceneOpen))
 		{
+			// to do: temp
+			ImGui::ColorEdit4("Ambient Light", psConstBuffer.data.ambientLight.m128_f32);
+
 			hierarchy.OnImGui();
 			ImGui::End();
 		}

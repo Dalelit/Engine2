@@ -17,7 +17,7 @@ float attenuation(float distance)
 
 float4 main(float3 posWS : WSPosition, float3 norWS : WSNormal, float4 col : Color) : SV_TARGET
 {
-	float light = 0.0;
+		float light = 0.0;
 //col = float4(1.0, 1.0, 1.0, 1.0);
 
 norWS = normalize(norWS);

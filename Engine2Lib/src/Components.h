@@ -25,6 +25,8 @@ namespace Engine2
 
 		inline DirectX::XMMATRIX GetTransformTranspose() { return DirectX::XMMatrixTranspose(transform); }
 
+		inline DirectX::XMVECTOR GetTranslation() { return DirectX::XMMatrixTranspose(transform).r[3]; }
+
 		inline Transform& Multiply(DirectX::XMMATRIX m) { transform = DirectX::XMMatrixMultiplyTranspose(DirectX::XMMatrixTranspose(transform), m); return *this; }
 		
 		void OnImgui();

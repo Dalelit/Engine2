@@ -13,7 +13,6 @@ BallWorld::BallWorld() : Layer("BallWorld")
 	Engine::GetActiveCamera().LookAt(0.0f, 0.0f, 0.0f);
 
 	scene.psConstBuffer.data.ambientLight = { 0.1f, 0.1f, 0.1f, 1.0f };
-	scene.pointLights.emplace_back(PointLight({ -1.0f, 4.0f, -2.0f, 1.0f }, { 0.8f, 0.8f, 0.8f, 1.0f }));
 
 	CreateCube();
 	CreateSphere();

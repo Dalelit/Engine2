@@ -1,7 +1,6 @@
 #pragma once
 #include "pch.h"
 #include "ConstantBuffer.h"
-#include "Lights.h"
 #include "ECS.h"
 #include "Entity.h"
 #include "GizmoRender.h"
@@ -28,8 +27,6 @@ namespace Engine2
 			DirectX::XMMATRIX cameraTransform;
 		};
 		VSConstantBuffer<VSSceneData> vsConstBuffer;
-
-		std::vector<PointLight> pointLights;
 
 		struct PSSceneData
 		{

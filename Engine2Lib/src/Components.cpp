@@ -5,6 +5,7 @@
 #include "MeshRenderer.h"
 #include "RigidBody.h"
 #include "Particles.h"
+#include "Lights.h"
 
 using namespace DirectX;
 
@@ -92,6 +93,7 @@ namespace Engine2
 		if (coord.HasComponent<Transform>(id)) coord.GetComponent<Transform>(id)->OnImgui();
 		if (coord.HasComponent<RigidBody>(id)) coord.GetComponent<RigidBody>(id)->OnImgui();
 		if (coord.HasComponent<MeshRenderer>(id)) coord.GetComponent<MeshRenderer>(id)->OnImgui();
+		if (coord.HasComponent<PointLight>(id)) coord.GetComponent<PointLight>(id)->OnImgui();
 		if (coord.HasComponent<ParticleEmitter>(id)) coord.GetComponent<ParticleEmitter>(id)->OnImgui();
 		if (coord.HasComponent<Gizmo>(id)) coord.GetComponent<Gizmo>(id)->OnImgui();
 
@@ -99,6 +101,7 @@ namespace Engine2
 		{
 			if (!coord.HasComponent<RigidBody>(id) && ImGui::Selectable("RigidBody")) coord.AddComponent<RigidBody>(id);
 			if (!coord.HasComponent<MeshRenderer>(id) && ImGui::Selectable("MeshRenderer")) coord.AddComponent<MeshRenderer>(id);
+			if (!coord.HasComponent<PointLight>(id) && ImGui::Selectable("PointLight")) coord.AddComponent<PointLight>(id);
 			if (!coord.HasComponent<ParticleEmitter>(id) && ImGui::Selectable("ParticleEmitter")) coord.AddComponent<ParticleEmitter>(id);
 			if (!coord.HasComponent<Gizmo>(id) && ImGui::Selectable("Gizmo")) coord.AddComponent<Gizmo>(id);
 
