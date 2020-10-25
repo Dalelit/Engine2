@@ -36,16 +36,39 @@ namespace Engine2
 		return id;
 	}
 
+	void SceneHierarchy::DestroyEntity(SceneNode* parent, SceneNode* node)
+	{
+		E2_ASSERT(node, "Null pointer for destroy entity");
+
+		// clean up the children.
+		while (node->children.size() > 0)
+		{
+			DestroyEntity(node, &node->children.back());
+		}
+		
+		coordinator.DestroyEntity(node->id);
+
+		auto& vector = parent ? parent->children : sceneHierarchy;
+		auto iter = vector.begin() + (node - vector.data());
+		vector.erase(iter);
+
+		selected = parent;
+	}
+
 	void SceneHierarchy::OnImGui()
 	{
 		onImguiParent = nullptr;
 		addEntityParent = nullptr;
 		addEntityInsertBefore = nullptr;
+		deleteEntity = nullptr;
+		deleteEntityParent = nullptr;
 
 		for (auto& sn : sceneHierarchy) SceneNodeOnImGui(sn);
 
-		// deferred create entity if required
+		// deferred create/destroy entity if required
 		if (addEntityParent || addEntityInsertBefore) NewEntity(addEntityParent, addEntityInsertBefore);
+
+		if (deleteEntity) DestroyEntity(deleteEntityParent, deleteEntity);
 
 		if (ImGui::Button("Add Entity")) NewEntity();
 	}
@@ -66,7 +89,8 @@ namespace Engine2
 
 		bool open = ImGui::TreeNodeEx((void*)(uint64_t)node.id, flags, coordinator.GetComponent<EntityInfo>(node.id)->tag.c_str());
 
-		if (ImGui::IsItemClicked(0)) selected = &node;
+		if (ImGui::IsItemClicked(0))
+			selected = &node;
 
 		if (ImGui::BeginPopupContextItem())
 		{
@@ -79,6 +103,12 @@ namespace Engine2
 			{
 				addEntityParent = onImguiParent;
 				addEntityInsertBefore = &node;
+			}
+
+			if (ImGui::MenuItem("Delete Entity"))
+			{
+				deleteEntityParent = onImguiParent;
+				deleteEntity = &node;
 			}
 
 			ImGui::EndPopup();

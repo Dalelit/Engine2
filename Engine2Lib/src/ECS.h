@@ -2,6 +2,7 @@
 #include <iostream>
 #include <bitset>
 #include <cassert>
+#include <set>
 
 // Usage:
 /*
@@ -19,9 +20,11 @@
 */
 //
 // To Do:
-// - remove entities
-// - remove components
+// - safety as there is no checking
 // - emplace creation
+// - performance testing and tuning
+// - testing and test cases
+// - more efficient iterators
 
 
 namespace EngineECS
@@ -47,6 +50,8 @@ namespace EngineECS
 		inline EntityId_t GetEntity(ComponentIndex_t index) const { return indexToEntityMap[index]; }
 		inline EntityId_t* EntitiesBegin() const { return indexToEntityMap; }
 		inline EntityId_t* EntitiesEnd() const { return indexToEntityMap + count; }
+
+		virtual void DestroyComponent(EntityId_t id) = 0;
 
 		friend std::ostream& operator<<(std::ostream& out, const Storage& store) { store.print(out); return out; }
 		friend std::ostream& operator<<(std::ostream& out, const Storage* store) { store->print(out); return out; }
@@ -111,6 +116,27 @@ namespace EngineECS
 			return (T*)data + entityToIndexMap[id];
 		}
 
+		void DestroyComponent(EntityId_t id)
+		{
+			uint32_t index = entityToIndexMap[id];
+			T* pDeleted = ((T*)data) + index;
+			pDeleted->~T(); // destructor called
+
+			count--; // 1 less component stored;
+
+			// if there are still components, and the one deleted wasn't the last one, swap the end to fill the gap
+			if (count > 0 && index != count)
+			{
+				T* pLast = ((T*)data) + count;               // get the last entry
+				memcpy(pDeleted, pLast, sizeof(T));          // copy the last entry into the gap
+				EntityId_t idLast = indexToEntityMap[count]; // get the entity id of last entry
+				indexToEntityMap[index] = idLast;            // move id now in new location
+				entityToIndexMap[idLast] = index;            // last id linked to new index
+			}
+
+			next--; // next entry in the store is previous as the last entry has moved
+		}
+
 		inline T* begin() { return (T*)data; }
 		inline T* end() { return (T*)data + count; }
 		inline const T* begin() const { return (T*)data; }
@@ -159,14 +185,45 @@ namespace EngineECS
 
 		EntityId_t CreateEntity()
 		{
-			EntityId_t id = entityCounter++;
+			EntityId_t id;
+
+			if (availableIds.size() > 0)
+			{
+				auto iter = availableIds.begin();
+				id = *iter;
+				availableIds.erase(iter);
+			}
+			else
+			{
+				id = entityCounter++;
+			}
 
 			entitySignatures[id].reset();
 
 			return id;
 		}
 
-		EntityId_t GetEntityCount() const { return entityCounter; }
+		void DestroyEntity(EntityId_t id)
+		{
+			Signature& s = entitySignatures[id];
+			ComponentId_t componentId = 0;
+			ComponentId_t count = (ComponentId_t)s.count(); // get the number of components to destroy
+			
+			while (count > 0) // while there are still components to destroy
+			{
+				if (HasComponent(id, componentId)) // if it has the component
+				{
+					componentStores[componentId]->DestroyComponent(id);
+					count--; // count it's been destroyed
+				}
+				componentId++;
+			}
+
+			entitySignatures[id].reset();
+			availableIds.insert(id);
+		}
+
+		EntityId_t GetEntityCount() const { return entityCounter - (EntityId_t)availableIds.size(); }
 		EntityId_t GetMaxEntities() const { return maxEntities; }
 		ComponentId_t GetComponentCount() const { return componentIdCounter; }
 
@@ -175,11 +232,10 @@ namespace EngineECS
 		template <typename T>
 		T* AddComponent(EntityId_t id)
 		{
-			ComponentStorage<T>* store = GetComponentStorage<T>();
+			assert(!HasComponent<T>(id) && "Entity already has component");
 
 			entitySignatures[id].set(GetComponentId<T>());
-
-			return store->Create(id);
+			return GetComponentStorage<T>()->Create(id);
 		}
 
 		template <typename T>
@@ -191,6 +247,16 @@ namespace EngineECS
 		{
 			if (HasComponent<T>(id)) return GetComponentStorage<T>()->GetComponent(id);
 			else return nullptr;
+		}
+
+		template <typename T>
+		void DestroyComponent(EntityId_t id)
+		{
+			if (HasComponent<T>(id))
+			{
+				GetComponentStorage<T>()->DestroyComponent(id);
+				entitySignatures[id].reset(GetComponentId<T>());
+			}
 		}
 
 		template <typename T>
@@ -246,6 +312,7 @@ namespace EngineECS
 	private:
 		EntityId_t maxEntities;
 		EntityId_t entityCounter = 0;
+		std::set<EntityId_t> availableIds; // using something sorted. To Do: something more efficient?
 		Signature* entitySignatures = nullptr;
 
 		ComponentId_t componentIdCounter = 0;

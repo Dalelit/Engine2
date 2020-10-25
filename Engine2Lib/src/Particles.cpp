@@ -111,55 +111,52 @@ namespace Engine2
 
 	void ParticleEmitter::OnImgui()
 	{
-		if (ImGui::CollapsingHeader("Particle emitter"))
+		ImGui::Checkbox("Freeze", &freeze);
+		ImGui::DragFloat3("Position", position.m128_f32, 0.01f);
+			
+		int maxP = (int)maxParticles;
+		if (ImGui::DragInt("Max Particles", &maxP, 1.0f, 0, 100000)) { if (maxP > 0) SetMaxParticles(maxP); }
+			
+		if (ImGui::DragFloat("Rate", &rate, 0.1f)) { if (rate < 0.0f) rate = 0.0f; }
+		ImGui::DragFloat3("Force", force.m128_f32, 0.01f);
+		if (ImGui::BeginCombo("Mesh", currentMesh.c_str()))
 		{
-			ImGui::Checkbox("Freeze", &freeze);
-			ImGui::DragFloat3("Position", position.m128_f32, 0.01f);
-			
-			int maxP = (int)maxParticles;
-			if (ImGui::DragInt("Max Particles", &maxP, 1.0f, 0, 100000)) { if (maxP > 0) SetMaxParticles(maxP); }
-			
-			if (ImGui::DragFloat("Rate", &rate, 0.1f)) { if (rate < 0.0f) rate = 0.0f; }
-			ImGui::DragFloat3("Force", force.m128_f32, 0.01f);
-			if (ImGui::BeginCombo("Mesh", currentMesh.c_str()))
+			for (size_t i = 0; i < meshNames.size(); i++)
 			{
-				for (size_t i = 0; i < meshNames.size(); i++)
-				{
-					bool isSelected = (meshNames[i] == currentMesh);
-					if (ImGui::Selectable(meshNames[i].c_str(), isSelected)) SetMeshAndVertexShader(meshNames[i]);
-					if (isSelected) ImGui::SetItemDefaultFocus();
-				}
-				ImGui::EndCombo();
+				bool isSelected = (meshNames[i] == currentMesh);
+				if (ImGui::Selectable(meshNames[i].c_str(), isSelected)) SetMeshAndVertexShader(meshNames[i]);
+				if (isSelected) ImGui::SetItemDefaultFocus();
 			}
-			if (ImGui::BeginCombo("Pixel shader", currentPixelShader.c_str()))
-			{
-				for (size_t i = 0; i < pixelShaderNames.size(); i++)
-				{
-					bool isSelected = (pixelShaderNames[i] == currentPixelShader);
-					if (ImGui::Selectable(pixelShaderNames[i].c_str(), isSelected)) SetPixelShader(pixelShaderNames[i]);
-					if (isSelected) ImGui::SetItemDefaultFocus();
-				}
-				ImGui::EndCombo();
-			}
-			ImGui::Text("Emit start params");
-			if (ImGui::DragFloat("Lifespan", &lifeSpan, 0.1f)) { if (lifeSpan < 0.0f) lifeSpan = 0.0f; }
-			if (ImGui::DragFloat3("Vel min", velocityStartMin.m128_f32, 0.01f)) { InitStartParameters(); }
-			if (ImGui::DragFloat3("Vel max", velocityStartMax.m128_f32, 0.01f)) { InitStartParameters(); }
-			if (ImGui::DragFloat3("Rot speed min", rotationSpeedStartMin.m128_f32, 0.01f)) { InitStartParameters(); }
-			if (ImGui::DragFloat3("Rot speed max", rotationSpeedStartMax.m128_f32, 0.01f)) { InitStartParameters(); }
-			if (ImGui::DragFloat3("Scale start", scaleStart.m128_f32, 0.01f)) { InitStartParameters(); }
-			if (ImGui::DragFloat3("Scale end", scaleEnd.m128_f32, 0.01f)) { InitStartParameters(); }
-			if (ImGui::ColorEdit4("Col start min", colorStartMin.m128_f32)) { InitStartParameters(); }
-			if (ImGui::ColorEdit4("Col start max", colorStartMax.m128_f32)) { InitStartParameters(); }
-			if (ImGui::ColorEdit4("Col end min", colorEndMin.m128_f32)) { InitStartParameters(); }
-			if (ImGui::ColorEdit4("Col end max", colorEndMax.m128_f32)) { InitStartParameters(); }
-			ImGui::Text("Stats");
-			ImGui::Text("OnUpdate %fms", timerOnUpdate.Average());
-			ImGui::Text("OnRender %fms", timerOnRender.Average());
-			ImGui::Text("Active particles %i", activeCount);
-			ImGui::Text("Instances %i", instanceCount);
-			ImGui::Text("Buffer index %i", bufferIndex);
+			ImGui::EndCombo();
 		}
+		if (ImGui::BeginCombo("Pixel shader", currentPixelShader.c_str()))
+		{
+			for (size_t i = 0; i < pixelShaderNames.size(); i++)
+			{
+				bool isSelected = (pixelShaderNames[i] == currentPixelShader);
+				if (ImGui::Selectable(pixelShaderNames[i].c_str(), isSelected)) SetPixelShader(pixelShaderNames[i]);
+				if (isSelected) ImGui::SetItemDefaultFocus();
+			}
+			ImGui::EndCombo();
+		}
+		ImGui::Text("Emit start params");
+		if (ImGui::DragFloat("Lifespan", &lifeSpan, 0.1f)) { if (lifeSpan < 0.0f) lifeSpan = 0.0f; }
+		if (ImGui::DragFloat3("Vel min", velocityStartMin.m128_f32, 0.01f)) { InitStartParameters(); }
+		if (ImGui::DragFloat3("Vel max", velocityStartMax.m128_f32, 0.01f)) { InitStartParameters(); }
+		if (ImGui::DragFloat3("Rot speed min", rotationSpeedStartMin.m128_f32, 0.01f)) { InitStartParameters(); }
+		if (ImGui::DragFloat3("Rot speed max", rotationSpeedStartMax.m128_f32, 0.01f)) { InitStartParameters(); }
+		if (ImGui::DragFloat3("Scale start", scaleStart.m128_f32, 0.01f)) { InitStartParameters(); }
+		if (ImGui::DragFloat3("Scale end", scaleEnd.m128_f32, 0.01f)) { InitStartParameters(); }
+		if (ImGui::ColorEdit4("Col start min", colorStartMin.m128_f32)) { InitStartParameters(); }
+		if (ImGui::ColorEdit4("Col start max", colorStartMax.m128_f32)) { InitStartParameters(); }
+		if (ImGui::ColorEdit4("Col end min", colorEndMin.m128_f32)) { InitStartParameters(); }
+		if (ImGui::ColorEdit4("Col end max", colorEndMax.m128_f32)) { InitStartParameters(); }
+		ImGui::Text("Stats");
+		ImGui::Text("OnUpdate %fms", timerOnUpdate.Average());
+		ImGui::Text("OnRender %fms", timerOnRender.Average());
+		ImGui::Text("Active particles %i", activeCount);
+		ImGui::Text("Instances %i", instanceCount);
+		ImGui::Text("Buffer index %i", bufferIndex);
 	}
 
 	void ParticleEmitter::InitStartParameters()

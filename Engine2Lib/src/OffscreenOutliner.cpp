@@ -47,14 +47,8 @@ namespace Engine2
 
 	void OffscreenOutliner::OnImgui()
 	{
-		if (ImGui::TreeNodeEx("Outliner", ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			ImGui::DragFloat("Outline scale", &outlineScale, 0.05f, 1.0f, 2.0f);
-			ImGui::ColorEdit4("Outline color", outlineColor.m128_f32);
-			ImGui::TreePop();
-
-			offscreen.OnImgui();
-		}
+		ImGui::DragFloat("Outline scale", &outlineScale, 0.05f, 1.0f, 2.0f);
+		ImGui::ColorEdit4("Outline color", outlineColor.m128_f32);
 	}
 
 	void OffscreenOutliner::Initialise()

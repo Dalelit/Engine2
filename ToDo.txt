@@ -1,15 +1,19 @@
 Things that I want to work on...
 
 Near term
-- ECS delete
 - Scene serialisation
 	- https://github.com/jbeder/yaml-cpp
 	- https://github.com/pantoniou/libfyaml
 - Transform rework
+- Scene transform hierarchy
 - Materials and lighting
 - Model/mesh loading
+- Scene UI work
+	- maintain focus on selected entity on destroy
+	- auto expand hierarchy on create
 
 Long term
 - Rigid body and basic physics
 - shadows
 - water
+- boids

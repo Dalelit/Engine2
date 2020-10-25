@@ -26,20 +26,15 @@ namespace Engine2
 
 	void RigidBody::OnImgui()
 	{
-		if (ImGui::TreeNodeEx("RigidBody", ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_DefaultOpen))
+		ImGui::DragFloat3("Velocity", velocity.m128_f32, 0.1f);
+		ImGui::DragFloat3("Angular Velocity", angularVelocity.m128_f32, 0.1f);
+		ImGui::DragFloat("Mass", &mass, 0.1f);
+		ImGui::DragFloat3("Common gravity", gravity.m128_f32, 0.1f);
+
+		if (ImGui::Button("Reset"))
 		{
-			ImGui::DragFloat3("Velocity", velocity.m128_f32, 0.1f);
-			ImGui::DragFloat3("Angular Velocity", angularVelocity.m128_f32, 0.1f);
-			ImGui::DragFloat("Mass", &mass, 0.1f);
-			ImGui::DragFloat3("Common gravity", gravity.m128_f32, 0.1f);
-
-			if (ImGui::Button("Reset"))
-			{
-				velocity = g_XMZero;
-				angularVelocity = g_XMZero;
-			}
-
-			ImGui::TreePop();
+			velocity = g_XMZero;
+			angularVelocity = g_XMZero;
 		}
 	}
 

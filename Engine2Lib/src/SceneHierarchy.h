@@ -31,10 +31,13 @@ namespace Engine2
 		std::vector<SceneNode> sceneHierarchy;
 
 		EngineECS::EntityId_t NewEntity(SceneNode* parent = nullptr, SceneNode* insertBefore = nullptr);
+		void DestroyEntity(SceneNode* parent, SceneNode* node);
 
 		void SceneNodeOnImGui(SceneNode& node);
 		SceneNode* onImguiParent = nullptr;
 		SceneNode* addEntityParent = nullptr;
 		SceneNode* addEntityInsertBefore = nullptr;
+		SceneNode* deleteEntity = nullptr;
+		SceneNode* deleteEntityParent = nullptr;
 	};
 }

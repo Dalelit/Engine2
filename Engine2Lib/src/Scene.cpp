@@ -60,11 +60,15 @@ namespace Engine2
 
 		if (pointLights.Count() > 0)
 		{
-			
 			auto position = coordinator.GetComponent<Transform>(pointLights.GetEntity(0))->GetTranslation();
 			psConstBuffer.data.pointLightPosition = position;
 			psConstBuffer.data.pointLightColor = pointLights[0].GetColor();
 		}
+		else
+		{
+			psConstBuffer.data.pointLightColor = {};
+		}
+
 		psConstBuffer.Bind();
 	}
 

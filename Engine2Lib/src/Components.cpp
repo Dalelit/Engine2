@@ -64,49 +64,79 @@ namespace Engine2
 
 	void Gizmo::OnImgui()
 	{
-		if (ImGui::TreeNodeEx("Gizmo", ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_DefaultOpen))
+		const char* selected = "";
+
+		switch (type)
 		{
-			const char* selected = "";
-
-			switch (type)
-			{
-				case Types::Axis: selected = "Axis"; break;
-				case Types::Cube: selected = "Cube"; break;
-				case Types::Sphere: selected = "Sphere"; break;
-				case Types::Camera: selected = "Camera"; break;
-			}
-
-			if (ImGui::BeginCombo("Type", selected))
-			{
-				if (ImGui::Selectable("Axis",   type == Types::Axis)) type = Types::Axis;
-				if (ImGui::Selectable("Cube",   type == Types::Cube)) type = Types::Cube;
-				if (ImGui::Selectable("Sphere", type == Types::Sphere)) type = Types::Sphere;
-				if (ImGui::Selectable("Camera", type == Types::Camera)) type = Types::Camera;
-				ImGui::EndCombo();
-			}
-			ImGui::TreePop();
+			case Types::Axis: selected = "Axis"; break;
+			case Types::Cube: selected = "Cube"; break;
+			case Types::Sphere: selected = "Sphere"; break;
+			case Types::Camera: selected = "Camera"; break;
 		}
+
+		if (ImGui::BeginCombo("Type", selected))
+		{
+			if (ImGui::Selectable("Axis",   type == Types::Axis)) type = Types::Axis;
+			if (ImGui::Selectable("Cube",   type == Types::Cube)) type = Types::Cube;
+			if (ImGui::Selectable("Sphere", type == Types::Sphere)) type = Types::Sphere;
+			if (ImGui::Selectable("Camera", type == Types::Camera)) type = Types::Camera;
+			ImGui::EndCombo();
+		}
+	}
+
+	template <typename T>
+	inline void ComponentOnImgui(const std::string& displayName, EngineECS::EntityId_t id, EngineECS::Coordinator& coord)
+	{
+		if (coord.HasComponent<T>(id))
+		{
+			bool open = ImGui::TreeNodeEx(displayName.c_str(), ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_DefaultOpen);
+			bool destroy = false;
+
+			if (ImGui::BeginPopupContextItem())
+			{
+				if (ImGui::MenuItem("Destroy component")) destroy = true;
+
+				ImGui::EndPopup();
+			}
+
+			if (open)
+			{
+				coord.GetComponent<T>(id)->OnImgui();
+				ImGui::TreePop();
+			}
+
+			if (destroy)
+			{
+				coord.DestroyComponent<T>(id);
+			}
+		}
+	}
+
+	template <typename T>
+	inline void AddComponentOnImgui(const std::string& displayName, EngineECS::EntityId_t id, EngineECS::Coordinator& coord)
+	{
+		if (!coord.HasComponent<T>(id) && ImGui::Selectable(displayName.c_str())) coord.AddComponent<T>(id);
 	}
 
 	void Components::OnImgui(EngineECS::EntityId_t id, EngineECS::Coordinator& coord)
 	{
-		if (coord.HasComponent<EntityInfo>(id)) coord.GetComponent<EntityInfo>(id)->OnImgui();
-		if (coord.HasComponent<Transform>(id)) coord.GetComponent<Transform>(id)->OnImgui();
-		if (coord.HasComponent<RigidBody>(id)) coord.GetComponent<RigidBody>(id)->OnImgui();
-		if (coord.HasComponent<MeshRenderer>(id)) coord.GetComponent<MeshRenderer>(id)->OnImgui();
-		if (coord.HasComponent<PointLight>(id)) coord.GetComponent<PointLight>(id)->OnImgui();
-		if (coord.HasComponent<ParticleEmitter>(id)) coord.GetComponent<ParticleEmitter>(id)->OnImgui();
-		if (coord.HasComponent<Gizmo>(id)) coord.GetComponent<Gizmo>(id)->OnImgui();
-		if (coord.HasComponent<OffscreenOutliner>(id)) coord.GetComponent<OffscreenOutliner>(id)->OnImgui();
+		coord.GetComponent<EntityInfo>(id)->OnImgui();
+		coord.GetComponent<Transform>(id)->OnImgui();
+		ComponentOnImgui<RigidBody>("RigidBody", id, coord);
+		ComponentOnImgui<MeshRenderer>("MeshRenderer", id, coord);
+		ComponentOnImgui<PointLight>("PointLight", id, coord);
+		ComponentOnImgui<ParticleEmitter>("ParticleEmitter", id, coord);
+		ComponentOnImgui<Gizmo>("Gizmo", id, coord);
+		ComponentOnImgui<OffscreenOutliner>("Outliner", id, coord);
 
 		if (ImGui::BeginCombo("Add Component", ""))
 		{
-			if (!coord.HasComponent<RigidBody>(id) && ImGui::Selectable("RigidBody")) coord.AddComponent<RigidBody>(id);
-			if (!coord.HasComponent<MeshRenderer>(id) && ImGui::Selectable("MeshRenderer")) coord.AddComponent<MeshRenderer>(id);
-			if (!coord.HasComponent<PointLight>(id) && ImGui::Selectable("PointLight")) coord.AddComponent<PointLight>(id);
-			if (!coord.HasComponent<ParticleEmitter>(id) && ImGui::Selectable("ParticleEmitter")) coord.AddComponent<ParticleEmitter>(id);
-			if (!coord.HasComponent<Gizmo>(id) && ImGui::Selectable("Gizmo")) coord.AddComponent<Gizmo>(id);
-			if (!coord.HasComponent<OffscreenOutliner>(id) && ImGui::Selectable("Outliner")) coord.AddComponent<OffscreenOutliner>(id);
+			AddComponentOnImgui<RigidBody>("RigidBody", id, coord);
+			AddComponentOnImgui<MeshRenderer>("MeshRenderer", id, coord);
+			AddComponentOnImgui<PointLight>("PointLight", id, coord);
+			AddComponentOnImgui<ParticleEmitter>("ParticleEmitter", id, coord);
+			AddComponentOnImgui<Gizmo>("Gizmo", id, coord);
+			AddComponentOnImgui<OffscreenOutliner>("Outliner", id, coord);
 
 			ImGui::EndCombo();
 		}
