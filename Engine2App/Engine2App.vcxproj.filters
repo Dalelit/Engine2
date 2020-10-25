@@ -4,7 +4,6 @@
     <ClCompile Include="src\winmain.cpp" />
     <ClCompile Include="src\pch.cpp" />
     <ClCompile Include="src\BallWorld.cpp" />
-    <ClCompile Include="src\ModelTest.cpp" />
     <ClCompile Include="src\Empty.cpp" />
     <ClCompile Include="src\BlockWorld.cpp" />
     <ClCompile Include="src\BlockWorldChunk.cpp" />
@@ -14,7 +13,6 @@
     <ClInclude Include="src\pch.h" />
     <ClInclude Include="src\Voxel.h" />
     <ClInclude Include="src\BallWorld.h" />
-    <ClInclude Include="src\ModelTest.h" />
     <ClInclude Include="src\Empty.h" />
     <ClInclude Include="src\BlockWorld.h" />
     <ClInclude Include="src\BlockWorldChunk.h" />
@@ -32,8 +30,6 @@
     <FxCompile Include="Assets\Materials\WireframeBasicVS.hlsl" />
     <FxCompile Include="Assets\Materials\PixelShaderCommon.hlsl" />
     <FxCompile Include="Assets\Materials\BallWorld2VS.hlsl" />
-    <FxCompile Include="Assets\Materials\ModelTestPS.hlsl" />
-    <FxCompile Include="Assets\Materials\ModelTestVS.hlsl" />
     <FxCompile Include="Assets\Materials\SceneCBVS.hlsl" />
     <FxCompile Include="Assets\Materials\ParticlePSTest.hlsl" />
     <FxCompile Include="Assets\Materials\BlockWorldPS.hlsl" />

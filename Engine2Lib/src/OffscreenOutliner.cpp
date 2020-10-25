@@ -5,7 +5,7 @@ namespace Engine2
 {
 	OffscreenOutliner::OffscreenOutliner()
 	{
-		vsOutlineCB.slot = 1;
+		vsOutlineCB.slot = 2;
 		Initialise();
 		Configure();
 	}
@@ -47,10 +47,13 @@ namespace Engine2
 
 	void OffscreenOutliner::OnImgui()
 	{
-		if (ImGui::CollapsingHeader("Outliner"))
+		if (ImGui::TreeNodeEx("Outliner", ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			ImGui::DragFloat("Outline scale", &outlineScale, 0.05f, 1.0f, 2.0f);
 			ImGui::ColorEdit4("Outline color", outlineColor.m128_f32);
+			ImGui::TreePop();
+
+			offscreen.OnImgui();
 		}
 	}
 

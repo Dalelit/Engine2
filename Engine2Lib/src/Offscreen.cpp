@@ -65,7 +65,7 @@ namespace Engine2
 	{
 		if (ImGui::TreeNode("Offscreen target"))
 		{
-			ImGui::Text("Slot %i", slot);
+			ImGui::Text("Slot %i, width %i, height %i", slot, width, height);
 
 			if (ImGui::BeginCombo("Filter", pixelShaderName.c_str()))
 			{

@@ -11,10 +11,12 @@ public:
 
 	void OnUpdate(float dt);
 	void OnRender();
+	void OnApplicationEvent(Engine2::ApplicationEvent& event);
 	void OnImgui();
 
 protected:
 	Engine2::Scene scene;
 
 	void CreateCube();
+	void CreateModel();
 };

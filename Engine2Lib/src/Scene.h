@@ -1,5 +1,6 @@
 #pragma once
 #include "pch.h"
+#include "Events.h"
 #include "ConstantBuffer.h"
 #include "ECS.h"
 #include "Entity.h"
@@ -17,6 +18,7 @@ namespace Engine2
 
 		void OnUpdate(float dt);
 		void OnRender();
+		void OnApplicationEvent(Engine2::ApplicationEvent& event);
 
 		Entity CreateEntity() { return hierarchy.CreateEntity(); }
 
@@ -48,6 +50,7 @@ namespace Engine2
 		void RenderMeshes();
 		void RenderParticles();
 		void RenderGizmos();
+		void RenderOutlines();
 
 		void UpdatePhysics(float dt);
 		void UpdateParticles(float dt);

@@ -8,6 +8,8 @@
 #include "MeshRenderer.h"
 #include "RigidBody.h"
 #include "Lights.h"
+#include "VertexLayout.h"
+#include "AssetLoaders/ObjLoader.h"
 
 using namespace Engine2;
 using namespace EngineECS;
@@ -25,6 +27,7 @@ ECSTest::ECSTest() : Layer("ECSTest")
 	e.AddComponent<PointLight>();
 
 	CreateCube();
+	CreateModel();
 
 	//auto e = scene.CreateEntity();
 	//auto pe = e.AddComponent<ParticleEmitter>();
@@ -43,6 +46,11 @@ void ECSTest::OnRender()
 	scene.OnRender();
 }
 
+void ECSTest::OnApplicationEvent(Engine2::ApplicationEvent& event)
+{
+	scene.OnApplicationEvent(event);
+}
+
 void ECSTest::OnImgui()
 {
 	scene.OnImgui();
@@ -50,17 +58,8 @@ void ECSTest::OnImgui()
 
 void ECSTest::CreateCube()
 {
-	struct Vertex {
-		XMFLOAT3 position;
-		XMFLOAT3 normal;
-		XMFLOAT4 color;
-	};
-
-	std::vector<D3D11_INPUT_ELEMENT_DESC> vsLayout = {
-		{"Position",    0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"Normal",      0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"Color",       0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
-	};
+	using Vertex = VertexLayout::PositionNormalColor::Vertex;
+	auto vsLayout = VertexLayout::PositionNormalColor::GetLayout();
 
 	std::string vsfilename = Config::directories["ShaderSourceDir"] + "StandardPosNorColVS.hlsl";
 	std::string psfilename = Config::directories["ShaderSourceDir"] + "StandardPosNorColPS.hlsl";
@@ -113,4 +112,19 @@ void ECSTest::CreateCube()
 		e2.AddComponent<RigidBody>()->angularVelocity = { 0.0f , -0.8f, 0.3f, 0.0f };
 		e2.AddComponent<Gizmo>()->type = Gizmo::Types::Axis;
 	}
+}
+
+void ECSTest::CreateModel()
+{
+	using Vertex = VertexLayout::PositionNormalColor::Vertex;
+	auto vsLayout = VertexLayout::PositionNormalColor::GetLayout();
+
+	auto loadedModel = AssetLoaders::ObjLoader::Load(Engine2::Config::directories["ModelsDir"] + "torusSmooth.obj");
+
+	auto assets = MeshAssetLoader::CreateMeshAsset(*loadedModel);
+
+	auto e = scene.CreateEntity();
+	auto mr = e.AddComponent<MeshRenderer>();
+	mr->mesh = Mesh::Assets[assets[0]]; // to do: hack to the first one.
+	mr->material = Material::Assets["forPrimatives"];
 }

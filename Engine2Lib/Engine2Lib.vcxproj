@@ -199,6 +199,7 @@
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\Util.h" />
     <ClInclude Include="src\VertexBufferInstanced.h" />
+    <ClInclude Include="src\VertexLayout.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AssetLoaders\ObjLoader.cpp" />

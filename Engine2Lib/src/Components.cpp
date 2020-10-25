@@ -6,6 +6,7 @@
 #include "RigidBody.h"
 #include "Particles.h"
 #include "Lights.h"
+#include "OffscreenOutliner.h"
 
 using namespace DirectX;
 
@@ -96,6 +97,7 @@ namespace Engine2
 		if (coord.HasComponent<PointLight>(id)) coord.GetComponent<PointLight>(id)->OnImgui();
 		if (coord.HasComponent<ParticleEmitter>(id)) coord.GetComponent<ParticleEmitter>(id)->OnImgui();
 		if (coord.HasComponent<Gizmo>(id)) coord.GetComponent<Gizmo>(id)->OnImgui();
+		if (coord.HasComponent<OffscreenOutliner>(id)) coord.GetComponent<OffscreenOutliner>(id)->OnImgui();
 
 		if (ImGui::BeginCombo("Add Component", ""))
 		{
@@ -104,6 +106,7 @@ namespace Engine2
 			if (!coord.HasComponent<PointLight>(id) && ImGui::Selectable("PointLight")) coord.AddComponent<PointLight>(id);
 			if (!coord.HasComponent<ParticleEmitter>(id) && ImGui::Selectable("ParticleEmitter")) coord.AddComponent<ParticleEmitter>(id);
 			if (!coord.HasComponent<Gizmo>(id) && ImGui::Selectable("Gizmo")) coord.AddComponent<Gizmo>(id);
+			if (!coord.HasComponent<OffscreenOutliner>(id) && ImGui::Selectable("Outliner")) coord.AddComponent<OffscreenOutliner>(id);
 
 			ImGui::EndCombo();
 		}

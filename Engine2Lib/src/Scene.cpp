@@ -7,6 +7,7 @@
 #include "RigidBody.h"
 #include "Particles.h"
 #include "Lights.h"
+#include "OffscreenOutliner.h"
 
 using namespace EngineECS;
 
@@ -29,7 +30,19 @@ namespace Engine2
 
 		RenderMeshes();
 		RenderParticles();
+		RenderOutlines();
 		RenderGizmos();
+	}
+
+	// update any components that need to know when an event has happened
+	void Scene::OnApplicationEvent(Engine2::ApplicationEvent& event)
+	{
+		Coordinator& coordinator = hierarchy.GetECSCoordinator();
+
+		if (event.GetType() == Engine2::EventType::WindowResize)
+		{
+			for (auto& c : coordinator.GetComponents<OffscreenOutliner>()) c.Reconfigure();
+		}
 	}
 
 	void Scene::UpdateVSSceneConstBuffer()
@@ -101,6 +114,36 @@ namespace Engine2
 			}
 		}
 		gizmoRender.Render();
+	}
+
+	void Scene::RenderOutlines()
+	{
+		Coordinator& coordinator = hierarchy.GetECSCoordinator();
+		View<OffscreenOutliner, MeshRenderer, Transform> entities(coordinator);
+		for (auto e : entities)
+		{
+			// sets the world transform certex constant buffer
+			auto mr = coordinator.GetComponent<MeshRenderer>(e);
+			if (mr->IsValid())
+			{
+				mr->material->vertexShaderCB->data = *coordinator.GetComponent<Transform>(e);
+				mr->material->vertexShaderCB->UpdateBuffer();
+				mr->material->vertexShaderCB->Bind();
+
+				// binds the vertex buffer
+				auto drawable = mr->mesh;
+				drawable->Bind();
+
+				auto outliner = coordinator.GetComponent<OffscreenOutliner>(e);
+				outliner->Clear();
+
+				outliner->SetForWriteMask();
+				drawable->Draw();
+				outliner->SetForOutline();
+				drawable->Draw();
+				outliner->DrawToBackBuffer();
+			}
+		}
 	}
 
 	void Scene::UpdatePhysics(float dt)
