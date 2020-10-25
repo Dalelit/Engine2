@@ -2,7 +2,6 @@
 #include "Engine2.h"
 #include "BallWorld.h"
 #include "ModelTest.h"
-#include "ParticleTest.h"
 #include "BlockWorld.h"
 #include "ECSTest.h"
 
@@ -228,10 +227,9 @@ int WINAPI WinMain(
 	OnInputEventFunc = [](Engine2::InputEvent& event) { Engine2::Engine::Get().OnInputEvent(event); };
 
 	// reminder: camera position is set by last layer
-	//Engine2::Engine::Get().AttachLayer(new ModelTest(), false);
-	//Engine2::Engine::Get().AttachLayer(new BallWorld(), false);
-	//Engine2::Engine::Get().AttachLayer(new ParticleTest(), false);
-	//Engine2::Engine::Get().AttachLayer(new BlockWorld::BlockWorld(), false);
+	Engine2::Engine::Get().AttachLayer(new ModelTest(), false);
+	Engine2::Engine::Get().AttachLayer(new BallWorld(), false);
+	Engine2::Engine::Get().AttachLayer(new BlockWorld::BlockWorld(), false);
 	Engine2::Engine::Get().AttachLayer(new ECSTest());
 
 	clock_t lastTime = clock();

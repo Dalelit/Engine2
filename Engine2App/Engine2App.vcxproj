@@ -168,7 +168,6 @@
     <ClCompile Include="src\ECSTest.cpp" />
     <ClCompile Include="src\Empty.cpp" />
     <ClCompile Include="src\ModelTest.cpp" />
-    <ClCompile Include="src\ParticleTest.cpp" />
     <ClCompile Include="src\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -182,7 +181,6 @@
     <ClInclude Include="src\ECSTest.h" />
     <ClInclude Include="src\Empty.h" />
     <ClInclude Include="src\ModelTest.h" />
-    <ClInclude Include="src\ParticleTest.h" />
     <ClInclude Include="src\pch.h" />
     <ClInclude Include="src\Voxel.h" />
   </ItemGroup>
