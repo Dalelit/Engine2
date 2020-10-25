@@ -12,11 +12,11 @@ namespace Engine2
 {
 	void EntityInfo::OnImgui()
 	{
-		char buffer[256];
-		strcpy_s(buffer, 256, tag.c_str());
-		if (ImGui::InputText("Tag", buffer, 256))
+		char buffer[256] = {};
+		strcpy_s(buffer, sizeof(buffer), tag.c_str());
+		if (ImGui::InputText("Tag", buffer, sizeof(buffer)))
 		{
-			//tag = buffer;
+			tag = buffer;
 		}
 	}
 

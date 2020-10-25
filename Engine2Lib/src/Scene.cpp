@@ -11,7 +11,7 @@ using namespace EngineECS;
 
 namespace Engine2
 {
-	Scene::Scene() : vsConstBuffer(0), psConstBuffer(0), coordinator(100)
+	Scene::Scene() : vsConstBuffer(0), psConstBuffer(0)
 	{
 	}
 
@@ -29,71 +29,6 @@ namespace Engine2
 		RenderMeshes();
 		RenderParticles();
 		RenderGizmos();
-	}
-
-	Entity Scene::CreateEntity()
-	{
-		EntityId_t id = coordinator.CreateEntity();
-		coordinator.AddComponent<EntityInfo>(id)->tag = std::to_string(id);
-		coordinator.AddComponent<Transform>(id);
-		return Entity(id, coordinator);
-	}
-
-	void Scene::OnImgui()
-	{
-		if (ImGui::TreeNode("Scene"))
-		{
-			if (ImGui::CollapsingHeader("Lights"))
-			{
-				ImGui::ColorEdit4("Ambient", psConstBuffer.data.ambientLight.m128_f32);
-
-				for (auto& l : pointLights) l.OnImgui();
-			}
-			ImGui::TreePop();
-		}
-		ImGui::Separator();
-		if (ImGui::TreeNodeEx("Entities", ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			auto& allInfo = coordinator.GetComponents<EntityInfo>(); // Note: All entities when created through scene get an entityInfo component
-			for (EngineECS::ComponentIndex_t indx = 0; indx < allInfo.Count(); indx++)
-			{
-				if (ImGui::TreeNode(allInfo[indx].tag.c_str()))
-				{
-					Components::OnImgui(allInfo.GetEntity(indx), coordinator);
-					ImGui::TreePop();
-				}
-				ImGui::Separator();
-			}
-			
-			if (ImGui::Button("Add Entity"))
-			{
-				CreateEntity();
-			}
-			ImGui::Separator();
-			if (ImGui::TreeNodeEx("Stats", ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_DefaultOpen))
-			{
-				ImGui::Text("Entities: %i/%i", coordinator.GetEntityCount(), coordinator.GetMaxEntities());
-				ImGui::Text("Components:");
-				for (uint32_t i = 0; i < coordinator.GetComponentCount(); i++)
-				{
-					auto* pStore = coordinator.GetComponentStore(i);
-					if (pStore)
-					{
-						ImGui::Text("%i %s: %i/%i", i, pStore->GetName().c_str(), pStore->Count(), pStore->Capacity());
-					}
-				}
-				ImGui::TreePop();
-			}
-
-			ImGui::TreePop();
-		}
-		ImGui::Separator();
-		if (ImGui::TreeNode("Assets"))
-		{
-			Mesh::Assets.OnImGui();
-			Material::Assets.OnImGui();
-			ImGui::TreePop();
-		}
 	}
 
 	void Scene::UpdateVSSceneConstBuffer()
@@ -115,6 +50,7 @@ namespace Engine2
 
 	void Scene::RenderMeshes()
 	{
+		Coordinator& coordinator = hierarchy.GetECSCoordinator();
 		View<MeshRenderer, Transform> entities(coordinator);
 		for (auto e : entities)
 		{
@@ -130,6 +66,7 @@ namespace Engine2
 
 	void Scene::RenderParticles()
 	{
+		Coordinator& coordinator = hierarchy.GetECSCoordinator();
 		View<ParticleEmitter, Transform> entities(coordinator);
 		for (auto e : entities)
 		{
@@ -140,6 +77,7 @@ namespace Engine2
 
 	void Scene::RenderGizmos()
 	{
+		Coordinator& coordinator = hierarchy.GetECSCoordinator();
 		View<Gizmo, Transform> entities(coordinator);
 		gizmoRender.NewFrame();
 		for (auto e : entities)
@@ -160,6 +98,7 @@ namespace Engine2
 
 	void Scene::UpdatePhysics(float dt)
 	{
+		Coordinator& coordinator = hierarchy.GetECSCoordinator();
 		View<RigidBody, Transform> entities(coordinator);
 		for (auto e : entities)
 		{
@@ -171,12 +110,85 @@ namespace Engine2
 
 	void Scene::UpdateParticles(float dt)
 	{
+		Coordinator& coordinator = hierarchy.GetECSCoordinator();
 		View<ParticleEmitter, Transform> entities(coordinator);
 		for (auto e : entities)
 		{
 			auto* emitter = coordinator.GetComponent<ParticleEmitter>(e);
 			emitter->SetTransform( coordinator.GetComponent<Transform>(e)->GetTransformTranspose() );
 			emitter->OnUpdate(dt);
+		}
+	}
+
+	void Scene::OnImgui()
+	{
+		ImGuiScene();
+		ImGuiEntities();
+		ImGuiAssets();
+	}
+
+	void Scene::ImGuiScene()
+	{
+		static bool sceneOpen = true;
+		if (ImGui::Begin("Scene", &sceneOpen))
+		{
+			hierarchy.OnImGui();
+			ImGui::End();
+		}
+
+		static bool entityOpen = true;
+		if (ImGui::Begin("Entity", &entityOpen))
+		{
+			hierarchy.SelectedEntityOnImGui();
+			ImGui::End();
+		}
+	}
+
+	void Scene::ImGuiEntities()
+	{
+		static bool open = true;
+		if (ImGui::Begin("Entities", &open))
+		{
+			Coordinator& coordinator = hierarchy.GetECSCoordinator();
+
+			if (ImGui::TreeNodeEx("Stats", ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				ImGui::Text("Entities: %i/%i", coordinator.GetEntityCount(), coordinator.GetMaxEntities());
+				ImGui::Text("Components:");
+				for (uint32_t i = 0; i < coordinator.GetComponentCount(); i++)
+				{
+					auto* pStore = coordinator.GetComponentStore(i);
+					if (pStore)
+					{
+						ImGui::Text("%i %s: %i/%i", i, pStore->GetName().c_str(), pStore->Count(), pStore->Capacity());
+					}
+				}
+				ImGui::TreePop();
+			}
+
+			auto& allInfo = coordinator.GetComponents<EntityInfo>(); // Note: All entities when created through scene get an entityInfo component
+			for (EngineECS::ComponentIndex_t indx = 0; indx < allInfo.Count(); indx++)
+			{
+				if (ImGui::TreeNode(allInfo[indx].tag.c_str()))
+				{
+					Components::OnImgui(allInfo.GetEntity(indx), coordinator);
+					ImGui::TreePop();
+				}
+				ImGui::Separator();
+			}
+
+			ImGui::End();
+		}
+	}
+
+	void Scene::ImGuiAssets()
+	{
+		static bool open = true;
+		if (ImGui::Begin("Assets", &open))
+		{
+			Mesh::Assets.OnImGui();
+			Material::Assets.OnImGui();
+			ImGui::End();
 		}
 	}
 }

@@ -5,6 +5,7 @@
 #include "ECS.h"
 #include "Entity.h"
 #include "GizmoRender.h"
+#include "SceneHierarchy.h"
 
 namespace Engine2
 {
@@ -18,7 +19,7 @@ namespace Engine2
 		void OnUpdate(float dt);
 		void OnRender();
 
-		Entity CreateEntity();
+		Entity CreateEntity() { return hierarchy.CreateEntity(); }
 
 		void OnImgui();
 
@@ -40,7 +41,7 @@ namespace Engine2
 		PSConstantBuffer<PSSceneData> psConstBuffer;
 
 	protected:
-		EngineECS::Coordinator coordinator;
+		SceneHierarchy hierarchy;
 
 		GizmoRender gizmoRender;
 
@@ -53,6 +54,10 @@ namespace Engine2
 
 		void UpdatePhysics(float dt);
 		void UpdateParticles(float dt);
+
+		void ImGuiScene();
+		void ImGuiEntities();
+		void ImGuiAssets();
 	};
 
 }

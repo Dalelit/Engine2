@@ -51,6 +51,24 @@ namespace Engine2
 						ImGui::TreePop();
 					}
 				}
+				if (ImGui::TreeNode("Add"))
+				{
+					static char name[256] = {};
+
+					if (ImGui::Button("Add"))
+					{
+						std::string nameStr(name);
+						if (nameStr.length() > 0 && !Exists(name))
+						{
+							CreateAsset(name);
+							name[0] = '\0';
+						}
+					}
+					ImGui::SameLine();
+					ImGui::InputText("Name", name, sizeof(name));
+
+					ImGui::TreePop();
+				}
 				ImGui::TreePop();
 			}
 		}
