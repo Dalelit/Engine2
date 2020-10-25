@@ -1,0 +1,15 @@
+Things that I want to work on...
+
+Near term
+- ECS delete
+- Scene serialisation
+	- https://github.com/jbeder/yaml-cpp
+	- https://github.com/pantoniou/libfyaml
+- Transform rework
+- Materials and lighting
+- Model/mesh loading
+
+Long term
+- Rigid body and basic physics
+- shadows
+- water

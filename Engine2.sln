@@ -14,6 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
 		README.md = README.md
+		ToDo.txt = ToDo.txt
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Engine2CommandLineTest", "Engine2CommandLineTest\Engine2CommandLineTest.vcxproj", "{34F4C168-9B12-4BBB-99D8-8F477D7A4B49}"
