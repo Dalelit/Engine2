@@ -10,6 +10,7 @@
 #include "Lights.h"
 #include "VertexLayout.h"
 #include "AssetLoaders/ObjLoader.h"
+#include "SceneSerialisation.h"
 
 using namespace Engine2;
 using namespace EngineECS;
@@ -42,6 +43,11 @@ void SceneBuilder::OnApplicationEvent(Engine2::ApplicationEvent& event)
 
 void SceneBuilder::OnImgui()
 {
+	char buffer[256] = "Scenes//testScene.txt";
+	ImGui::InputText("Filename", buffer, sizeof(buffer));
+	if (ImGui::Button("Save")) SceneSerialisation(scene).SaveScene(buffer);
+	if (ImGui::Button("Load")) SceneSerialisation(scene).LoadScene(buffer);
+
 	scene.OnImgui();
 }
 

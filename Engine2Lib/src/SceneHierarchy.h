@@ -5,17 +5,22 @@
 
 namespace Engine2
 {
+	class SceneSerialisation; // for a friend
+
 	class SceneHierarchy
 	{
 	public:
 		SceneHierarchy() : coordinator(1000) {}
 
 		Entity CreateEntity() { return Entity(NewEntity(), coordinator); }
+		Entity GetEntity(EngineECS::EntityId_t id) { return Entity(id, coordinator); }
 
 		EngineECS::Coordinator& GetECSCoordinator() { return coordinator; }
 
 		void OnImGui();
 		void SelectedEntityOnImGui();
+
+		friend SceneSerialisation;
 
 	protected:
 		EngineECS::Coordinator coordinator;

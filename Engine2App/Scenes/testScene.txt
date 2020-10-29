@@ -1,0 +1,53 @@
+#  Add timestamp
+SceneInformation
+  # To do
+SceneHierarchy
+  Entity
+    Transform
+      transform:1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1
+    EntityInfo
+      tag:0
+    PointLight
+      color:1,1,1,1
+    Gizmo
+      type:2
+  Entity
+    Transform
+      transform:1,0,0,-3,0,0.172923,-0.984935,0,0,0.984935,0.172923,0,0,0,0,1
+    EntityInfo
+      tag:1
+    RigidBody
+      velocity:0,0,0,1
+      angularVelocity:0.5,0,0,0
+      mass:1
+      gravity:0,0,0,0
+    MeshRenderer
+      mesh:Cube
+      material:forPrimatives
+    Gizmo
+      type:0
+  Entity
+    Transform
+      transform:-0.355862,-0.975767,-1.08224,-2.18602,1.05121,0.599585,-0.886256,0.732993,1.00911,-0.9687,0.541579,1.91939,0,0,0,1
+    EntityInfo
+      tag:2
+    RigidBody
+      velocity:0,0,0,1
+      angularVelocity:0,-0.8,0.3,0
+      mass:1
+      gravity:0,0,0,0
+    MeshRenderer
+      mesh:Icosphere3
+      material:forPrimatives
+    Gizmo
+      type:0
+  Entity
+    Transform
+      transform:1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1
+    EntityInfo
+      tag:3
+    MeshRenderer
+      mesh:Torus
+      material:forPrimatives
+Assets
+  # To do

@@ -9,6 +9,8 @@
 
 namespace Engine2
 {
+	class SceneSerialisation; // for a friend
+
 	// Used for scene level resources that are commonly used and bound once per frame.
 	class Scene
 	{
@@ -21,6 +23,7 @@ namespace Engine2
 		void OnApplicationEvent(Engine2::ApplicationEvent& event);
 
 		Entity CreateEntity() { return hierarchy.CreateEntity(); }
+		Entity GetEntity(EngineECS::EntityId_t id) { return hierarchy.GetEntity(id); }
 
 		void OnImgui();
 
@@ -38,6 +41,8 @@ namespace Engine2
 			DirectX::XMVECTOR pointLightColor;
 		};
 		PSConstantBuffer<PSSceneData> psConstBuffer;
+
+		friend SceneSerialisation;
 
 	protected:
 		SceneHierarchy hierarchy;

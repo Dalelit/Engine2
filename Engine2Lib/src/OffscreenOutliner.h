@@ -28,6 +28,12 @@ namespace Engine2
 
 		void OnImgui();
 
+		inline float GetOutlineScale() { return outlineScale; }
+		inline DirectX::XMVECTOR GetOutlineColor() { return outlineColor; }
+
+		void SetOutlineScale(float scale) { outlineScale = scale; }
+		void SetOutlineColor(DirectX::XMVECTOR color) { outlineColor = color; }
+
 	protected:
 		Offscreen offscreen;
 

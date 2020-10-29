@@ -10,11 +10,8 @@ namespace Engine2
 		PointLight() = default;
 		PointLight(DirectX::XMVECTOR color) : color(color) {}
 
-		inline DirectX::XMVECTOR GetColor() { return color; }
-
 		void OnImgui();
 
-	protected:
 		DirectX::XMVECTOR color = { 1.0f, 1.0f, 1.0f, 1.0f};
 	};
 }

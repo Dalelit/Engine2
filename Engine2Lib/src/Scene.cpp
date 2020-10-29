@@ -62,7 +62,7 @@ namespace Engine2
 		{
 			auto position = coordinator.GetComponent<Transform>(pointLights.GetEntity(0))->GetTranslation();
 			psConstBuffer.data.pointLightPosition = position;
-			psConstBuffer.data.pointLightColor = pointLights[0].GetColor();
+			psConstBuffer.data.pointLightColor = pointLights[0].color;
 		}
 		else
 		{

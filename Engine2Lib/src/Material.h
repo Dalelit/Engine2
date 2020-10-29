@@ -23,6 +23,8 @@ namespace Engine2
 
 		void OnImgui(bool assetInfo = false);
 
+		const std::string& Name() const { return name; }
+
 		std::shared_ptr<VSConstantBuffer<Transform>> vertexShaderCB;
 		std::shared_ptr<VertexShader> vertexShader;
 		std::shared_ptr<PixelShader> pixelShader;

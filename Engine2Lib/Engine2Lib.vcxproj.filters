@@ -51,6 +51,8 @@
     <ClInclude Include="src\AssetStore.h" />
     <ClInclude Include="src\SceneHierarchy.h" />
     <ClInclude Include="src\VertexLayout.h" />
+    <ClInclude Include="src\SceneSerialisation.h" />
+    <ClInclude Include="src\Serialiser.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\pch.cpp" />
@@ -88,6 +90,8 @@
     <ClCompile Include="src\MeshRenderer.cpp" />
     <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\SceneHierarchy.cpp" />
+    <ClCompile Include="src\SceneSerialisation.cpp" />
+    <ClCompile Include="src\Serialiser.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Assets\Shaders\GizmosPS.hlsl" />
