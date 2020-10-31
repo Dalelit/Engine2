@@ -7,12 +7,15 @@
 
 namespace Engine2
 {
+	class SceneSerialisation; // for a friend
+
 	template <class T>
 	class AssetStore
 	{
 	public:
 
 		using TSharedPtr = std::shared_ptr<T>;
+		using TMap = std::unordered_map<std::string, TSharedPtr>;
 
 		TSharedPtr& CreateAsset(const std::string& name)
 		{
@@ -29,7 +32,7 @@ namespace Engine2
 		}
 
 		// Note: Does not check it exists.
-		TSharedPtr& GetAsset(const std::string& name)
+		inline TSharedPtr& GetAsset(const std::string& name)
 		{
 			return map.at(name);
 		}
@@ -41,34 +44,30 @@ namespace Engine2
 
 		void OnImGui()
 		{
-			if (ImGui::TreeNode(typeid(T).name()))
+			for (auto& [k, v] : map)
 			{
-				for (auto& [k, v] : map)
+				if (ImGui::TreeNode(k.c_str()))
 				{
-					if (ImGui::TreeNode(k.c_str()))
-					{
-						v->OnImgui(true);
-						ImGui::TreePop();
-					}
-				}
-				if (ImGui::TreeNode("Add"))
-				{
-					static char name[256] = {};
-
-					if (ImGui::Button("Add"))
-					{
-						std::string nameStr(name);
-						if (nameStr.length() > 0 && !Exists(name))
-						{
-							CreateAsset(name);
-							name[0] = '\0';
-						}
-					}
-					ImGui::SameLine();
-					ImGui::InputText("Name", name, sizeof(name));
-
+					v->OnImgui();
 					ImGui::TreePop();
 				}
+			}
+			if (ImGui::TreeNode("Add"))
+			{
+				static char name[256] = {};
+
+				if (ImGui::Button("Add"))
+				{
+					std::string nameStr(name);
+					if (nameStr.length() > 0 && !Exists(name))
+					{
+						CreateAsset(name);
+						name[0] = '\0';
+					}
+				}
+				ImGui::SameLine();
+				ImGui::InputText("Name", name, sizeof(name));
+
 				ImGui::TreePop();
 			}
 		}
@@ -91,7 +90,9 @@ namespace Engine2
 			return result;
 		}
 
+		friend SceneSerialisation;
+
 	private:
-		std::unordered_map<std::string, TSharedPtr> map;
+		TMap map;
 	};
 }

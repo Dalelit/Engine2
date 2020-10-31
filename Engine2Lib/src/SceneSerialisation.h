@@ -17,5 +17,6 @@ namespace Engine2
 
 		void SaveSceneNode(Serialisation::Serialiser::Node& node, SceneHierarchy::SceneNode& sceneNode);
 		void SaveComponents(Serialisation::Serialiser::Node& node, Entity entity);
+		void SaveAssets(Serialisation::Serialiser::Node& node);
 	};
 }

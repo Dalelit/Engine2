@@ -33,13 +33,15 @@ namespace Engine2
 		// vt 0.250000 0.490000
 		// vn 0.0000 -1.0000 0.0000
 		// usemtl None
-		// s off
+		// s off or a number
 		// f 1/1/1 12/2/1 2/3/1  --> vertex/texture/normal indices
 		//
 		void ObjLoader::LoadObjects(ObjLoader& loader)
 		{
 			std::ifstream srcFile(loader.filename);
-			E2_ASSERT(srcFile.is_open(), "Falied to open object file");
+
+			if (!srcFile.is_open()) return;
+			//E2_ASSERT(srcFile.is_open(), "Falied to open object file");
 
 			std::string token;
 			std::string name;
@@ -105,7 +107,11 @@ namespace Engine2
 				}
 				else if (token == "s")
 				{
-					srcFile >> currentObj->s;
+					std::string value;
+					srcFile >> value;
+
+					if (value == "off") currentObj->s = 0;
+					else currentObj->s = std::stoi(value);
 				}
 				else if (token == "f")
 				{

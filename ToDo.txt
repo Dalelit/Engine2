@@ -2,8 +2,6 @@ Things that I want to work on...
 
 Near term
 - Scene serialisation
-	- https://github.com/jbeder/yaml-cpp
-	- https://github.com/pantoniou/libfyaml
 - Transform rework
 - Scene transform hierarchy
 - Materials and lighting
@@ -11,9 +9,17 @@ Near term
 - Scene UI work
 	- maintain focus on selected entity on destroy
 	- auto expand hierarchy on create
+- Bugs
+	- Minimising some of the ImGui windows causes issue
 
 Long term
 - Rigid body and basic physics
 - shadows
 - water
 - boids
+
+
+Future?
+- Use yaml
+	- https://github.com/jbeder/yaml-cpp
+	- https://github.com/pantoniou/libfyaml

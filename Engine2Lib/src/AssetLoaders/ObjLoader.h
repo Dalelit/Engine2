@@ -19,7 +19,7 @@ namespace Engine2
 		{
 			std::string name;
 			std::string material;
-			unsigned int s;
+			int s;
 			std::vector<unsigned int> facesV;
 			std::vector<unsigned int> facesVt;
 			std::vector<unsigned int> facesVn;

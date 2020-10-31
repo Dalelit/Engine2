@@ -3,12 +3,15 @@
 #include "SceneHierarchy.h"
 #include "Components.h"
 #include "submodules/imgui/imgui.h"
+#include "VertexLayout.h"
+#include "VertexBuffer.h"
+#include "MeshRenderer.h"
 
 using namespace EngineECS;
 
 namespace Engine2
 {
-	EntityId_t SceneHierarchy::NewEntity(SceneNode* parent, SceneNode* insertBefore)
+	SceneHierarchy::SceneNode* SceneHierarchy::NewEntity(SceneNode* parent, SceneNode* insertBefore)
 	{
 		EntityId_t id = coordinator.CreateEntity();
 		coordinator.AddComponent<EntityInfo>(id)->tag = std::to_string(id);
@@ -33,7 +36,7 @@ namespace Engine2
 			selected = &vector.back();
 		}
 
-		return id;
+		return selected;
 	}
 
 	void SceneHierarchy::DestroyEntity(SceneNode* parent, SceneNode* node)
@@ -71,6 +74,14 @@ namespace Engine2
 		if (deleteEntity) DestroyEntity(deleteEntityParent, deleteEntity);
 
 		if (ImGui::Button("Add Entity")) NewEntity();
+
+		if (ImGui::CollapsingHeader("Loader"))
+		{
+			static char buffer[256] = "Assets\\Models\\Torus.obj";
+			ImGui::InputText("filename", buffer, sizeof(buffer));
+			if (ImGui::Button("Load")) LoadModel(buffer);
+		}
+
 	}
 
 	void SceneHierarchy::SelectedEntityOnImGui()
@@ -79,6 +90,71 @@ namespace Engine2
 		{
 			Components::OnImgui(selected->id, coordinator);
 		}
+	}
+
+	bool SceneHierarchy::LoadModel(const std::string& sourceFilename)
+	{
+		using Vertex = VertexLayout::PositionNormalColor::Vertex;
+		auto vsLayout = VertexLayout::PositionNormalColor::GetLayout();
+
+		auto loadedModel = AssetLoaders::ObjLoader::Load(sourceFilename);
+
+		if (!loadedModel) return false;
+
+		// To Do: will sort this out later.
+		auto material = Material::Assets["Default"];
+
+		auto root = NewEntity();
+		coordinator.GetComponent<EntityInfo>(root->id)->tag = sourceFilename;
+
+		for (auto& [name, data] : loadedModel->objects)
+		{
+			auto sn = NewEntity(root);
+			Entity entity(sn->id, coordinator);
+
+			entity.GetComponent<EntityInfo>()->tag = name;
+			auto mr = entity.AddComponent<MeshRenderer>();
+
+			// create the verticies from the loaded model
+			std::vector<Vertex> verticies;
+
+			if (data.facesV.size() != data.facesVn.size()) return false;
+
+			verticies.reserve(data.facesV.size()); // get the memory size
+
+			auto pos = data.facesV.data();
+			auto nor = data.facesVn.data();
+			size_t count = data.facesV.size();
+
+			Vertex v;
+			if (loadedModel->materials.find(data.material) == loadedModel->materials.end())
+			{
+				v.color = { 1.0f, 1.0f, 1.0f, 1.0f };
+			}
+			else
+			{
+				v.color.x = loadedModel->materials[data.material].Kd.x;
+				v.color.y = loadedModel->materials[data.material].Kd.y;
+				v.color.z = loadedModel->materials[data.material].Kd.z;
+				v.color.w = 1.0f;
+			}
+
+			while (count > 0)
+			{
+				v.position = loadedModel->verticies[*pos];
+				v.normal = loadedModel->normals[*nor];
+				verticies.push_back(v);
+				pos++;
+				nor++;
+				count--;
+			}
+
+			mr->material = material;
+			mr->mesh = std::make_shared<Mesh>(name);
+			mr->mesh->SetDrawable<MeshTriangleList<Vertex>>(verticies);
+		}
+
+		return true;
 	}
 
 	void SceneHierarchy::SceneNodeOnImGui(SceneNode& node)

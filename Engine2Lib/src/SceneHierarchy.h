@@ -12,13 +12,15 @@ namespace Engine2
 	public:
 		SceneHierarchy() : coordinator(1000) {}
 
-		Entity CreateEntity() { return Entity(NewEntity(), coordinator); }
+		Entity CreateEntity() { return Entity(NewEntity()->id, coordinator); }
 		Entity GetEntity(EngineECS::EntityId_t id) { return Entity(id, coordinator); }
 
 		EngineECS::Coordinator& GetECSCoordinator() { return coordinator; }
 
 		void OnImGui();
 		void SelectedEntityOnImGui();
+
+		bool LoadModel(const std::string& sourceFilename);
 
 		friend SceneSerialisation;
 
@@ -35,7 +37,7 @@ namespace Engine2
 		SceneNode* selected = nullptr;
 		std::vector<SceneNode> sceneHierarchy;
 
-		EngineECS::EntityId_t NewEntity(SceneNode* parent = nullptr, SceneNode* insertBefore = nullptr);
+		SceneNode* NewEntity(SceneNode* parent = nullptr, SceneNode* insertBefore = nullptr);
 		void DestroyEntity(SceneNode* parent, SceneNode* node);
 
 		void SceneNodeOnImGui(SceneNode& node);

@@ -23,6 +23,7 @@ SceneBuilder::SceneBuilder() : Layer("SceneBuilder")
 
 	scene.psConstBuffer.data.ambientLight = { 0.2f, 0.2f, 0.2f, 1.0f };
 
+	LoadPrimatives();
 	BuildTestScene();
 }
 
@@ -60,6 +61,7 @@ void SceneBuilder::BuildTestScene()
 		auto e = scene.CreateEntity();
 		e.AddComponent<Gizmo>()->type = Gizmo::Types::Sphere;
 		e.AddComponent<PointLight>();
+		e.GetComponent<Transform>()->Set(-3.0f, 3.0f, -3.0f);
 	}
 
 	// add a particle emitter
@@ -71,9 +73,10 @@ void SceneBuilder::BuildTestScene()
 		//e.GetComponent<Transform>()->Set(-2.0f, 0.0f, 2.0f);
 	}
 
-	// Create primatives
 	using Vertex = VertexLayout::PositionNormalColor::Vertex;
 	auto vsLayout = VertexLayout::PositionNormalColor::GetLayout();
+
+	return;
 
 	// sphere
 	{
@@ -93,16 +96,6 @@ void SceneBuilder::BuildTestScene()
 
 		auto m = Mesh::Assets.CreateAsset("Cube");
 		m->SetDrawable<MeshTriangleIndexList<Vertex>>(verticies, Primatives::Cube::indicies);
-	}
-
-	// create material
-	{
-		std::string vsfilename = Config::directories["ShaderSourceDir"] + "StandardPosNorColVS.hlsl";
-		std::string psfilename = Config::directories["ShaderSourceDir"] + "StandardPosNorColPS.hlsl";
-		auto mat = Material::Assets.CreateAsset("forPrimatives");
-		mat->vertexShaderCB = std::make_shared<VSConstantBuffer<Transform>>(1);
-		mat->vertexShader = std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout);
-		mat->pixelShader = std::make_shared<PixelShaderDynamic>(psfilename);
 	}
 
 	{
@@ -140,5 +133,27 @@ void SceneBuilder::BuildTestScene()
 		auto mr = e.AddComponent<MeshRenderer>();
 		mr->mesh = Mesh::Assets[assets[0]]; // to do: hack to the first one.
 		mr->material = Material::Assets["forPrimatives"];
+	}
+}
+
+void SceneBuilder::LoadPrimatives()
+{
+	scene.LoadModel("Assets\\Models\\Cube.obj");
+	scene.LoadModel("Assets\\Models\\Cone.obj");
+	scene.LoadModel("Assets\\Models\\Cylinder.obj");
+	scene.LoadModel("Assets\\Models\\Plane.obj");
+	scene.LoadModel("Assets\\Models\\Sphere.obj");
+	scene.LoadModel("Assets\\Models\\Torus.obj");
+
+	// create material
+	{
+		auto vsLayout = VertexLayout::PositionNormalColor::GetLayout();
+		std::string vsfilename = Config::directories["ShaderSourceDir"] + "StandardPosNorColVS.hlsl";
+		std::string psfilename = Config::directories["ShaderSourceDir"] + "StandardPosNorColPS.hlsl";
+
+		auto mat = Material::Assets.CreateAsset("Default");
+		mat->vertexShaderCB = std::make_shared<VSConstantBuffer<Transform>>(1);
+		mat->vertexShader = std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout);
+		mat->pixelShader = std::make_shared<PixelShaderDynamic>(psfilename);
 	}
 }

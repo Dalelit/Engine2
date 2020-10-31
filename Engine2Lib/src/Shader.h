@@ -55,8 +55,6 @@ namespace Engine2
 		VertexShader() = default;
 		wrl::ComPtr<ID3D11VertexShader> pVertexShader = nullptr;
 		wrl::ComPtr<ID3D11InputLayout> pInputLayout = nullptr;
-
-		void CreateVertexShader(ID3DBlob& shaderBlob, std::vector<D3D11_INPUT_ELEMENT_DESC>& layout, const std::string info);
 	};
 
 	/////////////////// pixel shader ///////////////////

@@ -18,4 +18,5 @@ protected:
 	Engine2::Scene scene;
 
 	void BuildTestScene();
+	void LoadPrimatives();
 };

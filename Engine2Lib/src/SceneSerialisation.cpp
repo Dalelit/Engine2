@@ -21,6 +21,11 @@ namespace Engine2
 		out.Comment(" Add timestamp");
 
 		{
+			auto node = out.GetNode("Assets");
+			SaveAssets(node);
+		}
+
+		{
 			auto node = out.GetNode("SceneInformation");
 			node.Comment("To do");
 		}
@@ -32,12 +37,6 @@ namespace Engine2
 				SaveSceneNode(node, sceneNode);
 			}
 		}
-
-		{
-			auto node = out.GetNode("Assets");
-			node.Comment("To do");
-		}
-
 
 		return true;
 	}
@@ -106,6 +105,29 @@ namespace Engine2
 			auto n = node.SubNode("OffscreenOutliner");
 			n.Store("outlineScale", c->GetOutlineScale());
 			n.Store("outlineColor", c->GetOutlineColor());
+		}
+	}
+
+	void SceneSerialisation::SaveAssets(Serialisation::Serialiser::Node& node)
+	{
+		{
+			auto n = node.SubNode("Meshes");
+			for (auto [name, mesh] : Mesh::Assets.map)
+			{
+				auto m = n.SubNode(name);
+				m.Store("type", 0);
+				m.Store("filename", "to do");
+			}
+		}
+		{
+			auto n = node.SubNode("Materials");
+			for (auto [name, mat] : Material::Assets.map)
+			{
+				auto m = n.SubNode(name);
+				if (mat->pixelShader) m.Store("pixelShader", mat->pixelShader->GetName());
+				if (mat->vertexShader) m.Store("vertexShader", mat->vertexShader->GetName());
+				//m.Store("vertexShaderCB", mat->vertexShaderCB->);
+			}
 		}
 	}
 }

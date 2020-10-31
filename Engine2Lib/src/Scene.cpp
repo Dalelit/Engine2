@@ -8,6 +8,7 @@
 #include "Particles.h"
 #include "Lights.h"
 #include "OffscreenOutliner.h"
+#include "VertexLayout.h"
 
 using namespace EngineECS;
 
@@ -243,9 +244,37 @@ namespace Engine2
 		static bool open = true;
 		if (ImGui::Begin("Assets", &open))
 		{
-			Mesh::Assets.OnImGui();
-			Material::Assets.OnImGui();
+			if (ImGui::TreeNode("Meshes"))
+			{
+				Mesh::Assets.OnImGui();
+
+				static char buffer[256] = "Assets\\Models\\";
+				ImGui::InputText("Filename", buffer, sizeof(buffer));
+				if (ImGui::Button("Load model")) LoadModel(buffer);
+
+				ImGui::TreePop();
+			}
+
+			if (ImGui::TreeNode("Materials"))
+			{
+				Material::Assets.OnImGui();
+				ImGui::TreePop();
+			}
+
 			ImGui::End();
 		}
+	}
+
+	bool Scene::LoadModel(const std::string& sourceFilename)
+	{
+		using Vertex = VertexLayout::PositionNormalColor::Vertex;
+		auto vsLayout = VertexLayout::PositionNormalColor::GetLayout();
+
+		auto loadedModel = AssetLoaders::ObjLoader::Load(sourceFilename);
+
+		auto assets = MeshAssetLoader::CreateMeshAsset(*loadedModel);
+
+		if (assets.size() > 0) return true;
+		else return false;
 	}
 }

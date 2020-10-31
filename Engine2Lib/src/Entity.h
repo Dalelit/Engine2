@@ -11,6 +11,8 @@ namespace Engine2
 
 		~Entity();
 
+		EngineECS::EntityId_t Id() { return id; }
+
 		template <typename T>
 		T* AddComponent() { return coordinator.AddComponent<T>(id); }
 

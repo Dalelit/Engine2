@@ -42,6 +42,8 @@ namespace Engine2
 		};
 		PSConstantBuffer<PSSceneData> psConstBuffer;
 
+		bool LoadModel(const std::string& sourceFilename);
+
 		friend SceneSerialisation;
 
 	protected:
@@ -63,6 +65,7 @@ namespace Engine2
 		void ImGuiScene();
 		void ImGuiEntities();
 		void ImGuiAssets();
+
 	};
 
 }
