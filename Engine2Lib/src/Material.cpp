@@ -26,14 +26,18 @@ namespace Engine2
 			{
 				ImGui::Text("vertexShaderCB references %i", vertexShaderCB.use_count());
 				ImGui::Text("vertexShader references %i", vertexShader.use_count());
+				ImGui::Text("pixelShaderCB references %i", pixelShaderCB.use_count());
 				ImGui::Text("pixelShader references %i", pixelShader.use_count());
 			}
 
 			if (vertexShaderCB) vertexShaderCB->OnImgui();
-			else ImGui::Text("VertexShaderCB null");
+			else ImGui::Text("vertexShaderCB null");
 
 			if (vertexShader) vertexShader->OnImgui();
-			else ImGui::Text("VertexShader null");
+			else ImGui::Text("vertexShader null");
+
+			if (pixelShaderCB) pixelShaderCB->OnImgui();
+			else ImGui::Text("pixelShaderCB null");
 
 			if (pixelShader) pixelShader->OnImgui();
 			else ImGui::Text("pixelShader null");

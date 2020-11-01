@@ -6,8 +6,14 @@
 
 namespace Engine2
 {
+	class ConstantBufferBase : public Bindable
+	{
+	public:
+		virtual void UpdateBuffer() = 0;
+	};
+
 	template <typename T>
-	class ConstantBuffer : public Bindable
+	class ConstantBuffer : public ConstantBufferBase
 	{
 	public:
 		T data = {};
@@ -43,17 +49,6 @@ namespace Engine2
 			DXDevice::GetContext().Unmap(pConstantBuffer.Get(), 0);
 		}
 
-		void OnImgui()
-		{
-			if (ImGui::TreeNode("Constant buffer"))
-			{
-				if (ImguiFunc) ImguiFunc();
-				ImGui::TreePop();
-			}
-		}
-
-		std::function<void()> ImguiFunc = nullptr;
-
 	protected:
 		wrl::ComPtr<ID3D11Buffer> pConstantBuffer = nullptr;
 	};
@@ -72,6 +67,15 @@ namespace Engine2
 		}
 
 		void Unbind() { DXDevice::GetContext().PSSetConstantBuffers(this->slot, 0u, nullptr); }
+
+		void OnImgui()
+		{
+			if (ImGui::TreeNode("Pixel Shader Constant buffer"))
+			{
+				ImGui::Text("No override");
+				ImGui::TreePop();
+			}
+		}
 	};
 
 	template <typename T>
@@ -88,6 +92,15 @@ namespace Engine2
 		}
 
 		void Unbind() { DXDevice::GetContext().VSSetConstantBuffers(this->slot, 0u, nullptr); }
+
+		void OnImgui()
+		{
+			if (ImGui::TreeNode("Vertex Shader Constant buffer"))
+			{
+				ImGui::Text("No override");
+				ImGui::TreePop();
+			}
+		}
 	};
 
 	template <typename T>

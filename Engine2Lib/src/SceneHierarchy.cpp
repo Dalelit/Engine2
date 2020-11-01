@@ -6,6 +6,7 @@
 #include "VertexLayout.h"
 #include "VertexBuffer.h"
 #include "MeshRenderer.h"
+#include "MaterialLibrary.h"
 
 using namespace EngineECS;
 
@@ -101,11 +102,22 @@ namespace Engine2
 
 		if (!loadedModel) return false;
 
-		// To Do: will sort this out later.
-		auto material = Material::Assets["Default"];
-
 		auto root = NewEntity();
 		coordinator.GetComponent<EntityInfo>(root->id)->tag = sourceFilename;
+
+		std::map<std::string, std::shared_ptr<MaterialLibrary::PositionNormalColorMaterial>> materials;
+		for (auto& [name, data] : loadedModel->materials)
+		{
+			auto mat = std::make_shared<MaterialLibrary::PositionNormalColorMaterial>();
+			auto cb = mat->GetPSCB();
+			cb->ambient = data.Ka;
+			cb->diffuse = data.Kd;
+			cb->emission = data.Ke;
+			cb->specular = data.Ks;
+			cb->specularExponent = data.Ns;
+
+			materials.insert({ name, mat });
+		}
 
 		for (auto& [name, data] : loadedModel->objects)
 		{
@@ -127,18 +139,8 @@ namespace Engine2
 			size_t count = data.facesV.size();
 
 			Vertex v;
-			if (loadedModel->materials.find(data.material) == loadedModel->materials.end())
-			{
-				v.color = { 1.0f, 1.0f, 1.0f, 1.0f };
-			}
-			else
-			{
-				v.color.x = loadedModel->materials[data.material].Kd.x;
-				v.color.y = loadedModel->materials[data.material].Kd.y;
-				v.color.z = loadedModel->materials[data.material].Kd.z;
-				v.color.w = 1.0f;
-			}
-
+			v.color = { 1.0f, 1.0f, 1.0f, 1.0f }; // always white color. shader sets the color
+			
 			while (count > 0)
 			{
 				v.position = loadedModel->verticies[*pos];
@@ -149,7 +151,7 @@ namespace Engine2
 				count--;
 			}
 
-			mr->material = material;
+			mr->material = materials[data.material];
 			mr->mesh = std::make_shared<Mesh>(name);
 			mr->mesh->SetDrawable<MeshTriangleList<Vertex>>(verticies);
 		}

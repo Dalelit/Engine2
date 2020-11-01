@@ -157,6 +157,7 @@
     <ClInclude Include="src\GizmoRender.h" />
     <ClInclude Include="src\Instances.h" />
     <ClInclude Include="src\Material.h" />
+    <ClInclude Include="src\MaterialLibrary.h" />
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\MeshRenderer.h" />
     <ClInclude Include="src\RigidBody.h" />
@@ -214,6 +215,7 @@
     <ClCompile Include="src\Instrumentation.cpp" />
     <ClCompile Include="src\Lights.cpp" />
     <ClCompile Include="src\Material.cpp" />
+    <ClCompile Include="src\MaterialLibrary.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\MeshRenderer.cpp" />
     <ClCompile Include="src\OffscreenOutliner.cpp" />

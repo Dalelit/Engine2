@@ -27,6 +27,8 @@ namespace Engine2
 
 		std::shared_ptr<VSConstantBuffer<Transform>> vertexShaderCB;
 		std::shared_ptr<VertexShader> vertexShader;
+
+		std::shared_ptr<ConstantBufferBase> pixelShaderCB;
 		std::shared_ptr<PixelShader> pixelShader;
 
 	protected:
