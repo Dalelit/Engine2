@@ -74,7 +74,7 @@ namespace Engine2
 		VertexShaderLayoutDesc layout;
 		FileWatcher fileWatcher;
 		std::string status;
-		bool autoReload = true;
+		bool autoReload = false;
 
 		void Load();
 	};
@@ -113,7 +113,7 @@ namespace Engine2
 		std::string target;
 		FileWatcher fileWatcher;
 		std::string status;
-		bool autoReload = true;
+		bool autoReload = false;
 
 		void Load();
 	};

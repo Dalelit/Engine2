@@ -16,7 +16,6 @@
     <ClInclude Include="src\submodules\imgui\imstb_truetype.h" />
     <ClInclude Include="src\DXImgui.h" />
     <ClInclude Include="src\Common.h" />
-    <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\ConstantBuffer.h" />
     <ClInclude Include="src\Camera.h" />
@@ -68,7 +67,6 @@
     <ClCompile Include="src\submodules\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\DXImgui.cpp" />
     <ClCompile Include="src\Shader.cpp" />
-    <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\Entity.cpp" />

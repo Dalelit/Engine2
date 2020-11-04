@@ -82,5 +82,6 @@ void SceneBuilder::LoadPrimatives()
 	scene.LoadModel("Assets\\Models\\Sphere.obj");
 	scene.LoadModel("Assets\\Models\\Torus.obj");
 
-	auto mat = Material::Assets.CreateAsset<MaterialLibrary::PositionNormalColorMaterial>("Default PNC");
+	Material::Assets.CreateAsset<MaterialLibrary::PositionNormalColorMaterial>("Default PNC");
+	Material::Assets.CreateAsset<MaterialLibrary::PositionNormalColorWireframe>("Wireframe PNC");
 }

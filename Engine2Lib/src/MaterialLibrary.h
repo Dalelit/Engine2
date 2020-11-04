@@ -13,6 +13,8 @@ namespace Engine2
 		VSPtr GetVertexShader(const std::string& filename, VertexShaderLayoutDesc& layout);
 		PSPtr GetPixelShader(const std::string& filename);
 
+		//////////////////////////////////////////////////////////
+
 		struct StandardMaterial
 		{
 			DirectX::XMFLOAT3 ambient = { 0.1f, 0.1f, 0.1f }; float pad1;
@@ -37,7 +39,8 @@ namespace Engine2
 			void OnImgui();
 		};
 
-		// standard psotion, normal, color material with standard buffer and shaders
+		//////////////////////////////////////////////////////////
+		// standard postion, normal, color material with standard buffer and shaders
 		class PositionNormalColorMaterial : public Material
 		{
 		public:
@@ -46,6 +49,15 @@ namespace Engine2
 			StandardMaterial* GetPSCB() { return &((StandardMaterialPSCB*)(pixelShaderCB.get()))->data; }
 		};
 
+		//////////////////////////////////////////////////////////
+		// Used to wireframe a model
+		class PositionNormalColorWireframe : public Material
+		{
+		public:
+			PositionNormalColorWireframe(const std::string& name = "PositionNormalColorWireframe");
+			void PreDraw() { DXDevice::Get().SetWireframeRenderState(); } // called before bind and draw
+			void PostDraw() { DXDevice::Get().SetDefaultRenderState(); }  // called after bind and draw
+		};
 	};
 
 }

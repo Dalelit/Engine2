@@ -65,8 +65,6 @@ namespace Engine2
 		{
 			auto layout = VertexLayout::PositionNormalColor::GetLayout();
 
-			// To Do: move the hlsl's into proper locations
-
 			vertexShaderCB = std::make_shared<StandardMaterialVSCB>(1);
 			vertexShader = GetVertexShader(Config::directories["EngineShaderSourceDir"] + "PositionNormalColorVS.hlsl", layout);
 
@@ -74,5 +72,43 @@ namespace Engine2
 			pixelShader = GetPixelShader(Config::directories["EngineShaderSourceDir"] + "PositionNormalColorPS.hlsl");
 		}
 
+		PositionNormalColorWireframe::PositionNormalColorWireframe(const std::string& name)
+		{
+			auto layout = VertexLayout::PositionNormalColor::GetLayout();
+
+			vertexShaderCB = std::make_shared<StandardMaterialVSCB>(1);
+			vertexShader = GetVertexShader(Config::directories["EngineShaderSourceDir"] + "PositionNormalColorVS.hlsl", layout);
+
+			// simple constant buffer to take 1 color to draw the wireframe
+			class PSCB : public PSConstantBuffer<DirectX::XMFLOAT4>
+			{
+			public:
+				PSCB(unsigned int bindSlot) : PSConstantBuffer<DirectX::XMFLOAT4>(bindSlot) {
+					data = { 0.1f, 0.8f, 0.1f, 1.0f };
+				}
+
+				void OnImgui() {
+					if (ImGui::TreeNode("Wireframe PS Constant Buffer")) {
+						if (ImGui::ColorEdit3("Color", &data.x)) UpdateBuffer(); // note: edit3 until I decide to put blending in
+						ImGui::TreePop();
+					}
+				}
+			};
+
+			std::string src = R"(
+				cbuffer wireframeConst : register (b1)
+				{
+					float4 lineColor;
+				}
+
+				float4 main(float3 posWS : WSPosition, float3 norWS : WSNormal, float4 col : Color) : SV_TARGET
+				{
+					return lineColor;
+				}
+			)";
+
+			pixelShaderCB = std::make_shared<PSCB>(1);
+			pixelShader = PixelShader::CreateFromString(src);
+		}
 	}
 }

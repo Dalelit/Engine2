@@ -5,8 +5,10 @@ namespace Engine2
 {
 	void MeshRenderer::BindAndDraw()
 	{
+		material->PreDraw();
 		material->Bind();
 		mesh->BindAndDraw();
+		material->PostDraw();
 	}
 
 	void MeshRenderer::OnImgui()
