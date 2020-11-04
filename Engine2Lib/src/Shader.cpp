@@ -38,7 +38,7 @@ namespace Engine2
 		this->name = "VertexShader";
 		this->info = info;
 
-			HRESULT hr;
+		HRESULT hr;
 
 		hr = DXDevice::GetDevice().CreateVertexShader(
 			shaderBlob.GetBufferPointer(),
@@ -105,6 +105,80 @@ namespace Engine2
 		return std::make_shared<VertexShader>(*pBlob.Get(), layout, "Source file: " + filename + "\n" + entryPoint + " " + target);
 	}
 
+	VertexShaderFile::VertexShaderFile(const std::string& filename, VertexShaderLayoutDesc& layout, const std::string entryPoint, const std::string target) :
+		filename(filename), layout(layout), entryPoint(entryPoint), target(target), fileWatcher(filename)
+	{
+		this->name = "VertexShaderFile";
+		this->info = "Source file: " + filename + "\n" + entryPoint + " " + target;
+
+		Load();
+	}
+
+	void VertexShaderFile::Reload()
+	{
+		if (fileWatcher.Check())
+		{
+			pVertexShader.Reset();
+			pInputLayout.Reset();
+			Load();
+		}
+	}
+
+	void VertexShaderFile::OnImgui()
+	{
+		if (ImGui::TreeNode(name.c_str()))
+		{
+			ImGui::Text(info.c_str());
+			ImGui::Text(status.c_str());
+			ImGui::Checkbox("Auto update", &autoReload);
+			ImGui::TreePop();
+		}
+	}
+
+	void VertexShaderFile::Load()
+	{
+		status = "";
+
+		HRESULT hr;
+		wrl::ComPtr<ID3DBlob> pBlob;
+		wrl::ComPtr<ID3DBlob> pErrBlob;
+
+		hr = D3DCompileFromFile(Util::ToWString(filename).c_str(), 0, D3D_COMPILE_STANDARD_FILE_INCLUDE, entryPoint.c_str(), target.c_str(), 0, 0, &pBlob, &pErrBlob);
+
+		if (FAILED(hr))
+		{
+			status = "Failed to compile file " + filename;
+			return;
+		}
+
+		hr = DXDevice::GetDevice().CreateVertexShader(
+			pBlob->GetBufferPointer(),
+			pBlob->GetBufferSize(),
+			nullptr,
+			&pVertexShader);
+
+		if (FAILED(hr))
+		{
+			status = "Failed to CreateVertexShader";
+			return;
+		}
+
+		hr = DXDevice::GetDevice().CreateInputLayout(
+			layout.data(),
+			(UINT)layout.size(),
+			pBlob->GetBufferPointer(),
+			pBlob->GetBufferSize(),
+			&pInputLayout);
+
+		if (FAILED(hr))
+		{
+			status = "Failed to CreateInputLayout";
+			return;
+		}
+
+		status = "Loaded";
+	}
+
 	///////////////// Pixel shaders /////////////////
 
 	PixelShader::PixelShader(ID3DBlob& shaderBlob, const std::string info)
@@ -164,6 +238,66 @@ namespace Engine2
 		if (FAILED(hr)) return nullptr;
 
 		return std::make_shared<PixelShader>(*pBlob.Get(), "Source file: " + filename + "\n"+ entryPoint + " " + target);
+	}
+
+	PixelShaderFile::PixelShaderFile(const std::string& filename, const std::string entryPoint, const std::string target) :
+		filename(filename), entryPoint(entryPoint), target(target), fileWatcher(filename)
+	{
+		this->name = "PixelShaderFile";
+		this->info = "Source file: " + filename + "\n" + entryPoint + " " + target;
+
+		Load();
+	}
+
+	void PixelShaderFile::Reload()
+	{
+		if (fileWatcher.Check())
+		{
+			pPixelShader.Reset();
+			Load();
+		}
+	}
+
+	void PixelShaderFile::OnImgui()
+	{
+		if (ImGui::TreeNode(name.c_str()))
+		{
+			ImGui::Text(info.c_str());
+			ImGui::Text(status.c_str());
+			ImGui::Checkbox("Auto update", &autoReload);
+			ImGui::TreePop();
+		}
+	}
+
+	void PixelShaderFile::Load()
+	{
+		status = "";
+
+		HRESULT hr;
+		wrl::ComPtr<ID3DBlob> pBlob;
+		wrl::ComPtr<ID3DBlob> pErrBlob;
+
+		hr = D3DCompileFromFile(Util::ToWString(filename).c_str(), 0, D3D_COMPILE_STANDARD_FILE_INCLUDE, entryPoint.c_str(), target.c_str(), 0, 0, &pBlob, &pErrBlob);
+
+		if (FAILED(hr))
+		{
+			status = "Failed to compile file " + filename;
+			return;
+		}
+
+		hr = DXDevice::GetDevice().CreatePixelShader(
+			pBlob->GetBufferPointer(),
+			pBlob->GetBufferSize(),
+			nullptr,
+			&pPixelShader);
+
+		if (FAILED(hr))
+		{
+			status = "Failed to CreatePixelShader";
+			return;
+		}
+
+		status = "Loaded";
 	}
 
 	///////////////// Geometry shaders /////////////////

@@ -103,5 +103,7 @@
     <FxCompile Include="Assets\Shaders\ParticlePS.hlsl" />
     <FxCompile Include="Assets\Shaders\ParticlePSCircle.hlsl" />
     <FxCompile Include="Assets\Shaders\ParticleVS.hlsl" />
+    <FxCompile Include="Assets\Shaders\PositionNormalColorPS.hlsl" />
+    <FxCompile Include="Assets\Shaders\PositionNormalColorVS.hlsl" />
   </ItemGroup>
 </Project>

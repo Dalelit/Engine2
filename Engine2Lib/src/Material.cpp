@@ -9,6 +9,7 @@ namespace Engine2
 	{
 		vertexShaderCB->Bind();
 		vertexShader->Bind();
+		pixelShaderCB->Bind();
 		pixelShader->Bind();
 	}
 

@@ -11,6 +11,7 @@
 #include "VertexLayout.h"
 #include "AssetLoaders/ObjLoader.h"
 #include "SceneSerialisation.h"
+#include "MaterialLibrary.h"
 
 using namespace Engine2;
 using namespace EngineECS;
@@ -145,15 +146,5 @@ void SceneBuilder::LoadPrimatives()
 	scene.LoadModel("Assets\\Models\\Sphere.obj");
 	scene.LoadModel("Assets\\Models\\Torus.obj");
 
-	// create material
-	{
-		auto vsLayout = VertexLayout::PositionNormalColor::GetLayout();
-		std::string vsfilename = Config::directories["ShaderSourceDir"] + "StandardPosNorColVS.hlsl";
-		std::string psfilename = Config::directories["ShaderSourceDir"] + "StandardPosNorColPS.hlsl";
-
-		auto mat = Material::Assets.CreateAsset("Default");
-		mat->vertexShaderCB = std::make_shared<VSConstantBuffer<Transform>>(1);
-		mat->vertexShader = std::make_shared<VertexShaderDynamic>(vsfilename, vsLayout);
-		mat->pixelShader = std::make_shared<PixelShaderDynamic>(psfilename);
-	}
+	auto mat = Material::Assets.CreateAsset<MaterialLibrary::PositionNormalColorMaterial>("Default PNC");
 }

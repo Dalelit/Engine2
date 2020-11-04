@@ -57,6 +57,28 @@ namespace Engine2
 		wrl::ComPtr<ID3D11InputLayout> pInputLayout = nullptr;
 	};
 
+	class VertexShaderFile : public VertexShader
+	{
+	public:
+		VertexShaderFile(const std::string& filename, VertexShaderLayoutDesc& layout, const std::string entryPoint = "main", const std::string target = "vs_5_0");
+		
+		void Bind() { if (autoReload) Reload(); VertexShader::Bind(); }
+		void Reload(); // only reloads if the file has changed
+		inline bool IsValid() { return (pVertexShader && pInputLayout); }
+		void OnImgui();
+
+	protected:
+		std::string filename;
+		std::string entryPoint;
+		std::string target;
+		VertexShaderLayoutDesc layout;
+		FileWatcher fileWatcher;
+		std::string status;
+		bool autoReload = true;
+
+		void Load();
+	};
+
 	/////////////////// pixel shader ///////////////////
 
 	class PixelShader : public Shader
@@ -73,6 +95,27 @@ namespace Engine2
 	protected:
 		PixelShader() = default;
 		wrl::ComPtr<ID3D11PixelShader> pPixelShader = nullptr;
+	};
+
+	class PixelShaderFile : public PixelShader
+	{
+	public:
+		PixelShaderFile(const std::string& filename, const std::string entryPoint = "main", const std::string target = "ps_5_0");
+
+		void Bind() { if (autoReload) Reload(); PixelShader::Bind(); }
+		void Reload(); // only reloads if the file has changed
+		inline bool IsValid() { return (pPixelShader); }
+		void OnImgui();
+
+	protected:
+		std::string filename;
+		std::string entryPoint;
+		std::string target;
+		FileWatcher fileWatcher;
+		std::string status;
+		bool autoReload = true;
+
+		void Load();
 	};
 
 	/////////////////// geometry shader ///////////////////

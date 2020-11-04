@@ -18,7 +18,7 @@ namespace Engine2
 			if (existing != vertexShaders.end()) return existing->second;
 
 			// create
-			VSPtr ptr = VertexShader::CreateFromSourceFile(filename, layout);
+			VSPtr ptr = std::make_shared<VertexShaderFile>(filename, layout);
 
 			if (!ptr) return nullptr; // failed to load
 
@@ -35,7 +35,7 @@ namespace Engine2
 			if (existing != pixelShaders.end()) return existing->second;
 
 			// create
-			PSPtr ptr = PixelShader::CreateFromSourceFile(filename);
+			PSPtr ptr = std::make_shared<PixelShaderFile>(filename);
 
 			if (!ptr) return nullptr; // failed to load
 
@@ -52,7 +52,10 @@ namespace Engine2
 				if (ImGui::ColorEdit3("Ambient", &data.ambient.x)) UpdateBuffer();
 				if (ImGui::ColorEdit3("Diffuse", &data.diffuse.x)) UpdateBuffer();
 				if (ImGui::ColorEdit3("Specular", &data.specular.x)) UpdateBuffer();
-				if (ImGui::DragFloat("Exponent", &data.specularExponent)) UpdateBuffer();
+				if (ImGui::DragFloat("Exponent", &data.specularExponent)) {
+					if (data.specularExponent < 0.001f) data.specularExponent = 0.001f;
+					UpdateBuffer();
+				}
 				if (ImGui::ColorEdit3("Emission", &data.emission.x)) UpdateBuffer();
 				ImGui::TreePop();
 			}
@@ -65,10 +68,10 @@ namespace Engine2
 			// To Do: move the hlsl's into proper locations
 
 			vertexShaderCB = std::make_shared<StandardMaterialVSCB>(1);
-			vertexShader = GetVertexShader("Assets\\Materials\\StandardPosNorColVS.hlsl", layout);
+			vertexShader = GetVertexShader(Config::directories["EngineShaderSourceDir"] + "PositionNormalColorVS.hlsl", layout);
 
 			pixelShaderCB = std::make_shared<StandardMaterialPSCB>(1);
-			pixelShader = GetPixelShader("Assets\\Materials\\StandardPosNorColPS.hlsl");
+			pixelShader = GetPixelShader(Config::directories["EngineShaderSourceDir"] + "PositionNormalColorPS.hlsl");
 		}
 
 	}

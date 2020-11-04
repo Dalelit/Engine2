@@ -25,6 +25,15 @@ namespace Engine2
 			return GetAsset(name);
 		}
 
+		template <class OVERLOADEDTYPE, typename... ARGS>
+		TSharedPtr& CreateAsset(const std::string& name, ARGS... args)
+		{
+			E2_ASSERT(!Exists(name), "Attempting to create an asset that already exists");
+
+			map[name] = std::make_shared<OVERLOADEDTYPE>(args...);
+			return GetAsset(name);
+		}
+
 		// Note: Does not check it exists.
 		TSharedPtr& operator[](const std::string& name)
 		{
