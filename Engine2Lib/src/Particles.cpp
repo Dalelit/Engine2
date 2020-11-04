@@ -277,7 +277,7 @@ namespace Engine2
 		else if (shaderName == "Test")
 		{
 			// to do: this is in the lib, but uses a shader file in the app directories...
-			pPS = std::make_shared<PixelShaderDynamic>(Config::directories["ShaderSourceDir"] + "ParticlePSTest.hlsl");
+			pPS = std::make_shared<PixelShaderFile>(Config::directories["ShaderSourceDir"] + "ParticlePSTest.hlsl");
 		}
 		else { E2_ASSERT(false, "Unknwon pixel shader name for partcile system"); }
 

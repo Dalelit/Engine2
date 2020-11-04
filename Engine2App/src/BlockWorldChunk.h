@@ -132,8 +132,8 @@ namespace BlockWorld
 		bool IsValidBlockIndex(DirectX::XMINT3 index) { return index.x >= 0 && index.y >= 0 && index.z >= 0 && index.x < ChunkSpecs.wide && index.y < ChunkSpecs.high && index.z < ChunkSpecs.deep; }
 
 
-		std::shared_ptr<Engine2::VertexShaderDynamic> pVS;
-		std::shared_ptr<Engine2::PixelShaderDynamic>  pPS;
+		std::shared_ptr<Engine2::VertexShaderFile> pVS;
+		std::shared_ptr<Engine2::PixelShaderFile>  pPS;
 
 		void OnImgui();
 

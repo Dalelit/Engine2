@@ -17,8 +17,8 @@ namespace BlockWorld
 
 		VertexData vd;
 
-		pVS = std::make_shared<VertexShaderDynamic>(Config::directories["ShaderSourceDir"] + "BlockWorld2VS.hlsl", vd.vsLayout);
-		pPS = std::make_shared<PixelShaderDynamic>(Config::directories["ShaderSourceDir"] + "BlockWorldPS.hlsl");
+		pVS = std::make_shared<VertexShaderFile>(Config::directories["ShaderSourceDir"] + "BlockWorld2VS.hlsl", vd.vsLayout);
+		pPS = std::make_shared<PixelShaderFile>(Config::directories["ShaderSourceDir"] + "BlockWorldPS.hlsl");
 	}
 
 	ChunkManager::~ChunkManager()

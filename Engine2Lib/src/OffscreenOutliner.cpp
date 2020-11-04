@@ -59,10 +59,10 @@ namespace Engine2
 		};
 
 		std::string vsFileName = Config::directories["ShaderCompiledDir"] + "OutlineVS.cso";
-		pVSOutline = VertexShaderDynamic::CreateFromCompiledFile(vsFileName, vsLayout);
+		pVSOutline = VertexShader::CreateFromCompiledFile(vsFileName, vsLayout);
 
 		std::string psFileName = Config::directories["ShaderCompiledDir"] + "OutlinePS.cso";
-		pPSOutline = PixelShaderDynamic::CreateFromCompiledFile(psFileName);
+		pPSOutline = PixelShader::CreateFromCompiledFile(psFileName);
 	}
 	
 	void OffscreenOutliner::Configure()

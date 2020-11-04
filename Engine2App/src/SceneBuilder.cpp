@@ -65,75 +65,11 @@ void SceneBuilder::BuildTestScene()
 		e.GetComponent<Transform>()->Set(-3.0f, 3.0f, -3.0f);
 	}
 
-	// add a particle emitter
-	{
-		//auto e = scene.CreateEntity();
-		//auto pe = e.AddComponent<ParticleEmitter>();
-		//pe->SetMaxParticles(2000);
-		//pe->SetRate(500.0f);
-		//e.GetComponent<Transform>()->Set(-2.0f, 0.0f, 2.0f);
-	}
-
-	using Vertex = VertexLayout::PositionNormalColor::Vertex;
-	auto vsLayout = VertexLayout::PositionNormalColor::GetLayout();
-
-	return;
-
-	// sphere
-	{
-		auto ico = Primatives::IcoSphere::CreateIcoSphere(3);
-		std::vector<Vertex> verticies(ico.verticies->size());
-		Primatives::CopyPositionNormal(verticies, *ico.verticies);
-		for (auto& vi : verticies) vi.color = { 0.3f, 0.6f, 0.7f, 1.0f };
-
-		auto m = Mesh::Assets.CreateAsset("Icosphere3");
-		m->SetDrawable<MeshTriangleIndexList<Vertex>>(verticies, *ico.indicies);
-	}
-
-	// cube
-	{
-		std::vector<Vertex> verticies(Primatives::Cube::verticies.size());
-		Primatives::CopyPositionNormalColor(verticies, Primatives::Cube::verticies);
-
-		auto m = Mesh::Assets.CreateAsset("Cube");
-		m->SetDrawable<MeshTriangleIndexList<Vertex>>(verticies, Primatives::Cube::indicies);
-	}
-
 	{
 		auto e = scene.CreateEntity();
-		e.GetComponent<Transform>()->Set(-3.0f, 0.0f, 0.0f);
 		auto mr = e.AddComponent<MeshRenderer>();
-		mr->mesh = Mesh::Assets["Cube"];
-		mr->material = Material::Assets["forPrimatives"];
-
-		auto rb = e.AddComponent<RigidBody>();
-		rb->angularVelocity = { 0.5f , 0.0f, 0.0f, 0.0f };
-		e.AddComponent<Gizmo>()->type = Gizmo::Types::Axis;
-	}
-
-	{
-		auto e2 = scene.CreateEntity();
-		auto mr2 = e2.AddComponent<MeshRenderer>();
-		mr2->mesh = Mesh::Assets["Icosphere3"];
-		mr2->material = Material::Assets["forPrimatives"];
-		e2.GetComponent<Transform>()->Set(3.0f, 0.0f, 0.0f, 1.5f, 1.5f, 1.5f, 15.0f, 30.0f, 45.0f);
-		e2.AddComponent<RigidBody>()->angularVelocity = { 0.0f , -0.8f, 0.3f, 0.0f };
-		e2.AddComponent<Gizmo>()->type = Gizmo::Types::Axis;
-	}
-
-	// load a model
-	{
-		using Vertex = VertexLayout::PositionNormalColor::Vertex;
-		auto vsLayout = VertexLayout::PositionNormalColor::GetLayout();
-
-		auto loadedModel = AssetLoaders::ObjLoader::Load(Engine2::Config::directories["ModelsDir"] + "torusSmooth.obj");
-
-		auto assets = MeshAssetLoader::CreateMeshAsset(*loadedModel);
-
-		auto e = scene.CreateEntity();
-		auto mr = e.AddComponent<MeshRenderer>();
-		mr->mesh = Mesh::Assets[assets[0]]; // to do: hack to the first one.
-		mr->material = Material::Assets["forPrimatives"];
+		mr->mesh = Mesh::Assets["Sphere"];
+		mr->material = Material::Assets["Default PNC"];
 	}
 }
 
