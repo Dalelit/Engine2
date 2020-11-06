@@ -9,7 +9,10 @@ namespace Engine2
 	class ConstantBufferBase : public Bindable
 	{
 	public:
-		virtual void UpdateBuffer() = 0;
+		std::shared_ptr<ConstantBufferBase> Clone() const { return std::shared_ptr<ConstantBufferBase>(CloneImpl()); }
+
+	protected:
+		virtual ConstantBufferBase* CloneImpl() const = 0;
 	};
 
 	template <typename T>
@@ -76,6 +79,9 @@ namespace Engine2
 				ImGui::TreePop();
 			}
 		}
+
+	protected:
+		PSConstantBuffer<T>* CloneImpl() const { return new PSConstantBuffer(*this); }
 	};
 
 	template <typename T>
@@ -101,6 +107,9 @@ namespace Engine2
 				ImGui::TreePop();
 			}
 		}
+
+	protected:
+		VSConstantBuffer<T>* CloneImpl() const { return new VSConstantBuffer(*this); }
 	};
 
 	template <typename T>
@@ -117,6 +126,9 @@ namespace Engine2
 		}
 
 		void Unbind() { DXDevice::GetContext().GSSetConstantBuffers(this->slot, 0u, nullptr); }
+
+	protected:
+		GSConstantBuffer<T>* CloneImpl() const { return new GSConstantBuffer(*this); }
 	};
 
 }

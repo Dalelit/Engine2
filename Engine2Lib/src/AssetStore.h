@@ -51,6 +51,8 @@ namespace Engine2
 			return map.find(name) != map.end(); // map.count(name) == 1
 		}
 
+		size_t Size() { return map.size(); }
+
 		void OnImGui()
 		{
 			for (auto& [k, v] : map)

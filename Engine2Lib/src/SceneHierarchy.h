@@ -17,8 +17,8 @@ namespace Engine2
 
 		EngineECS::Coordinator& GetECSCoordinator() { return coordinator; }
 
-		void OnImGui();
-		void SelectedEntityOnImGui();
+		void OnImgui();
+		void SelectedEntityOnImgui();
 
 		bool LoadModel(const std::string& sourceFilename);
 

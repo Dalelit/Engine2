@@ -30,6 +30,8 @@ namespace Engine2
 		{
 		public:
 			StandardMaterialVSCB(unsigned int bindSlot) : VSConstantBuffer<Transform>(bindSlot) {}
+		protected:
+			StandardMaterialVSCB* CloneImpl() const { return new StandardMaterialVSCB(*this); }
 		};
 
 		class StandardMaterialPSCB : public PSConstantBuffer<StandardMaterial>
@@ -37,6 +39,8 @@ namespace Engine2
 		public:
 			StandardMaterialPSCB(unsigned int bindSlot) : PSConstantBuffer<StandardMaterial>(bindSlot) {}
 			void OnImgui();
+		protected:
+			StandardMaterialPSCB* CloneImpl() const { return new StandardMaterialPSCB(*this); }
 		};
 
 		//////////////////////////////////////////////////////////
@@ -57,6 +61,8 @@ namespace Engine2
 			PositionNormalColorWireframe(const std::string& name = "PositionNormalColorWireframe");
 			void PreDraw() { DXDevice::Get().SetWireframeRenderState(); } // called before bind and draw
 			void PostDraw() { DXDevice::Get().SetDefaultRenderState(); }  // called after bind and draw
+
+			std::shared_ptr<Material> Clone(const std::string& cloneName);
 		};
 	};
 

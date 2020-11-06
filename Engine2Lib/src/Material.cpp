@@ -19,10 +19,28 @@ namespace Engine2
 		vertexShaderCB->UpdateBuffer();
 	}
 
+	std::shared_ptr<Material> Material::Clone(const std::string& cloneName)
+	{
+		auto ptr = Assets.CreateAsset(cloneName);
+
+		ptr->vertexShaderCB = std::make_shared<VSConstantBuffer<Transform>>(*vertexShaderCB); // vertexShaderCB->Clone();
+		ptr->vertexShader = vertexShader;
+		ptr->pixelShaderCB = pixelShaderCB->Clone();
+		ptr->pixelShader = pixelShader;
+
+		return std::shared_ptr<Material>();
+	}
+
 	void Material::OnImgui(bool assetInfo)
 	{
 		if (ImGui::TreeNodeEx("Material", ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_DefaultOpen, "Material %s", name.c_str()))
 		{
+			if (ImGui::BeginPopupContextItem())
+			{
+				if (ImGui::MenuItem("Clone")) Clone();
+				ImGui::EndPopup();
+			}
+
 			if (assetInfo)
 			{
 				ImGui::Text("vertexShaderCB references %i", vertexShaderCB.use_count());

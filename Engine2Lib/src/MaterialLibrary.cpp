@@ -93,6 +93,8 @@ namespace Engine2
 						ImGui::TreePop();
 					}
 				}
+			protected:
+				PSCB* CloneImpl() const { return new PSCB(*this); }
 			};
 
 			std::string src = R"(
@@ -109,6 +111,18 @@ namespace Engine2
 
 			pixelShaderCB = std::make_shared<PSCB>(1);
 			pixelShader = PixelShader::CreateFromString(src);
+		}
+
+		std::shared_ptr<Material> PositionNormalColorWireframe::Clone(const std::string& cloneName)
+		{
+			auto ptr = Assets.CreateAsset<PositionNormalColorWireframe>(cloneName);
+
+			ptr->vertexShaderCB = std::make_shared<VSConstantBuffer<Transform>>(*vertexShaderCB); // vertexShaderCB->Clone();
+			ptr->vertexShader = vertexShader;
+			ptr->pixelShaderCB = pixelShaderCB->Clone();
+			ptr->pixelShader = pixelShader;
+
+			return std::shared_ptr<Material>();
 		}
 	}
 }

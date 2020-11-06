@@ -25,6 +25,9 @@ namespace Engine2
 
 		bool IsValid() { return vertexShaderCB && vertexShader && pixelShader; }
 
+		std::shared_ptr<Material> Clone() { return Clone(name + std::to_string(Assets.Size())); }
+		virtual std::shared_ptr<Material> Clone(const std::string& cloneName);
+
 		void OnImgui(bool assetInfo = false);
 
 		const std::string& Name() const { return name; }

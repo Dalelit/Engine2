@@ -59,7 +59,7 @@ namespace Engine2
 		selected = parent;
 	}
 
-	void SceneHierarchy::OnImGui()
+	void SceneHierarchy::OnImgui()
 	{
 		onImguiParent = nullptr;
 		addEntityParent = nullptr;
@@ -85,7 +85,7 @@ namespace Engine2
 
 	}
 
-	void SceneHierarchy::SelectedEntityOnImGui()
+	void SceneHierarchy::SelectedEntityOnImgui()
 	{
 		if (selected)
 		{

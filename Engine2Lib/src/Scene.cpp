@@ -190,14 +190,14 @@ namespace Engine2
 			// to do: temp
 			ImGui::ColorEdit4("Ambient Light", psConstBuffer.data.ambientLight.m128_f32);
 
-			hierarchy.OnImGui();
+			hierarchy.OnImgui();
 			ImGui::End();
 		}
 
 		static bool entityOpen = true;
 		if (ImGui::Begin("Entity", &entityOpen))
 		{
-			hierarchy.SelectedEntityOnImGui();
+			hierarchy.SelectedEntityOnImgui();
 			ImGui::End();
 		}
 	}
