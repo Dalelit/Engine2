@@ -36,7 +36,6 @@ namespace Engine2
 		struct PSSceneData
 		{
 			DirectX::XMVECTOR CameraPosition;
-			DirectX::XMVECTOR ambientLight;
 			DirectX::XMVECTOR pointLightPosition;
 			DirectX::XMVECTOR pointLightColor;
 		};

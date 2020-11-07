@@ -18,23 +18,14 @@
   <ItemGroup>
     <FxCompile Include="Assets\Materials\SceneEntityCBVS.hlsl" />
     <FxCompile Include="Assets\Materials\PSTest.hlsl" />
-    <FxCompile Include="Assets\Materials\VSTest.hlsl" />
     <FxCompile Include="Assets\Materials\GSTest.hlsl" />
     <FxCompile Include="Assets\Materials\PS_BlurSimple.hlsl" />
-    <FxCompile Include="Assets\Materials\BallWorld1PS.hlsl" />
-    <FxCompile Include="Assets\Materials\BallWorld1VS.hlsl" />
-    <FxCompile Include="Assets\Materials\WireframeBasicPS.hlsl" />
-    <FxCompile Include="Assets\Materials\WireframeBasicVS.hlsl" />
     <FxCompile Include="Assets\Materials\PixelShaderCommon.hlsl" />
-    <FxCompile Include="Assets\Materials\BallWorld2VS.hlsl" />
     <FxCompile Include="Assets\Materials\SceneCBVS.hlsl" />
-    <FxCompile Include="Assets\Materials\ParticlePSTest.hlsl" />
     <FxCompile Include="Assets\Materials\BlockWorldPS.hlsl" />
     <FxCompile Include="Assets\Materials\BlockWorldVS.hlsl" />
     <FxCompile Include="Assets\Materials\BlockWorldHighlightPS.hlsl" />
     <FxCompile Include="Assets\Materials\BlockWorldHighlightVS.hlsl" />
     <FxCompile Include="Assets\Materials\BlockWorld2VS.hlsl" />
-    <FxCompile Include="Assets\Materials\StandardPosNorColVS.hlsl" />
-    <FxCompile Include="Assets\Materials\StandardPosNorColPS.hlsl" />
   </ItemGroup>
 </Project>

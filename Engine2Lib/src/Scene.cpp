@@ -192,9 +192,6 @@ namespace Engine2
 		static bool sceneOpen = true;
 		if (ImGui::Begin("Scene", &sceneOpen))
 		{
-			// to do: temp
-			ImGui::ColorEdit4("Ambient Light", psConstBuffer.data.ambientLight.m128_f32);
-
 			hierarchy.OnImgui();
 			ImGui::End();
 		}

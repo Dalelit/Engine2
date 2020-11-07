@@ -22,8 +22,6 @@ SceneBuilder::SceneBuilder() : Layer("SceneBuilder")
 	Engine::GetActiveCamera().SetPosition(5.0f, 5.0f, -5.0f);
 	Engine::GetActiveCamera().LookAt(0.0f, 0.0f, 0.0f);
 
-	scene.psConstBuffer.data.ambientLight = { 0.2f, 0.2f, 0.2f, 1.0f };
-
 	LoadPrimatives();
 	BuildTestScene();
 }
