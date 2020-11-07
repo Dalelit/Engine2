@@ -55,4 +55,14 @@ namespace Engine2
 		std::string filename;
 		FILETIME lastWriteTime = {};
 	};
+
+	class FileSelectionDialogue
+	{
+	public:
+		inline static bool LoadDialogue(std::string& filename) { return OpenDialogue(filename, true); }
+		inline static bool SaveDialogue(std::string& filename) { return OpenDialogue(filename, false); }
+
+	protected:
+		static bool OpenDialogue(std::string& filename, bool fileMustExist);
+	};
 }

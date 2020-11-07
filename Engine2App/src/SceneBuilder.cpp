@@ -45,10 +45,18 @@ void SceneBuilder::OnApplicationEvent(Engine2::ApplicationEvent& event)
 
 void SceneBuilder::OnImgui()
 {
-	char buffer[256] = "Scenes//testScene.txt";
-	ImGui::InputText("Filename", buffer, sizeof(buffer));
-	if (ImGui::Button("Save")) SceneSerialisation(scene).SaveScene(buffer);
-	if (ImGui::Button("Load")) SceneSerialisation(scene).LoadScene(buffer);
+	static std::string selectedFile = "Scenes//testScene.txt";
+	ImGui::Text("File: %s", selectedFile.c_str());
+	if (ImGui::Button("Save as..."))
+		if (FileSelectionDialogue::SaveDialogue(selectedFile))
+			SceneSerialisation(scene).SaveScene(selectedFile);
+	if (ImGui::Button("Save"))
+		SceneSerialisation(scene).SaveScene(selectedFile);
+	if (ImGui::Button("Load file..."))
+		if (FileSelectionDialogue::LoadDialogue(selectedFile))
+			SceneSerialisation(scene).LoadScene(selectedFile);
+	if (ImGui::Button("Reload"))
+		SceneSerialisation(scene).LoadScene(selectedFile);
 
 	scene.OnImgui();
 }
