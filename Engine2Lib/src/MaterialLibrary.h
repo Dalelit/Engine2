@@ -26,10 +26,10 @@ namespace Engine2
 			//float transparency; DirectX::XMFLOAT3 transmissionFilterColor; float indexOfRefraciton; uint32_t illumination;
 		};
 
-		class StandardMaterialVSCB : public VSConstantBuffer<Transform>
+		class StandardMaterialVSCB : public VSConstantBuffer<TransformMatrix>
 		{
 		public:
-			StandardMaterialVSCB(unsigned int bindSlot) : VSConstantBuffer<Transform>(bindSlot) {}
+			StandardMaterialVSCB(unsigned int bindSlot) : VSConstantBuffer<TransformMatrix>(bindSlot) {}
 		protected:
 			StandardMaterialVSCB* CloneImpl() const { return new StandardMaterialVSCB(*this); }
 		};

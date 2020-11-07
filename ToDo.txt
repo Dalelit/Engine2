@@ -1,9 +1,8 @@
 Things that I want to work on...
 
-Near term
+Near term / in progress
 - Scene serialisation
 - Transform rework
-- Scene transform hierarchy
 - Materials and lighting
 - Model/mesh loading
 - Scene UI work

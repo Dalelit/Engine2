@@ -21,6 +21,7 @@ namespace Engine2
 	void Scene::OnUpdate(float dt)
 	{
 		UpdatePhysics(dt);
+		UpdateTransformMatrix();
 		UpdateParticles(dt);
 	}
 
@@ -61,7 +62,7 @@ namespace Engine2
 
 		if (pointLights.Count() > 0)
 		{
-			auto position = coordinator.GetComponent<Transform>(pointLights.GetEntity(0))->GetTranslation();
+			auto position = coordinator.GetComponent<TransformMatrix>(pointLights.GetEntity(0))->GetTranslation();
 			psConstBuffer.data.pointLightPosition = position;
 			psConstBuffer.data.pointLightColor = pointLights[0].color;
 		}
@@ -83,7 +84,7 @@ namespace Engine2
 
 			if (mr->IsValid())
 			{
-				mr->material->SetTransform(*coordinator.GetComponent<Transform>(e));
+				mr->material->SetTransform(*coordinator.GetComponent<TransformMatrix>(e));
 				mr->BindAndDraw();
 			}
 		}
@@ -103,19 +104,19 @@ namespace Engine2
 	void Scene::RenderGizmos()
 	{
 		Coordinator& coordinator = hierarchy.GetECSCoordinator();
-		View<Gizmo, Transform> entities(coordinator);
+		View<Gizmo, TransformMatrix> entities(coordinator);
 		gizmoRender.NewFrame();
 		for (auto e : entities)
 		{
 			const auto& gizmo = coordinator.GetComponent<Gizmo>(e);
-			const auto& trans = coordinator.GetComponent<Transform>(e);
+			const auto& trans = coordinator.GetComponent<TransformMatrix>(e)->matrix;
 
 			switch (gizmo->type)
 			{
-			case Gizmo::Types::Axis:   gizmoRender.DrawAxis(trans->transform); break;
-			case Gizmo::Types::Cube:   gizmoRender.DrawCube(trans->transform); break;
-			case Gizmo::Types::Sphere: gizmoRender.DrawSphere(trans->transform); break;
-			case Gizmo::Types::Camera: gizmoRender.DrawCamera(trans->transform); break;
+			case Gizmo::Types::Axis:   gizmoRender.DrawAxis(trans); break;
+			case Gizmo::Types::Cube:   gizmoRender.DrawCube(trans); break;
+			case Gizmo::Types::Sphere: gizmoRender.DrawSphere(trans); break;
+			case Gizmo::Types::Camera: gizmoRender.DrawCamera(trans); break;
 			}
 		}
 		gizmoRender.Render();
@@ -131,8 +132,7 @@ namespace Engine2
 			auto mr = coordinator.GetComponent<MeshRenderer>(e);
 			if (mr->IsValid())
 			{
-				mr->material->vertexShaderCB->data = *coordinator.GetComponent<Transform>(e);
-				mr->material->vertexShaderCB->UpdateBuffer();
+				mr->material->SetTransform(*coordinator.GetComponent<TransformMatrix>(e));
 				mr->material->vertexShaderCB->Bind();
 
 				// binds the vertex buffer
@@ -163,6 +163,11 @@ namespace Engine2
 		}
 	}
 
+	void Scene::UpdateTransformMatrix()
+	{
+		hierarchy.UpdateTransformMatrix();
+	}
+
 	void Scene::UpdateParticles(float dt)
 	{
 		Coordinator& coordinator = hierarchy.GetECSCoordinator();
@@ -170,7 +175,7 @@ namespace Engine2
 		for (auto e : entities)
 		{
 			auto* emitter = coordinator.GetComponent<ParticleEmitter>(e);
-			emitter->SetTransform( coordinator.GetComponent<Transform>(e)->GetTransformTranspose() );
+			emitter->SetTransform(coordinator.GetComponent<TransformMatrix>(e)->matrix);
 			emitter->OnUpdate(dt);
 		}
 	}

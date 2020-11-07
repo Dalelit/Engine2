@@ -62,7 +62,7 @@ void SceneBuilder::BuildTestScene()
 		auto e = scene.CreateEntity();
 		e.AddComponent<Gizmo>()->type = Gizmo::Types::Sphere;
 		e.AddComponent<PointLight>();
-		e.GetComponent<Transform>()->Set(-3.0f, 3.0f, -3.0f);
+		e.GetComponent<Transform>()->position = { -3.0f, 3.0f, -3.0f, 0.0f };
 	}
 
 	{

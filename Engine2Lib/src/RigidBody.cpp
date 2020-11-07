@@ -16,12 +16,8 @@ namespace Engine2
 		//velocity += acceleration;
 
 		velocity += (gravity / mass) * dt;
-		//velocity = XMVectorSetW(velocity, 1.0f);
-		//XMMATRIX m = XMMatrixTranslationFromVector(velocity * dt);
-		XMMATRIX m = Math::TransformMatrixEuler(XMVectorSetW(velocity * dt, 1.0f), angularVelocity * dt);
-
-		//pTransform->transform *= XMMatrixTranspose(m);
-		pTransform->transform = XMMatrixTranspose(m) * pTransform->transform;
+		pTransform->position += velocity * dt;
+		pTransform->rotation += angularVelocity * dt;
 	}
 
 	void RigidBody::OnImgui()

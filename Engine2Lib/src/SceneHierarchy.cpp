@@ -9,6 +9,7 @@
 #include "MaterialLibrary.h"
 
 using namespace EngineECS;
+using namespace DirectX;
 
 namespace Engine2
 {
@@ -17,6 +18,7 @@ namespace Engine2
 		EntityId_t id = coordinator.CreateEntity();
 		coordinator.AddComponent<EntityInfo>(id)->tag = std::to_string(id);
 		coordinator.AddComponent<Transform>(id);
+		coordinator.AddComponent<TransformMatrix>(id);
 
 		if (insertBefore)
 		{
@@ -57,6 +59,29 @@ namespace Engine2
 		vector.erase(iter);
 
 		selected = parent;
+	}
+
+	void SceneHierarchy::UpdateTransformMatrix()
+	{
+		auto matrix = XMMatrixIdentity();
+		for (auto& sn : sceneHierarchy)
+		{
+			UpdateTransformMatrix(sn, matrix);
+		}
+	}
+
+	void SceneHierarchy::UpdateTransformMatrix(SceneNode& node, DirectX::XMMATRIX& parentMatrix)
+	{
+		auto pTransform = coordinator.GetComponent<Transform>(node.id);
+		auto pMatrix = coordinator.GetComponent<TransformMatrix>(node.id);
+		auto matrix = pTransform->Matrix();
+		matrix *= parentMatrix;
+		pMatrix->matrix = XMMatrixTranspose(matrix);
+
+		for (auto& child : node.children)
+		{
+			UpdateTransformMatrix(child, matrix);
+		}
 	}
 
 	void SceneHierarchy::OnImgui()

@@ -60,6 +60,7 @@ namespace Engine2
 		void RenderOutlines();
 
 		void UpdatePhysics(float dt);
+		void UpdateTransformMatrix();
 		void UpdateParticles(float dt);
 
 		void ImGuiScene();

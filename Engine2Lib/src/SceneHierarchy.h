@@ -17,6 +17,8 @@ namespace Engine2
 
 		EngineECS::Coordinator& GetECSCoordinator() { return coordinator; }
 
+		void UpdateTransformMatrix();
+
 		void OnImgui();
 		void SelectedEntityOnImgui();
 
@@ -39,6 +41,8 @@ namespace Engine2
 
 		SceneNode* NewEntity(SceneNode* parent = nullptr, SceneNode* insertBefore = nullptr);
 		void DestroyEntity(SceneNode* parent, SceneNode* node);
+
+		void UpdateTransformMatrix(SceneNode& node, DirectX::XMMATRIX& parentMatrix);
 
 		void SceneNodeOnImGui(SceneNode& node);
 		SceneNode* onImguiParent = nullptr;

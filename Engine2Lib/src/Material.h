@@ -21,7 +21,7 @@ namespace Engine2
 		void Bind();
 		virtual void PostDraw() {} // called after bind and draw
 
-		void SetTransform(Transform& transform);
+		void SetTransform(TransformMatrix& transform);
 
 		bool IsValid() { return vertexShaderCB && vertexShader && pixelShader; }
 
@@ -32,7 +32,7 @@ namespace Engine2
 
 		const std::string& Name() const { return name; }
 
-		std::shared_ptr<VSConstantBuffer<Transform>> vertexShaderCB;
+		std::shared_ptr<VSConstantBuffer<TransformMatrix>> vertexShaderCB;
 		std::shared_ptr<VertexShader> vertexShader;
 
 		std::shared_ptr<ConstantBufferBase> pixelShaderCB;

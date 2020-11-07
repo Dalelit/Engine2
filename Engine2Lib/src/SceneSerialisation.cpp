@@ -58,7 +58,9 @@ namespace Engine2
 		{
 			auto c = entity.GetComponent<Transform>();
 			auto n = node.SubNode("Transform");
-			n.Store("transform", c->transform);
+			n.Store("position", c->position);
+			n.Store("scale", c->scale);
+			n.Store("rotation", c->rotation);
 		}
 		if (entity.HasComponent<EntityInfo>())
 		{

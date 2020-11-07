@@ -1,26 +1,42 @@
 #  Add timestamp
 Assets
   Meshes
-    Cube
+    Sphere
       type:0
       filename:to do
-    Icosphere3
+    Cube
       type:0
       filename:to do
     Torus
       type:0
       filename:to do
+    Cone
+      type:0
+      filename:to do
+    Cylinder
+      type:0
+      filename:to do
+    Plane
+      type:0
+      filename:to do
   Materials
-    forPrimatives
-      pixelShader:
-      vertexShader:
-    hghjghj
+    Default PNC
+      pixelShader:PixelShaderFile
+      vertexShader:VertexShaderFile
+    Wireframe PNC
+      pixelShader:PixelShader
+      vertexShader:VertexShaderFile
+    PositionNormalColorMaterial2
+      pixelShader:PixelShaderFile
+      vertexShader:VertexShaderFile
 SceneInformation
   # To do
 SceneHierarchy
   Entity
     Transform
-      transform:1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1
+      position:-3,3,-3,0
+      scale:1,1,1,0
+      rotation:0,0,0,0
     EntityInfo
       tag:0
     PointLight
@@ -29,39 +45,21 @@ SceneHierarchy
       type:2
   Entity
     Transform
-      transform:1,0,0,-3,0,0.0894912,0.995989,0,0,-0.995989,0.0894912,0,0,0,0,1
+      position:0,0,0,1
+      scale:1,1,1,0
+      rotation:0,0,0,0
     EntityInfo
       tag:1
-    RigidBody
-      velocity:0,0,0,1
-      angularVelocity:0.5,0,0,0
-      mass:1
-      gravity:0,0,0,0
     MeshRenderer
-      mesh:Cube
-      material:forPrimatives
-    Gizmo
-      type:0
-  Entity
-    Transform
-      transform:0.270928,-1.1842,-0.879921,-1.03338,1.05712,0.779882,-0.724076,0.997929,1.02912,-0.489345,0.975423,2.63367,0,0,0,1
-    EntityInfo
-      tag:2
-    RigidBody
-      velocity:0,0,0,1
-      angularVelocity:0,-0.8,0.3,0
-      mass:1
-      gravity:0,0,0,0
-    MeshRenderer
-      mesh:Icosphere3
-      material:forPrimatives
-    Gizmo
-      type:0
-  Entity
-    Transform
-      transform:1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1
-    EntityInfo
-      tag:3
-    MeshRenderer
-      mesh:Torus
-      material:forPrimatives
+      mesh:Sphere
+      material:PositionNormalColorMaterial
+    Entity
+      Transform
+        position:0,2.5,0,1
+        scale:0.5,0.5,0.5,0
+        rotation:0,0,0,0
+      EntityInfo
+        tag:2
+      MeshRenderer
+        mesh:Torus
+        material:PositionNormalColorMaterial2

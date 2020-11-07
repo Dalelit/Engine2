@@ -13,7 +13,7 @@ namespace Engine2
 		pixelShader->Bind();
 	}
 
-	void Material::SetTransform(Transform& transform)
+	void Material::SetTransform(TransformMatrix& transform)
 	{
 		vertexShaderCB->data = transform;
 		vertexShaderCB->UpdateBuffer();
@@ -23,7 +23,7 @@ namespace Engine2
 	{
 		auto ptr = Assets.CreateAsset(cloneName);
 
-		ptr->vertexShaderCB = std::make_shared<VSConstantBuffer<Transform>>(*vertexShaderCB); // vertexShaderCB->Clone();
+		ptr->vertexShaderCB = std::make_shared<VSConstantBuffer<TransformMatrix>>(*vertexShaderCB); // vertexShaderCB->Clone();
 		ptr->vertexShader = vertexShader;
 		ptr->pixelShaderCB = pixelShaderCB->Clone();
 		ptr->pixelShader = pixelShader;
