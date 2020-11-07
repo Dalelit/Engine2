@@ -5,7 +5,8 @@ cbuffer sceneConst : register (b0)
 
 cbuffer modelConst : register (b1)
 {
-	matrix worldTransform;
+	matrix modelRotation;
+	matrix modelTransform;
 };
 
 struct VSOut
@@ -20,10 +21,10 @@ VSOut main(float3 pos : Position, float3 nor : Normal, float4 col : Color)
 {
 	VSOut vso;
 
-	float4 pws = mul(float4(pos, 1.0f), worldTransform);
+	float4 pws = mul(float4(pos, 1.0f), modelTransform);
 
 	vso.posWS = pws.xyz;
-	vso.norWS = nor;
+	vso.norWS = mul(float4(nor, 1.0f), modelRotation).xyz;
 	vso.col = col;
 	vso.posSS = mul(pws, cameraTransform);
 

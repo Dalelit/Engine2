@@ -2,6 +2,7 @@
 #include "ECS.h"
 #include "Entity.h"
 #include <vector>
+#include "Components.h"
 
 namespace Engine2
 {
@@ -42,7 +43,7 @@ namespace Engine2
 		SceneNode* NewEntity(SceneNode* parent = nullptr, SceneNode* insertBefore = nullptr);
 		void DestroyEntity(SceneNode* parent, SceneNode* node);
 
-		void UpdateTransformMatrix(SceneNode& node, DirectX::XMMATRIX& parentMatrix);
+		void UpdateTransformMatrix(SceneNode& node, TransformMatrix& parentMatrix);
 
 		void SceneNodeOnImGui(SceneNode& node);
 		SceneNode* onImguiParent = nullptr;

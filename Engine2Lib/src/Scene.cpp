@@ -109,7 +109,7 @@ namespace Engine2
 		for (auto e : entities)
 		{
 			const auto& gizmo = coordinator.GetComponent<Gizmo>(e);
-			const auto& trans = coordinator.GetComponent<TransformMatrix>(e)->matrix;
+			const auto& trans = coordinator.GetComponent<TransformMatrix>(e)->transformMatrix;
 
 			switch (gizmo->type)
 			{
@@ -175,7 +175,7 @@ namespace Engine2
 		for (auto e : entities)
 		{
 			auto* emitter = coordinator.GetComponent<ParticleEmitter>(e);
-			emitter->SetTransform(coordinator.GetComponent<TransformMatrix>(e)->matrix);
+			emitter->SetTransform(coordinator.GetComponent<TransformMatrix>(e)->transformMatrix);
 			emitter->OnUpdate(dt);
 		}
 	}

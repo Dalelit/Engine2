@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "Common.h"
 #include "SceneHierarchy.h"
-#include "Components.h"
 #include "submodules/imgui/imgui.h"
 #include "VertexLayout.h"
 #include "VertexBuffer.h"
@@ -63,20 +62,25 @@ namespace Engine2
 
 	void SceneHierarchy::UpdateTransformMatrix()
 	{
-		auto matrix = XMMatrixIdentity();
+		TransformMatrix matrix(XMMatrixIdentity(), XMMatrixIdentity());
+
 		for (auto& sn : sceneHierarchy)
 		{
 			UpdateTransformMatrix(sn, matrix);
 		}
 	}
 
-	void SceneHierarchy::UpdateTransformMatrix(SceneNode& node, DirectX::XMMATRIX& parentMatrix)
+	void SceneHierarchy::UpdateTransformMatrix(SceneNode& node, TransformMatrix& parentMatrix)
 	{
 		auto pTransform = coordinator.GetComponent<Transform>(node.id);
 		auto pMatrix = coordinator.GetComponent<TransformMatrix>(node.id);
-		auto matrix = pTransform->Matrix();
-		matrix *= parentMatrix;
-		pMatrix->matrix = XMMatrixTranspose(matrix);
+
+		TransformMatrix matrix(*pTransform);
+
+		matrix.transformMatrix *= parentMatrix.transformMatrix;
+		matrix.rotationMatrix *= parentMatrix.rotationMatrix;
+
+		pMatrix->SetTranspose(matrix);
 
 		for (auto& child : node.children)
 		{

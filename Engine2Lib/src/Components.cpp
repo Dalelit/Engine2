@@ -74,12 +74,30 @@ namespace Engine2
 		}
 	}
 
+	TransformMatrix::TransformMatrix(Transform& transform) :
+		rotationMatrix(XMMatrixRotationRollPitchYawFromVector(transform.rotation)),
+		transformMatrix(XMMatrixScalingFromVector(transform.scale) * rotationMatrix * XMMatrixTranslationFromVector(transform.position))
+	{
+		// same as set
+	}
+
+	TransformMatrix::TransformMatrix(XMMATRIX transformMatrix, XMMATRIX rotationMatrix) :
+		transformMatrix(transformMatrix), rotationMatrix(rotationMatrix)
+	{
+	}
+
+	void TransformMatrix::Set(Transform& transform)
+	{
+		rotationMatrix = XMMatrixRotationRollPitchYawFromVector(transform.rotation);
+		transformMatrix = XMMatrixScalingFromVector(transform.scale) * rotationMatrix * XMMatrixTranslationFromVector(transform.position);
+	}
+
 	void TransformMatrix::OnImgui()
 	{
 		if (ImGui::TreeNodeEx("TransformMatrix"))
 		{
 			XMVECTOR vScale, vRotQ, vTrans, vRotEulerDeg, vRotEulerDegNew;
-			XMMatrixDecompose(&vScale, &vRotQ, &vTrans, XMMatrixTranspose(matrix));
+			XMMatrixDecompose(&vScale, &vRotQ, &vTrans, XMMatrixTranspose(transformMatrix));
 			vRotEulerDegNew = vRotEulerDeg = Math::RadToDeg(Math::QuaternionToEuler(vRotQ));
 
 			ImGui::DragFloat3("Position", vTrans.m128_f32, 0.1f);
