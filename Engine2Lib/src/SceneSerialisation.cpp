@@ -123,7 +123,7 @@ namespace Engine2
 		}
 		{
 			auto n = node.SubNode("Materials");
-			for (auto [name, mat] : Material::Assets.map)
+			for (auto [name, mat] : Material::Materials.map)
 			{
 				auto m = n.SubNode(name);
 				if (mat->pixelShader) m.Store("pixelShader", mat->pixelShader->GetName());

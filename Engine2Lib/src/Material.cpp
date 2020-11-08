@@ -3,7 +3,9 @@
 
 namespace Engine2
 {
-	AssetStore<Material> Material::Assets;
+	AssetStore<Material>         Material::Materials;
+	AssetStore<VertexShaderFile> Material::VertexShaders;
+	AssetStore<PixelShaderFile>  Material::PixelShaders;
 
 	void Material::Bind()
 	{
@@ -21,14 +23,15 @@ namespace Engine2
 
 	std::shared_ptr<Material> Material::Clone(const std::string& cloneName)
 	{
-		auto ptr = Assets.CreateAsset(cloneName);
+		auto ptr = std::make_shared<Material>(cloneName);
 
 		ptr->vertexShaderCB = std::make_shared<VSConstantBuffer<TransformMatrix>>(*vertexShaderCB); // vertexShaderCB->Clone();
 		ptr->vertexShader = vertexShader;
 		ptr->pixelShaderCB = pixelShaderCB->Clone();
 		ptr->pixelShader = pixelShader;
 
-		return std::shared_ptr<Material>();
+		Materials.StoreAsset(cloneName, ptr);
+		return ptr;
 	}
 
 	void Material::OnImgui(bool assetInfo)

@@ -9,7 +9,7 @@ namespace Engine2
 
 	void Mesh::OnImgui(bool assetInfo)
 	{
-		if (ImGui::TreeNodeEx("Mesh", ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_DefaultOpen, "Mesh %s", name.c_str()))
+		if (ImGui::TreeNodeEx("Mesh", ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_DefaultOpen, name.c_str()))
 		{
 			if (assetInfo) ImGui::Text("Drawable references %i", drawable.use_count());
 
@@ -55,6 +55,7 @@ namespace Engine2
 
 			// create the asset
 			auto m = Mesh::Assets.CreateAsset(name);
+			m->SetName(name);
 			names.push_back(name);
 			m->SetDrawable<MeshTriangleList<Vertex>>(verticies);
 		}

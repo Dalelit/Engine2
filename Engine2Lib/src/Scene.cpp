@@ -259,7 +259,19 @@ namespace Engine2
 
 			if (ImGui::TreeNode("Materials"))
 			{
-				Material::Assets.OnImGui();
+				Material::Materials.OnImGui();
+				ImGui::TreePop();
+			}
+
+			if (ImGui::TreeNode("Vertex Shaders"))
+			{
+				Material::VertexShaders.OnImGui();
+				ImGui::TreePop();
+			}
+
+			if (ImGui::TreeNode("Pixel Shaders"))
+			{
+				Material::PixelShaders.OnImGui();
 				ImGui::TreePop();
 			}
 

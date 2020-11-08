@@ -8,7 +8,7 @@ namespace Engine2
 	{
 		using VSPtr = std::shared_ptr<VertexShaderFile>;
 		using PSPtr = std::shared_ptr<PixelShaderFile>;
-		
+
 		// Retrieve existing, or create and stores, a shader
 		VSPtr GetVertexShader(const std::string& filename, VertexShaderLayoutDesc& layout);
 		PSPtr GetPixelShader(const std::string& filename);

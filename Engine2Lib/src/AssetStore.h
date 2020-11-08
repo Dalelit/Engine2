@@ -17,16 +17,18 @@ namespace Engine2
 		using TSharedPtr = std::shared_ptr<T>;
 		using TMap = std::unordered_map<std::string, TSharedPtr>;
 
-		TSharedPtr& CreateAsset(const std::string& name)
+
+		template <typename... ARGS>
+		TSharedPtr CreateAsset(const std::string& name, ARGS... args)
 		{
 			E2_ASSERT(!Exists(name), "Attempting to create an asset that already exists");
 
-			map[name] = std::make_shared<T>(name);
+			map[name] = std::make_shared<T>(args...);
 			return GetAsset(name);
 		}
 
 		template <class OVERLOADEDTYPE, typename... ARGS>
-		TSharedPtr& CreateAsset(const std::string& name, ARGS... args)
+		TSharedPtr CreateAsset(const std::string& name, ARGS... args)
 		{
 			E2_ASSERT(!Exists(name), "Attempting to create an asset that already exists");
 
@@ -34,16 +36,26 @@ namespace Engine2
 			return GetAsset(name);
 		}
 
-		// Note: Does not check it exists.
-		TSharedPtr& operator[](const std::string& name)
+		TSharedPtr StoreAsset(const std::string& name, TSharedPtr ptr)
 		{
-			return map.at(name);
+			E2_ASSERT(!Exists(name), "Attempting to store an asset that already exists");
+
+			map[name] = ptr;
+			return ptr;
 		}
 
 		// Note: Does not check it exists.
-		inline TSharedPtr& GetAsset(const std::string& name)
+		TSharedPtr operator[](const std::string& name)
 		{
-			return map.at(name);
+			return GetAsset(name);
+		}
+
+		// Note: Does not check it exists.
+		inline TSharedPtr GetAsset(const std::string& name)
+		{
+			auto ptr = map.find(name);
+			if (map.find(name) != map.end()) return ptr->second;
+			else return nullptr;
 		}
 
 		bool Exists(const std::string& name)
@@ -62,24 +74,6 @@ namespace Engine2
 					v->OnImgui();
 					ImGui::TreePop();
 				}
-			}
-			if (ImGui::TreeNode("Add"))
-			{
-				static char name[256] = {};
-
-				if (ImGui::Button("Add"))
-				{
-					std::string nameStr(name);
-					if (nameStr.length() > 0 && !Exists(name))
-					{
-						CreateAsset(name);
-						name[0] = '\0';
-					}
-				}
-				ImGui::SameLine();
-				ImGui::InputText("Name", name, sizeof(name));
-
-				ImGui::TreePop();
 			}
 		}
 

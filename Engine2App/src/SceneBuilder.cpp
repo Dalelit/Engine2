@@ -75,7 +75,7 @@ void SceneBuilder::BuildTestScene()
 		auto e = scene.CreateEntity();
 		auto mr = e.AddComponent<MeshRenderer>();
 		mr->mesh = Mesh::Assets["Sphere"];
-		mr->material = Material::Assets["Default PNC"];
+		mr->material = Material::Materials["Default PNC"];
 	}
 }
 
@@ -88,6 +88,6 @@ void SceneBuilder::LoadPrimatives()
 	scene.LoadModel("Assets\\Models\\Sphere.obj");
 	scene.LoadModel("Assets\\Models\\Torus.obj");
 
-	Material::Assets.CreateAsset<MaterialLibrary::PositionNormalColorMaterial>("Default PNC");
-	Material::Assets.CreateAsset<MaterialLibrary::PositionNormalColorWireframe>("Wireframe PNC");
+	Material::Materials.CreateAsset<MaterialLibrary::PositionNormalColorMaterial>("Default PNC");
+	Material::Materials.CreateAsset<MaterialLibrary::PositionNormalColorWireframe>("Wireframe PNC");
 }

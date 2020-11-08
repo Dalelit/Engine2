@@ -8,14 +8,12 @@ namespace Engine2
 	namespace MaterialLibrary
 	{
 		// store of created shaders, indexed off filename
-		std::unordered_map<std::string, VSPtr> vertexShaders;
-		std::unordered_map<std::string, PSPtr> pixelShaders;
 
 		VSPtr GetVertexShader(const std::string& filename, VertexShaderLayoutDesc& layout)
 		{
 			// retrieve it if already loaded
-			auto existing = vertexShaders.find("filename");
-			if (existing != vertexShaders.end()) return existing->second;
+			auto existing = Material::VertexShaders.GetAsset(filename);
+			if (existing) return existing;
 
 			// create
 			VSPtr ptr = std::make_shared<VertexShaderFile>(filename, layout);
@@ -23,7 +21,7 @@ namespace Engine2
 			if (!ptr) return nullptr; // failed to load
 
 			// add to the store
-			vertexShaders.insert({ filename, ptr });
+			Material::VertexShaders.StoreAsset(filename, ptr);
 			
 			return ptr;
 		}
@@ -31,8 +29,8 @@ namespace Engine2
 		PSPtr GetPixelShader(const std::string& filename)
 		{
 			// retrieve it if already loaded
-			auto existing = pixelShaders.find("filename");
-			if (existing != pixelShaders.end()) return existing->second;
+			auto existing = Material::PixelShaders.GetAsset(filename);
+			if (existing) return existing;
 
 			// create
 			PSPtr ptr = std::make_shared<PixelShaderFile>(filename);
@@ -40,7 +38,7 @@ namespace Engine2
 			if (!ptr) return nullptr; // failed to load
 
 			// add to the store
-			pixelShaders.insert({ filename, ptr });
+			Material::PixelShaders.StoreAsset(filename, ptr);
 
 			return ptr;
 		}
@@ -115,7 +113,7 @@ namespace Engine2
 
 		std::shared_ptr<Material> PositionNormalColorWireframe::Clone(const std::string& cloneName)
 		{
-			auto ptr = Assets.CreateAsset<PositionNormalColorWireframe>(cloneName);
+			auto ptr = Materials.CreateAsset<PositionNormalColorWireframe>(cloneName);
 
 			ptr->vertexShaderCB = std::make_shared<VSConstantBuffer<TransformMatrix>>(*vertexShaderCB); // vertexShaderCB->Clone();
 			ptr->vertexShader = vertexShader;

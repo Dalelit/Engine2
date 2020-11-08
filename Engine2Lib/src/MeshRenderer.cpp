@@ -20,7 +20,7 @@ namespace Engine2
 
 		if (material) material->OnImgui();
 		else ImGui::Text("Material null");
-		auto newMat = Material::Assets.OnImguiSelector();
+		auto newMat = Material::Materials.OnImguiSelector();
 		if (newMat) material = newMat;
 	}
 }
