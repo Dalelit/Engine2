@@ -6,15 +6,6 @@ namespace Engine2
 	// to do: namespace vs class... trying out namespace
 	namespace MaterialLibrary
 	{
-		using VSPtr = std::shared_ptr<VertexShaderFile>;
-		using PSPtr = std::shared_ptr<PixelShaderFile>;
-
-		// Retrieve existing, or create and stores, a shader
-		VSPtr GetVertexShader(const std::string& filename, VertexShaderLayoutDesc& layout);
-		PSPtr GetPixelShader(const std::string& filename);
-
-		//////////////////////////////////////////////////////////
-
 		struct StandardMaterial
 		{
 			DirectX::XMFLOAT3 ambient = { 0.1f, 0.1f, 0.1f }; float pad1;

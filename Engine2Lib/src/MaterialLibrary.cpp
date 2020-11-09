@@ -7,42 +7,6 @@ namespace Engine2
 {
 	namespace MaterialLibrary
 	{
-		// store of created shaders, indexed off filename
-
-		VSPtr GetVertexShader(const std::string& filename, VertexShaderLayoutDesc& layout)
-		{
-			// retrieve it if already loaded
-			auto existing = Material::VertexShaders.GetAsset(filename);
-			if (existing) return existing;
-
-			// create
-			VSPtr ptr = std::make_shared<VertexShaderFile>(filename, layout);
-
-			if (!ptr) return nullptr; // failed to load
-
-			// add to the store
-			Material::VertexShaders.StoreAsset(filename, ptr);
-			
-			return ptr;
-		}
-
-		PSPtr GetPixelShader(const std::string& filename)
-		{
-			// retrieve it if already loaded
-			auto existing = Material::PixelShaders.GetAsset(filename);
-			if (existing) return existing;
-
-			// create
-			PSPtr ptr = std::make_shared<PixelShaderFile>(filename);
-
-			if (!ptr) return nullptr; // failed to load
-
-			// add to the store
-			Material::PixelShaders.StoreAsset(filename, ptr);
-
-			return ptr;
-		}
-
 		void StandardMaterialPSCB::OnImgui()
 		{
 			if (ImGui::TreeNode("Standard Material PS Constant Buffer"))

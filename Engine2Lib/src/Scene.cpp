@@ -249,11 +249,6 @@ namespace Engine2
 			if (ImGui::TreeNode("Meshes"))
 			{
 				Mesh::Assets.OnImGui();
-
-				static char buffer[256] = "Assets\\Models\\";
-				ImGui::InputText("Filename", buffer, sizeof(buffer));
-				if (ImGui::Button("Load model")) LoadModel(buffer);
-
 				ImGui::TreePop();
 			}
 

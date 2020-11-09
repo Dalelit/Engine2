@@ -14,6 +14,10 @@ namespace Engine2
 		static AssetStore<VertexShaderFile> VertexShaders;
 		static AssetStore<PixelShaderFile>  PixelShaders;
 
+		// Retrieve existing, or create and stores, a shader
+		static std::shared_ptr<VertexShaderFile> GetVertexShader(const std::string& filename, VertexShaderLayoutDesc& layout);
+		static std::shared_ptr<PixelShaderFile> GetPixelShader(const std::string& filename);
+
 		Material() = default;
 		Material(const std::string& name) : name(name) {}
 		virtual ~Material() = default;
