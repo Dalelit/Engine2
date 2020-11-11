@@ -47,6 +47,7 @@ namespace Engine2
 		vertexShader->Bind();
 		pixelShaderCB->Bind();
 		pixelShader->Bind();
+		if (texture) texture->Bind();
 	}
 
 	void Material::SetTransform(TransformMatrix& transform)
@@ -63,6 +64,7 @@ namespace Engine2
 		ptr->vertexShader = vertexShader;
 		ptr->pixelShaderCB = pixelShaderCB->Clone();
 		ptr->pixelShader = pixelShader;
+		ptr->texture = texture;
 
 		Materials.StoreAsset(cloneName, ptr);
 		return ptr;
@@ -84,6 +86,7 @@ namespace Engine2
 				ImGui::Text("vertexShader references %i", vertexShader.use_count());
 				ImGui::Text("pixelShaderCB references %i", pixelShaderCB.use_count());
 				ImGui::Text("pixelShader references %i", pixelShader.use_count());
+				ImGui::Text("texture references %i", texture.use_count());
 			}
 
 			if (vertexShaderCB) vertexShaderCB->OnImgui();
@@ -97,6 +100,9 @@ namespace Engine2
 
 			if (pixelShader) pixelShader->OnImgui();
 			else ImGui::Text("pixelShader null");
+
+			if (texture) texture->OnImgui();
+			else ImGui::Text("texture null");
 
 			ImGui::TreePop();
 		}

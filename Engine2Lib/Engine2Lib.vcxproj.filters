@@ -53,6 +53,8 @@
     <ClInclude Include="src\SceneSerialisation.h" />
     <ClInclude Include="src\Serialiser.h" />
     <ClInclude Include="src\MaterialLibrary.h" />
+    <ClInclude Include="src\TextureLoader.h" />
+    <ClInclude Include="src\MeshLoader.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\pch.cpp" />
@@ -92,6 +94,9 @@
     <ClCompile Include="src\SceneSerialisation.cpp" />
     <ClCompile Include="src\Serialiser.cpp" />
     <ClCompile Include="src\MaterialLibrary.cpp" />
+    <ClCompile Include="src\TextureLoader.cpp" />
+    <ClCompile Include="src\MeshLoader.cpp" />
+    <ClCompile Include="src\VertexLayout.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Assets\Shaders\GizmosPS.hlsl" />
@@ -103,5 +108,7 @@
     <FxCompile Include="Assets\Shaders\ParticleVS.hlsl" />
     <FxCompile Include="Assets\Shaders\PositionNormalColorPS.hlsl" />
     <FxCompile Include="Assets\Shaders\PositionNormalColorVS.hlsl" />
+    <FxCompile Include="Assets\Shaders\PositionNormalTextureVS.hlsl" />
+    <FxCompile Include="Assets\Shaders\PositionNormalTexturePS.hlsl" />
   </ItemGroup>
 </Project>

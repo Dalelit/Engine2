@@ -12,6 +12,7 @@
 #include "AssetLoaders/ObjLoader.h"
 #include "SceneSerialisation.h"
 #include "MaterialLibrary.h"
+#include "TextureLoader.h"
 
 using namespace Engine2;
 using namespace EngineECS;
@@ -63,7 +64,7 @@ void SceneBuilder::BuildTestScene()
 {
 	RigidBody::gravity = g_XMZero;
 
-	// add a light
+	 // add a light
 	{
 		auto e = scene.CreateEntity();
 		e.AddComponent<Gizmo>()->type = Gizmo::Types::Sphere;
@@ -76,6 +77,23 @@ void SceneBuilder::BuildTestScene()
 		auto mr = e.AddComponent<MeshRenderer>();
 		mr->mesh = Mesh::Assets["Sphere"];
 		mr->material = Material::Materials["Default PNC"];
+		e.GetComponent<Transform>()->position = { 0.0f, 1.3f, 0.0f, 1.0f };
+	}
+
+	{
+		// textured test
+		auto e = scene.CreateEntity();
+		auto mr = e.AddComponent<MeshRenderer>();
+		mr->mesh = Mesh::Assets["Plane_t"];
+		e.GetComponent<Transform>()->scale = { 4.0f, 4.0f, 4.0f, 1.0f };
+
+		mr->material = Material::Materials.CreateAsset("Textured");
+		mr->material->vertexShaderCB = std::make_shared<MaterialLibrary::StandardMaterialVSCB>(1);;
+		mr->material->vertexShader = Material::GetVertexShader(Config::directories["EngineShaderSourceDir"] + "PositionNormalTextureVS.hlsl", VertexLayout::PositionNormalTexture::Layout);
+		mr->material->pixelShaderCB = std::make_shared<MaterialLibrary::StandardMaterialPSCB>(1);
+		mr->material->pixelShader = Material::GetPixelShader(Config::directories["EngineShaderSourceDir"] + "PositionNormalTexturePS.hlsl");
+		mr->material->texture = TextureLoader::LoadTexture("Assets\\Textures\\NZ Small.jpg");
+		mr->material->texture->SetSampler(D3D11_FILTER::D3D11_FILTER_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_CLAMP);
 	}
 }
 

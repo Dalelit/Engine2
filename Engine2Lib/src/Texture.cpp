@@ -40,8 +40,8 @@ namespace Engine2
 
 		E2_ASSERT_HR(hr, "CreateShaderResourceView failed");
 
-		name = "Texture2D " + std::to_string(texDesc.Width) + "x" + std::to_string(texDesc.Height);
-		info = "MipsLevels " + std::to_string(srvDesc.Texture2D.MipLevels);
+		name = "Texture2D";
+		info = "Size " + std::to_string(texDesc.Width) + "x" + std::to_string(texDesc.Height) + " MipsLevels " + std::to_string(srvDesc.Texture2D.MipLevels);
 	}
 
 	Texture::Texture(unsigned int slot, Microsoft::WRL::ComPtr<ID3D11Texture2D> pTextureToWrap) :

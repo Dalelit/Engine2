@@ -28,9 +28,13 @@ namespace Engine2
 		void Bind();
 		void Unbind();
 
+		void SetSampler(D3D11_FILTER filter, D3D11_TEXTURE_ADDRESS_MODE addressMode) { pSampler = std::make_shared<TextureSampler>(filter, addressMode); }
 		void SetSampler(std::shared_ptr<TextureSampler> pTexSampler) { pSampler = pTexSampler; }
 
 		void OnImgui();
+
+		void SetName(const std::string& newName) { name = newName; }
+		void SetSlot(unsigned int newSlot) { slot = newSlot; }
 
 	protected:
 		unsigned int slot;

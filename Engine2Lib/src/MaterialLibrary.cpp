@@ -25,7 +25,7 @@ namespace Engine2
 
 		PositionNormalColorMaterial::PositionNormalColorMaterial(const std::string& name) : Material(name)
 		{
-			auto layout = VertexLayout::PositionNormalColor::GetLayout();
+			auto layout = VertexLayout::PositionNormalColor::Layout;
 
 			vertexShaderCB = std::make_shared<StandardMaterialVSCB>(1);
 			vertexShader = GetVertexShader(Config::directories["EngineShaderSourceDir"] + "PositionNormalColorVS.hlsl", layout);
@@ -36,7 +36,7 @@ namespace Engine2
 
 		PositionNormalColorWireframe::PositionNormalColorWireframe(const std::string& name)
 		{
-			auto layout = VertexLayout::PositionNormalColor::GetLayout();
+			auto layout = VertexLayout::PositionNormalColor::Layout;
 
 			vertexShaderCB = std::make_shared<StandardMaterialVSCB>(1);
 			vertexShader = GetVertexShader(Config::directories["EngineShaderSourceDir"] + "PositionNormalColorVS.hlsl", layout);

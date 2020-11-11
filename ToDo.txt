@@ -4,6 +4,7 @@ Near term / in progress
 - Scene serialisation
 - Transform rework
 - Materials and lighting
+	- clean up engine shaders to move common code into include file
 - Model/mesh loading
 - Scene UI work
 	- maintain focus on selected entity on destroy

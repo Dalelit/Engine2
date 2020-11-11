@@ -3,6 +3,7 @@
 #include "Components.h"
 #include "ConstantBuffer.h"
 #include "Shader.h"
+#include "Texture.h"
 
 namespace Engine2
 {
@@ -43,6 +44,8 @@ namespace Engine2
 
 		std::shared_ptr<ConstantBufferBase> pixelShaderCB;
 		std::shared_ptr<PixelShader> pixelShader;
+
+		std::shared_ptr<Texture> texture;
 
 	protected:
 		std::string name;

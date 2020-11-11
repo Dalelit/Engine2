@@ -9,6 +9,8 @@
 #include "Lights.h"
 #include "OffscreenOutliner.h"
 #include "VertexLayout.h"
+#include "MeshLoader.h"
+#include "TextureLoader.h"
 
 using namespace EngineECS;
 
@@ -270,20 +272,31 @@ namespace Engine2
 				ImGui::TreePop();
 			}
 
+			if (ImGui::TreeNode("Textures"))
+			{
+				TextureLoader::Textures.OnImGui();
+				ImGui::TreePop();
+			}
+
 			ImGui::End();
 		}
 	}
 
 	bool Scene::LoadModel(const std::string& sourceFilename)
 	{
-		using Vertex = VertexLayout::PositionNormalColor::Vertex;
-		auto vsLayout = VertexLayout::PositionNormalColor::GetLayout();
+		bool result = false;
 
 		auto loadedModel = AssetLoaders::ObjLoader::Load(sourceFilename);
 
-		auto assets = MeshAssetLoader::CreateMeshAsset(*loadedModel);
+		auto assets = MeshAssetLoader::CreateMeshAssetPositionNormalColor(*loadedModel);
+		if (assets.size() > 0) result = true;
 
-		if (assets.size() > 0) return true;
-		else return false;
+		if (loadedModel->textureCoords.size() > 0)
+		{
+			assets = MeshAssetLoader::CreateMeshAssetPositionNormalTexture(*loadedModel);
+			if (assets.size() > 0) result = true;
+		}
+
+		return result;
 	}
 }

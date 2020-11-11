@@ -6,6 +6,7 @@
 #include "VertexBuffer.h"
 #include "MeshRenderer.h"
 #include "MaterialLibrary.h"
+#include "MeshLoader.h"
 
 using namespace EngineECS;
 using namespace DirectX;
@@ -124,8 +125,8 @@ namespace Engine2
 
 	bool SceneHierarchy::LoadModel(const std::string& sourceFilename)
 	{
-		using Vertex = VertexLayout::PositionNormalColor::Vertex;
-		auto vsLayout = VertexLayout::PositionNormalColor::GetLayout();
+		using Vertex = VertexLayout::PositionNormalColor;
+		auto vsLayout = VertexLayout::PositionNormalColor::Layout;
 
 		auto loadedModel = AssetLoaders::ObjLoader::Load(sourceFilename);
 
