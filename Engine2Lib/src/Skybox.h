@@ -2,6 +2,7 @@
 #include "Resources.h"
 #include "VertexBuffer.h"
 #include "Shader.h"
+#include "Texture.h"
 
 namespace Engine2
 {
@@ -25,14 +26,14 @@ namespace Engine2
 		std::string path;
 		std::string status = "Uninitialised";
 
-		Microsoft::WRL::ComPtr<ID3D11Texture2D1> pTexture = nullptr;
-		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pSRView = nullptr;
-		Microsoft::WRL::ComPtr<ID3D11SamplerState> pSamplerState = nullptr;
 		wrl::ComPtr<ID3D11DepthStencilState> pDepthStencilState = nullptr;
 		wrl::ComPtr<ID3D11RasterizerState> pRasterizerState = nullptr;
 
-		std::shared_ptr<VertexShader> vertexShader;
-		std::shared_ptr<PixelShader> pixelShader;
-		std::shared_ptr<Drawable> vertexBuffer;
+		std::unique_ptr<Texture> texture;
+		std::unique_ptr<VertexShader> vertexShader;
+		std::unique_ptr<PixelShader> pixelShader;
+		std::unique_ptr<Drawable> vertexBuffer;
+
+		bool InitialiseTexture(const std::string& directory);
 	};
 }

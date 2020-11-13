@@ -6,8 +6,6 @@ namespace Engine2
 	Texture::Texture(unsigned int slot, Surface& surface, DXGI_FORMAT format) :
 		slot(slot)
 	{
-		HRESULT hr;
-
 		D3D11_TEXTURE2D_DESC1 texDesc = {};
 		texDesc.Width = surface.GetWidth();
 		texDesc.Height = surface.GetHeight();
@@ -26,22 +24,40 @@ namespace Engine2
 		data.SysMemPitch = surface.GetPitch();
 		data.SysMemSlicePitch = surface.GetSlicePitch();
 
-		hr = DXDevice::GetDevice().CreateTexture2D1(&texDesc, &data, &pTexture);
-
-		E2_ASSERT_HR(hr, "CreateTexture2D1 failed");
-
 		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 		srvDesc.Format = texDesc.Format;
 		srvDesc.ViewDimension = D3D11_SRV_DIMENSION::D3D11_SRV_DIMENSION_TEXTURE2D;
 		srvDesc.Texture2D.MostDetailedMip = 0;
 		srvDesc.Texture2D.MipLevels = 1;
 
-		hr = DXDevice::GetDevice().CreateShaderResourceView(pTexture.Get(), &srvDesc, &pSRView);
+		Initialise(texDesc, srvDesc, &data);
+	}
 
-		E2_ASSERT_HR(hr, "CreateShaderResourceView failed");
+	Texture::Texture(unsigned int slot, Surface& surface, D3D11_TEXTURE2D_DESC1& texDesc, D3D11_SHADER_RESOURCE_VIEW_DESC& srvDesc) :
+		slot(slot)
+	{
+		D3D11_SUBRESOURCE_DATA data = {};
+		data.pSysMem = surface.GetDataVoidPtr();
+		data.SysMemPitch = surface.GetPitch();
+		data.SysMemSlicePitch = surface.GetSlicePitch();
 
-		name = "Texture2D";
-		info = "Size " + std::to_string(texDesc.Width) + "x" + std::to_string(texDesc.Height) + " MipsLevels " + std::to_string(srvDesc.Texture2D.MipLevels);
+		Initialise(texDesc, srvDesc, &data);
+	}
+
+	Texture::Texture(unsigned int slot, std::vector<std::shared_ptr<Surface>> surfaces, D3D11_TEXTURE2D_DESC1& texDesc, D3D11_SHADER_RESOURCE_VIEW_DESC& srvDesc) :
+		slot(slot)
+	{
+		E2_ASSERT_HR(texDesc.ArraySize == surfaces.size(), "Texture Desc array size does not match surface count");
+
+		D3D11_SUBRESOURCE_DATA data[6] = {};
+		for (int i = 0; i < 6; i++)
+		{
+			data[i].pSysMem = surfaces[i]->GetDataVoidPtr();
+			data[i].SysMemPitch = surfaces[i]->GetPitch();
+			data[i].SysMemSlicePitch = surfaces[i]->GetSlicePitch();
+		}
+
+		Initialise(texDesc, srvDesc, data);
 	}
 
 	Texture::Texture(unsigned int slot, Microsoft::WRL::ComPtr<ID3D11Texture2D> pTextureToWrap) :
@@ -68,6 +84,22 @@ namespace Engine2
 
 		name = "Texture2D wrap existing texture";
 		info = "MipsLevels " + std::to_string(srvDesc.Texture2D.MipLevels);
+	}
+
+	void Texture::Initialise(D3D11_TEXTURE2D_DESC1& texDesc, D3D11_SHADER_RESOURCE_VIEW_DESC& srvDesc, D3D11_SUBRESOURCE_DATA* data)
+	{
+		HRESULT hr;
+
+		hr = DXDevice::GetDevice().CreateTexture2D1(&texDesc, data, &pTexture);
+
+		E2_ASSERT_HR(hr, "CreateTexture2D1 failed");
+
+		hr = DXDevice::GetDevice().CreateShaderResourceView(pTexture.Get(), &srvDesc, &pSRView);
+
+		E2_ASSERT_HR(hr, "CreateShaderResourceView failed");
+
+		name = "Texture2D";
+		info = "Size " + std::to_string(texDesc.Width) + "x" + std::to_string(texDesc.Height) + " MipsLevels " + std::to_string(srvDesc.Texture2D.MipLevels);
 	}
 
 	void Texture::Bind()

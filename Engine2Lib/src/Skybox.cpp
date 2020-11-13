@@ -6,72 +6,9 @@ namespace Engine2
 {
 	bool Skybox::Initialise(const std::string& directory)
 	{
-		// https://docs.microsoft.com/en-us/windows/win32/direct3d11/overviews-direct3d-11-resources-textures-intro
-
-		path = directory;
-
 		HRESULT hr;
 
-		//load 6 files
-		std::string fileType = ".jpg";
-		std::vector<std::string> names = { "right", "left", "top", "bottom", "front", "back" };
-		std::vector<std::shared_ptr<Surface>> surfaces;
-		surfaces.reserve(6);
-		for (int i = 0; i < 6; i++)
-		{
-			surfaces.push_back(SurfaceLoader::LoadSurface(directory + "\\" + names[i] + fileType));
-			if (!surfaces.back()) { status = SurfaceLoader::LastResult; return false; }
-		}
-
-		// create the texture
-
-		D3D11_TEXTURE2D_DESC1 texDesc = {};
-		texDesc.Width = surfaces[0]->GetWidth();
-		texDesc.Height = surfaces[0]->GetHeight();
-		texDesc.MipLevels = 1u;
-		texDesc.Format = SurfaceLoader::Format;
-		texDesc.SampleDesc.Count = 1u;
-		texDesc.SampleDesc.Quality = 0u;
-		texDesc.Usage = D3D11_USAGE_DEFAULT;
-		texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-		// cube map specifics
-		texDesc.ArraySize = 6u;
-		texDesc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
-
-		D3D11_SUBRESOURCE_DATA data[6] = {};
-		for (int i = 0; i < 6; i++)
-		{
-			data[i].pSysMem = surfaces[i]->GetDataVoidPtr();
-			data[i].SysMemPitch = surfaces[i]->GetPitch();
-			data[i].SysMemSlicePitch = 0; // surface.GetSlicePitch();
-		}
-
-		hr = DXDevice::GetDevice().CreateTexture2D1(&texDesc, data, &pTexture);
-
-		if (FAILED(hr)) { status = "CreateTexture2D1 failed"; return false; }
-
-		// create the texture view
-
-		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-		srvDesc.Format = texDesc.Format;
-		srvDesc.ViewDimension = D3D11_SRV_DIMENSION::D3D11_SRV_DIMENSION_TEXTURECUBE;
-		srvDesc.Texture2D.MostDetailedMip = 0;
-		srvDesc.Texture2D.MipLevels = 1;
-
-		hr = DXDevice::GetDevice().CreateShaderResourceView(pTexture.Get(), &srvDesc, &pSRView);
-
-		if (FAILED(hr)) { status = "CreateShaderResourceView failed"; return false; }
-
-		// create the texture sampler
-		D3D11_SAMPLER_DESC sampDesc = {};
-		sampDesc.Filter = D3D11_FILTER::D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-		sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_CLAMP;
-		sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_CLAMP;
-		sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_CLAMP;
-
-		hr = DXDevice::GetDevice().CreateSamplerState(&sampDesc, &pSamplerState);
-
-		if (FAILED(hr)) { status = "CreateSamplerState failed"; return false; }
+		InitialiseTexture(directory);
 
 		// create the depth stencil settings
 
@@ -109,22 +46,67 @@ namespace Engine2
 			{"Position", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
 		};
 
-		vertexBuffer = std::make_shared<MeshTriangleIndexList<Vertex>>(verticies, indicies);
+		vertexBuffer = std::make_unique<MeshTriangleIndexList<Vertex>>(verticies, indicies);
 
-		vertexShader = std::make_shared<VertexShaderFile>(Config::directories["EngineShaderSourceDir"] + "SkyboxVS.hlsl", layout);
+		vertexShader = std::make_unique<VertexShaderFile>(Config::directories["EngineShaderSourceDir"] + "SkyboxVS.hlsl", layout);
 		
-		pixelShader = std::make_shared<PixelShaderFile>(Config::directories["EngineShaderSourceDir"] + "SkyboxPS.hlsl");
+		pixelShader = std::make_unique<PixelShaderFile>(Config::directories["EngineShaderSourceDir"] + "SkyboxPS.hlsl");
 
 		status = "";
 		SetActive();
 		return true;
 	}
 
+	bool Skybox::InitialiseTexture(const std::string& directory)
+	{
+		path = directory;
+
+		//load 6 files
+		std::string fileType = ".jpg";
+		std::vector<std::string> names = { "right", "left", "top", "bottom", "front", "back" };
+		std::vector<std::shared_ptr<Surface>> surfaces;
+		surfaces.reserve(6);
+		for (int i = 0; i < 6; i++)
+		{
+			surfaces.push_back(SurfaceLoader::LoadSurface(directory + "\\" + names[i] + fileType));
+			if (!surfaces.back()) { status = SurfaceLoader::LastResult; return false; }
+		}
+
+		// create the texture
+
+		D3D11_TEXTURE2D_DESC1 texDesc = {};
+		texDesc.Width = surfaces[0]->GetWidth();
+		texDesc.Height = surfaces[0]->GetHeight();
+		texDesc.MipLevels = 1u;
+		texDesc.Format = SurfaceLoader::Format;
+		texDesc.SampleDesc.Count = 1u;
+		texDesc.SampleDesc.Quality = 0u;
+		texDesc.Usage = D3D11_USAGE_DEFAULT;
+		texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+		// cube map specifics
+		texDesc.ArraySize = 6u;
+		texDesc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
+
+		// create the texture view
+
+		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+		srvDesc.Format = texDesc.Format;
+		srvDesc.ViewDimension = D3D11_SRV_DIMENSION::D3D11_SRV_DIMENSION_TEXTURECUBE;
+		srvDesc.Texture2D.MostDetailedMip = 0;
+		srvDesc.Texture2D.MipLevels = 1;
+
+		texture = std::make_unique<Texture>(slot, surfaces, texDesc, srvDesc);
+
+		texture->SetSampler(D3D11_FILTER::D3D11_FILTER_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_CLAMP);
+
+		return true;
+	}
+
+
 	void Skybox::Bind()
 	{
 		// cube texture
-		DXDevice::GetContext().PSSetShaderResources(slot, 1u, pSRView.GetAddressOf());
-		DXDevice::GetContext().PSSetSamplers(slot, 1u, pSamplerState.GetAddressOf());
+		texture->Bind();
 
 		// pixel shader
 		pixelShader->Bind();
@@ -158,6 +140,7 @@ namespace Engine2
 			ImGui::Checkbox("Active", &active);
 			ImGui::Text("Status: %s", status.c_str());
 			ImGui::Text("Path: %s", path.c_str());
+			if (texture) texture->OnImgui();
 			if (vertexShader) vertexShader->OnImgui();
 			if (pixelShader) pixelShader->OnImgui();
 			if (vertexBuffer) vertexBuffer->OnImgui();

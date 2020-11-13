@@ -22,6 +22,8 @@ namespace Engine2
 	{
 	public:
 		Texture(unsigned int slot, Surface& surface, DXGI_FORMAT format);
+		Texture(unsigned int slot, Surface& surface, D3D11_TEXTURE2D_DESC1& texDesc, D3D11_SHADER_RESOURCE_VIEW_DESC& srvDesc);
+		Texture(unsigned int slot, std::vector<std::shared_ptr<Surface>> surfaces, D3D11_TEXTURE2D_DESC1& texDesc, D3D11_SHADER_RESOURCE_VIEW_DESC& srvDesc);
 		Texture(unsigned int slot, Microsoft::WRL::ComPtr<ID3D11Texture2D> pTextureToWrap);
 		~Texture() = default;
 
@@ -45,5 +47,7 @@ namespace Engine2
 
 		Microsoft::WRL::ComPtr<ID3D11Texture2D1> pTexture = nullptr;
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pSRView = nullptr;
+
+		void Initialise(D3D11_TEXTURE2D_DESC1& texDesc, D3D11_SHADER_RESOURCE_VIEW_DESC& srvDesc, D3D11_SUBRESOURCE_DATA* data);
 	};
 }
