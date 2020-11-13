@@ -34,7 +34,7 @@ namespace Engine2
 		inline bool IsActive() { return active; }
 		inline void SetActive(bool makeActive = true) { active = makeActive; }
 
-		inline void SetTransform(DirectX::XMMATRIX transform) { emitLocation = DirectX::XMVector3Transform(position, transform); }
+		inline void SetTransform(DirectX::XMMATRIX transform) { emitLocation = DirectX::XMVector4Transform(position, transform); }
 
 		void SetMaxParticles(size_t maxParticleCount);
 		size_t GetMaxParticles() { return maxParticles; }
@@ -47,7 +47,7 @@ namespace Engine2
 	protected:
 		bool active = true;
 		bool freeze = false;
-		DirectX::XMVECTOR position;
+		DirectX::XMVECTOR position = { 0.0f, 0.0f, 0.0f, 1.0f };
 		DirectX::XMVECTOR emitLocation;
 		float rate = 10.0; // per second
 		size_t maxParticles;

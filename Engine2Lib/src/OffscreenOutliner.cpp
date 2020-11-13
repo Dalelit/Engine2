@@ -47,7 +47,7 @@ namespace Engine2
 
 	void OffscreenOutliner::OnImgui()
 	{
-		ImGui::DragFloat("Outline scale", &outlineScale, 0.05f, 1.0f, 2.0f);
+		ImGui::DragFloat("Outline scale", &outlineScale, 0.005f, 1.0f, 2.0f);
 		ImGui::ColorEdit4("Outline color", outlineColor.m128_f32);
 	}
 

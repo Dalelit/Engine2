@@ -34,10 +34,10 @@ namespace Engine2
 
 		RenderMeshes();
 		RenderParticles();
+		if (skybox.IsActive()) skybox.BindAndDraw();
 		RenderOutlines();
 		RenderGizmos();
 
-		if (skybox.IsActive()) skybox.BindAndDraw();
 	}
 
 	// update any components that need to know when an event has happened
@@ -175,11 +175,11 @@ namespace Engine2
 	void Scene::UpdateParticles(float dt)
 	{
 		Coordinator& coordinator = hierarchy.GetECSCoordinator();
-		View<ParticleEmitter, Transform> entities(coordinator);
+		View<ParticleEmitter, TransformMatrix> entities(coordinator);
 		for (auto e : entities)
 		{
 			auto* emitter = coordinator.GetComponent<ParticleEmitter>(e);
-			emitter->SetTransform(coordinator.GetComponent<TransformMatrix>(e)->transformMatrix);
+			emitter->SetTransform(coordinator.GetComponent<TransformMatrix>(e)->MatrixTransposed()); // note: transposed as the matrix is ready for GPU
 			emitter->OnUpdate(dt);
 		}
 	}

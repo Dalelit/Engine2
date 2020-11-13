@@ -5,7 +5,8 @@ cbuffer sceneConst : register (b0)
 
 cbuffer modelConst : register (b1)
 {
-	matrix worldTransform;
+	matrix modelRotation;
+	matrix modelTransform;
 };
 
 cbuffer outlineConst : register (b2)
@@ -15,7 +16,9 @@ cbuffer outlineConst : register (b2)
 
 float4 main(float3 pos : Position) : SV_POSITION
 {
-	float4 pws = mul(float4(pos * outlineScale, 1.0f), worldTransform);
+	float4 pws = float4(pos * outlineScale, 1.0f); // scale to the outline size
+	pws = mul(pws, modelTransform); // transform to the world
+	pws = mul(pws, cameraTransform); // transform to the camera
 
-	return mul( pws, cameraTransform );
+	return pws;
 }

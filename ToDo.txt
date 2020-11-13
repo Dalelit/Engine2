@@ -2,7 +2,6 @@ Things that I want to work on...
 
 Near term / in progress
 - Scene serialisation
-- Transform rework
 - Materials and lighting
 	- clean up engine shaders to move common code into include file
 - Model/mesh loading
@@ -11,8 +10,16 @@ Near term / in progress
 	- auto expand hierarchy on create
 	- load new textures
 	- load new skybox textures
+	- model loading
+- Alternative cameras
+- ECS
+	- create systems rather than hard coding in scene
+- Particle system
+	- add an emit direction, and use transform to change it
 - Bugs
-	- Outliner doesn't scale with transform
+	- Skybox doesn't check that it's valid before rendering
+- Proper error handling and logging
+	- use exceptions
 
 Long term
 - Rigid body and basic physics
