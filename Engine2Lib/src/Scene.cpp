@@ -198,15 +198,15 @@ namespace Engine2
 		{
 			hierarchy.OnImgui();
 			skybox.OnImgui();
-			ImGui::End();
 		}
+		ImGui::End();
 
 		static bool entityOpen = true;
 		if (ImGui::Begin("Entity", &entityOpen))
 		{
 			hierarchy.SelectedEntityOnImgui();
-			ImGui::End();
 		}
+		ImGui::End();
 	}
 
 	void Scene::ImGuiEntities()
@@ -216,34 +216,42 @@ namespace Engine2
 		{
 			Coordinator& coordinator = hierarchy.GetECSCoordinator();
 
-			if (ImGui::TreeNodeEx("Stats", ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_DefaultOpen))
+			ImGui::Text("Stats:");
+			ImGui::Text(" Entities  : %i/%i", coordinator.GetEntityCount(), coordinator.GetMaxEntities());
+			ImGui::Text(" Components: %i/%i", coordinator.GetComponentCount(), EngineECS::MAXCOMPONENTS);
+
+			if (ImGui::TreeNodeEx("Components", ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_DefaultOpen))
 			{
-				ImGui::Text("Entities: %i/%i", coordinator.GetEntityCount(), coordinator.GetMaxEntities());
-				ImGui::Text("Components:");
 				for (uint32_t i = 0; i < coordinator.GetComponentCount(); i++)
 				{
 					auto* pStore = coordinator.GetComponentStore(i);
 					if (pStore)
 					{
-						ImGui::Text("%i %s: %i/%i", i, pStore->GetName().c_str(), pStore->Count(), pStore->Capacity());
+						ImGui::Text(" %i %s: %i/%i", i, pStore->GetName().c_str(), pStore->Count(), pStore->Capacity());
+					}
+					else
+					{
+						ImGui::Text(" %i %s:", i, coordinator.GetComponentName(i));
 					}
 				}
 				ImGui::TreePop();
 			}
 
-			auto& allInfo = coordinator.GetComponents<EntityInfo>(); // Note: All entities when created through scene get an entityInfo component
-			for (EngineECS::ComponentIndex_t indx = 0; indx < allInfo.Count(); indx++)
+			if (ImGui::TreeNode("Entities"))
 			{
-				if (ImGui::TreeNode(allInfo[indx].tag.c_str()))
+				auto& allInfo = coordinator.GetComponents<EntityInfo>(); // Note: All entities when created through scene get an entityInfo component
+				for (EngineECS::ComponentIndex_t indx = 0; indx < allInfo.Count(); indx++)
 				{
-					Components::OnImgui(allInfo.GetEntity(indx), coordinator);
-					ImGui::TreePop();
+					if (ImGui::TreeNode(allInfo[indx].tag.c_str()))
+					{
+						Components::OnImgui(allInfo.GetEntity(indx), coordinator);
+						ImGui::TreePop();
+					}
+					ImGui::Separator();
 				}
-				ImGui::Separator();
 			}
-
-			ImGui::End();
 		}
+		ImGui::End();
 	}
 
 	void Scene::ImGuiAssets()
@@ -280,9 +288,8 @@ namespace Engine2
 				TextureLoader::Textures.OnImGui();
 				ImGui::TreePop();
 			}
-
-			ImGui::End();
 		}
+		ImGui::End();
 	}
 
 	bool Scene::LoadModel(const std::string& sourceFilename)

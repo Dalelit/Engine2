@@ -9,8 +9,10 @@ Near term / in progress
 - Scene UI work
 	- maintain focus on selected entity on destroy
 	- auto expand hierarchy on create
+	- load new textures
+	- load new skybox textures
 - Bugs
-	- Minimising some of the ImGui windows causes issue
+	- Outliner doesn't scale with transform
 
 Long term
 - Rigid body and basic physics
