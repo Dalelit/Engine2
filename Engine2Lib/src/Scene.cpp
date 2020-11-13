@@ -36,6 +36,8 @@ namespace Engine2
 		RenderParticles();
 		RenderOutlines();
 		RenderGizmos();
+
+		if (skybox.IsActive()) skybox.BindAndDraw();
 	}
 
 	// update any components that need to know when an event has happened
@@ -195,6 +197,7 @@ namespace Engine2
 		if (ImGui::Begin("Scene", &sceneOpen))
 		{
 			hierarchy.OnImgui();
+			skybox.OnImgui();
 			ImGui::End();
 		}
 

@@ -25,6 +25,8 @@ SceneBuilder::SceneBuilder() : Layer("SceneBuilder")
 
 	LoadPrimatives();
 	BuildTestScene();
+
+	scene.GetSkybox().Initialise("Assets\\Skyboxes\\Test");
 }
 
 void SceneBuilder::OnUpdate(float dt)

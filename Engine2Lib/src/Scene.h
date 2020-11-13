@@ -6,6 +6,7 @@
 #include "Entity.h"
 #include "GizmoRender.h"
 #include "SceneHierarchy.h"
+#include "Skybox.h"
 
 namespace Engine2
 {
@@ -43,10 +44,13 @@ namespace Engine2
 
 		bool LoadModel(const std::string& sourceFilename);
 
+		Skybox& GetSkybox() { return skybox; }
+
 		friend SceneSerialisation;
 
 	protected:
 		SceneHierarchy hierarchy;
+		Skybox skybox;
 
 		GizmoRender gizmoRender;
 

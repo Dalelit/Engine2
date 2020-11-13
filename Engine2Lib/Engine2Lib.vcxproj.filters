@@ -55,6 +55,8 @@
     <ClInclude Include="src\MaterialLibrary.h" />
     <ClInclude Include="src\TextureLoader.h" />
     <ClInclude Include="src\MeshLoader.h" />
+    <ClInclude Include="src\Skybox.h" />
+    <ClInclude Include="src\SurfaceLoader.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\pch.cpp" />
@@ -97,6 +99,8 @@
     <ClCompile Include="src\TextureLoader.cpp" />
     <ClCompile Include="src\MeshLoader.cpp" />
     <ClCompile Include="src\VertexLayout.cpp" />
+    <ClCompile Include="src\Skybox.cpp" />
+    <ClCompile Include="src\SurfaceLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Assets\Shaders\GizmosPS.hlsl" />
@@ -110,5 +114,7 @@
     <FxCompile Include="Assets\Shaders\PositionNormalColorVS.hlsl" />
     <FxCompile Include="Assets\Shaders\PositionNormalTextureVS.hlsl" />
     <FxCompile Include="Assets\Shaders\PositionNormalTexturePS.hlsl" />
+    <FxCompile Include="Assets\Shaders\SkyboxPS.hlsl" />
+    <FxCompile Include="Assets\Shaders\SkyboxVS.hlsl" />
   </ItemGroup>
 </Project>
