@@ -1,18 +1,17 @@
 #include "pch.h"
 #include "SceneBuilder.h"
-#include "Primatives.h"
 #include "Engine2.h"
-#include "VertexBuffer.h"
 #include "Components.h"
 #include "Particles.h"
 #include "MeshRenderer.h"
 #include "RigidBody.h"
 #include "Lights.h"
 #include "VertexLayout.h"
-#include "AssetLoaders/ObjLoader.h"
 #include "SceneSerialisation.h"
 #include "MaterialLibrary.h"
 #include "TextureLoader.h"
+#include "Offscreen.h"
+#include "UtilFileDialog.h"
 
 using namespace Engine2;
 using namespace EngineECS;
@@ -26,7 +25,16 @@ SceneBuilder::SceneBuilder() : Layer("SceneBuilder")
 	LoadPrimatives();
 	BuildTestScene();
 
-	scene.GetSkybox().Initialise("Assets\\Skyboxes\\Test");
+	//scene.GetSkybox().Initialise("Assets\\Skyboxes\\Test");
+	std::vector<std::string> files = {
+		"Assets\\Skyboxes\\Corona\\corona_ft.png",
+		"Assets\\Skyboxes\\Corona\\corona_bk.png",
+		"Assets\\Skyboxes\\Corona\\corona_up.png",
+		"Assets\\Skyboxes\\Corona\\corona_dn.png",
+		"Assets\\Skyboxes\\Corona\\corona_rt.png",
+		"Assets\\Skyboxes\\Corona\\corona_lf.png",
+	};
+	scene.GetSkybox().Initialise(files);
 }
 
 void SceneBuilder::OnUpdate(float dt)
@@ -49,12 +57,12 @@ void SceneBuilder::OnImgui()
 	static std::string selectedFile = "Scenes//testScene.txt";
 	ImGui::Text("File: %s", selectedFile.c_str());
 	if (ImGui::Button("Save as..."))
-		if (FileSelectionDialogue::SaveDialogue(selectedFile))
+		if (Util::FileSelectionDialogue::SaveDialogue(selectedFile))
 			SceneSerialisation(scene).SaveScene(selectedFile);
 	if (ImGui::Button("Save"))
 		SceneSerialisation(scene).SaveScene(selectedFile);
 	if (ImGui::Button("Load file..."))
-		if (FileSelectionDialogue::LoadDialogue(selectedFile))
+		if (Util::FileSelectionDialogue::LoadDialogue(selectedFile))
 			SceneSerialisation(scene).LoadScene(selectedFile);
 	if (ImGui::Button("Reload"))
 		SceneSerialisation(scene).LoadScene(selectedFile);

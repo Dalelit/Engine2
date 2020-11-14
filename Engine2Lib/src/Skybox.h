@@ -6,11 +6,23 @@
 
 namespace Engine2
 {
+	class SkyboxFileSelector
+	{
+	public:
+		void OnImgui();
+
+		std::vector<std::string>& GetFilenames() { return filenames; }
+
+	protected:
+		std::vector<std::string> filenames;
+	};
+
 	class Skybox : public Drawable
 	{
 	public:
 
-		bool Initialise(const std::string& directory);
+		bool Initialise(const std::string& directory, const std::string& fileType = "jpg");
+		bool Initialise(std::vector<std::string>& filenames);
 
 		void Bind();
 		void Draw();
@@ -23,7 +35,7 @@ namespace Engine2
 	protected:
 		bool active = false;
 		unsigned int slot = 0;
-		std::string path;
+		std::vector<std::string> filelist;
 		std::string status = "Uninitialised";
 
 		wrl::ComPtr<ID3D11DepthStencilState> pDepthStencilState = nullptr;
@@ -34,6 +46,8 @@ namespace Engine2
 		std::unique_ptr<PixelShader> pixelShader;
 		std::unique_ptr<Drawable> vertexBuffer;
 
-		bool InitialiseTexture(const std::string& directory);
+		SkyboxFileSelector fileSelection;
+
+		bool InitialiseTexture(std::vector<std::string>& filenames);
 	};
 }

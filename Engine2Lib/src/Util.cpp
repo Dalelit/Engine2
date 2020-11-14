@@ -41,33 +41,4 @@ namespace Engine2
 			return { len * sinf(yzAng) * cosf(xzAng), len * sinf(yzAng) * sin(xzAng), len * cosf(yzAng), 1.0f };
 		}
 	}
-
-
-	bool FileSelectionDialogue::OpenDialogue(std::string& filename, bool fileMustExist)
-	{
-		OPENFILENAMEA ofn;
-		char szfile[256] = "";
-
-		// Initialize OPENFILENAME
-		ZeroMemory(&ofn, sizeof(ofn));
-		ofn.lStructSize = sizeof(ofn);
-		ofn.hwndOwner = DXDevice::Get().GetWindowHandle();
-		ofn.lpstrFile = szfile;
-		ofn.lpstrFile[0] = '\0';
-		ofn.nMaxFile = sizeof(szfile);
-		ofn.lpstrFilter = "All\0*.*"; // "All\0*.*\0Text\0*.TXT\0"
-		ofn.nFilterIndex = 1;
-		ofn.lpstrFileTitle = NULL;
-		ofn.nMaxFileTitle = 0;
-		ofn.lpstrInitialDir = NULL;
-		ofn.Flags = OFN_PATHMUSTEXIST;
-		if (fileMustExist) ofn.Flags |= OFN_FILEMUSTEXIST;
-
-		BOOL result = GetOpenFileNameA(&ofn);
-
-		if (result) filename = szfile;
-
-		return result;
-	}
-
 }

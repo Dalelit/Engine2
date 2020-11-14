@@ -1,14 +1,15 @@
 #include "pch.h"
 #include "Skybox.h"
 #include "SurfaceLoader.h"
+#include "UtilFileDialog.h"
 
 namespace Engine2
 {
-	bool Skybox::Initialise(const std::string& directory)
+	bool Skybox::Initialise(std::vector<std::string>& filenames)
 	{
 		HRESULT hr;
 
-		InitialiseTexture(directory);
+		InitialiseTexture(filenames);
 
 		// create the depth stencil settings
 
@@ -57,18 +58,29 @@ namespace Engine2
 		return true;
 	}
 
-	bool Skybox::InitialiseTexture(const std::string& directory)
+	bool Skybox::Initialise(const std::string& directory, const std::string& fileType)
 	{
-		path = directory;
-
 		//load 6 files
-		std::string fileType = ".jpg";
-		std::vector<std::string> names = { "right", "left", "top", "bottom", "front", "back" };
+		std::vector<std::string> filenames = {
+			directory + "\\right." + fileType,
+			directory + "\\left." + fileType,
+			directory + "\\top." + fileType,
+			directory + "\\bottom." + fileType,
+			directory + "\\front." + fileType,
+			directory + "\\back." + fileType
+		};
+
+		return Initialise(filenames);
+	}
+	bool Skybox::InitialiseTexture(std::vector<std::string>& filenames)
+	{
+		E2_ASSERT(filenames.size() == 6, "Expect 6 filenames for skybox");
+
 		std::vector<std::shared_ptr<Surface>> surfaces;
 		surfaces.reserve(6);
 		for (int i = 0; i < 6; i++)
 		{
-			surfaces.push_back(SurfaceLoader::LoadSurface(directory + "\\" + names[i] + fileType));
+			surfaces.push_back(SurfaceLoader::LoadSurface(filenames[i]));
 			if (!surfaces.back()) { status = SurfaceLoader::LastResult; return false; }
 		}
 
@@ -99,9 +111,10 @@ namespace Engine2
 
 		texture->SetSampler(D3D11_FILTER::D3D11_FILTER_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_CLAMP);
 
+		filelist = filenames; // store the filenames so it can be serialised
+
 		return true;
 	}
-
 
 	void Skybox::Bind()
 	{
@@ -139,11 +152,58 @@ namespace Engine2
 		{
 			ImGui::Checkbox("Active", &active);
 			ImGui::Text("Status: %s", status.c_str());
-			ImGui::Text("Path: %s", path.c_str());
 			if (texture) texture->OnImgui();
 			if (vertexShader) vertexShader->OnImgui();
 			if (pixelShader) pixelShader->OnImgui();
 			if (vertexBuffer) vertexBuffer->OnImgui();
+			fileSelection.OnImgui();
+			if (fileSelection.GetFilenames().size() == 6 &&  ImGui::Button("Update Skybox textures"))
+			{
+				// have a valid list from the file selector so update the textures if clicked
+				InitialiseTexture(fileSelection.GetFilenames());
+			}
+			if (ImGui::TreeNode("Current files"))
+			{
+				for (auto& fn : filelist) ImGui::Text(" %s", fn.c_str());
+				ImGui::TreePop();
+			}
+			ImGui::TreePop();
+		}
+
+	}
+	
+	void SkyboxFileSelector::OnImgui()
+	{
+		if (ImGui::TreeNode("File selector"))
+		{
+			if (ImGui::Button("Select files"))
+			{
+				filenames.clear();
+				Util::FileSelectionDialogue::SelectFilesDialogue(filenames);
+			}
+
+			for (auto i = 0u; i < filenames.size(); i++)
+			{
+				ImGui::Text("  %s", filenames[i].c_str());
+				if (i == 0)
+				{
+					ImGui::SameLine();
+					ImGui::Text(" "); // just for spacing
+				}
+				else // can move up one
+				{
+					ImGui::SameLine();
+					ImGui::Text("^");
+					if (ImGui::IsItemClicked()) std::swap(filenames[i - 1u], filenames[i]);
+				}
+				if (i < filenames.size() - 1) // can move down one
+				{
+					ImGui::SameLine();
+					ImGui::Text("v");
+					if (ImGui::IsItemClicked()) std::swap(filenames[i], filenames[i + 1u]);
+				}
+			}
+
 			ImGui::TreePop();
 		}
 	}

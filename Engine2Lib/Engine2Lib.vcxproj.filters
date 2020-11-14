@@ -57,6 +57,7 @@
     <ClInclude Include="src\MeshLoader.h" />
     <ClInclude Include="src\Skybox.h" />
     <ClInclude Include="src\SurfaceLoader.h" />
+    <ClInclude Include="src\UtilFileDialog.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\pch.cpp" />
@@ -101,6 +102,7 @@
     <ClCompile Include="src\VertexLayout.cpp" />
     <ClCompile Include="src\Skybox.cpp" />
     <ClCompile Include="src\SurfaceLoader.cpp" />
+    <ClCompile Include="src\UtilFileDialog.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Assets\Shaders\GizmosPS.hlsl" />
