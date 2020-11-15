@@ -21,7 +21,7 @@ namespace Engine2
 
 		void LoadViewProjectionMatrixT(DirectX::XMMATRIX& vpMatrix) { vpMatrix = DirectX::XMMatrixTranspose(viewProjectionMatrix); }; // transpose for DX.
 
-		void OnImugui();
+		void OnImgui();
 
 		inline void Translate(float x, float y, float z)   { position.m128_f32[0] += x; position.m128_f32[1] += y; position.m128_f32[2] += z; }
 		inline void SetPosition(float x, float y, float z) { position = {x, y, z, 1.0f}; }

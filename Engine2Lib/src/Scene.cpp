@@ -11,6 +11,7 @@
 #include "VertexLayout.h"
 #include "MeshLoader.h"
 #include "TextureLoader.h"
+#include "CameraComponent.h"
 
 using namespace EngineECS;
 
@@ -27,17 +28,22 @@ namespace Engine2
 		UpdateParticles(dt);
 	}
 
-	void Scene::OnRender()
+	void Scene::OnRender(Camera& camera)
 	{
-		UpdateVSSceneConstBuffer();
-		UpdatePSSceneConstBuffer();
+		RenderImage(camera);
+		CamerasRender();
+	}
+
+	void Scene::RenderImage(Camera& camera, bool showGizmos)
+	{
+		UpdateVSSceneConstBuffer(camera);
+		UpdatePSSceneConstBuffer(camera);
 
 		RenderMeshes();
 		RenderParticles();
 		if (skybox.IsActive()) skybox.BindAndDraw();
 		RenderOutlines();
-		RenderGizmos();
-
+		if (gizmoEnabled && showGizmos) RenderGizmos();
 	}
 
 	// update any components that need to know when an event has happened
@@ -51,15 +57,15 @@ namespace Engine2
 		}
 	}
 
-	void Scene::UpdateVSSceneConstBuffer()
+	void Scene::UpdateVSSceneConstBuffer(Camera& camera)
 	{
-		Engine::GetActiveCamera().LoadViewProjectionMatrixT(vsConstBuffer.data.cameraTransform);
+		camera.LoadViewProjectionMatrixT(vsConstBuffer.data.cameraTransform);
 		vsConstBuffer.Bind();
 	}
 
-	void Scene::UpdatePSSceneConstBuffer()
+	void Scene::UpdatePSSceneConstBuffer(Camera& camera)
 	{
-		psConstBuffer.data.CameraPosition = Engine::GetActiveCamera().GetPosition();
+		psConstBuffer.data.CameraPosition = camera.GetPosition();
 
 		Coordinator& coordinator = hierarchy.GetECSCoordinator();
 		auto& pointLights = coordinator.GetComponents<PointLight>();
@@ -155,6 +161,25 @@ namespace Engine2
 		}
 	}
 
+	void Scene::CamerasRender()
+	{
+		Coordinator& coordinator = hierarchy.GetECSCoordinator();
+		View<CameraComponent, Transform> entities(coordinator);
+		for (auto e : entities)
+		{
+			auto* cc = coordinator.GetComponent<CameraComponent>(e);
+			auto* tr = coordinator.GetComponent<Transform>(e);
+
+			cc->GetCamera().Update(); // to do: not real good that this has to be called here.
+			cc->Clear();
+			cc->SetAsTarget();
+			RenderImage(cc->GetCamera(), false);
+
+			cc->ShowSubDisplay();
+		}
+		DXDevice::Get().SetBackBufferAsRenderTarget();
+	}
+
 	void Scene::UpdatePhysics(float dt)
 	{
 		Coordinator& coordinator = hierarchy.GetECSCoordinator();
@@ -197,6 +222,8 @@ namespace Engine2
 		if (ImGui::Begin("Scene", &sceneOpen))
 		{
 			hierarchy.OnImgui();
+			ImGui::Separator();
+			ImGui::Checkbox("Show Gizmos", &gizmoEnabled);
 			skybox.OnImgui();
 		}
 		ImGui::End();

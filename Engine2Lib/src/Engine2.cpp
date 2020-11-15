@@ -228,7 +228,7 @@ namespace Engine2
 				}
 				ImGui::EndCombo();
 			}
-			for (auto& c : cameras) c->OnImugui();
+			for (auto& c : cameras) c->OnImgui();
 		}
 		ImGui::End();
 	}

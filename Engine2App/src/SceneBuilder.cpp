@@ -10,8 +10,8 @@
 #include "SceneSerialisation.h"
 #include "MaterialLibrary.h"
 #include "TextureLoader.h"
-#include "Offscreen.h"
 #include "UtilFileDialog.h"
+#include "CameraComponent.h"
 
 using namespace Engine2;
 using namespace EngineECS;
@@ -25,16 +25,24 @@ SceneBuilder::SceneBuilder() : Layer("SceneBuilder")
 	LoadPrimatives();
 	BuildTestScene();
 
-	//scene.GetSkybox().Initialise("Assets\\Skyboxes\\Test");
-	std::vector<std::string> files = {
-		"Assets\\Skyboxes\\Corona\\corona_ft.png",
-		"Assets\\Skyboxes\\Corona\\corona_bk.png",
-		"Assets\\Skyboxes\\Corona\\corona_up.png",
-		"Assets\\Skyboxes\\Corona\\corona_dn.png",
-		"Assets\\Skyboxes\\Corona\\corona_rt.png",
-		"Assets\\Skyboxes\\Corona\\corona_lf.png",
-	};
-	scene.GetSkybox().Initialise(files);
+	scene.GetSkybox().Initialise("Assets\\Skyboxes\\Test");
+	//std::vector<std::string> files = {
+	//	"Assets\\Skyboxes\\Corona\\corona_ft.png",
+	//	"Assets\\Skyboxes\\Corona\\corona_bk.png",
+	//	"Assets\\Skyboxes\\Corona\\corona_up.png",
+	//	"Assets\\Skyboxes\\Corona\\corona_dn.png",
+	//	"Assets\\Skyboxes\\Corona\\corona_rt.png",
+	//	"Assets\\Skyboxes\\Corona\\corona_lf.png",
+	//};
+	//scene.GetSkybox().Initialise(files);
+
+	{
+		auto e = scene.CreateEntity();
+		auto cc = e.AddComponent<CameraComponent>();
+		auto& camera = cc->GetCamera();
+		camera.SetPosition(5.0f, 5.0f, -5.0f);
+		camera.LookAt(0.0f, 0.0f, 0.0f);
+	}
 }
 
 void SceneBuilder::OnUpdate(float dt)

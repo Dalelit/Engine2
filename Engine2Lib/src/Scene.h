@@ -7,6 +7,7 @@
 #include "GizmoRender.h"
 #include "SceneHierarchy.h"
 #include "Skybox.h"
+#include "Engine2.h"
 
 namespace Engine2
 {
@@ -20,7 +21,8 @@ namespace Engine2
 		~Scene() = default;
 
 		void OnUpdate(float dt);
-		void OnRender();
+		void OnRender() { OnRender(Engine::GetActiveCamera()); }
+		void OnRender(Camera& camera);
 		void OnApplicationEvent(Engine2::ApplicationEvent& event);
 
 		Entity CreateEntity() { return hierarchy.CreateEntity(); }
@@ -46,6 +48,9 @@ namespace Engine2
 
 		Skybox& GetSkybox() { return skybox; }
 
+		// returns the previous setting if you want to revert
+		inline bool EnableGizmos(bool show = true) { auto current = gizmoEnabled; gizmoEnabled = show; return current; }
+
 		friend SceneSerialisation;
 
 	protected:
@@ -53,14 +58,19 @@ namespace Engine2
 		Skybox skybox;
 
 		GizmoRender gizmoRender;
+		bool gizmoEnabled = true;
 
-		void UpdateVSSceneConstBuffer();
-		void UpdatePSSceneConstBuffer();
+		void UpdateVSSceneConstBuffer(Camera& camera);
+		void UpdatePSSceneConstBuffer(Camera& camera);
 
 		void RenderMeshes();
 		void RenderParticles();
 		void RenderGizmos();
 		void RenderOutlines();
+
+		void RenderImage(Camera& camera, bool showGizmos = false);
+
+		void CamerasRender();
 
 		void UpdatePhysics(float dt);
 		void UpdateTransformMatrix();

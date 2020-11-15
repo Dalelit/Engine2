@@ -89,7 +89,7 @@ namespace Engine2
 		{
 			ImGui::Checkbox("Show", &subDisplay.show);
 			if (ImGui::DragFloat2("Left,Top", subDisplay.leftTop, 0.05f, -1.0f, 1.0f)) InitialiseSubDisplayVB();
-			if (ImGui::DragFloat("Size", &subDisplay.size, 0.05f, 0.1f)) InitialiseSubDisplayVB();
+			if (ImGui::DragFloat("Size", &subDisplay.size, 0.05f, 0.1f, 2.0f)) InitialiseSubDisplayVB();
 			ImGui::TreePop();
 		}
 	}
@@ -343,7 +343,7 @@ namespace Engine2
 		{
 			ImGui::Checkbox("Show", &subDisplayDepthBuffer.show);
 			if (ImGui::DragFloat2("Left,Top", subDisplayDepthBuffer.leftTop, 0.05f, -1.0f, 1.0f)) InitialiseSubDisplayDepthBufferVB();
-			if (ImGui::DragFloat("Size", &subDisplayDepthBuffer.size, 0.05f, 0.1f)) InitialiseSubDisplayDepthBufferVB();
+			if (ImGui::DragFloat("Size", &subDisplayDepthBuffer.size, 0.05f, 0.1f, 2.0f)) InitialiseSubDisplayDepthBufferVB();
 			ImGui::TreePop();
 		}
 	}

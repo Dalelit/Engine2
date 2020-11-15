@@ -7,6 +7,7 @@
 #include "Particles.h"
 #include "Lights.h"
 #include "OffscreenOutliner.h"
+#include "CameraComponent.h"
 
 using namespace DirectX;
 
@@ -175,6 +176,7 @@ namespace Engine2
 		ComponentOnImgui<ParticleEmitter>("ParticleEmitter", id, coord);
 		ComponentOnImgui<Gizmo>("Gizmo", id, coord);
 		ComponentOnImgui<OffscreenOutliner>("Outliner", id, coord);
+		ComponentOnImgui<CameraComponent>("Camera", id, coord);
 
 		if (ImGui::BeginCombo("Add Component", ""))
 		{
@@ -184,6 +186,7 @@ namespace Engine2
 			AddComponentOnImgui<ParticleEmitter>("ParticleEmitter", id, coord);
 			AddComponentOnImgui<Gizmo>("Gizmo", id, coord);
 			AddComponentOnImgui<OffscreenOutliner>("Outliner", id, coord);
+			AddComponentOnImgui<CameraComponent>("Camera", id, coord);
 
 			ImGui::EndCombo();
 		}

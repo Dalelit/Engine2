@@ -58,6 +58,7 @@
     <ClInclude Include="src\Skybox.h" />
     <ClInclude Include="src\SurfaceLoader.h" />
     <ClInclude Include="src\UtilFileDialog.h" />
+    <ClInclude Include="src\CameraComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\pch.cpp" />
@@ -103,6 +104,7 @@
     <ClCompile Include="src\Skybox.cpp" />
     <ClCompile Include="src\SurfaceLoader.cpp" />
     <ClCompile Include="src\UtilFileDialog.cpp" />
+    <ClCompile Include="src\CameraComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Assets\Shaders\GizmosPS.hlsl" />

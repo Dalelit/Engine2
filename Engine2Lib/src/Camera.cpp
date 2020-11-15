@@ -20,7 +20,7 @@ namespace Engine2
 		viewProjectionMatrix = viewMatrix * projectionMatrix;
 	}
 
-	void Camera::OnImugui()
+	void Camera::OnImgui()
 	{
 		if (ImGui::TreeNode(name.c_str()))
 		{
