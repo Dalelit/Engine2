@@ -14,37 +14,26 @@ namespace Engine2
 	class Camera
 	{
 	public:
-		Camera(std::string name) : name(name) {}
+		Camera() {}
+		Camera(const std::string& name) : name(name) {}
 		virtual ~Camera() = default;
 
-		void Update(); // called once by the input control to calc the data once per frame
+		void Update(DirectX::XMVECTOR position, DirectX::XMVECTOR rotation);
 
 		void LoadViewProjectionMatrixT(DirectX::XMMATRIX& vpMatrix) { vpMatrix = DirectX::XMMatrixTranspose(viewProjectionMatrix); }; // transpose for DX.
 
-		void OnImgui();
-
-		inline void Translate(float x, float y, float z)   { position.m128_f32[0] += x; position.m128_f32[1] += y; position.m128_f32[2] += z; }
-		inline void SetPosition(float x, float y, float z) { position = {x, y, z, 1.0f}; }
-		void Move(float forwardDist, float rightDist, float upDist);
-
-		void LookAt(float x, float y, float z);
-
-		inline void Rotate(float yawRads, float pitchRads)      { yaw += yawRads; pitch += pitchRads; WrapYaw(); ClampPitch(); }
-		inline void SetRotation(float yawRads, float pitchRads) { yaw = yawRads; pitch = pitchRads; WrapYaw(); ClampPitch(); }
+		virtual void OnImgui();
 
 		inline void SetAspectRatio(float ratio) { aspectRatio = ratio; }
 		inline bool IsAspectRatioLockedToScreen() { return aspectRatioLockedToScreen; }
 		inline bool SetAspectRatioLockedToScreen(bool locked = true) { aspectRatioLockedToScreen = locked; }
 
-		inline DirectX::XMVECTOR GetPosition() { return position; }
 		inline std::string& GetName() { return name; }
+		inline void SetName(const std::string& newName) { name = newName; }
 
+		inline DirectX::XMVECTOR GetPosition() { return position; }
 		DirectX::XMMATRIX GetTransform() { return transform; }
 
-		// Origin is the relative point on the screen (0,0) to (1,1). NDC have top left as origin.
-		Ray ScreenCoordToRay(float x, float y);
-
-		Ray ForwardDirectionRay();
 
 	protected:
 		std::string name;
@@ -54,21 +43,51 @@ namespace Engine2
 		float farZ = 10000.0f;
 		bool aspectRatioLockedToScreen = true;
 
-		DirectX::XMVECTOR position = {};
-		DirectX::XMVECTOR direction = {};
+		static constexpr DirectX::XMVECTOR FORWARD = { 0.0f, 0.0f, 1.0f, 1.0f };
+		static constexpr DirectX::XMVECTOR UP = { 0.0f, 1.0f, 0.0f, 1.0f };
+
+		DirectX::XMVECTOR direction;
+		DirectX::XMVECTOR position;
 		DirectX::XMMATRIX transform;
-
-		float yaw = 0.0f;
-		float pitch = 0.0f;
-		float pitchBound = DirectX::XM_PIDIV2 - 0.001f;
-
 		DirectX::XMMATRIX viewMatrix;
 		DirectX::XMMATRIX projectionMatrix;
 		DirectX::XMMATRIX viewProjectionMatrix;
 
+		bool showGizmos = true;
+	};
+
+	class SceneCamera : public Camera
+	{
+	public:
+		SceneCamera(const std::string& name) : Camera(name) {}
+
+		void Update(); // called once by the input control to calc the data once per frame
+
+		inline void Translate(float x, float y, float z) { position.m128_f32[0] += x; position.m128_f32[1] += y; position.m128_f32[2] += z; }
+		inline void SetPosition(float x, float y, float z) { position = { x, y, z, 1.0f }; }
+		void Move(float forwardDist, float rightDist, float upDist);
+		inline DirectX::XMVECTOR GetPosition() { return position; }
+
+		inline void Rotate(float yawRads, float pitchRads) { yaw += yawRads; pitch += pitchRads; WrapYaw(); ClampPitch(); }
+		inline void SetRotation(float yawRads, float pitchRads) { yaw = yawRads; pitch = pitchRads; WrapYaw(); ClampPitch(); }
+
+		void LookAt(float x, float y, float z);
+
+		// Origin is the relative point on the screen (0,0) to (1,1). NDC have top left as origin.
+		Ray ScreenCoordToRay(float x, float y);
+
+		Ray ForwardDirectionRay();
+
+		void OnImgui();
+
+	protected:
+		DirectX::XMVECTOR position = { 0.0f, 0.0f, 0.0f, 1.0f };
+		DirectX::XMVECTOR rotation = { 0.0f, 0.0f, 0.0f, 0.0f };
+		float yaw;
+		float pitch;
+
+		float pitchBound = DirectX::XM_PIDIV2 - 0.001f;
 		inline void ClampPitch() { pitch = std::clamp(pitch, -pitchBound, pitchBound); }
 		inline void WrapYaw() { yaw = fmodf((float)yaw, DirectX::XM_2PI); if (yaw < 0.0f) yaw += DirectX::XM_2PI; }
-
-		bool showGizmos = true;
 	};
 }

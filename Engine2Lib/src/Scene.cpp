@@ -3,6 +3,7 @@
 #include "Camera.h"
 #include "Engine2.h"
 #include "Components.h"
+#include "Transform.h"
 #include "MeshRenderer.h"
 #include "RigidBody.h"
 #include "Particles.h"
@@ -26,6 +27,7 @@ namespace Engine2
 		UpdatePhysics(dt);
 		UpdateTransformMatrix();
 		UpdateParticles(dt);
+		UpdateCameras();
 	}
 
 	void Scene::OnRender(Camera& camera)
@@ -170,7 +172,7 @@ namespace Engine2
 			auto* cc = coordinator.GetComponent<CameraComponent>(e);
 			auto* tr = coordinator.GetComponent<Transform>(e);
 
-			cc->GetCamera().Update(); // to do: not real good that this has to be called here.
+			cc->GetCamera().Update(tr->position, tr->rotation);
 			cc->Clear();
 			cc->SetAsTarget();
 			RenderImage(cc->GetCamera(), false);
@@ -209,11 +211,38 @@ namespace Engine2
 		}
 	}
 
+	void Scene::UpdateCameras()
+	{
+		Coordinator& coordinator = hierarchy.GetECSCoordinator();
+		View<Transform, Camera> entities(coordinator);
+		for (auto e : entities)
+		{
+			auto c = coordinator.GetComponent<Camera>(e);
+			auto t = coordinator.GetComponent<Transform>(e);
+
+			c->Update(t->position, t->rotation);
+		}
+	}
+
+	Entity Scene::CreateSceneCamera(const std::string& name, bool makeMainCamera)
+	{
+		auto entity = CreateEntity();
+		auto camera = entity.AddComponent<Camera>();
+		camera->SetName(name);
+		camera->SetAspectRatio( DXDevice::Get().GetAspectRatio() );
+		entity.GetComponent<EntityInfo>()->tag = name;
+
+		if (makeMainCamera) SetMainSceneCarmera(entity.Id());
+
+		return entity;
+	}
+
 	void Scene::OnImgui()
 	{
 		ImGuiScene();
 		ImGuiEntities();
 		ImGuiAssets();
+		ImGuiCameras();
 	}
 
 	void Scene::ImGuiScene()
@@ -315,6 +344,27 @@ namespace Engine2
 				TextureLoader::Textures.OnImGui();
 				ImGui::TreePop();
 			}
+		}
+		ImGui::End();
+	}
+
+	void Scene::ImGuiCameras()
+	{
+		static bool open = true;
+
+		if (ImGui::Begin("Cameras", &open))
+		{
+			//if (ImGui::BeginCombo("", currentCamera->GetName().c_str()))
+			//{
+			//	for (unsigned int i = 0; i < cameras.size(); i++)
+			//	{
+			//		bool isSelected = (i == currentCameraIndx);
+			//		if (ImGui::Selectable(cameras[i]->GetName().c_str(), isSelected)) SetCurrentCamera(i);
+			//		if (isSelected) ImGui::SetItemDefaultFocus();
+			//	}
+			//	ImGui::EndCombo();
+			//}
+			//for (auto& c : cameras) c->OnImgui();
 		}
 		ImGui::End();
 	}

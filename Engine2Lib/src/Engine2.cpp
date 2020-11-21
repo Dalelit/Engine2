@@ -18,11 +18,6 @@ namespace Engine2
 	{
 		imgui.Initialise(hwnd, device);
 		imguiActive = true;
-
-		pInputController = std::make_unique<InputController>();
-
-		// creates the main camera at 0, and sets the input control to use it
-		SetCurrentCamera(AddCamera("main"));
 	}
 
 	Engine::~Engine()
@@ -31,28 +26,6 @@ namespace Engine2
 		{
 			delete layer;
 		}
-	}
-
-	unsigned int Engine::AddCamera(std::string name)
-	{
-		unsigned int indx = (unsigned int)cameras.size();
-		cameras.emplace_back(std::make_unique<Camera>(name));
-		cameras[indx]->SetAspectRatio(device.GetAspectRatio());
-		return indx;
-	}
-
-	void Engine::SetCurrentCamera(unsigned int indx)
-	{
-		E2_ASSERT(indx >= 0 && indx < cameras.size(), "Trying to set camera indx past number of cameras");
-		currentCamera = cameras[indx].get();
-		currentCameraIndx = indx;
-		pInputController->SetCamera(currentCamera);
-	}
-
-	Camera* Engine::GetCamera(unsigned int indx)
-	{
-		E2_ASSERT(indx >= 0 && indx < cameras.size(), "Trying to get camera indx past number of cameras");
-		return cameras[indx].get();
 	}
 
 	void Engine::DoFrame(float deltaTime)
@@ -66,8 +39,6 @@ namespace Engine2
 	{
 		updateMemory.Set();
 		frameTime.Set(); // Tick just before present frame
-
-		pInputController->OnUpdate(deltaTime);
 
 		// update layers
 		for (auto layer : layers)
@@ -126,8 +97,6 @@ namespace Engine2
 
 	void Engine::OnApplicationEvent(ApplicationEvent& event)
 	{
-		pInputController->OnApplicationEvent(event);
-
 		EventDispatcher dispacher(event);
 
 		dispacher.Dispatch<WindowResizeEvent>(E2_BIND_EVENT_FUNC(Engine::OnResize));
@@ -143,8 +112,6 @@ namespace Engine2
 		// check if ImGui handled the event
 		if (event.GetGroup() == EventGroup::Mouse && ImGui::GetIO().WantCaptureMouse) return;
 		if (event.GetGroup() == EventGroup::Keyboard && ImGui::GetIO().WantCaptureKeyboard) return;
-
-		pInputController->OnInputEvent(event);
 
 		//EventDispatcher dispacher(event);
 
@@ -164,7 +131,6 @@ namespace Engine2
 		{
 			minimised = false;
 			device.ScreenSizeChanged();
-			for (auto& c : cameras) if (c->IsAspectRatioLockedToScreen()) c->SetAspectRatio(device.GetAspectRatio());
 		}
 
 		return true;
@@ -183,12 +149,6 @@ namespace Engine2
 
 		static bool drawStatsOpen = true;
 		if (drawStatsOpen) Instrumentation::Drawing::ImguiWindow(&drawStatsOpen);
-
-		static bool inputControllerOpen = true;
-		if (inputControllerOpen) pInputController->ImguiWindow(&inputControllerOpen);
-
-		static bool cameraOpen = true;
-		if (cameraOpen) ImuguiCameraWindow(&cameraOpen);
 
 		if (ImGui::Begin("Engine2", nullptr, ImGuiWindowFlags_MenuBar))
 		{
@@ -211,25 +171,6 @@ namespace Engine2
 			}
 		}
 
-		ImGui::End();
-	}
-
-	void Engine::ImuguiCameraWindow(bool* pOpen)
-	{
-		if (ImGui::Begin("Cameras", pOpen))
-		{
-			if (ImGui::BeginCombo("", currentCamera->GetName().c_str()))
-			{
-				for (unsigned int i = 0; i < cameras.size(); i++)
-				{
-					bool isSelected = (i == currentCameraIndx);
-					if (ImGui::Selectable(cameras[i]->GetName().c_str(), isSelected)) SetCurrentCamera(i);
-					if (isSelected) ImGui::SetItemDefaultFocus();
-				}
-				ImGui::EndCombo();
-			}
-			for (auto& c : cameras) c->OnImgui();
-		}
 		ImGui::End();
 	}
 

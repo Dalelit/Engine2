@@ -53,7 +53,7 @@ namespace Engine2
 		void OnApplicationEvent(ApplicationEvent& event);
 		void ImguiWindow(bool* pOpen);
 
-		inline void SetCamera(Camera* ptr) { pCamera = ptr; }
+		inline void SetCamera(SceneCamera* ptr) { pCamera = ptr; }
 		inline Ray GetRayFromMouse() { return pCamera->ScreenCoordToRay(State.MouseNormaliseCoordinates.x, State.MouseNormaliseCoordinates.y); }
 		inline Ray GetRayForward()   { return pCamera->ForwardDirectionRay(); }
 
@@ -62,7 +62,7 @@ namespace Engine2
 		void SetCursorClipping(bool clipped) { State.ClipCursor = clipped; UpdateCursorClipping(); }
 
 	protected:
-		Camera* pCamera;
+		SceneCamera* pCamera;
 
 		void OnMouseMove(MouseMoveEvent& event);
 		void OnMouseButtonPressed(MouseButtonPressedEvent& event);

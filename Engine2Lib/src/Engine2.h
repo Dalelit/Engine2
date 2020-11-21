@@ -6,8 +6,6 @@
 #include "DXImgui.h"
 #include "Events.h"
 #include "Layer.h"
-#include "Camera.h"
-#include "InputController.h"
 #include "Instrumentation.h"
 
 namespace Engine2 {
@@ -18,20 +16,9 @@ namespace Engine2 {
 
 		static void CreateEngine(HWND hwnd);
 		inline static Engine& Get() { return *instance; }
-		inline static Camera& GetActiveCamera() { return *instance->CurrentCamera(); }
-		inline static InputController& GetInputController() { return *instance->pInputController; }
 
 		Engine(HWND hwnd);
 		~Engine();
-
-		std::unique_ptr<InputController> pInputController;
-
-		inline Camera* CurrentCamera() { return currentCamera; }
-		inline std::vector<std::unique_ptr<Camera>>& GetCameras() { return instance->cameras; }
-		unsigned int AddCamera(std::string name);
-		void SetCurrentCamera(unsigned int indx);
-		Camera* GetCamera(unsigned int indx);
-		inline Camera* AddGetCamera(std::string name) { return GetCamera(AddCamera(name)); }
 
 		void DoFrame(float deltaTime); // does update then render
 		void Update(float deltaTime);
@@ -55,11 +42,6 @@ namespace Engine2 {
 		std::vector<Layer*> layers;
 		bool minimised = false;
 		bool imguiActive = false;
-
-		std::vector<std::unique_ptr<Camera>> cameras;
-		Camera* currentCamera;
-		unsigned int currentCameraIndx;
-		void ImuguiCameraWindow(bool* pOpen);
 
 		// application event handlers
 		bool OnResize(WindowResizeEvent& event);

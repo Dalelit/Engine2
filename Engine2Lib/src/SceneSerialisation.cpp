@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "SceneSerialisation.h"
 #include "Components.h"
+#include "Transform.h"
 #include "MeshRenderer.h"
 #include "RigidBody.h"
 #include "Particles.h"

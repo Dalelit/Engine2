@@ -2,6 +2,7 @@
 #include "SceneBuilder.h"
 #include "Engine2.h"
 #include "Components.h"
+#include "Transform.h"
 #include "Particles.h"
 #include "MeshRenderer.h"
 #include "RigidBody.h"
@@ -19,8 +20,15 @@ using namespace DirectX;
 
 SceneBuilder::SceneBuilder() : Layer("SceneBuilder")
 {
-	Engine::GetActiveCamera().SetPosition(5.0f, 5.0f, -5.0f);
-	Engine::GetActiveCamera().LookAt(0.0f, 0.0f, 0.0f);
+	//Engine::GetActiveCamera().SetPosition(5.0f, 5.0f, -5.0f);
+	//Engine::GetActiveCamera().LookAt(0.0f, 0.0f, 0.0f);
+
+	{
+		auto mainCamera = scene.CreateSceneCamera("Main", true);
+		auto t = mainCamera.GetComponent<Transform>();
+		t->SetPosition(5.0f, 5.0f, -5.0f);
+		t->LookAt(0.0f, 0.0f, 0.0f);
+	}
 
 	LoadPrimatives();
 	BuildTestScene();
@@ -40,8 +48,9 @@ SceneBuilder::SceneBuilder() : Layer("SceneBuilder")
 		auto e = scene.CreateEntity();
 		auto cc = e.AddComponent<CameraComponent>();
 		auto& camera = cc->GetCamera();
-		camera.SetPosition(5.0f, 5.0f, -5.0f);
-		camera.LookAt(0.0f, 0.0f, 0.0f);
+		auto tr = e.GetComponent<Transform>();
+		tr->position = { 5.0f, 6.3f, 5.0f, 1.0f };
+		tr->LookAt(0.0f, 1.3f, 0.0f);
 	}
 }
 

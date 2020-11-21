@@ -7,20 +7,32 @@ namespace Engine2
 {
 	using namespace DirectX;
 
-	void Camera::Update()
+	void Camera::Update(DirectX::XMVECTOR position, DirectX::XMVECTOR rotation)
 	{
 		// view matrix
-		XMMATRIX rot = XMMatrixRotationRollPitchYaw(-pitch, yaw, 0.0f);
+		XMMATRIX rot = XMMatrixRotationRollPitchYawFromVector(rotation);
 		transform = rot * XMMatrixTranslationFromVector(position);
-		direction = XMVector3Transform({ 0.0f, 0.0f, 1.0f, 1.0f }, rot); // rotate from the default forward direciton 0,0,1
+		direction = XMVector3Transform(FORWARD, rot); // rotate from the default forward direciton 0,0,1
 
 		// note: XMMatrixLookToLH normalises the direction vector
-		viewMatrix = XMMatrixLookToLH(position, direction, { 0.0f, 1.0f, 0.0f, 1.0f }); // default up 0,1,0
+		viewMatrix = XMMatrixLookToLH(position, direction, UP);
 		projectionMatrix = XMMatrixPerspectiveFovLH(fov, aspectRatio, nearZ, farZ);
 		viewProjectionMatrix = viewMatrix * projectionMatrix;
 	}
 
 	void Camera::OnImgui()
+	{
+		if (ImGui::TreeNode(name.c_str()))
+		{
+			ImGui::DragFloat("Aspect ratio", &aspectRatio, 0.25f, 0.1f, 0.1f);
+			ImGui::DragFloat("FOV", &fov, 0.01f); ImGui::SameLine(); ImGui::Text("%.1f Degs", XMConvertToDegrees(fov));
+			ImGui::DragFloat("Near Z", &nearZ, 0.25f, 0.001f, farZ);
+			ImGui::DragFloat("Far Z", &farZ, 0.25f, nearZ + 0.01f, 1000000.0f);
+			ImGui::TreePop();
+		}
+	}
+
+	void SceneCamera::OnImgui()
 	{
 		if (ImGui::TreeNode(name.c_str()))
 		{
@@ -35,7 +47,12 @@ namespace Engine2
 		}
 	}
 
-	void Camera::Move(float forwardDist, float rightDist, float upDist)
+	void SceneCamera::Update()
+	{
+		Camera::Update(position, {pitch, yaw, 0.0f, 0.0f });
+	}
+
+	void SceneCamera::Move(float forwardDist, float rightDist, float upDist)
 	{
 		position += forwardDist * direction;
 
@@ -46,7 +63,7 @@ namespace Engine2
 		position += up * upDist;
 	}
 
-	void Camera::LookAt(float x, float y, float z)
+	void SceneCamera::LookAt(float x, float y, float z)
 	{
 		XMVECTOR lookAtDir = XMVector3Normalize(XMVECTOR({ x, y, z, 1.0f }) - position);
 
@@ -54,7 +71,7 @@ namespace Engine2
 		yaw = atan2f(lookAtDir.m128_f32[0], lookAtDir.m128_f32[2]);
 	}
 
-	Ray Camera::ScreenCoordToRay(float x, float y)
+	Ray SceneCamera::ScreenCoordToRay(float x, float y)
 	{
 		Ray ray;
 
@@ -83,7 +100,7 @@ namespace Engine2
 		return ray;
 	}
 
-	Ray Camera::ForwardDirectionRay()
+	Ray SceneCamera::ForwardDirectionRay()
 	{
 		return { position + nearZ * direction, direction };
 	}

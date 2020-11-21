@@ -1,5 +1,5 @@
 #pragma once
-#include "pch.h"
+//#include "pch.h"
 #include "ECS.h"
 
 namespace Engine2
@@ -7,9 +7,9 @@ namespace Engine2
 	class Entity
 	{
 	public:
-		Entity(EngineECS::EntityId_t id, EngineECS::Coordinator& coordinator);
+		Entity(EngineECS::EntityId_t id, EngineECS::Coordinator& coordinator) : id(id), coordinator(coordinator) {}
 
-		~Entity();
+		Entity& operator=(Entity& rhs) { id = rhs.id; coordinator = rhs.coordinator; return *this; }
 
 		EngineECS::EntityId_t Id() { return id; }
 

@@ -1,6 +1,7 @@
 #pragma once
 #include "AssetStore.h"
 #include "Components.h"
+#include "Transform.h"
 #include "ConstantBuffer.h"
 #include "Shader.h"
 #include "Texture.h"

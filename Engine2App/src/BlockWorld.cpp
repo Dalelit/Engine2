@@ -28,12 +28,12 @@ namespace BlockWorld
 		//CreateVertexBuffer();
 		//CreateVertexBufferHighlight();
 
-		Engine::GetActiveCamera().SetPosition(10.0f, 6.0f, -5.0f);
+		//Engine::GetActiveCamera().SetPosition(10.0f, 6.0f, -5.0f);
 		//Engine::GetActiveCamera().LookAt((float)segment.stride / 2.0f, (float)segment.stride / 2.0f, (float)segment.stride / 2.0f);
-		Engine::GetActiveCamera().LookAt(0.0f, 0.0f, 0.0f);
+		//Engine::GetActiveCamera().LookAt(0.0f, 0.0f, 0.0f);
 
 		//Engine::GetInputController().State.MouseLook = true;
-		Engine::GetInputController().MovementConfiguration.moveSpeed = 10.0f;
+		//Engine::GetInputController().MovementConfiguration.moveSpeed = 10.0f;
 	}
 
 	BlockWorld::~BlockWorld()
@@ -44,18 +44,18 @@ namespace BlockWorld
 	{
 		scene.OnUpdate(dt);
 
-		Ray ray;
-		if (Engine::GetInputController().State.MouseLook)
-			ray = Engine::GetInputController().GetRayForward();
-		else
-			ray = Engine::GetInputController().GetRayFromMouse();
+		//Ray ray;
+		//if (Engine::GetInputController().State.MouseLook)
+		//	ray = Engine::GetInputController().GetRayForward();
+		//else
+		//	ray = Engine::GetInputController().GetRayFromMouse();
 
-		blockHit = chunkMgr.Intersects(ray.origin, ray.direction, hitInfo);
+		//blockHit = chunkMgr.Intersects(ray.origin, ray.direction, hitInfo);
 
-		if (blockHit)
-		{
-			hitLocation = ray.origin + ray.direction * hitInfo.distance;
-		}
+		//if (blockHit)
+		//{
+		//	hitLocation = ray.origin + ray.direction * hitInfo.distance;
+		//}
 
 		//Block* pNewHitBlock = RayHit(ray, hitDistance);
 
@@ -369,17 +369,17 @@ namespace BlockWorld
 	{
 		if (event.GetKey() == 'M')
 		{
-			auto& ic = Engine::GetInputController();
-			if (ic.State.MouseLook)
-			{
-				ic.State.MouseLook = false;
-				ic.SetCursorClipping(false);
-			}
-			else
-			{
-				ic.State.MouseLook = true;
-				ic.SetCursorClipping(true);
-			}
+			//auto& ic = Engine::GetInputController();
+			//if (ic.State.MouseLook)
+			//{
+			//	ic.State.MouseLook = false;
+			//	ic.SetCursorClipping(false);
+			//}
+			//else
+			//{
+			//	ic.State.MouseLook = true;
+			//	ic.SetCursorClipping(true);
+			//}
 		}
 	}
 

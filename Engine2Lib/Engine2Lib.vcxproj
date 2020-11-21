@@ -162,6 +162,7 @@
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\MeshLoader.h" />
     <ClInclude Include="src\MeshRenderer.h" />
+    <ClInclude Include="src\NativeScript.h" />
     <ClInclude Include="src\RigidBody.h" />
     <ClInclude Include="src\SceneHierarchy.h" />
     <ClInclude Include="src\SceneSerialisation.h" />
@@ -169,6 +170,7 @@
     <ClInclude Include="src\Skybox.h" />
     <ClInclude Include="src\SurfaceLoader.h" />
     <ClInclude Include="src\TextureLoader.h" />
+    <ClInclude Include="src\Transform.h" />
     <ClInclude Include="src\UtilFileDialog.h" />
     <ClInclude Include="src\UtilMath.h" />
     <ClInclude Include="src\AssetLoaders\ObjLoader.h" />
@@ -214,7 +216,6 @@
     <ClCompile Include="src\CameraComponent.cpp" />
     <ClCompile Include="src\Components.cpp" />
     <ClCompile Include="src\Config.cpp" />
-    <ClCompile Include="src\Entity.cpp" />
     <ClCompile Include="src\GizmoRender.cpp" />
     <ClCompile Include="src\InputController.cpp" />
     <ClCompile Include="src\Instances.cpp" />
@@ -272,6 +273,7 @@
     <ClCompile Include="src\SurfaceLoader.cpp" />
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\TextureLoader.cpp" />
+    <ClCompile Include="src\Transform.cpp" />
     <ClCompile Include="src\Util.cpp" />
     <ClCompile Include="src\UtilFileDialog.cpp" />
     <ClCompile Include="src\VertexLayout.cpp" />

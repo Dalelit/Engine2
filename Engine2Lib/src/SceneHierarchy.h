@@ -3,6 +3,7 @@
 #include "Entity.h"
 #include <vector>
 #include "Components.h"
+#include "Transform.h"
 
 namespace Engine2
 {

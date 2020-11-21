@@ -1,5 +1,6 @@
 #pragma once
 #include "Components.h"
+#include "Transform.h"
 
 namespace Engine2
 {

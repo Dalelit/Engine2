@@ -7,8 +7,12 @@ using namespace DirectX;
 
 Empty::Empty() : Layer("Empty")
 {
-	Engine::GetActiveCamera().SetPosition(0.0f, 2.0f, -3.0f);
-	Engine::GetActiveCamera().LookAt(0.0f, 0.0f, 0.0f);
+	{
+		auto mainCamera = scene.CreateSceneCamera("Main", true);
+		auto t = mainCamera.GetComponent<Transform>();
+		t->SetPosition(5.0f, 5.0f, -5.0f);
+		t->LookAt(0.0f, 0.0f, 0.0f);
+	}
 }
 
 Empty::~Empty()

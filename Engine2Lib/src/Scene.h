@@ -8,6 +8,7 @@
 #include "SceneHierarchy.h"
 #include "Skybox.h"
 #include "Engine2.h"
+#include "Camera.h"
 
 namespace Engine2
 {
@@ -21,12 +22,16 @@ namespace Engine2
 		~Scene() = default;
 
 		void OnUpdate(float dt);
-		void OnRender() { OnRender(Engine::GetActiveCamera()); }
+		void OnRender() { OnRender(GetMainSceneCamera()); }
 		void OnRender(Camera& camera);
 		void OnApplicationEvent(Engine2::ApplicationEvent& event);
 
 		Entity CreateEntity() { return hierarchy.CreateEntity(); }
 		Entity GetEntity(EngineECS::EntityId_t id) { return hierarchy.GetEntity(id); }
+
+		Entity CreateSceneCamera(const std::string& name, bool makeMainCamera = false);
+		void SetMainSceneCarmera(EngineECS::EntityId_t cameraEntityId) { mainCameraEntity = cameraEntityId; }
+		Camera& GetMainSceneCamera() { return *hierarchy.GetECSCoordinator().GetComponent<Camera>(mainCameraEntity); }
 
 		void OnImgui();
 
@@ -56,6 +61,7 @@ namespace Engine2
 	protected:
 		SceneHierarchy hierarchy;
 		Skybox skybox;
+		EngineECS::EntityId_t mainCameraEntity;
 
 		GizmoRender gizmoRender;
 		bool gizmoEnabled = true;
@@ -75,10 +81,12 @@ namespace Engine2
 		void UpdatePhysics(float dt);
 		void UpdateTransformMatrix();
 		void UpdateParticles(float dt);
+		void UpdateCameras();
 
 		void ImGuiScene();
 		void ImGuiEntities();
 		void ImGuiAssets();
+		void ImGuiCameras();
 
 	};
 
