@@ -18,7 +18,6 @@ Near term / in progress
 	- add an emit direction, and use transform to change it
 - Bugs
 	- Skybox doesn't check that it's valid before rendering
-	- Selected entity UI box appears to allocate memory... think its ComponentOnImgui
 - Proper error handling and logging
 	- use exceptions
 

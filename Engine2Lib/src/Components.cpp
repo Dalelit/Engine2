@@ -49,11 +49,11 @@ namespace Engine2
 	}
 
 	template <typename T>
-	void ComponentOnImgui(const std::string& displayName, EngineECS::EntityId_t id, EngineECS::Coordinator& coord)
+	void ComponentOnImgui(const char* displayName, EngineECS::EntityId_t id, EngineECS::Coordinator& coord)
 	{
 		if (coord.HasComponent<T>(id))
 		{
-			bool open = ImGui::TreeNodeEx(displayName.c_str(), ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_DefaultOpen);
+			bool open = ImGui::TreeNodeEx(displayName, ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_DefaultOpen);
 			bool destroy = false;
 
 			if (ImGui::BeginPopupContextItem())
@@ -77,9 +77,9 @@ namespace Engine2
 	}
 
 	template <typename T>
-	inline void AddComponentOnImgui(const std::string& displayName, EngineECS::EntityId_t id, EngineECS::Coordinator& coord)
+	inline void AddComponentOnImgui(const char* displayName, EngineECS::EntityId_t id, EngineECS::Coordinator& coord)
 	{
-		if (!coord.HasComponent<T>(id) && ImGui::Selectable(displayName.c_str())) coord.AddComponent<T>(id);
+		if (!coord.HasComponent<T>(id) && ImGui::Selectable(displayName)) coord.AddComponent<T>(id);
 	}
 
 	void Components::OnImgui(EngineECS::EntityId_t id, EngineECS::Coordinator& coord)
