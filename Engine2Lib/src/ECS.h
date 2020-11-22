@@ -16,7 +16,7 @@
 	EntityView<Transform,RigidBody> v(coord); // Get a view of all entities with a set signature of components (I'd expect the view to be better)
 	EntityView v(coord);                      // Get a view of all entities
 	for (auto t : v) { t }                    // Use the view
-	coord.GetComponents<Transform>();         // Get all of a single component, can us in a for (auto c : xxx) loop
+	coord.GetComponents<Transform>();         // Get all of a single component, can us in a for (auto c : xxx) loop, or use the iterator which can also reference the entity id.
 */
 //
 // To Do:
@@ -24,7 +24,6 @@
 // - emplace creation
 // - performance testing and tuning
 // - testing and test cases
-// - more efficient iterators
 
 
 namespace EngineECS
@@ -38,6 +37,12 @@ namespace EngineECS
 
 	using Signature = std::bitset<MAXCOMPONENTS>;
 
+
+	/*
+	* 
+	* Storage interface
+	* 
+	*/
 	class Storage
 	{
 	public:
@@ -66,6 +71,15 @@ namespace EngineECS
 		EntityId_t* indexToEntityMap = nullptr;
 	};
 
+	/*
+	*
+	* Templated Storage class using the storage interface.
+	* Where the components are stored.
+	* Assumes an entity can only have a component once.
+	* 
+	* To do - version for mulitples of the same component for an entity
+	*
+	*/
 	template <typename T>
 	class ComponentStorage : public Storage
 	{
@@ -137,11 +151,6 @@ namespace EngineECS
 			next--; // next entry in the store is previous as the last entry has moved
 		}
 
-		inline T* begin() { return (T*)data; }
-		inline T* end() { return (T*)data + count; }
-		inline const T* begin() const { return (T*)data; }
-		inline const T* end() const { return (T*)data + count; }
-
 		inline T& operator[](ComponentIndex_t indx) { return *((T*)data + indx); }
 		inline const T& operator[](ComponentIndex_t indx) const { return *((T*)data + indx); }
 
@@ -159,11 +168,45 @@ namespace EngineECS
 			out << id << " " << name << ", " << count << "/" << capacity;
 		}
 
+		class Iterator
+		{
+		public:
+			Iterator(T* component, EntityId_t* entities) : currentComponent(component), currentEntity(entities) {}
+
+			T& operator*() const { return *currentComponent; }
+			bool operator==(const Iterator& other) const { return currentComponent == other.currentComponent; }
+			bool operator!=(const Iterator& other) const { return currentComponent != other.currentComponent; }
+
+			// Get the entity id for the current component the iterator is referencing
+			EntityId_t EntityId() { return *currentEntity; }
+
+			Iterator& operator++()
+			{
+				currentComponent++;
+				currentEntity++;
+				return *this;
+			}
+
+		private:
+			T* currentComponent;
+			EntityId_t* currentEntity;
+		};
+
+		Iterator begin() { return Iterator((T*)data, indexToEntityMap); }
+		Iterator end()   { return Iterator((T*)data + count, indexToEntityMap + count); }
+		const Iterator begin() const { return Iterator((T*)data, indexToEntityMap); }
+		const Iterator end() const   { return Iterator((T*)data + count, indexToEntityMap + count); }
+
 	private:
 		void* data = nullptr;
 		T* next = nullptr;
 	};
 
+	/*
+	*
+	* Coordinate is the main class used to create/destroy/access entities and their components
+	*
+	*/
 	class Coordinator
 	{
 	public:
@@ -337,6 +380,11 @@ namespace EngineECS
 		}
 	};
 
+	/*
+	*
+	* View base/interface
+	*
+	*/
 	class ViewBase
 	{
 	public:
@@ -369,6 +417,12 @@ namespace EngineECS
 		}
 	};
 
+	/*
+	*
+	* Templated View class.
+	* Iterates over the shortest list of components, checking the entity signature.
+	*
+	*/
 	template <typename... T>
 	class View : public ViewBase
 	{
@@ -467,6 +521,13 @@ namespace EngineECS
 		Storage* componentStore = nullptr;
 	};
 
+	/*
+	*
+	* Entity View.
+	* Iterates over the entities checking the signature.
+	* Not as efficient of the 'View' class unless you know you're going to look at all entities.
+	*
+	*/
 	template <typename... T>
 	class EntityView : public ViewBase
 	{

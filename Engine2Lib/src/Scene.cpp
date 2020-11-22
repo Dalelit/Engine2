@@ -214,13 +214,12 @@ namespace Engine2
 	void Scene::UpdateCameras()
 	{
 		Coordinator& coordinator = hierarchy.GetECSCoordinator();
-		View<Transform, Camera> entities(coordinator);
-		for (auto e : entities)
-		{
-			auto c = coordinator.GetComponent<Camera>(e);
-			auto t = coordinator.GetComponent<Transform>(e);
 
-			c->Update(t->position, t->rotation);
+		auto& cameras = coordinator.GetComponents<Camera>();
+		for (auto iter = cameras.begin(); iter != cameras.end(); ++iter)
+		{
+			auto t = coordinator.GetComponent<Transform>(iter.EntityId());
+			(*iter).Update(t->position, t->rotation);
 		}
 	}
 

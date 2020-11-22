@@ -14,6 +14,7 @@ Near term / in progress
 - Alternative cameras
 - ECS
 	- create systems rather than hard coding in scene
+	- use case of mulitple components for a single entity
 - Particle system
 	- add an emit direction, and use transform to change it
 - Bugs
