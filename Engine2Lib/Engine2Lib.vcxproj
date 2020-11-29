@@ -162,10 +162,12 @@
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\MeshLoader.h" />
     <ClInclude Include="src\MeshRenderer.h" />
-    <ClInclude Include="src\NativeScript.h" />
     <ClInclude Include="src\RigidBody.h" />
     <ClInclude Include="src\SceneHierarchy.h" />
     <ClInclude Include="src\SceneSerialisation.h" />
+    <ClInclude Include="src\Script.h" />
+    <ClInclude Include="src\ScriptComponent.h" />
+    <ClInclude Include="src\ScriptComponents\InputControllerScript.h" />
     <ClInclude Include="src\Serialiser.h" />
     <ClInclude Include="src\Skybox.h" />
     <ClInclude Include="src\SurfaceLoader.h" />
@@ -243,6 +245,8 @@
     </ClCompile>
     <ClCompile Include="src\SceneHierarchy.cpp" />
     <ClCompile Include="src\SceneSerialisation.cpp" />
+    <ClCompile Include="src\ScriptComponent.cpp" />
+    <ClCompile Include="src\ScriptComponents\InputControllerScript.cpp" />
     <ClCompile Include="src\Serialiser.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\Skybox.cpp" />

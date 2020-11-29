@@ -13,6 +13,8 @@
 #include "TextureLoader.h"
 #include "UtilFileDialog.h"
 #include "CameraComponent.h"
+#include "ScriptComponent.h"
+#include "ScriptComponents/InputControllerScript.h"
 
 using namespace Engine2;
 using namespace EngineECS;
@@ -20,14 +22,19 @@ using namespace DirectX;
 
 SceneBuilder::SceneBuilder() : Layer("SceneBuilder")
 {
-	//Engine::GetActiveCamera().SetPosition(5.0f, 5.0f, -5.0f);
-	//Engine::GetActiveCamera().LookAt(0.0f, 0.0f, 0.0f);
+	{
+		ScriptComponent::RegisterScript<InputControllerScript>("Input Controller");
+	}
 
 	{
 		auto mainCamera = scene.CreateSceneCamera("Main", true);
 		auto t = mainCamera.GetComponent<Transform>();
 		t->SetPosition(5.0f, 5.0f, -5.0f);
 		t->LookAt(0.0f, 0.0f, 0.0f);
+
+		auto sc = mainCamera.AddComponent<ScriptComponent>();
+		sc->SetEntity(mainCamera);
+		sc->CreateInstance("Input Controller");
 	}
 
 	LoadPrimatives();

@@ -82,6 +82,7 @@ namespace Engine2
 		void UpdateTransformMatrix();
 		void UpdateParticles(float dt);
 		void UpdateCameras();
+		void UpdateScripts(float dt);
 
 		void ImGuiScene();
 		void ImGuiEntities();

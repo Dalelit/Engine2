@@ -13,6 +13,7 @@
 #include "MeshLoader.h"
 #include "TextureLoader.h"
 #include "CameraComponent.h"
+#include "ScriptComponent.h"
 
 using namespace EngineECS;
 
@@ -28,6 +29,7 @@ namespace Engine2
 		UpdateTransformMatrix();
 		UpdateParticles(dt);
 		UpdateCameras();
+		UpdateScripts(dt);
 	}
 
 	void Scene::OnRender(Camera& camera)
@@ -220,6 +222,17 @@ namespace Engine2
 		{
 			auto t = coordinator.GetComponent<Transform>(iter.EntityId());
 			(*iter).Update(t->position, t->rotation);
+		}
+	}
+
+	void Scene::UpdateScripts(float dt)
+	{
+		Coordinator& coordinator = hierarchy.GetECSCoordinator();
+
+		auto& scs = coordinator.GetComponents<ScriptComponent>();
+		for (auto& sc : scs)
+		{
+			sc.OnUpdate(dt);
 		}
 	}
 

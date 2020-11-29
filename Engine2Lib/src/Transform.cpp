@@ -12,6 +12,13 @@ namespace Engine2
 		return XMMatrixScalingFromVector(scale) * XMMatrixRotationRollPitchYawFromVector(rotation) * XMMatrixTranslationFromVector(position);
 	}
 
+	DirectX::XMVECTOR Transform::Forward()
+	{
+		auto qrot = XMQuaternionRotationRollPitchYawFromVector(rotation);
+
+		return XMVector3Rotate(Directions.forward, qrot);
+	}
+
 	void Transform::LookAt(DirectX::XMVECTOR location)
 	{
 		XMVECTOR lookAtDir = XMVector3Normalize(location - position);
@@ -23,6 +30,24 @@ namespace Engine2
 			0.0f
 		};
 		
+	}
+
+	void Transform::Move(float forward)
+	{
+		auto qrot = XMQuaternionRotationRollPitchYawFromVector(rotation);
+
+		position += XMVector3Rotate(Directions.forward, qrot) * forward;
+	}
+
+	void Transform::Move(float forward, float right, float up)
+	{
+		auto qrot = XMQuaternionRotationRollPitchYawFromVector(rotation);
+		
+		XMVECTOR translation = XMVector3Rotate(Directions.forward, qrot) * forward;
+		translation += XMVector3Rotate(Directions.right, qrot) * right;
+		translation += XMVector3Rotate(Directions.up, qrot) * up;
+
+		position += translation;
 	}
 
 	void Transform::OnImgui()

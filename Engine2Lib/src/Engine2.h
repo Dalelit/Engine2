@@ -7,6 +7,7 @@
 #include "Events.h"
 #include "Layer.h"
 #include "Instrumentation.h"
+#include "InputController.h"
 
 namespace Engine2 {
 
@@ -16,6 +17,7 @@ namespace Engine2 {
 
 		static void CreateEngine(HWND hwnd);
 		inline static Engine& Get() { return *instance; }
+		inline const InputController::InputState& InputState() { return inputController->State; }
 
 		Engine(HWND hwnd);
 		~Engine();
@@ -36,6 +38,7 @@ namespace Engine2 {
 
 	private:
 		static std::unique_ptr<Engine> instance;
+		std::unique_ptr<InputController> inputController;
 
 		DXDevice& device;
 		DXImgui imgui;

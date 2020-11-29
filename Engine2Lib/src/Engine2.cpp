@@ -18,6 +18,7 @@ namespace Engine2
 	{
 		imgui.Initialise(hwnd, device);
 		imguiActive = true;
+		inputController = std::make_unique<InputController>();
 	}
 
 	Engine::~Engine()
@@ -33,6 +34,8 @@ namespace Engine2
 		Instrumentation::FrameReset();
 		Update(deltaTime);
 		Render();
+
+		inputController->FrameReset(); // reset at the end of the main loop as the event handlers happen at the beginning of the loop
 	}
 
 	void Engine::Update(float deltaTime)
@@ -40,6 +43,7 @@ namespace Engine2
 		updateMemory.Set();
 		frameTime.Set(); // Tick just before present frame
 
+		inputController->OnUpdate(deltaTime);
 		// update layers
 		for (auto layer : layers)
 		{
@@ -97,6 +101,8 @@ namespace Engine2
 
 	void Engine::OnApplicationEvent(ApplicationEvent& event)
 	{
+		inputController->OnApplicationEvent(event);
+
 		EventDispatcher dispacher(event);
 
 		dispacher.Dispatch<WindowResizeEvent>(E2_BIND_EVENT_FUNC(Engine::OnResize));
@@ -112,6 +118,8 @@ namespace Engine2
 		// check if ImGui handled the event
 		if (event.GetGroup() == EventGroup::Mouse && ImGui::GetIO().WantCaptureMouse) return;
 		if (event.GetGroup() == EventGroup::Keyboard && ImGui::GetIO().WantCaptureKeyboard) return;
+
+		inputController->OnInputEvent(event);
 
 		//EventDispatcher dispacher(event);
 
@@ -149,6 +157,9 @@ namespace Engine2
 
 		static bool drawStatsOpen = true;
 		if (drawStatsOpen) Instrumentation::Drawing::ImguiWindow(&drawStatsOpen);
+
+		static bool inputControllerOpen = true;
+		if (inputControllerOpen) inputController->ImguiWindow(&inputControllerOpen);
 
 		if (ImGui::Begin("Engine2", nullptr, ImGuiWindowFlags_MenuBar))
 		{

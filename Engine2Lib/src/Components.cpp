@@ -10,6 +10,7 @@
 #include "OffscreenOutliner.h"
 #include "Camera.h"
 #include "CameraComponent.h"
+#include "ScriptComponent.h"
 
 
 using namespace DirectX;
@@ -95,6 +96,7 @@ namespace Engine2
 		ComponentOnImgui<OffscreenOutliner>("Outliner", id, coord);
 		ComponentOnImgui<Camera>("Camera", id, coord);
 		ComponentOnImgui<CameraComponent>("CameraComponent", id, coord);
+		ComponentOnImgui<ScriptComponent>("Scripts", id, coord);
 
 		if (ImGui::BeginCombo("Add Component", ""))
 		{
@@ -106,6 +108,14 @@ namespace Engine2
 			AddComponentOnImgui<OffscreenOutliner>("Outliner", id, coord);
 			AddComponentOnImgui<Camera>("Camera", id, coord);
 			AddComponentOnImgui<CameraComponent>("CameraComponent", id, coord);
+			
+			// Script Components need and extra step of setting the entity
+			//AddComponentOnImgui<ScriptComponent>("Scripts", id, coord);
+			if (!coord.HasComponent<ScriptComponent>(id) && ImGui::Selectable("Scripts"))
+			{
+				auto* sc = coord.AddComponent<ScriptComponent>(id);
+				sc->SetEntity(Entity(id, coord));
+			}
 
 			ImGui::EndCombo();
 		}

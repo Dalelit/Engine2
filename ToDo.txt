@@ -15,6 +15,7 @@ Near term / in progress
 - ECS
 	- create systems rather than hard coding in scene
 	- use case of mulitple components for a single entity
+	- HasComponents test for multiple components at time
 - Particle system
 	- add an emit direction, and use transform to change it
 - Bugs
