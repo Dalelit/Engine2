@@ -109,7 +109,8 @@ namespace EngineECS
 			delete[] indexToEntityMap;
 		}
 
-		T* Create(EntityId_t id)
+		template <typename... ARGS>
+		T* CreateComponent(EntityId_t id, ARGS... args)
 		{
 			assert(count < capacity && "Exceeded storage capacity");
 
@@ -122,7 +123,7 @@ namespace EngineECS
 			count++;
 			next++;
 
-			return new(result) T(); // default construct in the required memory location
+			return new(result) T(args...); // default construct in the required memory location
 		}
 
 		inline T* GetComponent(EntityId_t id)
@@ -273,13 +274,13 @@ namespace EngineECS
 
 		bool TestEntity(Signature signature, EntityId_t id) { return (entitySignatures[id] & signature) == signature; }
 
-		template <typename T>
-		T* AddComponent(EntityId_t id)
+		template <typename T, typename... ARGS>
+		T* AddComponent(EntityId_t id, ARGS... args)
 		{
 			assert(!HasComponent<T>(id) && "Entity already has component");
 
 			entitySignatures[id].set(GetComponentId<T>());
-			return GetComponentStorage<T>()->Create(id);
+			return GetComponentStorage<T>()->CreateComponent(id, args...);
 		}
 
 		template <typename T>

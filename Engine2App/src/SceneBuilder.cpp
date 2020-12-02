@@ -53,8 +53,7 @@ SceneBuilder::SceneBuilder() : Layer("SceneBuilder")
 
 	{
 		auto e = scene.CreateEntity();
-		auto cc = e.AddComponent<Camera>();
-		cc->SetName("Offscreen camera test");
+		auto cc = e.AddComponent<Camera>("Offscreen camera test");
 		cc->SetAspectRatio(DXDevice::Get().GetAspectRatio());
 		auto buffer = e.AddComponent<OffscreenWithDepthBuffer>();
 		auto tr = e.GetComponent<Transform>();

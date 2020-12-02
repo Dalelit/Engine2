@@ -11,12 +11,12 @@ Near term / in progress
 	- load new textures
 	- load new skybox textures
 	- model loading
-- Alternative cameras
 - ECS
 	- create systems rather than hard coding in scene
 	- use case of mulitple components for a single entity
 	- HasComponents test for multiple components at time
-	- Argument forwarding for component constructor
+	- Callback method for when a component is added to allow an initialisation if required. (e.g. via the gui adding a camera needs the aspect ratio set)
+	- Work out a way to register components better than current Componets class
 - Particle system
 	- add an emit direction, and use transform to change it
 - Bugs

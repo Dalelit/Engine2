@@ -243,8 +243,7 @@ namespace Engine2
 	Entity Scene::CreateSceneCamera(const std::string& name, bool makeMainCamera)
 	{
 		auto entity = CreateEntity();
-		auto camera = entity.AddComponent<Camera>();
-		camera->SetName(name);
+		auto camera = entity.AddComponent<Camera>(name);
 		camera->SetAspectRatio( DXDevice::Get().GetAspectRatio() );
 		entity.GetComponent<EntityInfo>()->tag = name;
 

@@ -22,10 +22,15 @@ namespace Engine2
 
 	void Camera::OnImgui()
 	{
-		if (ImGui::TreeNode(name.c_str()))
+		if (ImGui::TreeNode(this, name.c_str()))
 		{
+			char buffer[256];
+			strcpy_s(buffer, sizeof(buffer), name.c_str());
+			if (ImGui::InputText("Name", buffer, sizeof(buffer))) name = buffer;
+
 			ImGui::DragFloat("Aspect ratio", &aspectRatio, 0.25f, 0.1f, 0.1f);
-			ImGui::DragFloat("FOV", &fov, 0.01f); ImGui::SameLine(); ImGui::Text("%.1f Degs", XMConvertToDegrees(fov));
+			float deg = XMConvertToDegrees(fov);
+			if (ImGui::DragFloat("FOV", &deg, 0.1f)) fov = XMConvertToRadians(deg);
 			ImGui::DragFloat("Near Z", &nearZ, 0.25f, 0.001f, farZ);
 			ImGui::DragFloat("Far Z", &farZ, 0.25f, nearZ + 0.01f, 1000000.0f);
 			ImGui::TreePop();
