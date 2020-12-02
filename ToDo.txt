@@ -16,6 +16,7 @@ Near term / in progress
 	- create systems rather than hard coding in scene
 	- use case of mulitple components for a single entity
 	- HasComponents test for multiple components at time
+	- Argument forwarding for component constructor
 - Particle system
 	- add an emit direction, and use transform to change it
 - Bugs

@@ -46,6 +46,7 @@ namespace Engine2
 		inline void SetPixelShader(std::shared_ptr<PixelShader> pNewPixelShader) { pPS = pNewPixelShader; }
 
 		void OnImgui();
+		virtual void ShowSubDisplay() { ShowSubDisplayRenderTarget(); }
 		void ShowSubDisplayRenderTarget();
 
 		std::map<std::string, std::shared_ptr<PixelShader>> pixelShaders; // Public so can add to this. Populated with AddSampleFilters on constructuion.
@@ -109,6 +110,8 @@ namespace Engine2
 			InitialiseShaderResources();
 		}
 
+		void ShowSubDisplay() override { ShowSubDisplayRenderTarget(); ShowSubDisplayDepthBuffer(); }
+		
 		void ShowSubDisplayDepthBuffer();
 
 	protected:

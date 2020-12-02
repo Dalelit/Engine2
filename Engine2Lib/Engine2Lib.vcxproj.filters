@@ -58,7 +58,6 @@
     <ClInclude Include="src\Skybox.h" />
     <ClInclude Include="src\SurfaceLoader.h" />
     <ClInclude Include="src\UtilFileDialog.h" />
-    <ClInclude Include="src\CameraComponent.h" />
     <ClInclude Include="src\Transform.h" />
     <ClInclude Include="src\ScriptComponent.h" />
     <ClInclude Include="src\Script.h" />
@@ -107,7 +106,6 @@
     <ClCompile Include="src\Skybox.cpp" />
     <ClCompile Include="src\SurfaceLoader.cpp" />
     <ClCompile Include="src\UtilFileDialog.cpp" />
-    <ClCompile Include="src\CameraComponent.cpp" />
     <ClCompile Include="src\Transform.cpp" />
     <ClCompile Include="src\ScriptComponent.cpp" />
     <ClCompile Include="src\ScriptComponents\InputControllerScript.cpp" />

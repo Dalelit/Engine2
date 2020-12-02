@@ -12,9 +12,9 @@
 #include "MaterialLibrary.h"
 #include "TextureLoader.h"
 #include "UtilFileDialog.h"
-#include "CameraComponent.h"
 #include "ScriptComponent.h"
 #include "ScriptComponents/InputControllerScript.h"
+#include "Offscreen.h"
 
 using namespace Engine2;
 using namespace EngineECS;
@@ -53,8 +53,10 @@ SceneBuilder::SceneBuilder() : Layer("SceneBuilder")
 
 	{
 		auto e = scene.CreateEntity();
-		auto cc = e.AddComponent<CameraComponent>();
-		auto& camera = cc->GetCamera();
+		auto cc = e.AddComponent<Camera>();
+		cc->SetName("Offscreen camera test");
+		cc->SetAspectRatio(DXDevice::Get().GetAspectRatio());
+		auto buffer = e.AddComponent<OffscreenWithDepthBuffer>();
 		auto tr = e.GetComponent<Transform>();
 		tr->position = { 5.0f, 6.3f, 5.0f, 1.0f };
 		tr->LookAt(0.0f, 1.3f, 0.0f);

@@ -12,13 +12,14 @@
 #include "VertexLayout.h"
 #include "MeshLoader.h"
 #include "TextureLoader.h"
-#include "CameraComponent.h"
 #include "ScriptComponent.h"
 
 using namespace EngineECS;
 
 namespace Engine2
 {
+	using namespace EngineECS;
+
 	Scene::Scene() : vsConstBuffer(0), psConstBuffer(0)
 	{
 	}
@@ -32,16 +33,18 @@ namespace Engine2
 		UpdateScripts(dt);
 	}
 
-	void Scene::OnRender(Camera& camera)
+	void Scene::OnRender(EntityId_t cameraEntity)
 	{
-		RenderImage(camera);
+		RenderImage(cameraEntity);
 		CamerasRender();
 	}
 
-	void Scene::RenderImage(Camera& camera, bool showGizmos)
+	void Scene::RenderImage(EntityId_t cameraEntity, bool showGizmos)
 	{
-		UpdateVSSceneConstBuffer(camera);
-		UpdatePSSceneConstBuffer(camera);
+		auto pCamera = hierarchy.GetECSCoordinator().GetComponent<Camera>(cameraEntity);
+		auto pTransform = hierarchy.GetECSCoordinator().GetComponent<Transform>(cameraEntity);
+		UpdateVSSceneConstBuffer(*pCamera, *pTransform);
+		UpdatePSSceneConstBuffer(*pCamera, *pTransform);
 
 		RenderMeshes();
 		RenderParticles();
@@ -57,19 +60,20 @@ namespace Engine2
 
 		if (event.GetType() == Engine2::EventType::WindowResize)
 		{
+			for (auto& c : coordinator.GetComponents<Camera>()) if (c.IsAspectRatioLockedToScreen()) c.SetAspectRatio(DXDevice::Get().GetAspectRatio());
 			for (auto& c : coordinator.GetComponents<OffscreenOutliner>()) c.Reconfigure();
 		}
 	}
 
-	void Scene::UpdateVSSceneConstBuffer(Camera& camera)
+	void Scene::UpdateVSSceneConstBuffer(Camera& camera, Transform& transform)
 	{
 		camera.LoadViewProjectionMatrixT(vsConstBuffer.data.cameraTransform);
 		vsConstBuffer.Bind();
 	}
 
-	void Scene::UpdatePSSceneConstBuffer(Camera& camera)
+	void Scene::UpdatePSSceneConstBuffer(Camera& camera, Transform& transform)
 	{
-		psConstBuffer.data.CameraPosition = camera.GetPosition();
+		psConstBuffer.data.CameraPosition = transform.position;
 
 		Coordinator& coordinator = hierarchy.GetECSCoordinator();
 		auto& pointLights = coordinator.GetComponents<PointLight>();
@@ -168,18 +172,18 @@ namespace Engine2
 	void Scene::CamerasRender()
 	{
 		Coordinator& coordinator = hierarchy.GetECSCoordinator();
-		View<CameraComponent, Transform> entities(coordinator);
+		View<Camera, OffscreenWithDepthBuffer> entities(coordinator);
 		for (auto e : entities)
 		{
-			auto* cc = coordinator.GetComponent<CameraComponent>(e);
-			auto* tr = coordinator.GetComponent<Transform>(e);
+			//auto* ca = coordinator.GetComponent<Camera>(e);
+			//auto* tr = coordinator.GetComponent<Transform>(e);
+			auto* of = coordinator.GetComponent<OffscreenWithDepthBuffer>(e);
 
-			cc->GetCamera().Update(tr->position, tr->rotation);
-			cc->Clear();
-			cc->SetAsTarget();
-			RenderImage(cc->GetCamera(), false);
+			of->Clear();
+			of->SetAsTarget();
+			RenderImage(e, false);
 
-			cc->ShowSubDisplay();
+			of->ShowSubDisplay();
 		}
 		DXDevice::Get().SetBackBufferAsRenderTarget();
 	}
@@ -366,17 +370,23 @@ namespace Engine2
 
 		if (ImGui::Begin("Cameras", &open))
 		{
-			//if (ImGui::BeginCombo("", currentCamera->GetName().c_str()))
-			//{
-			//	for (unsigned int i = 0; i < cameras.size(); i++)
-			//	{
-			//		bool isSelected = (i == currentCameraIndx);
-			//		if (ImGui::Selectable(cameras[i]->GetName().c_str(), isSelected)) SetCurrentCamera(i);
-			//		if (isSelected) ImGui::SetItemDefaultFocus();
-			//	}
-			//	ImGui::EndCombo();
-			//}
-			//for (auto& c : cameras) c->OnImgui();
+			auto& cameras = hierarchy.GetECSCoordinator().GetComponents<Camera>();
+
+			if (ImGui::BeginCombo("", cameras[mainCameraEntity].GetName().c_str()))
+			{
+				for (auto iter = cameras.begin(); iter != cameras.end(); ++iter)
+				{
+					bool isSelected = (iter.EntityId() == mainCameraEntity);
+					if (ImGui::Selectable((*iter).GetName().c_str(), isSelected)) SetMainSceneCarmera(iter.EntityId());
+					if (isSelected) ImGui::SetItemDefaultFocus();
+				}
+				ImGui::EndCombo();
+			}
+
+			for (auto iter = cameras.begin(); iter != cameras.end(); ++iter)
+			{
+				iter->OnImgui();
+			}
 		}
 		ImGui::End();
 	}

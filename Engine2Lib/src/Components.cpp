@@ -9,7 +9,6 @@
 #include "Lights.h"
 #include "OffscreenOutliner.h"
 #include "Camera.h"
-#include "CameraComponent.h"
 #include "ScriptComponent.h"
 
 
@@ -95,7 +94,6 @@ namespace Engine2
 		ComponentOnImgui<Gizmo>("Gizmo", id, coord);
 		ComponentOnImgui<OffscreenOutliner>("Outliner", id, coord);
 		ComponentOnImgui<Camera>("Camera", id, coord);
-		ComponentOnImgui<CameraComponent>("CameraComponent", id, coord);
 		ComponentOnImgui<ScriptComponent>("Scripts", id, coord);
 
 		if (ImGui::BeginCombo("Add Component", ""))
@@ -107,7 +105,6 @@ namespace Engine2
 			AddComponentOnImgui<Gizmo>("Gizmo", id, coord);
 			AddComponentOnImgui<OffscreenOutliner>("Outliner", id, coord);
 			AddComponentOnImgui<Camera>("Camera", id, coord);
-			AddComponentOnImgui<CameraComponent>("CameraComponent", id, coord);
 			
 			// Script Components need and extra step of setting the entity
 			//AddComponentOnImgui<ScriptComponent>("Scripts", id, coord);

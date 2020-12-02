@@ -174,6 +174,7 @@ namespace EngineECS
 			Iterator(T* component, EntityId_t* entities) : currentComponent(component), currentEntity(entities) {}
 
 			T& operator*() const { return *currentComponent; }
+			T* operator->() const { return currentComponent; }
 			bool operator==(const Iterator& other) const { return currentComponent == other.currentComponent; }
 			bool operator!=(const Iterator& other) const { return currentComponent != other.currentComponent; }
 

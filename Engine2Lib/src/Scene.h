@@ -22,8 +22,8 @@ namespace Engine2
 		~Scene() = default;
 
 		void OnUpdate(float dt);
-		void OnRender() { OnRender(GetMainSceneCamera()); }
-		void OnRender(Camera& camera);
+		void OnRender() { OnRender(mainCameraEntity); }
+		void OnRender(EngineECS::EntityId_t cameraEntity);
 		void OnApplicationEvent(Engine2::ApplicationEvent& event);
 
 		Entity CreateEntity() { return hierarchy.CreateEntity(); }
@@ -66,15 +66,15 @@ namespace Engine2
 		GizmoRender gizmoRender;
 		bool gizmoEnabled = true;
 
-		void UpdateVSSceneConstBuffer(Camera& camera);
-		void UpdatePSSceneConstBuffer(Camera& camera);
+		void UpdateVSSceneConstBuffer(Camera& camera, Transform& transform);
+		void UpdatePSSceneConstBuffer(Camera& camera, Transform& transform);
 
 		void RenderMeshes();
 		void RenderParticles();
 		void RenderGizmos();
 		void RenderOutlines();
 
-		void RenderImage(Camera& camera, bool showGizmos = false);
+		void RenderImage(EngineECS::EntityId_t cameraEntity, bool showGizmos = false);
 
 		void CamerasRender();
 
