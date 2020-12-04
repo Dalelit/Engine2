@@ -201,7 +201,9 @@ namespace Engine2
 			{ {right, bottom, 0.0f}, {1.0f, 1.0f} },
 		};
 
-		return std::make_shared<MeshTriangleList<Vertex>>(verticies);
+		auto vb = std::make_shared<VertexBuffer>();
+		vb->Initialise<Vertex>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, verticies);
+		return vb;
 	}
 
 	void Offscreen::InitialiseSubDisplayVB()

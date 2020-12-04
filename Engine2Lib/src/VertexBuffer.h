@@ -9,11 +9,17 @@
 
 namespace Engine2
 {
-	template <typename V, D3D11_PRIMITIVE_TOPOLOGY TOP>
 	class VertexBuffer : public Drawable
 	{
 	public:
-		VertexBuffer(std::vector<V>& verticies, bool updatableVerticies = false) {
+		VertexBuffer() {
+			info = "Uninitialised vertex buffer";
+		}
+
+		template <typename V>
+		void Initialise(D3D11_PRIMITIVE_TOPOLOGY top, std::vector<V>& verticies, bool updatableVerticies = false) {
+
+			topology = top;
 
 			bufferStrides[0] = sizeof(V);
 			bufferOffsets[0] = 0;
@@ -40,6 +46,27 @@ namespace Engine2
 			info = "VertexBuffer vertex count: " + std::to_string(vertexCount);
 		}
 
+		template <typename V>
+		void Update(std::vector<V>& verticies) {
+			// to do: D3D11_MAP_WRITE_DISCARD v D3D11_MAP_WRITE_NO_OVERWRITE ?
+
+			HRESULT hr;
+
+			vertexCount = verticies.size();
+
+			auto& context = DXDevice::GetContext();
+			auto ptrBuffer = pVertexBuffer.Get();
+
+			D3D11_MAPPED_SUBRESOURCE mappedSubResource;
+			hr = context.Map(ptrBuffer, 0u, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubResource);
+
+			E2_ASSERT_HR(hr, "VertexBufferDynamic Map failed");
+
+			memcpy(mappedSubResource.pData, verticies.data(), sizeof(V) * verticies.size());
+
+			context.Unmap(ptrBuffer, 0);
+		}
+
 		virtual ~VertexBuffer() = default;
 
 		virtual void Bind() {
@@ -62,11 +89,10 @@ namespace Engine2
 		UINT numberOfBuffers = 1u;
 
 	protected:
-		VertexBuffer() = default;
 		std::string info;
 		wrl::ComPtr<ID3D11Buffer> pVertexBuffer = nullptr;
 
-		D3D11_PRIMITIVE_TOPOLOGY topology = TOP;
+		D3D11_PRIMITIVE_TOPOLOGY topology;
 
 		UINT bufferStrides[1] = {  }; // set by vertexSize in constructor
 		UINT bufferOffsets[1] = { 0 };
@@ -74,13 +100,20 @@ namespace Engine2
 		UINT vertexCount;
 	};
 
-	template <typename V, D3D11_PRIMITIVE_TOPOLOGY TOP>
-	class VertexBufferIndex : public VertexBuffer<V, TOP>
+	class VertexBufferIndex : public VertexBuffer
 	{
 	public:
-		VertexBufferIndex(std::vector<V>& verticies, std::vector<unsigned int>& indicies, bool updatableVerticies = false, bool updatableIndicies = false) :
-			VertexBuffer<V, TOP>(verticies, updatableVerticies)
-		{
+		VertexBufferIndex() {
+			this->info = "Uninitialised vertex buffer index";
+		}
+
+		template <typename V>
+		void Initialise(D3D11_PRIMITIVE_TOPOLOGY top, std::vector<V>& verticies, std::vector<unsigned int>& indicies, bool updatableVerticies = false, bool updatableIndicies = false) {
+
+			topology = top;
+
+			VertexBuffer::Initialise<V>(top, verticies, updatableVerticies); // call base initialise
+
 			HRESULT hr;
 
 			indxCount = (unsigned int)indicies.size();
@@ -105,6 +138,29 @@ namespace Engine2
 			this->info += " index count: " + std::to_string(indxCount);
 		}
 
+		template <typename V>
+		void Update(std::vector<V>& verticies, std::vector<unsigned int>& indicies) {
+			// to do: D3D11_MAP_WRITE_DISCARD v D3D11_MAP_WRITE_NO_OVERWRITE ?
+
+			VertexBuffer::Update<V>(verticies);
+			
+			HRESULT hr;
+
+			indxCount = (unsigned int)indicies.size();
+
+			auto& context = DXDevice::GetContext();
+			auto ptrBuffer = pIndexBuffer.Get();
+
+			D3D11_MAPPED_SUBRESOURCE mappedSubResource;
+			hr = context.Map(ptrBuffer, 0u, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubResource);
+
+			E2_ASSERT_HR(hr, "VertexBufferIndex Map failed");
+
+			memcpy(mappedSubResource.pData, indicies.data(), sizeof(unsigned int) * indicies.size());
+
+			context.Unmap(ptrBuffer, 0);
+		}
+
 		void Bind() {
 			DXDevice::GetContext().IASetPrimitiveTopology(this->topology);
 			DXDevice::GetContext().IASetVertexBuffers(this->slot, this->numberOfBuffers, this->pVertexBuffer.GetAddressOf(), this->bufferStrides, this->bufferOffsets);
@@ -126,33 +182,4 @@ namespace Engine2
 		wrl::ComPtr<ID3D11Buffer> pIndexBuffer = nullptr;
 		unsigned int indxCount = 0;
 	};
-
-	template <typename V>
-	class MeshTriangleList : public VertexBuffer<V, D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST>
-	{
-	public:
-		MeshTriangleList(std::vector<V>& verticies) : VertexBuffer<V, D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST>(verticies) {}
-	};
-
-	template <typename V>
-	class MeshTriangleIndexList : public VertexBufferIndex<V, D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST>
-	{
-	public:
-		MeshTriangleIndexList(std::vector<V>& verticies, std::vector<unsigned int>& indicies) : VertexBufferIndex<V, D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST>(verticies, indicies) {}
-	};
-
-	template <typename V>
-	class WireframeList : public VertexBuffer<V, D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINELIST>
-	{
-	public:
-		WireframeList(std::vector<V>& verticies) : VertexBuffer<V, D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINELIST>(verticies) {}
-	};
-
-	template <typename V>
-	class WireframeIndexList : public VertexBufferIndex<V, D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINELIST>
-	{
-	public:
-		WireframeIndexList(std::vector<V>& verticies, std::vector<unsigned int>& indicies) : VertexBufferIndex<V, D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINELIST>(verticies, indicies) {}
-	};
-
 }

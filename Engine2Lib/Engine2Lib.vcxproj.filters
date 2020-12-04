@@ -32,7 +32,6 @@
     <ClInclude Include="src\VertexBuffer.h" />
     <ClInclude Include="src\Primatives.h" />
     <ClInclude Include="src\Lights.h" />
-    <ClInclude Include="src\VertexBufferDynamic.h" />
     <ClInclude Include="src\VertexBufferInstanced.h" />
     <ClInclude Include="src\AssetLoaders\ObjLoader.h" />
     <ClInclude Include="src\OffscreenOutliner.h" />

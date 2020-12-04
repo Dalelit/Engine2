@@ -43,7 +43,9 @@ namespace Engine2
 			auto m = Mesh::Assets.CreateAsset(name);
 			m->SetName(name);
 			names.push_back(name);
-			m->SetDrawable<MeshTriangleList<Vertex>>(verticies);
+			auto vb = std::make_shared<VertexBuffer>();
+			vb->Initialise<Vertex>(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST, verticies);
+			m->SetDrawable(vb);
 		}
 
 		return names;
@@ -88,7 +90,9 @@ namespace Engine2
 			auto m = Mesh::Assets.CreateAsset(name + "_t");
 			m->SetName(name);
 			names.push_back(name);
-			m->SetDrawable<MeshTriangleList<Vertex>>(verticies);
+			auto vb = std::make_shared<VertexBuffer>();
+			vb->Initialise<Vertex>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, verticies);
+			m->SetDrawable(vb);
 		}
 
 		return names;

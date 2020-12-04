@@ -628,7 +628,11 @@ namespace BlockWorld
 			blockOrigin.m128_f32[2] += BlockSpecs.size;
 		}
 
-		if (verticies.size() > 0) pChunk->pVB = std::make_shared<MeshTriangleIndexList<VertexData::Vertex>>(verticies, indicies);
+		if (verticies.size() > 0)
+		{
+			pChunk->pVB = std::make_shared<VertexBufferIndex>();
+			pChunk->pVB->Initialise<VertexData::Vertex>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, verticies, indicies);
+		}
 	}
 
 }

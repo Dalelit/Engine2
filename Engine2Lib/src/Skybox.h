@@ -44,7 +44,7 @@ namespace Engine2
 		std::unique_ptr<Texture> texture;
 		std::unique_ptr<VertexShader> vertexShader;
 		std::unique_ptr<PixelShader> pixelShader;
-		std::unique_ptr<Drawable> vertexBuffer;
+		std::unique_ptr<VertexBufferIndex> vertexBuffer;
 
 		SkyboxFileSelector fileSelection;
 

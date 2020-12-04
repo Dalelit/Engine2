@@ -183,7 +183,9 @@ namespace Engine2
 
 			mr->material = materials[data.material];
 			mr->mesh = std::make_shared<Mesh>(name);
-			mr->mesh->SetDrawable<MeshTriangleList<Vertex>>(verticies);
+			auto vb = std::make_shared<VertexBuffer>();
+			vb->Initialise<Vertex>(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST, verticies);
+			mr->mesh->SetDrawable(vb);
 		}
 
 		return true;

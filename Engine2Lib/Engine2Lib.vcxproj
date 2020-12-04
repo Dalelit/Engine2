@@ -194,7 +194,6 @@
     <ClInclude Include="src\Events.h" />
     <ClInclude Include="src\DXDevice.h" />
     <ClInclude Include="src\Engine2.h" />
-    <ClInclude Include="src\VertexBufferDynamic.h" />
     <ClInclude Include="src\VertexBuffer.h" />
     <ClInclude Include="src\pch.h" />
     <ClInclude Include="src\Shader.h" />

@@ -22,8 +22,7 @@ namespace Engine2
 
 		bool IsValid() { return drawable != nullptr; }
 
-		template <class T, class... ARGS>
-		void SetDrawable(ARGS&&... args) { drawable = std::make_shared<T>(std::forward<ARGS>(args)...); }
+		void SetDrawable(std::shared_ptr<Drawable> vertexBuffer) { drawable = vertexBuffer; }
 
 		void SetName(std::string str) { name = str; }
 		const std::string& Name() const { return name; }

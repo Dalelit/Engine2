@@ -47,7 +47,8 @@ namespace Engine2
 			{"Position", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
 		};
 
-		vertexBuffer = std::make_unique<MeshTriangleIndexList<Vertex>>(verticies, indicies);
+		vertexBuffer = std::make_unique<VertexBufferIndex>();
+		vertexBuffer->Initialise<Vertex>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, verticies, indicies);
 
 		vertexShader = std::make_unique<VertexShaderFile>(Config::directories["EngineShaderSourceDir"] + "SkyboxVS.hlsl", layout);
 		

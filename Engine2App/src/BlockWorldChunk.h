@@ -1,6 +1,6 @@
 #pragma once
 #include "Common.h"
-#include "VertexBufferDynamic.h"
+#include "VertexBuffer.h"
 #include "Shader.h"
 
 namespace BlockWorld
@@ -50,7 +50,7 @@ namespace BlockWorld
 		DirectX::XMVECTOR origin;
 		DirectX::BoundingBox bounds;
 		Block* blocks;
-		std::shared_ptr<Engine2::Drawable> pVB;
+		std::shared_ptr<Engine2::VertexBufferIndex> pVB;
 	};
 
 	struct HitInfo
