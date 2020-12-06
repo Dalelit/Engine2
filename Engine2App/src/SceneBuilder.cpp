@@ -52,14 +52,19 @@ SceneBuilder::SceneBuilder() : Layer("SceneBuilder")
 	//scene.GetSkybox().Initialise(files);
 
 	{
-		auto e = scene.CreateEntity();
-		auto cc = e.AddComponent<Camera>("Offscreen camera test");
-		cc->SetAspectRatio(DXDevice::Get().GetAspectRatio());
-		e.AddComponent<Gizmo>(Gizmo::Types::Camera);
-		auto buffer = e.AddComponent<OffscreenWithDepthBuffer>();
-		auto tr = e.GetComponent<Transform>();
-		tr->position = { 5.0f, 6.3f, 5.0f, 1.0f };
-		tr->LookAt(0.0f, 1.3f, 0.0f);
+		//auto e = scene.CreateEntity();
+		//auto cc = e.AddComponent<Camera>("Offscreen camera test");
+		//cc->SetAspectRatio(DXDevice::Get().GetAspectRatio());
+		//e.AddComponent<Gizmo>(Gizmo::Types::Camera);
+		//auto buffer = e.AddComponent<OffscreenWithDepthBuffer>();
+		//auto tr = e.GetComponent<Transform>();
+		//tr->position = { 5.0f, 6.3f, 5.0f, 1.0f };
+		//tr->LookAt(0.0f, 1.3f, 0.0f);
+	}
+
+	{
+		auto e = scene.CreateEntity("Directional Light Test");
+		auto dl = e.AddComponent<DirectionalLight>();
 	}
 }
 
@@ -102,14 +107,16 @@ void SceneBuilder::BuildTestScene()
 
 	 // add a light
 	{
-		auto e = scene.CreateEntity();
+		auto e = scene.CreateEntity("Point light 1");
 		e.AddComponent<Gizmo>(Gizmo::Types::Sphere);
 		e.AddComponent<PointLight>();
-		e.GetComponent<Transform>()->position = { -3.0f, 3.0f, -3.0f, 0.0f };
+		auto tr = e.GetComponent<Transform>();
+		tr->SetPosition(-3.0f, 3.0f, -3.0f);
+		tr->SetScale(0.25f); // just to make the gizmo smaller
 	}
 
 	{
-		auto e = scene.CreateEntity();
+		auto e = scene.CreateEntity("Sphere");
 		auto mr = e.AddComponent<MeshRenderer>();
 		mr->mesh = Mesh::Assets["Sphere"];
 		mr->material = Material::Materials["Default PNC"];
@@ -117,8 +124,30 @@ void SceneBuilder::BuildTestScene()
 	}
 
 	{
+		auto e = scene.CreateEntity("Cube");
+		auto mr = e.AddComponent<MeshRenderer>();
+		mr->mesh = Mesh::Assets["Cube"];
+		mr->material = Material::Materials["Default PNC"]->Clone();
+		auto cb = std::static_pointer_cast<PSConstantBuffer<MaterialLibrary::StandardMaterial>>(mr->material->pixelShaderCB);
+		if (cb) cb->data.diffuse = { 0.8f, 0.2f, 0.2f };
+		e.GetComponent<Transform>()->position = { -2.0f, 2.0f, -1.0f, 1.0f };
+	}
+
+	{
+		auto e = scene.CreateEntity("Plane plane");
+		auto mr = e.AddComponent<MeshRenderer>();
+		mr->mesh = Mesh::Assets["Plane"];
+		mr->material = Material::Materials["Default PNC"]->Clone();
+		auto cb = std::static_pointer_cast<PSConstantBuffer<MaterialLibrary::StandardMaterial>>(mr->material->pixelShaderCB);
+		if (cb) cb->data.diffuse = { 0.2f, 0.8f, 0.2f };
+		auto tr = e.GetComponent<Transform>();
+		tr->SetPosition(0.0f, -2.0f, 0.0f);
+		tr->SetScale(20.0f);
+	}
+
+	{
 		// textured test
-		auto e = scene.CreateEntity();
+		auto e = scene.CreateEntity("Texture plane");
 		auto mr = e.AddComponent<MeshRenderer>();
 		mr->mesh = Mesh::Assets["Plane_t"];
 		e.GetComponent<Transform>()->scale = { 4.0f, 4.0f, 4.0f, 1.0f };

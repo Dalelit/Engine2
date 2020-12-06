@@ -13,10 +13,11 @@ using namespace DirectX;
 
 namespace Engine2
 {
-	SceneHierarchy::SceneNode* SceneHierarchy::NewEntity(SceneNode* parent, SceneNode* insertBefore)
+	SceneHierarchy::SceneNode* SceneHierarchy::NewEntity(const std::string& name, SceneNode* parent, SceneNode* insertBefore)
 	{
 		EntityId_t id = coordinator.CreateEntity();
-		coordinator.AddComponent<EntityInfo>(id)->tag = std::to_string(id);
+		if (name.empty()) coordinator.AddComponent<EntityInfo>(id)->tag = std::to_string(id);
+		else coordinator.AddComponent<EntityInfo>(id)->tag = name;
 		coordinator.AddComponent<Transform>(id);
 		coordinator.AddComponent<TransformMatrix>(id);
 
@@ -100,11 +101,11 @@ namespace Engine2
 		for (auto& sn : sceneHierarchy) SceneNodeOnImGui(sn);
 
 		// deferred create/destroy entity if required
-		if (addEntityParent || addEntityInsertBefore) NewEntity(addEntityParent, addEntityInsertBefore);
+		if (addEntityParent || addEntityInsertBefore) NewEntity(std::string(), addEntityParent, addEntityInsertBefore);
 
 		if (deleteEntity) DestroyEntity(deleteEntityParent, deleteEntity);
 
-		if (ImGui::Button("Add Entity")) NewEntity();
+		if (ImGui::Button("Add Entity")) NewEntity(std::string());
 
 		if (ImGui::CollapsingHeader("Loader"))
 		{
@@ -132,7 +133,7 @@ namespace Engine2
 
 		if (!loadedModel) return false;
 
-		auto root = NewEntity();
+		auto root = NewEntity(sourceFilename);
 		coordinator.GetComponent<EntityInfo>(root->id)->tag = sourceFilename;
 
 		std::map<std::string, std::shared_ptr<MaterialLibrary::PositionNormalColorMaterial>> materials;
@@ -151,7 +152,7 @@ namespace Engine2
 
 		for (auto& [name, data] : loadedModel->objects)
 		{
-			auto sn = NewEntity(root);
+			auto sn = NewEntity(name, root);
 			Entity entity(sn->id, coordinator);
 
 			entity.GetComponent<EntityInfo>()->tag = name;
