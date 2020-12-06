@@ -6,6 +6,7 @@ Near term / in progress
 	- clean up engine shaders to move common code into include file
 	- have each render step set the state, rather than rely on the default state
 	- create a render pipeline to manage stages
+	- Skybox only used in perspective
 - Model/mesh loading
 - Scene UI work
 	- maintain focus on selected entity on destroy
@@ -27,7 +28,8 @@ Near term / in progress
 	- Camera rotation around z. Gizmo changes but camera is locked.
 	- Offscreen targets need to render subdisplay using the aspect ratio
 - Proper error handling and logging
-	- use exceptions
+	- use exceptions?
+	- add logging
 
 Long term
 - Rigid body and basic physics

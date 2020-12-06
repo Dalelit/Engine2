@@ -178,7 +178,7 @@ namespace Engine2
 		addLine(3, 7);
 	}
 
-	void GizmoRender::DrawCamera(const DirectX::XMMATRIX& instance, float nearPlane, float farPlane, float aspectRatio, float fieldOfView)
+	void GizmoRender::DrawCameraPerspective(const DirectX::XMMATRIX& instance, float nearPlane, float farPlane, float aspectRatio, float fieldOfView)
 	{
 		Vertex v;
 		v.color = cameraColor;
@@ -227,6 +227,64 @@ namespace Engine2
 		addLine(origin, p1);
 		addLine(origin, p2);
 		addLine(origin, p3);
+	}
+
+	void GizmoRender::DrawCameraOrthographic(const DirectX::XMMATRIX& instance, float nearPlane, float farPlane, float viewWidth, float viewHeight)
+	{
+		Vertex v;
+		v.color = cameraColor;
+
+		auto tr = XMMatrixTranspose(instance); // engine stores the transform ready for the GPU... so undo that.
+
+		Vertex verticies[9];
+		for (int i = 0; i < 9; ++i) verticies[i].color = cameraColor;
+
+		auto addLine = [&](int p1, int p2) {
+			lineBuffer.push_back(verticies[p1]);
+			lineBuffer.push_back(verticies[p2]);
+		};
+
+		float xDist = viewWidth * 0.5f;
+		float yDist = viewHeight * 0.5f;
+
+		// origin
+		XMStoreFloat3(&verticies[0].position, XMVector3Transform({ 0.0f, 0.0f, 0.0f, 1.0f }, tr));
+
+		// near plane
+		XMStoreFloat3(&verticies[1].position, XMVector3Transform({ -xDist,  yDist, nearPlane, 1.0f }, tr));
+		XMStoreFloat3(&verticies[2].position, XMVector3Transform({  xDist,  yDist, nearPlane, 1.0f }, tr));
+		XMStoreFloat3(&verticies[3].position, XMVector3Transform({  xDist, -yDist, nearPlane, 1.0f }, tr));
+		XMStoreFloat3(&verticies[4].position, XMVector3Transform({ -xDist, -yDist, nearPlane, 1.0f }, tr));
+
+		// far plane
+		XMStoreFloat3(&verticies[5].position, XMVector3Transform({ -xDist,  yDist, farPlane, 1.0f }, tr));
+		XMStoreFloat3(&verticies[6].position, XMVector3Transform({  xDist,  yDist, farPlane, 1.0f }, tr));
+		XMStoreFloat3(&verticies[7].position, XMVector3Transform({  xDist, -yDist, farPlane, 1.0f }, tr));
+		XMStoreFloat3(&verticies[8].position, XMVector3Transform({ -xDist, -yDist, farPlane, 1.0f }, tr));
+
+		// origin to near
+		addLine(0, 1);
+		addLine(0, 2);
+		addLine(0, 3);
+		addLine(0, 4);
+
+		// near
+		addLine(1, 2);
+		addLine(2, 3);
+		addLine(3, 4);
+		addLine(4, 1);
+
+		// near to far
+		addLine(1, 5);
+		addLine(2, 6);
+		addLine(3, 7);
+		addLine(4, 8);
+
+		// far
+		addLine(5, 6);
+		addLine(6, 7);
+		addLine(7, 8);
+		addLine(8, 5);
 	}
 
 	void GizmoRender::CreateBuffers()

@@ -16,7 +16,12 @@ namespace Engine2
 
 		// note: XMMatrixLookToLH normalises the direction vector
 		viewMatrix = XMMatrixLookToLH(position, direction, UP);
-		projectionMatrix = XMMatrixPerspectiveFovLH(fov, aspectRatio, nearZ, farZ);
+		
+		if (orthographic)
+			projectionMatrix = XMMatrixOrthographicLH(viewWidth, viewHeight, nearZ, farZ);
+		else
+			projectionMatrix = XMMatrixPerspectiveFovLH(fov, aspectRatio, nearZ, farZ);
+		
 		viewProjectionMatrix = viewMatrix * projectionMatrix;
 	}
 
@@ -28,11 +33,28 @@ namespace Engine2
 			strcpy_s(buffer, sizeof(buffer), name.c_str());
 			if (ImGui::InputText("Name", buffer, sizeof(buffer))) name = buffer;
 
-			if (ImGui::DragFloat("Aspect ratio", &aspectRatio, 0.05f)) if (aspectRatio < 0.01f) aspectRatio = 0.01f;
-			float deg = XMConvertToDegrees(fov);
-			if (ImGui::DragFloat("FOV", &deg, 0.1f)) fov = XMConvertToRadians(deg);
+			ImGui::Checkbox("Orthographic", &orthographic);
+
+			if (ImGui::DragFloat("Aspect ratio", &aspectRatio, 0.05f))
+			{
+				// call set aspect ratio as some calcs are triggered
+				if (aspectRatio < 0.01f) SetAspectRatio(0.01f); // clamp it.
+				else SetAspectRatio(aspectRatio);
+			}
 			ImGui::DragFloat("Near Z", &nearZ, 0.25f, 0.001f, farZ);
 			ImGui::DragFloat("Far Z", &farZ, 0.25f, nearZ + 0.01f, 1000000.0f);
+
+			if (orthographic)
+			{
+				// lock the width/height with the aspect ratio
+				if (ImGui::DragFloat("View width", &viewWidth)) viewHeight = viewWidth / aspectRatio;
+				if (ImGui::DragFloat("View height", &viewHeight)) viewWidth = viewHeight * aspectRatio;
+			}
+			else
+			{
+				float deg = XMConvertToDegrees(fov);
+				if (ImGui::DragFloat("FOV", &deg, 0.1f)) fov = XMConvertToRadians(deg);
+			}
 			ImGui::TreePop();
 		}
 	}

@@ -48,7 +48,7 @@ namespace Engine2
 
 		RenderMeshes();
 		RenderParticles();
-		if (skybox.IsActive()) skybox.BindAndDraw();
+		if (skybox.IsActive() && pCamera->IsPerspective()) skybox.BindAndDraw();
 		RenderOutlines();
 		if (gizmoEnabled && showGizmos) RenderGizmos();
 	}
@@ -137,7 +137,12 @@ namespace Engine2
 			case Gizmo::Types::Camera:
 				auto pCamera = coordinator.GetComponent<Camera>(e);
 				if (pCamera)
-					gizmoRender.DrawCamera(trans, pCamera->NearPlane(), pCamera->FarPlane(), pCamera->AspectRatio(), pCamera->FieldOfView());
+				{
+					if (pCamera->IsOrthographic())
+						gizmoRender.DrawCameraOrthographic(trans, pCamera->NearPlane(), pCamera->FarPlane(), pCamera->ViewWidth(), pCamera->ViewHeight());
+					else
+						gizmoRender.DrawCameraPerspective(trans, pCamera->NearPlane(), pCamera->FarPlane(), pCamera->AspectRatio(), pCamera->FieldOfView());
+				}
 				break;
 			}
 		}

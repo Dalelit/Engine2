@@ -32,7 +32,8 @@ namespace Engine2
 		void DrawAxis(const DirectX::XMMATRIX& instance);
 		void DrawSphere(const DirectX::XMMATRIX& instance);
 		void DrawCube(const DirectX::XMMATRIX& instance);
-		void DrawCamera(const DirectX::XMMATRIX& instance, float nearPlane, float farPlane, float aspectRatio, float fieldOfView);
+		void DrawCameraPerspective(const DirectX::XMMATRIX& instance, float nearPlane, float farPlane, float aspectRatio, float fieldOfView);
+		void DrawCameraOrthographic(const DirectX::XMMATRIX& instance, float nearPlane, float farPlane, float viewWidth, float viewHeight);
 
 	protected:
 		size_t maxGizmos;
