@@ -24,6 +24,11 @@ namespace Engine2
 
 		virtual void OnImgui();
 
+		inline float AspectRatio() const { return aspectRatio; }
+		inline float NearPlane() const { return nearZ; }
+		inline float FarPlane() const { return farZ; }
+		inline float FieldOfView() const { return fov; }
+
 		inline void SetAspectRatio(float ratio) { aspectRatio = ratio; }
 		inline bool IsAspectRatioLockedToScreen() { return aspectRatioLockedToScreen; }
 		inline bool SetAspectRatioLockedToScreen(bool locked = true) { aspectRatioLockedToScreen = locked; }
@@ -39,7 +44,7 @@ namespace Engine2
 		float aspectRatio = 1.0f;
 		float fov = DirectX::XMConvertToRadians(75.0f);
 		float nearZ = 0.5f;
-		float farZ = 10000.0f;
+		float farZ = 1000.0f;
 		bool aspectRatioLockedToScreen = true;
 
 		static constexpr DirectX::XMVECTOR FORWARD = { 0.0f, 0.0f, 1.0f, 1.0f };

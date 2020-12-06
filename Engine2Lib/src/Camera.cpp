@@ -28,7 +28,7 @@ namespace Engine2
 			strcpy_s(buffer, sizeof(buffer), name.c_str());
 			if (ImGui::InputText("Name", buffer, sizeof(buffer))) name = buffer;
 
-			ImGui::DragFloat("Aspect ratio", &aspectRatio, 0.25f, 0.1f, 0.1f);
+			if (ImGui::DragFloat("Aspect ratio", &aspectRatio, 0.05f)) if (aspectRatio < 0.01f) aspectRatio = 0.01f;
 			float deg = XMConvertToDegrees(fov);
 			if (ImGui::DragFloat("FOV", &deg, 0.1f)) fov = XMConvertToRadians(deg);
 			ImGui::DragFloat("Near Z", &nearZ, 0.25f, 0.001f, farZ);

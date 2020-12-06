@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Components.h"
 #include "Transform.h"
+#include "Gizmo.h"
 #include "submodules/imgui/imgui.h"
 #include "UtilMath.h"
 #include "MeshRenderer.h"
@@ -10,7 +11,6 @@
 #include "OffscreenOutliner.h"
 #include "Camera.h"
 #include "ScriptComponent.h"
-
 
 using namespace DirectX;
 
@@ -23,28 +23,6 @@ namespace Engine2
 		if (ImGui::InputText("Tag", buffer, sizeof(buffer)))
 		{
 			tag = buffer;
-		}
-	}
-
-	void Gizmo::OnImgui()
-	{
-		const char* selected = "";
-
-		switch (type)
-		{
-			case Types::Axis: selected = "Axis"; break;
-			case Types::Cube: selected = "Cube"; break;
-			case Types::Sphere: selected = "Sphere"; break;
-			case Types::Camera: selected = "Camera"; break;
-		}
-
-		if (ImGui::BeginCombo("Type", selected))
-		{
-			if (ImGui::Selectable("Axis",   type == Types::Axis)) type = Types::Axis;
-			if (ImGui::Selectable("Cube",   type == Types::Cube)) type = Types::Cube;
-			if (ImGui::Selectable("Sphere", type == Types::Sphere)) type = Types::Sphere;
-			if (ImGui::Selectable("Camera", type == Types::Camera)) type = Types::Camera;
-			ImGui::EndCombo();
 		}
 	}
 
@@ -95,6 +73,7 @@ namespace Engine2
 		ComponentOnImgui<OffscreenOutliner>("Outliner", id, coord);
 		ComponentOnImgui<Camera>("Camera", id, coord);
 		ComponentOnImgui<ScriptComponent>("Scripts", id, coord);
+		ComponentOnImgui<OffscreenWithDepthBuffer>("OffscreenWithDepthBuffer", id, coord);
 
 		if (ImGui::BeginCombo("Add Component", ""))
 		{
@@ -105,7 +84,8 @@ namespace Engine2
 			AddComponentOnImgui<Gizmo>("Gizmo", id, coord);
 			AddComponentOnImgui<OffscreenOutliner>("Outliner", id, coord);
 			AddComponentOnImgui<Camera>("Camera", id, coord);
-			
+			AddComponentOnImgui<OffscreenWithDepthBuffer>("OffscreenWithDepthBuffer", id, coord);
+
 			// Script Components need and extra step of setting the entity
 			//AddComponentOnImgui<ScriptComponent>("Scripts", id, coord);
 			if (!coord.HasComponent<ScriptComponent>(id) && ImGui::Selectable("Scripts"))

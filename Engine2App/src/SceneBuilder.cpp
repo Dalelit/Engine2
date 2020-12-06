@@ -55,6 +55,7 @@ SceneBuilder::SceneBuilder() : Layer("SceneBuilder")
 		auto e = scene.CreateEntity();
 		auto cc = e.AddComponent<Camera>("Offscreen camera test");
 		cc->SetAspectRatio(DXDevice::Get().GetAspectRatio());
+		e.AddComponent<Gizmo>(Gizmo::Types::Camera);
 		auto buffer = e.AddComponent<OffscreenWithDepthBuffer>();
 		auto tr = e.GetComponent<Transform>();
 		tr->position = { 5.0f, 6.3f, 5.0f, 1.0f };
@@ -102,7 +103,7 @@ void SceneBuilder::BuildTestScene()
 	 // add a light
 	{
 		auto e = scene.CreateEntity();
-		e.AddComponent<Gizmo>()->type = Gizmo::Types::Sphere;
+		e.AddComponent<Gizmo>(Gizmo::Types::Sphere);
 		e.AddComponent<PointLight>();
 		e.GetComponent<Transform>()->position = { -3.0f, 3.0f, -3.0f, 0.0f };
 	}

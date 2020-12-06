@@ -4,7 +4,7 @@
 #include "ConstantBuffer.h"
 #include "ECS.h"
 #include "Entity.h"
-#include "GizmoRender.h"
+#include "Gizmo.h"
 #include "SceneHierarchy.h"
 #include "Skybox.h"
 #include "Engine2.h"

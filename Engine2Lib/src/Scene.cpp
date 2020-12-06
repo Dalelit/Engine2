@@ -35,7 +35,7 @@ namespace Engine2
 
 	void Scene::OnRender(EntityId_t cameraEntity)
 	{
-		RenderImage(cameraEntity);
+		RenderImage(cameraEntity, gizmoEnabled);
 		CamerasRender();
 	}
 
@@ -134,7 +134,11 @@ namespace Engine2
 			case Gizmo::Types::Axis:   gizmoRender.DrawAxis(trans); break;
 			case Gizmo::Types::Cube:   gizmoRender.DrawCube(trans); break;
 			case Gizmo::Types::Sphere: gizmoRender.DrawSphere(trans); break;
-			case Gizmo::Types::Camera: gizmoRender.DrawCamera(trans); break;
+			case Gizmo::Types::Camera:
+				auto pCamera = coordinator.GetComponent<Camera>(e);
+				if (pCamera)
+					gizmoRender.DrawCamera(trans, pCamera->NearPlane(), pCamera->FarPlane(), pCamera->AspectRatio(), pCamera->FieldOfView());
+				break;
 			}
 		}
 		gizmoRender.Render();

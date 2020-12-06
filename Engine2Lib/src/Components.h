@@ -12,14 +12,6 @@ namespace Engine2
 		void OnImgui();
 	};
 
-	struct Gizmo
-	{
-		enum Types {Axis, Cube, Sphere, Camera};
-		Types type = Types::Sphere;
-
-		void OnImgui();
-	};
-
 	class Components
 	{
 	public:
