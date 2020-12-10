@@ -74,7 +74,7 @@ namespace Engine2
 		ComponentOnImgui<OffscreenOutliner>("Outliner", id, coord);
 		ComponentOnImgui<Camera>("Camera", id, coord);
 		ComponentOnImgui<ScriptComponent>("Scripts", id, coord);
-		ComponentOnImgui<OffscreenWithDepthBuffer>("OffscreenWithDepthBuffer", id, coord);
+		ComponentOnImgui<Offscreen>("Offscreen", id, coord);
 
 		if (ImGui::BeginCombo("Add Component", ""))
 		{
@@ -86,7 +86,7 @@ namespace Engine2
 			AddComponentOnImgui<Gizmo>("Gizmo", id, coord);
 			AddComponentOnImgui<OffscreenOutliner>("Outliner", id, coord);
 			AddComponentOnImgui<Camera>("Camera", id, coord);
-			AddComponentOnImgui<OffscreenWithDepthBuffer>("OffscreenWithDepthBuffer", id, coord);
+			AddComponentOnImgui<Offscreen>("Offscreen", id, coord);
 
 			// Script Components need and extra step of setting the entity
 			//AddComponentOnImgui<ScriptComponent>("Scripts", id, coord);

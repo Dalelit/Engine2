@@ -95,7 +95,7 @@ namespace BlockWorld
 		// stats
 		//unsigned long instanceUpdateCount = 0;
 
-		Engine2::OffscreenWithDepthBuffer offscreen;
+		Engine2::Offscreen offscreen;
 
 		ChunkManager chunkMgr;
 		bool blockHit = false;

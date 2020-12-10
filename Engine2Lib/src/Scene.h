@@ -22,7 +22,7 @@ namespace Engine2
 		~Scene() = default;
 
 		void OnUpdate(float dt);
-		void OnRender() { OnRender(mainCameraEntity); }
+		inline void OnRender() { OnRender(mainCameraEntity); }
 		void OnRender(EngineECS::EntityId_t cameraEntity);
 		void OnApplicationEvent(Engine2::ApplicationEvent& event);
 
@@ -75,7 +75,7 @@ namespace Engine2
 		void RenderGizmos();
 		void RenderOutlines();
 
-		void RenderImage(EngineECS::EntityId_t cameraEntity, bool showGizmos = false);
+		void RenderImage(EngineECS::EntityId_t cameraEntity, bool mainCamera = true);
 
 		void CamerasRender();
 

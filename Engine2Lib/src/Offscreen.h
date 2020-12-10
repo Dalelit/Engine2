@@ -1,6 +1,6 @@
 #pragma once
 #include "pch.h"
-#include "Resources.h"
+#include "VertexBuffer.h"
 #include "Shader.h"
 
 namespace Engine2
@@ -12,128 +12,113 @@ namespace Engine2
 		// Default shaders in here use 0.
 		// If needed to be bound for other shaders in a different slot, need to update these shaders
 
-		Offscreen(unsigned int slot = 0);
-		virtual ~Offscreen() = default;
+		Offscreen(unsigned int slot = 0) : Offscreen(true, true, slot) {}
+		Offscreen(bool hasRenderTarget, bool hasDepthBuffer, unsigned int slot = 0);
 
 		// use as a shader resource
-		void Bind();   // binds as a resource
+		inline void Bind() { BindBuffer(slot); }   // binds as a resource. defaults to binding the render target
+		void BindBuffer(unsigned int textureSlot);
+		void BindDepthBuffer(unsigned int textureSlot);
 		void Unbind(); // unbinds as a resource
 		
 		// use as a target
-		virtual void SetAsTarget();    // makes this the offscreen target
+		void SetAsTarget();    // makes this the offscreen target
 		
 		// draw the results
 		void DrawToBackBuffer(); // draws the offscreen to the back buffer
-		virtual void Clear();    // clears it for the frame
+		void Clear();    // clears it for the frame
 
 		// manage the resources
-		virtual void Release();  // releases the resources, e.g when resizing
-		virtual void Configure() // configures the resources. Override the methods to replace behaviour
-		{
-			InitialiseBuffer();
-			InitialiseShaderResources();
-		}
-		virtual void Reconfigure() // call when there has been a resize
-		{
-			Release();
-			Configure();
-		}
+		void Release();     // releases the resources, e.g when resizing
+		void Configure();   // configures the resources. Override the methods to replace behaviour
+		void Reconfigure(); // call when there has been a resize
 
 		inline UINT GetWidth()  { return width; }
 		inline UINT GetHeight() { return height; }
 		inline wrl::ComPtr<ID3D11RenderTargetView>& GetRenderTargetView() { return pTargetView; }
 
+		inline bool HasRenderTarget() { return pBuffer; }
+		inline bool HasDepthBuffer() { return pDepthBuffer; }
+
 		inline void SetPixelShader(std::shared_ptr<PixelShader> pNewPixelShader) { pPS = pNewPixelShader; }
 
 		void OnImgui();
-		virtual void ShowSubDisplay() { ShowSubDisplayRenderTarget(); }
-		void ShowSubDisplayRenderTarget();
+		void ShowSubDisplay();
 
-		std::map<std::string, std::shared_ptr<PixelShader>> pixelShaders; // Public so can add to this. Populated with AddSampleFilters on constructuion.
+		static std::map<std::string, std::shared_ptr<PixelShader>> pixelShaders; // Public so can add to this. Populated with AddSampleFilters on constructuion.
 
 	protected:
-		std::shared_ptr<Drawable> pDrawable = nullptr;
+		// shader resources
+		unsigned int slot;
 
 		// render target
 		wrl::ComPtr<ID3D11Texture2D> pBuffer = nullptr;
 		wrl::ComPtr<ID3D11RenderTargetView> pTargetView = nullptr;
+		wrl::ComPtr<ID3D11ShaderResourceView> pBufferResourceView = nullptr;
+		wrl::ComPtr<ID3D11SamplerState> pBufferSamplerState = nullptr;
+
+		// depth buffer
+		wrl::ComPtr<ID3D11DepthStencilView> pDepthStencilView = nullptr;
+		wrl::ComPtr<ID3D11Texture2D> pDepthBuffer = nullptr;
+		wrl::ComPtr<ID3D11DepthStencilState> pDepthStencilState = nullptr;
+		UINT stencilRef = 0;
+		wrl::ComPtr<ID3D11ShaderResourceView> pDepthBufferResourceView;
+		wrl::ComPtr<ID3D11SamplerState> pDepthBufferSamplerState = nullptr;
+
 		// set when the buffer is created so it can be used by other resources
 		UINT width;
 		UINT height;
-		DXGI_FORMAT format;
-
-		// shader resources
-		unsigned int slot;
-		wrl::ComPtr<ID3D11ShaderResourceView> pResourceView = nullptr;
-		wrl::ComPtr<ID3D11SamplerState> pSamplerState = nullptr;
 
 		// Shaders.
 		// Default to copy. Could replace pixel shader with blur for example.
-		std::shared_ptr<VertexShader> pVS = nullptr;
 		std::shared_ptr<PixelShader> pPS = nullptr;
 		std::string pixelShaderName;
-		void AddSampleFilters();
 
-		virtual void InitialiseDrawResources();
-		virtual void InitialiseBuffer();
-		virtual void InitialiseShaderResources();
-		virtual void OnImguiSubDisplayNode();
+		void InitialiseBuffer();
+		void InitialiseDepthBuffer();
+		void ReleaseBuffer();
+		void ReleaseDepthBuffer();
 
-		std::shared_ptr<Drawable> CreateVertexBuffer(float left, float top, float right, float bottom);
+		static std::shared_ptr<VertexBuffer> CreateVertexBuffer(float left, float top, float right, float bottom);
 
 		// subwindow display of render target
 		struct {
 			bool show = true;
 			float leftTop[2] = { 0.5f, -0.5f };
 			float size = 0.5f;
-			std::shared_ptr<VertexShader> pVS;
-			std::shared_ptr<PixelShader>  pPS;
-			std::shared_ptr<Drawable>     pVB;
+			std::shared_ptr<VertexBuffer> pVB;
 		} subDisplay;
 		void InitialiseSubDisplayVB();
-	};
-
-	class OffscreenWithDepthBuffer : public Offscreen
-	{
-	public:
-
-		OffscreenWithDepthBuffer(unsigned int slot = 0);
-
-		void SetAsTarget();
-		void Clear();
-
-		void Release();
-		void Configure()
-		{
-			InitialiseBuffer();
-			InitialiseDepthBuffer();
-			InitialiseShaderResources();
-		}
-
-		void ShowSubDisplay() override { ShowSubDisplayRenderTarget(); ShowSubDisplayDepthBuffer(); }
-		
-		void ShowSubDisplayDepthBuffer();
-
-	protected:
-		// depth buffer
-		wrl::ComPtr<ID3D11DepthStencilView> pDepthStencilView = nullptr;
-		wrl::ComPtr<ID3D11Texture2D> pDepthTexture = nullptr;
-		wrl::ComPtr<ID3D11DepthStencilState> pDepthStencilState = nullptr;
-		UINT stencilRef = 0;
-
-		virtual void InitialiseDepthBuffer();
-		void OnImguiSubDisplayNode();
 
 		// subwindow display of depth buffer
 		struct {
 			bool show = true;
 			float leftTop[2] = { 0.5f, 0.0f };
 			float size = 0.5f;
-			std::shared_ptr<VertexShader> pVS;
-			std::shared_ptr<PixelShader>  pPS;
-			std::shared_ptr<Drawable>     pVB;
-			wrl::ComPtr<ID3D11ShaderResourceView> pDTRV;
+			std::shared_ptr<VertexBuffer> pVB;
 		} subDisplayDepthBuffer;
 		void InitialiseSubDisplayDepthBufferVB();
+
+		// Common resources created once and reused
+
+		static struct OffscreenCommonResources {
+
+			bool initialised = false;
+
+			struct {
+				std::shared_ptr<VertexBuffer> pVB;
+				std::shared_ptr<VertexShader> pVS;
+			} ForDrawToBackBuffer;
+
+			struct {
+				std::shared_ptr<VertexShader> pVS;
+				std::shared_ptr<PixelShader>  pPSBuffer;
+				std::shared_ptr<PixelShader>  pPSDepthBuffer;
+			} ForDrawToSubDisplay;
+
+		} Common;
+
+		static void InitialiseCommon();
+		static void AddSampleFilters();
 	};
 }

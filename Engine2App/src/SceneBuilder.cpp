@@ -52,14 +52,14 @@ SceneBuilder::SceneBuilder() : Layer("SceneBuilder")
 	//scene.GetSkybox().Initialise(files);
 
 	{
-		//auto e = scene.CreateEntity();
-		//auto cc = e.AddComponent<Camera>("Offscreen camera test");
-		//cc->SetAspectRatio(DXDevice::Get().GetAspectRatio());
-		//e.AddComponent<Gizmo>(Gizmo::Types::Camera);
-		//auto buffer = e.AddComponent<OffscreenWithDepthBuffer>();
-		//auto tr = e.GetComponent<Transform>();
-		//tr->position = { 5.0f, 6.3f, 5.0f, 1.0f };
-		//tr->LookAt(0.0f, 1.3f, 0.0f);
+		auto e = scene.CreateEntity("Offscreen test");
+		auto cc = e.AddComponent<Camera>("Offscreen camera test");
+		cc->SetAspectRatio(DXDevice::Get().GetAspectRatio());
+		e.AddComponent<Gizmo>(Gizmo::Types::Camera);
+		auto buffer = e.AddComponent<Offscreen>();
+		auto tr = e.GetComponent<Transform>();
+		tr->position = { 5.0f, 6.3f, 5.0f, 1.0f };
+		tr->LookAt(0.0f, 1.3f, 0.0f);
 	}
 
 	{

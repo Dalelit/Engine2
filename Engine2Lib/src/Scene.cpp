@@ -35,11 +35,11 @@ namespace Engine2
 
 	void Scene::OnRender(EntityId_t cameraEntity)
 	{
-		RenderImage(cameraEntity, gizmoEnabled);
+		RenderImage(cameraEntity, true);
 		CamerasRender();
 	}
 
-	void Scene::RenderImage(EntityId_t cameraEntity, bool showGizmos)
+	void Scene::RenderImage(EntityId_t cameraEntity, bool mainCamera)
 	{
 		auto pCamera = hierarchy.GetECSCoordinator().GetComponent<Camera>(cameraEntity);
 		auto pTransform = hierarchy.GetECSCoordinator().GetComponent<Transform>(cameraEntity);
@@ -49,8 +49,12 @@ namespace Engine2
 		RenderMeshes();
 		RenderParticles();
 		if (skybox.IsActive() && pCamera->IsPerspective()) skybox.BindAndDraw();
-		RenderOutlines();
-		if (gizmoEnabled && showGizmos) RenderGizmos();
+
+		if (mainCamera)
+		{
+			RenderOutlines();
+			if (gizmoEnabled) RenderGizmos();
+		}
 	}
 
 	// update any components that need to know when an event has happened
@@ -181,12 +185,12 @@ namespace Engine2
 	void Scene::CamerasRender()
 	{
 		Coordinator& coordinator = hierarchy.GetECSCoordinator();
-		View<Camera, OffscreenWithDepthBuffer> entities(coordinator);
+		View<Camera, Offscreen> entities(coordinator);
 		for (auto e : entities)
 		{
 			//auto* ca = coordinator.GetComponent<Camera>(e);
 			//auto* tr = coordinator.GetComponent<Transform>(e);
-			auto* of = coordinator.GetComponent<OffscreenWithDepthBuffer>(e);
+			auto* of = coordinator.GetComponent<Offscreen>(e);
 
 			of->Clear();
 			of->SetAsTarget();

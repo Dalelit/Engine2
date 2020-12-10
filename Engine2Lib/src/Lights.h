@@ -1,6 +1,8 @@
 #pragma once
 #include "pch.h"
 #include "Common.h"
+#include "Camera.h"
+#include "Offscreen.h"
 
 namespace Engine2
 {
@@ -33,6 +35,8 @@ namespace Engine2
 		DirectX::XMVECTOR color = { 1.0f, 1.0f, 1.0f, 1.0f };
 		DirectX::XMVECTOR rotation;
 		bool castShadows = true;
+		Camera camera;
 
+		DirectX::XMVECTOR position = { 10.0f, 10.0f, 10.0f, 1.0f };
 	};
 }
