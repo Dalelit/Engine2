@@ -9,6 +9,7 @@
 #include "Skybox.h"
 #include "Engine2.h"
 #include "Camera.h"
+#include "Lights.h"
 
 namespace Engine2
 {
@@ -62,6 +63,7 @@ namespace Engine2
 	protected:
 		SceneHierarchy hierarchy;
 		Skybox skybox;
+		DirectionalLight sun;
 		EngineECS::EntityId_t mainCameraEntity;
 
 		GizmoRender gizmoRender;
@@ -76,6 +78,8 @@ namespace Engine2
 		void RenderOutlines();
 
 		void RenderImage(EngineECS::EntityId_t cameraEntity, bool mainCamera = true);
+
+		void ShadowPass();
 
 		void CamerasRender();
 

@@ -25,18 +25,28 @@ namespace Engine2
 		void OnImgui();
 
 		inline void SetRotation(float x, float y, float z) { SetRotation({x, y, z, 1.0f}); }
-		inline void SetRotation(DirectX::XMVECTOR dir) { rotation = DirectX::XMVector3Normalize(dir); }
+		inline void SetRotation(DirectX::XMVECTOR rot) { rotation = rot; CalcPosition(); }
 
-		inline void ShadowsOn() { castShadows = true; }
-		inline void ShadowsOff() { castShadows = false; }
-		inline bool IsCastingShadows() { return castShadows; }
+		inline Camera& GetCamera() { return camera; }
+
+		DirectX::XMMATRIX GetModelViewProjectionMatrixT();
+
+		DirectX::XMMATRIX& GetTransform() { return transform; }
+		DirectX::XMMATRIX GetTransformT() { return DirectX::XMMatrixTranspose(GetTransform()); }
+
+		bool ShowGizmos() { return showGizmos; }
 
 	protected:
 		DirectX::XMVECTOR color = { 1.0f, 1.0f, 1.0f, 1.0f };
 		DirectX::XMVECTOR rotation;
-		bool castShadows = true;
+		DirectX::XMMATRIX transform;
 		Camera camera;
 
-		DirectX::XMVECTOR position = { 10.0f, 10.0f, 10.0f, 1.0f };
+		DirectX::XMVECTOR centre = DirectX::g_XMZero;
+		DirectX::XMVECTOR position;
+
+		bool showGizmos = true;
+
+		void CalcPosition();
 	};
 }

@@ -68,7 +68,6 @@ namespace Engine2
 		ComponentOnImgui<RigidBody>("RigidBody", id, coord);
 		ComponentOnImgui<MeshRenderer>("MeshRenderer", id, coord);
 		ComponentOnImgui<PointLight>("PointLight", id, coord);
-		ComponentOnImgui<DirectionalLight>("DirectionalLight", id, coord);
 		ComponentOnImgui<ParticleEmitter>("ParticleEmitter", id, coord);
 		ComponentOnImgui<Gizmo>("Gizmo", id, coord);
 		ComponentOnImgui<OffscreenOutliner>("Outliner", id, coord);
@@ -81,7 +80,6 @@ namespace Engine2
 			AddComponentOnImgui<RigidBody>("RigidBody", id, coord);
 			AddComponentOnImgui<MeshRenderer>("MeshRenderer", id, coord);
 			AddComponentOnImgui<PointLight>("PointLight", id, coord);
-			AddComponentOnImgui<DirectionalLight>("DirectionalLight", id, coord);
 			AddComponentOnImgui<ParticleEmitter>("ParticleEmitter", id, coord);
 			AddComponentOnImgui<Gizmo>("Gizmo", id, coord);
 			AddComponentOnImgui<OffscreenOutliner>("Outliner", id, coord);

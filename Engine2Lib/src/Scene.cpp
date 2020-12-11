@@ -57,6 +57,15 @@ namespace Engine2
 		}
 	}
 
+	void Scene::ShadowPass()
+	{
+		//UpdateVSSceneConstBuffer(light.GetCamera(), *pTransform);
+		//UpdatePSSceneConstBuffer(light.GetCamera(), *pTransform);
+
+		//RenderMeshes();
+		//RenderParticles();
+	}
+
 	// update any components that need to know when an event has happened
 	void Scene::OnApplicationEvent(Engine2::ApplicationEvent& event)
 	{
@@ -150,6 +159,13 @@ namespace Engine2
 				break;
 			}
 		}
+
+		if (sun.ShowGizmos())
+		{
+			auto& camera = sun.GetCamera();
+			gizmoRender.DrawCameraOrthographic(sun.GetTransformT(), camera.NearPlane(), camera.FarPlane(), camera.ViewWidth(), camera.ViewHeight());
+		}
+
 		gizmoRender.Render();
 	}
 
@@ -281,6 +297,11 @@ namespace Engine2
 			hierarchy.OnImgui();
 			ImGui::Separator();
 			ImGui::Checkbox("Show Gizmos", &gizmoEnabled);
+			if (ImGui::TreeNode("Sun"))
+			{
+				sun.OnImgui();
+				ImGui::TreePop();
+			}
 			skybox.OnImgui();
 		}
 		ImGui::End();
