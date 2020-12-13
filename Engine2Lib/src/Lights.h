@@ -60,6 +60,7 @@ namespace Engine2
 		{
 			DirectX::XMMATRIX viewProjection;
 			DirectX::XMVECTOR lightColor;
+			DirectX::XMVECTOR lightDirection;
 			float shadowBias;
 		};
 		PSConstantBuffer<ShadowPSCBData> pscbShadowCamera;

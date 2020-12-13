@@ -11,7 +11,7 @@ float4 main(float3 posWS : WSPosition, float3 norWS : WSNormal, float4 col : Col
 	// Generally the model is a white vertex
 	col *= float4(mat_diffuse, 1.0);
 
-	target += ShadowLighting(posWS);
+	target += ShadowLighting(posWS, norWS);
 
 	norWS = normalize(norWS);
 	float3 toLight = pointLightPosition.xyz - posWS.xyz;

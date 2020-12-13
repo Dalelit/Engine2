@@ -19,7 +19,7 @@ namespace Engine2
 	DirectionalLight::DirectionalLight() :
 		camera("Shadow camera"), offscreen(false, true), pscbShadowCamera(2u)
 	{
-		SetRotation(Math::DegToRad({45.0f, 135.0f, 0.0f, 0.0f}));
+		SetRotation(Math::DegToRad({30.0f, 40.0f, 0.0f, 0.0f}));
 		XMVECTOR degs = Math::RadToDeg(rotation);
 
 		camera.SetOrthographic();
@@ -58,7 +58,9 @@ namespace Engine2
 	void DirectionalLight::ShadowPassStart()
 	{
 		CalcPosition();
-		DXDevice::Get().ClearShaderResource(shadowMapSlot); //offscreen.Unbind();
+		auto device = DXDevice::Get();
+		device.ClearShaderResource(shadowMapSlot); //offscreen.Unbind();
+		device.SetNoFaceCullingRenderState();
 		offscreen.Clear();
 		offscreen.SetAsTarget();
 		pVSShader->Bind();
@@ -66,7 +68,9 @@ namespace Engine2
 
 	void DirectionalLight::ShadowPassEnd()
 	{
-		DXDevice::Get().SetBackBufferAsRenderTarget();
+		auto device = DXDevice::Get();
+		device.SetBackBufferAsRenderTarget();
+		device.SetDefaultRenderState();
 	}
 
 	void DirectionalLight::BindShadowMap()
@@ -83,9 +87,11 @@ namespace Engine2
 
 		float distance = camera.FarPlane() - camera.NearPlane();
 
-		position = centre - XMVector3Rotate({0.0f, 0.0f, 1.0f, 1.0f}, rotq) * distance * 0.5;
+		pscbShadowCamera.data.lightDirection = XMVector3Rotate({ 0.0f, 0.0f, 1.0f, 1.0f }, rotq);
 
-		transform = XMMatrixRotationRollPitchYawFromVector(rotation) * XMMatrixTranslationFromVector(position);
+		position = centre - pscbShadowCamera.data.lightDirection * distance * 0.5;
+
+		transform = XMMatrixRotationQuaternion(rotq) * XMMatrixTranslationFromVector(position);
 
 		camera.Update(position, rotation);
 	}
