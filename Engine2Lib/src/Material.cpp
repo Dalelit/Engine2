@@ -50,6 +50,11 @@ namespace Engine2
 		if (texture) texture->Bind();
 	}
 
+	void Material::ShadowBind()
+	{
+		vertexShaderCB->Bind();
+	}
+
 	void Material::SetTransform(TransformMatrix& transform)
 	{
 		vertexShaderCB->data = transform;

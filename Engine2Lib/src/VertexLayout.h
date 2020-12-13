@@ -6,6 +6,13 @@ namespace Engine2
 {
 	namespace VertexLayout
 	{
+		struct Position
+		{
+			DirectX::XMFLOAT3 position;
+
+			static std::vector<D3D11_INPUT_ELEMENT_DESC> Layout;
+		};
+
 		struct PositionNormalColor
 		{
 			DirectX::XMFLOAT3 position;

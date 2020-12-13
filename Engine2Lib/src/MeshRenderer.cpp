@@ -11,6 +11,17 @@ namespace Engine2
 		material->PostDraw();
 	}
 
+	void MeshRenderer::ShadowBindAndDraw()
+	{
+		//material->PreDraw();
+
+		material->ShadowBind();
+
+		mesh->BindAndDraw();
+
+		//material->PostDraw();
+	}
+
 	void MeshRenderer::OnImgui()
 	{
 		if (mesh) mesh->OnImgui();

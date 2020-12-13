@@ -27,6 +27,7 @@ namespace Engine2
 
 		virtual void PreDraw() {} // called before bind and draw
 		void Bind();
+		void ShadowBind();
 		virtual void PostDraw() {} // called after bind and draw
 
 		void SetTransform(TransformMatrix& transform);

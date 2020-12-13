@@ -3,6 +3,8 @@
 #include "Common.h"
 #include "Camera.h"
 #include "Offscreen.h"
+#include "Shader.h"
+#include "ConstantBuffer.h"
 
 namespace Engine2
 {
@@ -36,14 +38,31 @@ namespace Engine2
 
 		bool ShowGizmos() { return showGizmos; }
 
+		void ShadowPassStart();
+		void ShadowPassEnd();
+		void BindShadowMap();
+
+		inline void ShowOffscreenDepthBuffer() { offscreen.ShowSubDisplay(); }
+
 	protected:
-		DirectX::XMVECTOR color = { 1.0f, 1.0f, 1.0f, 1.0f };
 		DirectX::XMVECTOR rotation;
 		DirectX::XMMATRIX transform;
-		Camera camera;
 
 		DirectX::XMVECTOR centre = DirectX::g_XMZero;
 		DirectX::XMVECTOR position;
+
+		Camera camera;
+		Offscreen offscreen;
+		std::unique_ptr<VertexShaderFile> pVSShader;
+
+		UINT32 shadowMapSlot = 2u;
+		struct ShadowPSCBData
+		{
+			DirectX::XMMATRIX viewProjection;
+			DirectX::XMVECTOR lightColor;
+			float shadowBias;
+		};
+		PSConstantBuffer<ShadowPSCBData> pscbShadowCamera;
 
 		bool showGizmos = true;
 

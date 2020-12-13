@@ -1,3 +1,5 @@
+#include "ShadowPS.hlsli"
+
 float specular(float3 positionWS, float3 normalWS, float3 lightPositionWS, float3 cameraPositionWS, float specularExponent)
 {
 	float3 toPL = lightPositionWS - positionWS;
@@ -40,6 +42,8 @@ float4 main(float3 posWS : WSPosition, float3 norWS : WSNormal, float4 col : Col
 	// Change the vertex color to match the diffuse color
 	// Generally the model is a white vertex
 	col *= float4(mat_diffuse, 1.0);
+
+	target += ShadowLighting(posWS);
 
 	norWS = normalize(norWS);
 	float3 toLight = pointLightPosition.xyz - posWS.xyz;

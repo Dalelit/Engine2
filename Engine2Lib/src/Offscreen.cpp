@@ -55,16 +55,34 @@ namespace Engine2
 				}
 			)";
 
+			// pixel shader specific for depth buffer raw
+			std::string PSRawsrc = R"(
+				Texture2D tex;
+				SamplerState smplr;
+
+				float4 main(float2 texCoord : TexCoord) : SV_TARGET
+				{
+					float depth = tex.Sample(smplr, texCoord);
+					return float4(depth, depth, depth, 1.0);
+				}
+			)";
+
 			Common.ForDrawToSubDisplay.pVS = Common.ForDrawToBackBuffer.pVS; // same simple VS.
 			Common.ForDrawToSubDisplay.pPSBuffer = pixelShaders["Copy"];
 			Common.ForDrawToSubDisplay.pPSDepthBuffer = PixelShader::CreateFromString(PSsrc);
+			Common.ForDrawToSubDisplay.pPSDepthBufferRaw = PixelShader::CreateFromString(PSRawsrc);
 
 			Common.initialised = true;
 		}
 	}
 
-	Offscreen::Offscreen(bool hasRenderTarget, bool hasDepthBuffer, unsigned int slot)
+	Offscreen::Offscreen(bool hasRenderTarget, bool hasDepthBuffer, unsigned int slot) :
+		hasRenderTarget(hasRenderTarget), hasDepthBuffer(hasDepthBuffer)
 	{
+		auto bufferTexureDesc = DXDevice::Get().GetBackBufferTextureDesc();  // to do: will change this for more flexible dimensions
+		width = bufferTexureDesc.Width;
+		height = bufferTexureDesc.Height;
+
 		InitialiseCommon();
 
 		// default starting pixel shader is the copy
@@ -150,8 +168,11 @@ namespace Engine2
 
 	void Offscreen::Configure()
 	{
-		InitialiseBuffer();
-		InitialiseDepthBuffer();
+		if (hasRenderTarget)
+			InitialiseBuffer();
+
+		if (hasDepthBuffer)
+			InitialiseDepthBuffer();
 	}
 
 	void Offscreen::Reconfigure()
@@ -166,16 +187,14 @@ namespace Engine2
 		{
 			ImGui::Text("Slot %i, width %i, height %i", slot, width, height);
 
-			bool hasRenderBuffer = pBuffer;
-			if (ImGui::Checkbox("Render Buffer", &hasRenderBuffer))
+			if (ImGui::Checkbox("Render Target", &hasRenderTarget))
 			{
-				if (hasRenderBuffer)
+				if (hasRenderTarget)
 					InitialiseBuffer();
 				else
 					ReleaseBuffer();
 			}
 
-			bool hasDepthBuffer = pDepthBuffer;
 			if (ImGui::Checkbox("Depth Buffer", &hasDepthBuffer))
 			{
 				if (hasDepthBuffer)
@@ -195,7 +214,7 @@ namespace Engine2
 				ImGui::EndCombo();
 			}
 
-			if (hasRenderBuffer && ImGui::TreeNode("Render target"))
+			if (hasRenderTarget && ImGui::TreeNode("Render target"))
 			{
 				ImGui::Checkbox("Show", &subDisplay.show);
 				if (ImGui::DragFloat2("Left,Top", subDisplay.leftTop, 0.05f, -1.0f, 1.0f)) InitialiseSubDisplayVB();
@@ -206,6 +225,7 @@ namespace Engine2
 			if (hasDepthBuffer && ImGui::TreeNode("Depth buffer"))
 			{
 				ImGui::Checkbox("Show", &subDisplayDepthBuffer.show);
+				ImGui::Checkbox("Raw pixels", &subDisplayDepthBuffer.displayRaw);
 				if (ImGui::DragFloat2("Left,Top", subDisplayDepthBuffer.leftTop, 0.05f, -1.0f, 1.0f)) InitialiseSubDisplayDepthBufferVB();
 				if (ImGui::DragFloat("Size", &subDisplayDepthBuffer.size, 0.05f, 0.1f, 2.0f)) InitialiseSubDisplayDepthBufferVB();
 				ImGui::TreePop();
@@ -229,9 +249,6 @@ namespace Engine2
 		hr = DXDevice::GetDevice().CreateRenderTargetView(pBuffer.Get(), nullptr, &pTargetView);
 
 		E2_ASSERT_HR(hr, "CreateRenderTargetView for offscreen failed");
-
-		width = bufferTexureDesc.Width;
-		height = bufferTexureDesc.Height;
 
 		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 		srvDesc.Format = bufferTexureDesc.Format;
@@ -393,7 +410,10 @@ namespace Engine2
 			BindDepthBuffer(slot);
 
 			Common.ForDrawToSubDisplay.pVS->Bind();
-			Common.ForDrawToSubDisplay.pPSDepthBuffer->Bind();
+			if (subDisplayDepthBuffer.displayRaw)
+				Common.ForDrawToSubDisplay.pPSDepthBufferRaw->Bind();
+			else
+				 Common.ForDrawToSubDisplay.pPSDepthBuffer->Bind();
 			subDisplayDepthBuffer.pVB->BindAndDraw();
 			DXDevice::Get().ClearShaderResource(slot); // Unbind();
 			DXDevice::Get().SetBackBufferAsRenderTarget();

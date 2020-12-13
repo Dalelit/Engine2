@@ -1,3 +1,5 @@
+#include "ShadowPS.hlsli"
+
 float specular(float3 positionWS, float3 normalWS, float3 lightPositionWS, float3 cameraPositionWS, float specularExponent)
 {
 	float3 toPL = lightPositionWS - positionWS;
@@ -43,6 +45,8 @@ float4 main(float3 posWS : WSPosition, float3 norWS : WSNormal, float2 tc : Texc
 
 	float4 col = float4(tex.Sample(smplr, tc).rgb, 1.0f);
 	//float4 col = float4(tc.x, tc.y, 0.0, 1.0);
+
+	target += ShadowLighting(posWS);
 
 	norWS = normalize(norWS);
 	float3 toLight = pointLightPosition.xyz - posWS.xyz;

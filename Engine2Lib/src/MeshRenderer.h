@@ -9,6 +9,7 @@ namespace Engine2
 	public:
 
 		void BindAndDraw();
+		void ShadowBindAndDraw();
 
 		bool IsValid() { return mesh && mesh->IsValid() && material && material->IsValid(); }
 

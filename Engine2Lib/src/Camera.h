@@ -40,6 +40,9 @@ namespace Engine2
 		inline bool IsAspectRatioLockedToScreen() { return aspectRatioLockedToScreen; }
 		inline bool SetAspectRatioLockedToScreen(bool locked = true) { aspectRatioLockedToScreen = locked; }
 
+		inline void SetNearPlane(float distance) { nearZ = std::max<float>(distance, 0.0f); }
+		inline void SetFarPlane(float distance) { farZ = std::max<float>(distance, nearZ); }
+
 		inline std::string& GetName() { return name; }
 		inline void SetName(const std::string& newName) { name = newName; }
 

@@ -37,8 +37,8 @@ namespace Engine2
 		inline UINT GetHeight() { return height; }
 		inline wrl::ComPtr<ID3D11RenderTargetView>& GetRenderTargetView() { return pTargetView; }
 
-		inline bool HasRenderTarget() { return pBuffer; }
-		inline bool HasDepthBuffer() { return pDepthBuffer; }
+		inline bool HasRenderTarget() { return hasRenderTarget; }
+		inline bool HasDepthBuffer() { return hasDepthBuffer; }
 
 		inline void SetPixelShader(std::shared_ptr<PixelShader> pNewPixelShader) { pPS = pNewPixelShader; }
 
@@ -48,6 +48,9 @@ namespace Engine2
 		static std::map<std::string, std::shared_ptr<PixelShader>> pixelShaders; // Public so can add to this. Populated with AddSampleFilters on constructuion.
 
 	protected:
+		bool hasRenderTarget;
+		bool hasDepthBuffer;
+
 		// shader resources
 		unsigned int slot;
 
@@ -95,6 +98,7 @@ namespace Engine2
 			bool show = true;
 			float leftTop[2] = { 0.5f, 0.0f };
 			float size = 0.5f;
+			bool displayRaw = false;
 			std::shared_ptr<VertexBuffer> pVB;
 		} subDisplayDepthBuffer;
 		void InitialiseSubDisplayDepthBufferVB();
@@ -114,6 +118,7 @@ namespace Engine2
 				std::shared_ptr<VertexShader> pVS;
 				std::shared_ptr<PixelShader>  pPSBuffer;
 				std::shared_ptr<PixelShader>  pPSDepthBuffer;
+				std::shared_ptr<PixelShader>  pPSDepthBufferRaw;
 			} ForDrawToSubDisplay;
 
 		} Common;

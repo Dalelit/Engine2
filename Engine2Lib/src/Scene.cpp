@@ -35,8 +35,11 @@ namespace Engine2
 
 	void Scene::OnRender(EntityId_t cameraEntity)
 	{
+		ShadowPass();
 		RenderImage(cameraEntity, true);
 		CamerasRender();
+
+		sun.ShowOffscreenDepthBuffer();
 	}
 
 	void Scene::RenderImage(EntityId_t cameraEntity, bool mainCamera)
@@ -59,11 +62,33 @@ namespace Engine2
 
 	void Scene::ShadowPass()
 	{
+		sun.ShadowPassStart();
+
 		//UpdateVSSceneConstBuffer(light.GetCamera(), *pTransform);
+		sun.GetCamera().LoadViewProjectionMatrixT(vsConstBuffer.data.cameraTransform);
+		vsConstBuffer.Bind();
+
 		//UpdatePSSceneConstBuffer(light.GetCamera(), *pTransform);
+		DXDevice::GetContext().PSSetShader(nullptr, nullptr, 0u);
 
 		//RenderMeshes();
+		Coordinator& coordinator = hierarchy.GetECSCoordinator();
+		View<MeshRenderer, Transform> entities(coordinator);
+		for (auto e : entities)
+		{
+			const auto& mr = coordinator.GetComponent<MeshRenderer>(e);
+
+			if (mr->IsValid())
+			{
+				mr->material->SetTransform(*coordinator.GetComponent<TransformMatrix>(e));
+				mr->ShadowBindAndDraw();
+			}
+		}
+
 		//RenderParticles();
+
+		sun.ShadowPassEnd();
+		sun.BindShadowMap();
 	}
 
 	// update any components that need to know when an event has happened
