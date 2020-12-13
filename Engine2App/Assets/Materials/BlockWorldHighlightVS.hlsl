@@ -1,4 +1,4 @@
-#include "SceneCBVS.hlsl"
+#include "..\..\..\Engine2Lib\Assets\Shaders\VSCB0_Scene.hlsli"
 
 cbuffer entityConst : register (b1)
 {

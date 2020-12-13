@@ -154,6 +154,7 @@ void SceneBuilder::BuildTestScene()
 		mr->material->pixelShader = Material::GetPixelShader(Config::directories["EngineShaderSourceDir"] + "PositionNormalTexturePS.hlsl");
 		mr->material->texture = TextureLoader::LoadTexture("Assets\\Textures\\NZ Small.jpg");
 		mr->material->texture->SetSampler(D3D11_FILTER::D3D11_FILTER_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_CLAMP);
+		mr->material->texture->SetSlot(2u);
 	}
 }
 

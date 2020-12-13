@@ -1,7 +1,4 @@
-cbuffer sceneConst : register (b0)
-{
-	matrix cameraTransform;
-};
+#include "VSCB0_Scene.hlsli"
 
 struct VSOut
 {

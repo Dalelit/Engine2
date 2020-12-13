@@ -1,4 +1,4 @@
-cbuffer outlineConst : register (b0)
+cbuffer outlineConst : register (b2)
 {
 	float4 outlineColor;
 };

@@ -4,28 +4,11 @@
     <ClCompile Include="src\winmain.cpp" />
     <ClCompile Include="src\pch.cpp" />
     <ClCompile Include="src\Empty.cpp" />
-    <ClCompile Include="src\BlockWorld.cpp" />
-    <ClCompile Include="src\BlockWorldChunk.cpp" />
     <ClCompile Include="src\SceneBuilder.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h" />
     <ClInclude Include="src\Empty.h" />
-    <ClInclude Include="src\BlockWorld.h" />
-    <ClInclude Include="src\BlockWorldChunk.h" />
     <ClInclude Include="src\SceneBuilder.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="Assets\Materials\SceneEntityCBVS.hlsl" />
-    <FxCompile Include="Assets\Materials\PSTest.hlsl" />
-    <FxCompile Include="Assets\Materials\GSTest.hlsl" />
-    <FxCompile Include="Assets\Materials\PS_BlurSimple.hlsl" />
-    <FxCompile Include="Assets\Materials\PixelShaderCommon.hlsl" />
-    <FxCompile Include="Assets\Materials\SceneCBVS.hlsl" />
-    <FxCompile Include="Assets\Materials\BlockWorldPS.hlsl" />
-    <FxCompile Include="Assets\Materials\BlockWorldVS.hlsl" />
-    <FxCompile Include="Assets\Materials\BlockWorldHighlightPS.hlsl" />
-    <FxCompile Include="Assets\Materials\BlockWorldHighlightVS.hlsl" />
-    <FxCompile Include="Assets\Materials\BlockWorld2VS.hlsl" />
   </ItemGroup>
 </Project>

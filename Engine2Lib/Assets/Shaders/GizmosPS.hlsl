@@ -1,4 +1,4 @@
-cbuffer gizmoConst : register (b0)
+cbuffer gizmoConst : register (b2)
 {
 	float4 lineColor;
 };

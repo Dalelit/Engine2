@@ -1,4 +1,4 @@
-#include "PixelShaderCommon.hlsl"
+#include "..\..\..\Engine2Lib\Assets\Shaders\PS_Lighting.hlsli"
 
 
 float4 main(float3 norWS : WSNormal, uint type : BlockType) : SV_TARGET

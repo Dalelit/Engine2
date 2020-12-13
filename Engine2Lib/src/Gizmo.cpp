@@ -29,7 +29,7 @@ namespace Engine2
 	}
 
 	GizmoRender::GizmoRender(size_t maxGizmos) :
-		maxGizmos(maxGizmos), psCB(0)
+		maxGizmos(maxGizmos), psCB(2u)
 	{
 		CreateBuffers();
 

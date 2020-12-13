@@ -1,13 +1,6 @@
-cbuffer sceneConst : register (b0)
-{
-	matrix cameraTransform;
-};
+#include "VSCB0_Scene.hlsli"
 
-cbuffer modelConst : register (b1)
-{
-	matrix modelRotation;
-	matrix modelTransform;
-};
+#include "VSCB1_Model.hlsli"
 
 cbuffer outlineConst : register (b2)
 {

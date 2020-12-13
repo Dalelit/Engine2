@@ -1,39 +1,7 @@
-#include "ShadowPS.hlsli"
-
-float specular(float3 positionWS, float3 normalWS, float3 lightPositionWS, float3 cameraPositionWS, float specularExponent)
-{
-	float3 toPL = lightPositionWS - positionWS;
-	float normalLightDot = dot(normalWS, normalize(toPL));
-
-	float3 toCam = normalize(cameraPositionWS - positionWS);
-	float3 reflected = normalize(2.0 * dot(normalWS, toPL) * normalWS - toPL);
-	float spec = saturate(dot(reflected, toCam));
-	return pow(spec, specularExponent); // *specIntensity;
-};
-
-float attenuation(float distance)
-{
-	return 1.0 / (1.0 + 0.045 * distance + 0.0075 * distance * distance);
-};
-
-///////////////////////////////////////////////////
-
-cbuffer sceneConst : register (b0)
-{
-	float4 cameraPosition;
-	float4 pointLightPosition;
-	float4 pointLightColor;
-};
-
-cbuffer materialConst : register (b1)
-{
-	float3 mat_ambient;
-	float3 mat_diffuse;
-	float3 mat_specular;
-	float  mat_specularExponent;
-	float3 mat_emission;
-	float3 mat_padding;
-};
+#include "PS_Shadow.hlsli"
+#include "PS_Lighting.hlsli"
+#include "PSCB0_Scene.hlsli"
+#include "PSCB1_Material.hlsli"
 
 float4 main(float3 posWS : WSPosition, float3 norWS : WSNormal, float4 col : Color) : SV_TARGET
 {

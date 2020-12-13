@@ -3,7 +3,8 @@
 
 namespace Engine2
 {
-	OffscreenOutliner::OffscreenOutliner()
+	OffscreenOutliner::OffscreenOutliner() :
+		psOutlineCB(2u)
 	{
 		vsOutlineCB.slot = 2;
 		Initialise();

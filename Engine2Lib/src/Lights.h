@@ -55,7 +55,7 @@ namespace Engine2
 		Offscreen offscreen;
 		std::unique_ptr<VertexShaderFile> pVSShader;
 
-		UINT32 shadowMapSlot = 2u;
+		UINT32 shadowMapSlot = 1u;
 		struct ShadowPSCBData
 		{
 			DirectX::XMMATRIX viewProjection;

@@ -384,7 +384,12 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Shaders\ShadowPS.hlsli" />
+    <None Include="Assets\Shaders\PSCB0_Scene.hlsli" />
+    <None Include="Assets\Shaders\PSCB1_Material.hlsli" />
+    <None Include="Assets\Shaders\PS_Lighting.hlsli" />
+    <None Include="Assets\Shaders\PS_Shadow.hlsli" />
+    <None Include="Assets\Shaders\VSCB0_Scene.hlsli" />
+    <None Include="Assets\Shaders\VSCB1_Model.hlsli" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

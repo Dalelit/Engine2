@@ -5,8 +5,8 @@ cbuffer shadowConst : register (b2)
 	float shadowBias;
 }
 
-Texture2D shadowTex : register (t2);
-SamplerState shadowSmplr : register (s2);
+Texture2D shadowTex : register (t1);
+SamplerState shadowSmplr : register (s1);
 
 float4 ShadowLighting(float3 positionWS)
 {

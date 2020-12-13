@@ -5,6 +5,15 @@ Some conventions...
 
 LH coorindates
 
-Constant Buffers
+VS Constant Buffers
 0 = scene
-1 = entity
+1 = model
+
+PS Constant Buffers
+0 = scene
+1 = material
+2 = shadow lighting
+
+PS Textures/Samplers
+0 = Skybox
+1 = Shadow map

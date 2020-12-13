@@ -60,7 +60,7 @@ namespace Engine2
 			};
 
 			std::string src = R"(
-				cbuffer wireframeConst : register (b1)
+				cbuffer wireframeConst : register (b3)
 				{
 					float4 lineColor;
 				}
@@ -71,7 +71,7 @@ namespace Engine2
 				}
 			)";
 
-			pixelShaderCB = std::make_shared<PSCB>(1);
+			pixelShaderCB = std::make_shared<PSCB>(3u);
 			pixelShader = PixelShader::CreateFromString(src);
 		}
 

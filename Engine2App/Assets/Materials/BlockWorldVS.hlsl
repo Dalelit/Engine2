@@ -1,4 +1,4 @@
-#include "SceneCBVS.hlsl"
+#include "..\..\..\Engine2Lib\Assets\Shaders\VSCB0_Scene.hlsli"
 
 struct VSOut
 {
@@ -7,13 +7,13 @@ struct VSOut
 	float4 posSS : SV_POSITION;
 };
 
-VSOut main(float3 pos : Position, float3 nor : Normal, float3 instLocation : InstanceLocation, uint type : BlockType)
+VSOut main(float3 pos : Position, float3 nor : Normal, uint type : BlockType)
 {
 	VSOut vso;
 
 	vso.norWS = nor;
-	vso.type  = type;
-	vso.posSS = mul(float4(pos + instLocation, 1.0f), cameraTransform);
+	vso.type = type;
+	vso.posSS = mul(float4(pos, 1.0f), cameraTransform);
 
 	return vso;
 }
