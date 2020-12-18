@@ -2,9 +2,9 @@
 #include "pch.h"
 #include "Common.h"
 #include "Camera.h"
-#include "Offscreen.h"
 #include "Shader.h"
 #include "ConstantBuffer.h"
+#include "ShadowMap.h"
 
 namespace Engine2
 {
@@ -31,8 +31,6 @@ namespace Engine2
 
 		inline Camera& GetCamera() { return camera; }
 
-		DirectX::XMMATRIX GetModelViewProjectionMatrixT();
-
 		DirectX::XMMATRIX& GetTransform() { return transform; }
 		DirectX::XMMATRIX GetTransformT() { return DirectX::XMMatrixTranspose(GetTransform()); }
 
@@ -42,8 +40,6 @@ namespace Engine2
 		void ShadowPassEnd();
 		void BindShadowMap();
 
-		inline void ShowOffscreenDepthBuffer() { offscreen.ShowSubDisplay(); }
-
 	protected:
 		DirectX::XMVECTOR rotation;
 		DirectX::XMMATRIX transform;
@@ -52,7 +48,7 @@ namespace Engine2
 		DirectX::XMVECTOR position;
 
 		Camera camera;
-		Offscreen offscreen;
+		ShadowMap shadowMap;
 		std::unique_ptr<VertexShaderFile> pVSShader;
 
 		UINT32 shadowMapSlot = 1u;

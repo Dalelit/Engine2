@@ -168,8 +168,10 @@
     <ClInclude Include="src\ScriptComponent.h" />
     <ClInclude Include="src\ScriptComponents\InputControllerScript.h" />
     <ClInclude Include="src\Serialiser.h" />
+    <ClInclude Include="src\ShadowMap.h" />
     <ClInclude Include="src\Skybox.h" />
     <ClInclude Include="src\SurfaceLoader.h" />
+    <ClInclude Include="src\TextureGizmo.h" />
     <ClInclude Include="src\TextureLoader.h" />
     <ClInclude Include="src\Transform.h" />
     <ClInclude Include="src\UtilFileDialog.h" />
@@ -246,6 +248,7 @@
     <ClCompile Include="src\ScriptComponents\InputControllerScript.cpp" />
     <ClCompile Include="src\Serialiser.cpp" />
     <ClCompile Include="src\Shader.cpp" />
+    <ClCompile Include="src\ShadowMap.cpp" />
     <ClCompile Include="src\Skybox.cpp" />
     <ClCompile Include="src\submodules\imgui\imgui.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
@@ -273,6 +276,7 @@
     </ClCompile>
     <ClCompile Include="src\SurfaceLoader.cpp" />
     <ClCompile Include="src\Texture.cpp" />
+    <ClCompile Include="src\TextureGizmo.cpp" />
     <ClCompile Include="src\TextureLoader.cpp" />
     <ClCompile Include="src\Transform.cpp" />
     <ClCompile Include="src\Util.cpp" />

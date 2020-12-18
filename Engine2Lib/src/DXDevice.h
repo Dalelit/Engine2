@@ -30,7 +30,9 @@ namespace Engine2
 
 		inline void SetDefaultRenderState()       { pImmediateContext->RSSetState(pRSDefault.Get()); }
 		inline void SetNoFaceCullingRenderState() { pImmediateContext->RSSetState(pRSNoFaceCulling.Get()); }
+		inline void SetDefaultViewport()          { pImmediateContext->RSSetViewports(1, &viewport); }
 		inline void SetDefaultDepthStencilState() { pImmediateContext->OMSetDepthStencilState(pDepthStencilState.Get(), 0); }
+		inline void SetDepthStencilStateDepthDisabled() { pImmediateContext->OMSetDepthStencilState(pDepthStencilStateDepthDisabled.Get(), 0); }
 		inline void SetDefaultBlendState()        { pImmediateContext->OMSetBlendState(nullptr, nullptr, 0xffffffff); }
 		inline void SetAlphaBlendState()          { pImmediateContext->OMSetBlendState(pAlphaBlendState.Get(), nullptr, 0xffffffff); }
 		inline void SetWireframeRenderState(bool faceCulling = true) { if (faceCulling) pImmediateContext->RSSetState(pRSWireframe.Get()); else pImmediateContext->RSSetState(pRSWireframeNoFaceCulling.Get()); }
@@ -93,6 +95,7 @@ namespace Engine2
 		wrl::ComPtr<IDXGISwapChain1>      pSwapChain = nullptr;
 		wrl::ComPtr<ID3D11Device3>        pDevice = nullptr;
 		wrl::ComPtr<ID3D11DeviceContext3> pImmediateContext = nullptr;
+		D3D11_VIEWPORT					  viewport;
 
 		// back buffer
 		wrl::ComPtr<ID3D11Texture2D>        pBackBuffer = nullptr;
@@ -103,6 +106,7 @@ namespace Engine2
 		wrl::ComPtr<ID3D11DepthStencilView>  pDepthStencilView = nullptr;
 		wrl::ComPtr<ID3D11Texture2D>         pDepthTexture = nullptr;
 		wrl::ComPtr<ID3D11DepthStencilState> pDepthStencilState = nullptr;
+		wrl::ComPtr<ID3D11DepthStencilState> pDepthStencilStateDepthDisabled = nullptr;
 
 		void CreateDeviceAndSwapchain();
 		void ConfigurePipeline();

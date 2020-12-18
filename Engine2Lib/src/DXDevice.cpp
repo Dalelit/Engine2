@@ -64,6 +64,14 @@ namespace Engine2
 		hr = pDevice->CreateBlendState(&bsDesc, &pAlphaBlendState);
 
 		E2_ASSERT_HR(hr, "CreateBlendState failed");
+
+		// depth stencil state disabled
+
+		D3D11_DEPTH_STENCIL_DESC dsDesc = {};
+		dsDesc.DepthEnable = FALSE;
+		hr = pDevice->CreateDepthStencilState(&dsDesc, &pDepthStencilStateDepthDisabled);
+
+		E2_ASSERT_HR(hr, "CreateDepthStencilState failed");
 	}
 
 	void DXDevice::BeginFrame()
@@ -252,7 +260,6 @@ namespace Engine2
 
 		pBackBuffer->GetDesc(&backBufferDesc);
 
-		D3D11_VIEWPORT viewport = {};
 		viewport.TopLeftX = 0;
 		viewport.TopLeftY = 0;
 		viewport.Width = (float)backBufferDesc.Width;

@@ -38,8 +38,6 @@ namespace Engine2
 		ShadowPass();
 		RenderImage(cameraEntity, true);
 		CamerasRender();
-
-		sun.ShowOffscreenDepthBuffer();
 	}
 
 	void Scene::RenderImage(EntityId_t cameraEntity, bool mainCamera)

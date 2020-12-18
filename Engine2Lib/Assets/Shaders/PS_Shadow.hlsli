@@ -8,6 +8,7 @@ cbuffer shadowConst : register (b2)
 
 Texture2D shadowTex : register (t1);
 SamplerState shadowSmplr : register (s1);
+//SamplerComparisonState shadowSS : register (s1);
 
 float4 ShadowLighting(float3 positionWS, float3 normalWS)
 {
@@ -18,12 +19,17 @@ float4 ShadowLighting(float3 positionWS, float3 normalWS)
 		float4 posShadowSS = mul(float4(positionWS, 1.0), shadowCamera_viewProjectionMat); // world position in light screen space
 		float2 shadowUV = posShadowSS.xy * 0.5 + 0.5; // convert to texture coords
 		shadowUV.y = 1.0 - shadowUV.y; // invert y coords
+		
 		float shadowMapDepth = shadowTex.Sample(shadowSmplr, shadowUV).x; // get the depth from the light depth buffer
 		if (posShadowSS.z < shadowMapDepth + shadowBias)
 		{
 			dotNormLight = -dotNormLight;
 			result = shadowLightColor * dotNormLight;
 		}
+
+		//float shadowMapDepth = shadowTex.SampleCmpLevelZero(shadowSS, shadowUV, posShadowSS.z).x; // sample the depth from the light depth buffer
+		//dotNormLight = -dotNormLight;
+		//result = shadowLightColor * dotNormLight * shadowMapDepth;
 	}
 
 	return result;

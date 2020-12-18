@@ -17,7 +17,7 @@ namespace Engine2
 	//*************************
 
 	DirectionalLight::DirectionalLight() :
-		camera("Shadow camera"), offscreen(false, true), pscbShadowCamera(2u)
+		camera("Shadow camera"), pscbShadowCamera(2u)
 	{
 		SetRotation(Math::DegToRad({30.0f, 40.0f, 0.0f, 0.0f}));
 		XMVECTOR degs = Math::RadToDeg(rotation);
@@ -26,6 +26,8 @@ namespace Engine2
 		camera.SetAspectRatio(1.5f);
 		camera.SetNearPlane(0.1f);
 		camera.SetFarPlane(30.0f);
+
+		shadowMap.Initialise(1024, 1024);
 
 		pscbShadowCamera.data.lightColor = { 0.5f, 0.5f, 0.5f, 1.0f };
 		pscbShadowCamera.data.shadowBias = 0.005f;
@@ -44,15 +46,8 @@ namespace Engine2
 		ImGui::DragFloat3("Position", position.m128_f32, 0.5f);
 		ImGui::Checkbox("Show gizmos", &showGizmos);
 		camera.OnImgui();
-		offscreen.OnImgui();
 		pVSShader->OnImgui();
-	}
-
-	DirectX::XMMATRIX DirectionalLight::GetModelViewProjectionMatrixT()
-	{
-		XMMATRIX m;
-		camera.LoadViewProjectionMatrixT(m);
-		return m;
+		shadowMap.OnImgui();
 	}
 
 	void DirectionalLight::ShadowPassStart()
@@ -61,8 +56,8 @@ namespace Engine2
 		auto device = DXDevice::Get();
 		device.ClearShaderResource(shadowMapSlot); //offscreen.Unbind();
 		device.SetNoFaceCullingRenderState();
-		offscreen.Clear();
-		offscreen.SetAsTarget();
+		shadowMap.Clear();
+		shadowMap.SetAsTarget();
 		pVSShader->Bind();
 	}
 
@@ -71,11 +66,12 @@ namespace Engine2
 		auto device = DXDevice::Get();
 		device.SetBackBufferAsRenderTarget();
 		device.SetDefaultRenderState();
+		device.SetDefaultViewport();
 	}
 
 	void DirectionalLight::BindShadowMap()
 	{
-		offscreen.BindDepthBuffer(shadowMapSlot);
+		shadowMap.Bind();
 
 		camera.LoadViewProjectionMatrixT(pscbShadowCamera.data.viewProjection);
 		pscbShadowCamera.Bind();

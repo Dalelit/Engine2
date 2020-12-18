@@ -15,6 +15,7 @@ Near term / in progress
 	- load new textures
 	- load new skybox textures
 	- model loading
+	- Texture gizmo add aspect ratio setting/locking
 - ECS
 	- create systems rather than hard coding in scene
 	- use case of mulitple components for a single entity
