@@ -14,7 +14,9 @@ namespace Engine2
 		void Clear();
 		void SetAsTarget();
 
-		void Bind(); // binds the shadow map as a shader resource
+		// binds the shadow map as a shader resource
+		void BindWtihComparisonSampler();
+		void BindWithSimpleSampler();
 
 		void SetSlot(unsigned int textureSlot) { slot = textureSlot; }
 
@@ -29,6 +31,7 @@ namespace Engine2
 		wrl::ComPtr<ID3D11DepthStencilState> pDepthStencilState = nullptr;
 		wrl::ComPtr<ID3D11ShaderResourceView> pDepthBufferResourceView = nullptr;
 		wrl::ComPtr<ID3D11SamplerState> pDepthBufferSamplerState = nullptr;
+		wrl::ComPtr<ID3D11SamplerState> pDepthBufferSamplerComparisonState = nullptr;
 
 		// set when the buffer is created so it can be used by other resources
 		UINT width;

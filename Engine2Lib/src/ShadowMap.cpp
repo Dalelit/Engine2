@@ -4,7 +4,7 @@
 namespace Engine2
 {
 	ShadowMap::ShadowMap() :
-		width(1024), height(1024)
+		width(2048), height(2048)
 	{
 	}
 
@@ -28,7 +28,13 @@ namespace Engine2
 		DXDevice::GetContext().RSSetViewports(1, &viewport);
 	}
 
-	void ShadowMap::Bind()
+	void ShadowMap::BindWtihComparisonSampler()
+	{
+		DXDevice::GetContext().PSSetShaderResources(slot, 1u, pDepthBufferResourceView.GetAddressOf());
+		DXDevice::GetContext().PSSetSamplers(slot, 1u, pDepthBufferSamplerComparisonState.GetAddressOf());
+	}
+
+	void ShadowMap::BindWithSimpleSampler()
 	{
 		DXDevice::GetContext().PSSetShaderResources(slot, 1u, pDepthBufferResourceView.GetAddressOf());
 		DXDevice::GetContext().PSSetSamplers(slot, 1u, pDepthBufferSamplerState.GetAddressOf());
@@ -40,6 +46,7 @@ namespace Engine2
 
 		if (pTexGizmo)
 		{
+			BindWithSimpleSampler();
 			pTexGizmo->OnImgui();
 		}
 		else
@@ -103,17 +110,18 @@ namespace Engine2
 		E2_ASSERT_HR(hr, "CreateShaderResourceView failed for depth buffer");
 
 		D3D11_SAMPLER_DESC sampDesc = {};
-		
-		sampDesc.Filter = D3D11_FILTER::D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-
-		//sampDesc.Filter = D3D11_FILTER::D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
-		//sampDesc.ComparisonFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS_EQUAL;
-
 		sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_BORDER;
 		sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_BORDER;
 		sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_BORDER;
 
+		sampDesc.Filter = D3D11_FILTER::D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 		hr = DXDevice::GetDevice().CreateSamplerState(&sampDesc, &pDepthBufferSamplerState);
+
+		E2_ASSERT_HR(hr, "CreateSamplerState failed");
+
+		sampDesc.Filter = D3D11_FILTER::D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
+		sampDesc.ComparisonFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS_EQUAL;
+		hr = DXDevice::GetDevice().CreateSamplerState(&sampDesc, &pDepthBufferSamplerComparisonState);
 
 		E2_ASSERT_HR(hr, "CreateSamplerState failed");
 	}

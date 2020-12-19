@@ -71,7 +71,7 @@ namespace Engine2
 
 	void DirectionalLight::BindShadowMap()
 	{
-		shadowMap.Bind();
+		shadowMap.BindWtihComparisonSampler();
 
 		camera.LoadViewProjectionMatrixT(pscbShadowCamera.data.viewProjection);
 		pscbShadowCamera.Bind();
