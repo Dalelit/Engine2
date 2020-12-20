@@ -27,7 +27,7 @@ namespace Engine2
 		camera.SetNearPlane(0.1f);
 		camera.SetFarPlane(30.0f);
 
-		shadowMap.Initialise(1024, 1024);
+		shadowMap.Initialise(2048, 2048);
 
 		pscbShadowCamera.data.lightColor = { 0.5f, 0.5f, 0.5f, 1.0f };
 		pscbShadowCamera.data.shadowBias = 0.005f;

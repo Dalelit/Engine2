@@ -43,6 +43,9 @@ namespace Engine2
 		inline void SetNearPlane(float distance) { nearZ = std::max<float>(distance, 0.0f); }
 		inline void SetFarPlane(float distance) { farZ = std::max<float>(distance, nearZ); }
 
+		// top-left, top-right, bottom-right, bottom-left for near then far
+		std::vector<DirectX::XMVECTOR> GetFrustrumPoints();
+
 		inline std::string& GetName() { return name; }
 		inline void SetName(const std::string& newName) { name = newName; }
 
@@ -66,5 +69,8 @@ namespace Engine2
 		DirectX::XMMATRIX viewMatrix;
 		DirectX::XMMATRIX projectionMatrix;
 		DirectX::XMMATRIX viewProjectionMatrix;
+
+		std::vector<DirectX::XMVECTOR> GetFrustrumPointsOrthographic();
+		std::vector<DirectX::XMVECTOR> GetFrustrumPointsPerspective();
 	};
 }

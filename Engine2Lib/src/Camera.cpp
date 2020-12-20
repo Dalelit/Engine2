@@ -47,8 +47,16 @@ namespace Engine2
 			if (orthographic)
 			{
 				// lock the width/height with the aspect ratio
-				if (ImGui::DragFloat("View width", &viewWidth)) viewHeight = viewWidth / aspectRatio;
-				if (ImGui::DragFloat("View height", &viewHeight)) viewWidth = viewHeight * aspectRatio;
+				if (ImGui::DragFloat("View width", &viewWidth))
+				{
+					viewWidth = std::max<float>(1.0f, viewWidth);
+					viewHeight = viewWidth / aspectRatio;
+				}
+				if (ImGui::DragFloat("View height", &viewHeight))
+				{
+					viewHeight = std::max<float>(1.0f, viewHeight);
+					viewWidth = viewHeight * aspectRatio;
+				}
 			}
 			else
 			{
@@ -57,6 +65,57 @@ namespace Engine2
 			}
 			ImGui::TreePop();
 		}
+	}
+
+	std::vector<DirectX::XMVECTOR> Camera::GetFrustrumPoints()
+	{
+		if (orthographic)
+			return GetFrustrumPointsOrthographic();
+		else
+			return GetFrustrumPointsPerspective();
+	}
+
+	std::vector<DirectX::XMVECTOR> Camera::GetFrustrumPointsOrthographic()
+	{
+		float ydist = viewHeight * 0.5f;
+		float xdist = viewWidth * 0.5f;
+
+		std::vector<DirectX::XMVECTOR> points = {
+			{ -xdist,  ydist, nearZ, 1.0f },
+			{  xdist,  ydist, nearZ, 1.0f },
+			{  xdist, -ydist, nearZ, 1.0f },
+			{ -xdist, -ydist, nearZ, 1.0f },
+			{ -xdist,  ydist, farZ, 1.0f },
+			{  xdist,  ydist, farZ, 1.0f },
+			{  xdist, -ydist, farZ, 1.0f },
+			{ -xdist, -ydist, farZ, 1.0f },
+		};
+
+		return points;
+	}
+
+	std::vector<DirectX::XMVECTOR> Camera::GetFrustrumPointsPerspective()
+	{
+		float ydist = tanf(fov / 2.0f);
+		float xdist = ydist * aspectRatio;
+
+		float nydist = ydist * nearZ;
+		float nxdist = xdist * nearZ;
+		float fydist = ydist * farZ;
+		float fxdist = xdist * farZ;
+
+		std::vector<DirectX::XMVECTOR> points = {
+			{ -nxdist,  nydist, nearZ, 1.0f },
+			{  nxdist,  nydist, nearZ, 1.0f },
+			{  nxdist, -nydist, nearZ, 1.0f },
+			{ -nxdist, -nydist, nearZ, 1.0f },
+			{ -fxdist,  fydist, farZ, 1.0f },
+			{  fxdist,  fydist, farZ, 1.0f },
+			{  fxdist, -fydist, farZ, 1.0f },
+			{ -fxdist, -fydist, farZ, 1.0f },
+		};
+
+		return points;
 	}
 
 	//Ray Camera::ScreenCoordToRay(float x, float y)

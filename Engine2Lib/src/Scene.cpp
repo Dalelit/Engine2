@@ -173,12 +173,7 @@ namespace Engine2
 			case Gizmo::Types::Camera:
 				auto pCamera = coordinator.GetComponent<Camera>(e);
 				if (pCamera)
-				{
-					if (pCamera->IsOrthographic())
-						gizmoRender.DrawCameraOrthographic(trans, pCamera->NearPlane(), pCamera->FarPlane(), pCamera->ViewWidth(), pCamera->ViewHeight());
-					else
-						gizmoRender.DrawCameraPerspective(trans, pCamera->NearPlane(), pCamera->FarPlane(), pCamera->AspectRatio(), pCamera->FieldOfView());
-				}
+					gizmoRender.DrawCamera(trans, pCamera->GetFrustrumPoints());
 				break;
 			}
 		}
@@ -186,7 +181,7 @@ namespace Engine2
 		if (sun.ShowGizmos())
 		{
 			auto& camera = sun.GetCamera();
-			gizmoRender.DrawCameraOrthographic(sun.GetTransformT(), camera.NearPlane(), camera.FarPlane(), camera.ViewWidth(), camera.ViewHeight());
+			gizmoRender.DrawCamera(sun.GetTransformT(), camera.GetFrustrumPoints());
 		}
 
 		gizmoRender.Render();

@@ -178,89 +178,28 @@ namespace Engine2
 		addLine(3, 7);
 	}
 
-	void GizmoRender::DrawCameraPerspective(const DirectX::XMMATRIX& instance, float nearPlane, float farPlane, float aspectRatio, float fieldOfView)
+	void GizmoRender::DrawCamera(const DirectX::XMMATRIX& instance, const std::vector<DirectX::XMVECTOR> frustrumPoints)
 	{
-		Vertex v;
-		v.color = cameraColor;
-
-		auto tr = XMMatrixTranspose(instance); // engine stores the transform ready for the GPU... so undo that.
-
-		auto addLine = [&](XMFLOAT3 p1, XMFLOAT3 p2) {
-			v.position = p1;
-			lineBuffer.push_back(v);
-			v.position = p2;
-			lineBuffer.push_back(v);
-		};
-
-		float ydist = tanf(fieldOfView / 2.0f);
-		float xdist = ydist * aspectRatio;
-
-		XMFLOAT3 origin;
-		XMStoreFloat3(&origin, XMVector3Transform({ 0.0f, 0.0f, 0.0f, 1.0f }, tr));
-
-		XMFLOAT3 p0, p1, p2, p3;
-		float pydist = ydist * nearPlane;
-		float pxdist = xdist * nearPlane;
-		XMStoreFloat3(&p0, XMVector3Transform({ -pxdist,  pydist, nearPlane, 1.0f }, tr));
-		XMStoreFloat3(&p1, XMVector3Transform({  pxdist,  pydist, nearPlane, 1.0f }, tr));
-		XMStoreFloat3(&p2, XMVector3Transform({  pxdist, -pydist, nearPlane, 1.0f }, tr));
-		XMStoreFloat3(&p3, XMVector3Transform({ -pxdist, -pydist, nearPlane, 1.0f }, tr));
-
-		addLine(p0, p1);
-		addLine(p1, p2);
-		addLine(p2, p3);
-		addLine(p3, p0);
-
-		pydist = ydist * farPlane;
-		pxdist = xdist * farPlane;
-		XMStoreFloat3(&p0, XMVector3Transform({ -pxdist,  pydist, farPlane, 1.0f }, tr));
-		XMStoreFloat3(&p1, XMVector3Transform({  pxdist,  pydist, farPlane, 1.0f }, tr));
-		XMStoreFloat3(&p2, XMVector3Transform({  pxdist, -pydist, farPlane, 1.0f }, tr));
-		XMStoreFloat3(&p3, XMVector3Transform({ -pxdist, -pydist, farPlane, 1.0f }, tr));
-
-		addLine(p0, p1);
-		addLine(p1, p2);
-		addLine(p2, p3);
-		addLine(p3, p0);
-
-		addLine(origin, p0);
-		addLine(origin, p1);
-		addLine(origin, p2);
-		addLine(origin, p3);
-	}
-
-	void GizmoRender::DrawCameraOrthographic(const DirectX::XMMATRIX& instance, float nearPlane, float farPlane, float viewWidth, float viewHeight)
-	{
-		Vertex v;
-		v.color = cameraColor;
-
 		auto tr = XMMatrixTranspose(instance); // engine stores the transform ready for the GPU... so undo that.
 
 		Vertex verticies[9];
-		for (int i = 0; i < 9; ++i) verticies[i].color = cameraColor;
+		
+		// origin
+		XMStoreFloat3(&verticies[0].position, XMVector3Transform({ 0.0f, 0.0f, 0.0f, 1.0f }, tr));
+		verticies[0].color = cameraColor;
+
+		int i = 1;
+		for (auto p : frustrumPoints)
+		{
+			XMStoreFloat3(&verticies[i].position, XMVector3Transform(p, tr));
+			verticies[i].color = cameraColor;
+			++i;
+		}
 
 		auto addLine = [&](int p1, int p2) {
 			lineBuffer.push_back(verticies[p1]);
 			lineBuffer.push_back(verticies[p2]);
 		};
-
-		float xDist = viewWidth * 0.5f;
-		float yDist = viewHeight * 0.5f;
-
-		// origin
-		XMStoreFloat3(&verticies[0].position, XMVector3Transform({ 0.0f, 0.0f, 0.0f, 1.0f }, tr));
-
-		// near plane
-		XMStoreFloat3(&verticies[1].position, XMVector3Transform({ -xDist,  yDist, nearPlane, 1.0f }, tr));
-		XMStoreFloat3(&verticies[2].position, XMVector3Transform({  xDist,  yDist, nearPlane, 1.0f }, tr));
-		XMStoreFloat3(&verticies[3].position, XMVector3Transform({  xDist, -yDist, nearPlane, 1.0f }, tr));
-		XMStoreFloat3(&verticies[4].position, XMVector3Transform({ -xDist, -yDist, nearPlane, 1.0f }, tr));
-
-		// far plane
-		XMStoreFloat3(&verticies[5].position, XMVector3Transform({ -xDist,  yDist, farPlane, 1.0f }, tr));
-		XMStoreFloat3(&verticies[6].position, XMVector3Transform({  xDist,  yDist, farPlane, 1.0f }, tr));
-		XMStoreFloat3(&verticies[7].position, XMVector3Transform({  xDist, -yDist, farPlane, 1.0f }, tr));
-		XMStoreFloat3(&verticies[8].position, XMVector3Transform({ -xDist, -yDist, farPlane, 1.0f }, tr));
 
 		// origin to near
 		addLine(0, 1);
