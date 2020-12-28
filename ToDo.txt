@@ -15,7 +15,6 @@ Near term / in progress
 		- cascading shadow maps
 		- enable shadowmap to be resized
 		- not just blindly use the view camera far plane distance
-		- add more filtering
 - Model/mesh loading
 - Scene UI work
 	- maintain focus on selected entity on destroy
