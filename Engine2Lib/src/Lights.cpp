@@ -44,15 +44,14 @@ namespace Engine2
 		if (ImGui::DragFloat3("Angle", degs.m128_f32, 0.5f)) SetRotation(Math::DegToRad(degs));
 		ImGui::DragFloat3("Centre", centre.m128_f32, 0.5f);
 		ImGui::DragFloat3("Position", position.m128_f32, 0.5f);
-		ImGui::Checkbox("Show gizmos", &showGizmos);
 		camera.OnImgui();
 		pVSShader->OnImgui();
 		shadowMap.OnImgui();
 	}
 
-	void DirectionalLight::ShadowPassStart()
+	void DirectionalLight::ShadowPassStart(WorldCamera viewCamera)
 	{
-		CalcPosition();
+		CalcPosition(viewCamera);
 		auto device = DXDevice::Get();
 		device.ClearShaderResource(shadowMapSlot); //offscreen.Unbind();
 		device.SetNoFaceCullingRenderState();
@@ -77,18 +76,41 @@ namespace Engine2
 		pscbShadowCamera.Bind();
 	}
 
-	void DirectionalLight::CalcPosition()
+	void DirectionalLight::CalcPosition(WorldCamera viewCamera)
 	{
+		// get the light direction based on the rotation
 		auto rotq = XMQuaternionRotationRollPitchYawFromVector(rotation);
-
-		float distance = camera.FarPlane() - camera.NearPlane();
-
 		pscbShadowCamera.data.lightDirection = XMVector3Rotate({ 0.0f, 0.0f, 1.0f, 1.0f }, rotq);
+		
 
-		position = centre - pscbShadowCamera.data.lightDirection * distance * 0.5;
+		// convert the bounds of the view camera frustrum into the light's coordinates so the bounds can be worked out
+		auto lightWorldTransform = XMMatrixRotationQuaternion(rotq);
+		auto mInv = XMMatrixInverse(nullptr, lightWorldTransform); // to convert world points to light positions
+		auto points = viewCamera.GetFrustrumPoints(); // points in world space
+		std::for_each(points.begin(), points.end(), [&](auto& p) { p = XMVector4Transform(p, mInv); }); // now points in light coordinates
 
-		transform = XMMatrixRotationQuaternion(rotq) * XMMatrixTranslationFromVector(position);
+		// use a bounding box to get the extents of the light
+		BoundingBox bounds;
+		BoundingBox::CreateFromPoints(bounds, points.size(), (XMFLOAT3*)points.data(), sizeof(XMVECTOR));
 
+		// update the camera size to fit the bounds of the view camera frustrum
+		camera.SetViewWidth(bounds.Extents.x * 2.0f);
+		camera.SetViewHeight(bounds.Extents.y * 2.0f);
+
+		// set the near plane to a fixed distance, make the far plan cover the full distance of the points
+		constexpr float nearDist = 0.5f;
+		float distance = bounds.Extents.z * 2.0f;
+		camera.SetNearPlane(nearDist);
+		camera.SetFarPlane(distance + nearDist);
+
+		// set the shadow camera position - from the centre of the view camera frustrum, move back in the direction of the light
+		centre = viewCamera.GetFrustrumCentre();
+		position = centre - pscbShadowCamera.data.lightDirection * (bounds.Extents.z + nearDist);
+
+		// set the transform which will be passed to the shaders
+		//transform = lightWorldTransform * XMMatrixTranslationFromVector(position);
+
+		// update the shadow camera
 		camera.Update(position, rotation);
 	}
 }

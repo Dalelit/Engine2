@@ -79,7 +79,7 @@ namespace Engine2
 
 		void RenderImage(EngineECS::EntityId_t cameraEntity, bool mainCamera = true);
 
-		void ShadowPass();
+		void ShadowPass(EngineECS::EntityId_t viewCameraEntity);
 
 		void CamerasRender();
 

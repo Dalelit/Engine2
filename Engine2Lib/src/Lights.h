@@ -27,24 +27,19 @@ namespace Engine2
 		void OnImgui();
 
 		inline void SetRotation(float x, float y, float z) { SetRotation({x, y, z, 1.0f}); }
-		inline void SetRotation(DirectX::XMVECTOR rot) { rotation = rot; CalcPosition(); }
+		inline void SetRotation(DirectX::XMVECTOR rot) { rotation = rot; }
 
 		inline Camera& GetCamera() { return camera; }
 
-		DirectX::XMMATRIX& GetTransform() { return transform; }
-		DirectX::XMMATRIX GetTransformT() { return DirectX::XMMatrixTranspose(GetTransform()); }
-
-		bool ShowGizmos() { return showGizmos; }
-
-		void ShadowPassStart();
+		void ShadowPassStart(WorldCamera viewCamera);
 		void ShadowPassEnd();
 		void BindShadowMap();
 
+		DirectX::XMVECTOR GetCentre() { return centre; }
+
 	protected:
 		DirectX::XMVECTOR rotation;
-		DirectX::XMMATRIX transform;
-
-		DirectX::XMVECTOR centre = DirectX::g_XMZero;
+		DirectX::XMVECTOR centre;
 		DirectX::XMVECTOR position;
 
 		Camera camera;
@@ -61,8 +56,6 @@ namespace Engine2
 		};
 		PSConstantBuffer<ShadowPSCBData> pscbShadowCamera;
 
-		bool showGizmos = true;
-
-		void CalcPosition();
+		void CalcPosition(WorldCamera viewCamera);
 	};
 }

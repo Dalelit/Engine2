@@ -1,13 +1,21 @@
 Things that I want to work on...
 
 Near term / in progress
+- Clean up
+	- Transform - make it consistent and clear when the transposed or not version is being used
 - Scene serialisation
+- Mouse picking
 - Rendering, Materials and lighting
 	- manage bindings where things only need to be bound once per frame, or once unless changed (e.g. skybox texture)
 	- have each render step set the state, rather than rely on the default state
 	- create a render pipeline to manage stages
 	- Skybox only used in perspective
 	- Shadows... endless work to make it better.
+		- Move directional light/shadows to a distinct class/file
+		- cascading shadow maps
+		- enable shadowmap to be resized
+		- not just blindly use the view camera far plane distance
+		- add more filtering
 - Model/mesh loading
 - Scene UI work
 	- maintain focus on selected entity on destroy
@@ -44,3 +52,12 @@ Future?
 - Use yaml
 	- https://github.com/jbeder/yaml-cpp
 	- https://github.com/pantoniou/libfyaml
+
+
+Shadow links
+	- https://docs.microsoft.com/en-us/windows/win32/dxtecharts/cascaded-shadow-maps
+	- https://docs.microsoft.com/en-us/windows/win32/dxtecharts/common-techniques-to-improve-shadow-depth-maps
+	- http://developer.download.nvidia.com/shaderlibrary/docs/shadow_PCSS.pdf
+	- https://http.download.nvidia.com/developer/presentations/2005/SIGGRAPH/Percentage_Closer_Soft_Shadows.pdf
+	- http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/
+	- https://developer.download.nvidia.com/books/HTML/gpugems/gpugems_ch14.html

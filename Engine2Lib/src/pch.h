@@ -22,6 +22,7 @@
 
 #include <DirectXMath.h>
 #include <DirectXCollision.h>
+#include <DirectXColors.h>
 
 #include <d3d11_3.h>
 //#include <d2d1_3.h>

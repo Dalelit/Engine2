@@ -75,6 +75,12 @@ namespace Engine2
 			return GetFrustrumPointsPerspective();
 	}
 
+	DirectX::XMVECTOR Camera::GetFrustrumCentre()
+	{
+		float distance = ((farZ - nearZ) * 0.5f) + nearZ;
+		return FORWARD * distance;
+	}
+
 	std::vector<DirectX::XMVECTOR> Camera::GetFrustrumPointsOrthographic()
 	{
 		float ydist = viewHeight * 0.5f;
@@ -117,6 +123,21 @@ namespace Engine2
 
 		return points;
 	}
+
+	std::vector<DirectX::XMVECTOR> WorldCamera::GetFrustrumPoints()
+	{
+		auto points = camera.GetFrustrumPoints();
+
+		std::for_each(points.begin(), points.end(), [&](XMVECTOR& p) { p = XMVector3Transform(p, worldTransform); });
+
+		return points;
+	}
+
+	DirectX::XMVECTOR WorldCamera::GetFrustrumCentre()
+	{
+		return  XMVector3Transform(camera.GetFrustrumCentre(), worldTransform);
+	}
+
 
 	//Ray Camera::ScreenCoordToRay(float x, float y)
 	//{

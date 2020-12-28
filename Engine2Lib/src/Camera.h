@@ -21,6 +21,7 @@ namespace Engine2
 		void Update(DirectX::XMVECTOR position, DirectX::XMVECTOR rotation);
 
 		void LoadViewProjectionMatrixT(DirectX::XMMATRIX& vpMatrix) { vpMatrix = DirectX::XMMatrixTranspose(viewProjectionMatrix); }; // transpose for DX.
+		inline const DirectX::XMMATRIX& GetViewProjectionMatrix() const { return viewProjectionMatrix; }
 
 		void SetOrthographic() { orthographic = true; }
 		void SetPerspective() { orthographic = false; }
@@ -32,9 +33,13 @@ namespace Engine2
 		inline float AspectRatio() const { return aspectRatio; }
 		inline float NearPlane() const { return nearZ; }
 		inline float FarPlane() const { return farZ; }
+
 		inline float FieldOfView() const { return fov; }
+
 		inline float ViewWidth() const { return viewWidth; }
 		inline float ViewHeight() const { return viewHeight; }
+		inline void SetViewWidth(float width) { viewWidth = width; }
+		inline void SetViewHeight(float height) { viewHeight = height; }
 
 		inline void SetAspectRatio(float ratio) { aspectRatio = ratio; viewWidth = viewHeight * aspectRatio; }
 		inline bool IsAspectRatioLockedToScreen() { return aspectRatioLockedToScreen; }
@@ -45,6 +50,8 @@ namespace Engine2
 
 		// top-left, top-right, bottom-right, bottom-left for near then far
 		std::vector<DirectX::XMVECTOR> GetFrustrumPoints();
+
+		DirectX::XMVECTOR GetFrustrumCentre();
 
 		inline std::string& GetName() { return name; }
 		inline void SetName(const std::string& newName) { name = newName; }
@@ -58,7 +65,7 @@ namespace Engine2
 		float aspectRatio = 1.0f;
 		float fov = DirectX::XMConvertToRadians(75.0f);
 		float nearZ = 0.5f;
-		float farZ = 1000.0f;
+		float farZ = 100.0f;
 		bool aspectRatioLockedToScreen = true;
 		float viewWidth = 20.0f; // updated when aspectRatio set
 		float viewHeight = 20.0f;
@@ -72,5 +79,19 @@ namespace Engine2
 
 		std::vector<DirectX::XMVECTOR> GetFrustrumPointsOrthographic();
 		std::vector<DirectX::XMVECTOR> GetFrustrumPointsPerspective();
+	};
+
+	// Helper class
+	class WorldCamera
+	{
+	public:
+		Camera& camera;
+		DirectX::XMMATRIX worldTransform;
+
+		WorldCamera(Camera& camera, DirectX::XMMATRIX worldTransformMatrix) : camera(camera), worldTransform(worldTransformMatrix) {}
+
+		std::vector<DirectX::XMVECTOR> GetFrustrumPoints();
+
+		DirectX::XMVECTOR GetFrustrumCentre();
 	};
 }

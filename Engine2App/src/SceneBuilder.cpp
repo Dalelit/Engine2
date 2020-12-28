@@ -31,6 +31,7 @@ SceneBuilder::SceneBuilder() : Layer("SceneBuilder")
 		auto t = mainCamera.GetComponent<Transform>();
 		t->SetPosition(5.0f, 5.0f, -5.0f);
 		t->LookAt(0.0f, 0.0f, 0.0f);
+		mainCamera.GetComponent<Camera>()->SetFarPlane(25.0f);
 
 		auto sc = mainCamera.AddComponent<ScriptComponent>();
 		sc->SetEntity(mainCamera);

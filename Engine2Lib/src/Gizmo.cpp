@@ -82,48 +82,46 @@ namespace Engine2
 	void GizmoRender::DrawAxis(const DirectX::XMMATRIX& instance)
 	{
 		Vertex v0, v1;
-		auto tr = XMMatrixTranspose(instance); // engine stores the transform ready for the GPU... so undo that.
 
-		XMStoreFloat3(&v0.position, XMVector3Transform({ 0.0f, 0.0f, 0.0f, 1.0f }, tr));
+		XMStoreFloat3(&v0.position, XMVector3Transform({ 0.0f, 0.0f, 0.0f, 1.0f }, instance));
 
 		// x axis
 		v0.color = xAxisColor;
 		v1.color = xAxisColor;
-		XMStoreFloat3(&v1.position, XMVector3Transform({ 1.0f, 0.0f, 0.0f, 1.0f }, tr));
+		XMStoreFloat3(&v1.position, XMVector3Transform({ 1.0f, 0.0f, 0.0f, 1.0f }, instance));
 		lineBuffer.push_back(v0);
 		lineBuffer.push_back(v1);
 
 		// y axis
 		v0.color = yAxisColor;
 		v1.color = yAxisColor;
-		XMStoreFloat3(&v1.position, XMVector3Transform({ 0.0f, 1.0f, 0.0f, 1.0f }, tr));
+		XMStoreFloat3(&v1.position, XMVector3Transform({ 0.0f, 1.0f, 0.0f, 1.0f }, instance));
 		lineBuffer.push_back(v0);
 		lineBuffer.push_back(v1);
 
 		// z axis
 		v0.color = zAxisColor;
 		v1.color = zAxisColor;
-		XMStoreFloat3(&v1.position, XMVector3Transform({ 0.0f, 0.0f, 1.0f, 1.0f }, tr));
+		XMStoreFloat3(&v1.position, XMVector3Transform({ 0.0f, 0.0f, 1.0f, 1.0f }, instance));
 		lineBuffer.push_back(v0);
 		lineBuffer.push_back(v1);
 	}
 
 	void GizmoRender::DrawSphere(const DirectX::XMMATRIX& instance)
 	{
-		auto tr = XMMatrixTranspose(instance); // engine stores the transform ready for the GPU... so undo that.
 		auto position = spherePositions.begin();
 		Vertex vStart, vCurrent, vPrevious;
 
 		auto drawCircle = [&](XMFLOAT3 color) {
 			vStart.color = color;
 			vCurrent.color = color;
-			XMStoreFloat3(&vStart.position, XMVector3Transform(*position, tr));
+			XMStoreFloat3(&vStart.position, XMVector3Transform(*position, instance));
 			vPrevious = vStart;
 			++position;
 
 			for (UINT i = 1; i < pointsPerCircle; ++i)
 			{
-				XMStoreFloat3(&vCurrent.position, XMVector3Transform(*position, tr));
+				XMStoreFloat3(&vCurrent.position, XMVector3Transform(*position, instance));
 				lineBuffer.push_back(vPrevious);
 				lineBuffer.push_back(vCurrent);
 				vPrevious = vCurrent;
@@ -138,24 +136,23 @@ namespace Engine2
 		drawCircle(zAxisColor);
 	}
 
-	void GizmoRender::DrawCube(const DirectX::XMMATRIX& instance)
+	void GizmoRender::DrawCube(const DirectX::XMMATRIX& instance, DirectX::XMFLOAT3 color)
 	{
 		XMFLOAT3 positions[8];
-		auto tr = XMMatrixTranspose(instance); // engine stores the transform ready for the GPU... so undo that.
 
 		XMFLOAT3* pos = positions;
-		XMStoreFloat3(pos, XMVector3Transform({ -0.5f,  -0.5f,  -0.5f, 1.0f }, tr)); ++pos;
-		XMStoreFloat3(pos, XMVector3Transform({ -0.5f,   0.5f,  -0.5f, 1.0f }, tr)); ++pos;
-		XMStoreFloat3(pos, XMVector3Transform({  0.5f,   0.5f,  -0.5f, 1.0f }, tr)); ++pos;
-		XMStoreFloat3(pos, XMVector3Transform({  0.5f,  -0.5f,  -0.5f, 1.0f }, tr)); ++pos;
-		XMStoreFloat3(pos, XMVector3Transform({ -0.5f,  -0.5f,   0.5f, 1.0f }, tr)); ++pos;
-		XMStoreFloat3(pos, XMVector3Transform({ -0.5f,   0.5f,   0.5f, 1.0f }, tr)); ++pos;
-		XMStoreFloat3(pos, XMVector3Transform({  0.5f,   0.5f,   0.5f, 1.0f }, tr)); ++pos;
-		XMStoreFloat3(pos, XMVector3Transform({  0.5f,  -0.5f,   0.5f, 1.0f }, tr));
+		XMStoreFloat3(pos, XMVector3Transform({ -0.5f,  -0.5f,  -0.5f, 1.0f }, instance)); ++pos;
+		XMStoreFloat3(pos, XMVector3Transform({ -0.5f,   0.5f,  -0.5f, 1.0f }, instance)); ++pos;
+		XMStoreFloat3(pos, XMVector3Transform({  0.5f,   0.5f,  -0.5f, 1.0f }, instance)); ++pos;
+		XMStoreFloat3(pos, XMVector3Transform({  0.5f,  -0.5f,  -0.5f, 1.0f }, instance)); ++pos;
+		XMStoreFloat3(pos, XMVector3Transform({ -0.5f,  -0.5f,   0.5f, 1.0f }, instance)); ++pos;
+		XMStoreFloat3(pos, XMVector3Transform({ -0.5f,   0.5f,   0.5f, 1.0f }, instance)); ++pos;
+		XMStoreFloat3(pos, XMVector3Transform({  0.5f,   0.5f,   0.5f, 1.0f }, instance)); ++pos;
+		XMStoreFloat3(pos, XMVector3Transform({  0.5f,  -0.5f,   0.5f, 1.0f }, instance));
 
 		Vertex v1, v2;
-		v1.color = cubeColor;
-		v2.color = cubeColor;
+		v1.color = color;
+		v2.color = color;
 
 		auto addLine = [&](int p1, int p2) {
 			v1.position = positions[p1];
@@ -178,21 +175,19 @@ namespace Engine2
 		addLine(3, 7);
 	}
 
-	void GizmoRender::DrawCamera(const DirectX::XMMATRIX& instance, const std::vector<DirectX::XMVECTOR> frustrumPoints)
+	void GizmoRender::DrawCamera(const DirectX::XMMATRIX& instance, const std::vector<DirectX::XMVECTOR> frustrumPoints, DirectX::XMFLOAT3 color)
 	{
-		auto tr = XMMatrixTranspose(instance); // engine stores the transform ready for the GPU... so undo that.
-
 		Vertex verticies[9];
 		
 		// origin
-		XMStoreFloat3(&verticies[0].position, XMVector3Transform({ 0.0f, 0.0f, 0.0f, 1.0f }, tr));
-		verticies[0].color = cameraColor;
+		XMStoreFloat3(&verticies[0].position, XMVector3Transform({ 0.0f, 0.0f, 0.0f, 1.0f }, instance));
+		verticies[0].color = color;
 
 		int i = 1;
 		for (auto p : frustrumPoints)
 		{
-			XMStoreFloat3(&verticies[i].position, XMVector3Transform(p, tr));
-			verticies[i].color = cameraColor;
+			XMStoreFloat3(&verticies[i].position, XMVector3Transform(p, instance));
+			verticies[i].color = color;
 			++i;
 		}
 

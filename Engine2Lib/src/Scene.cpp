@@ -35,7 +35,7 @@ namespace Engine2
 
 	void Scene::OnRender(EntityId_t cameraEntity)
 	{
-		ShadowPass();
+		ShadowPass(cameraEntity);
 		RenderImage(cameraEntity, true);
 		CamerasRender();
 	}
@@ -58,9 +58,12 @@ namespace Engine2
 		}
 	}
 
-	void Scene::ShadowPass()
+	void Scene::ShadowPass(EntityId_t viewCameraEntity)
 	{
-		sun.ShadowPassStart();
+		auto pCamera = hierarchy.GetECSCoordinator().GetComponent<Camera>(viewCameraEntity);
+		auto pCameraTransform = hierarchy.GetECSCoordinator().GetComponent<TransformMatrix>(viewCameraEntity);
+
+		sun.ShadowPassStart(WorldCamera(*pCamera, pCameraTransform->MatrixTransposed()));
 
 		//UpdateVSSceneConstBuffer(light.GetCamera(), *pTransform);
 		sun.GetCamera().LoadViewProjectionMatrixT(vsConstBuffer.data.cameraTransform);
@@ -163,7 +166,7 @@ namespace Engine2
 		for (auto e : entities)
 		{
 			const auto& gizmo = coordinator.GetComponent<Gizmo>(e);
-			const auto& trans = coordinator.GetComponent<TransformMatrix>(e)->transformMatrix;
+			const auto trans = coordinator.GetComponent<TransformMatrix>(e)->MatrixTransposed(); // undo the GPU transpose
 
 			switch (gizmo->type)
 			{
@@ -178,13 +181,8 @@ namespace Engine2
 			}
 		}
 
-		if (sun.ShowGizmos())
-		{
-			auto& camera = sun.GetCamera();
-			gizmoRender.DrawCamera(sun.GetTransformT(), camera.GetFrustrumPoints());
-		}
-
 		gizmoRender.Render();
+		
 	}
 
 	void Scene::RenderOutlines()
