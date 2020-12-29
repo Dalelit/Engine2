@@ -120,7 +120,7 @@ namespace Engine2
 		if (ImGui::TreeNodeEx("TransformMatrix"))
 		{
 			XMVECTOR vScale, vRotQ, vTrans, vRotEulerDeg, vRotEulerDegNew;
-			XMMatrixDecompose(&vScale, &vRotQ, &vTrans, XMMatrixTranspose(transformMatrix));
+			XMMatrixDecompose(&vScale, &vRotQ, &vTrans, transformMatrix);
 			vRotEulerDegNew = vRotEulerDeg = Math::RadToDeg(Math::QuaternionToEuler(vRotQ));
 
 			ImGui::DragFloat3("Position", vTrans.m128_f32, 0.1f);

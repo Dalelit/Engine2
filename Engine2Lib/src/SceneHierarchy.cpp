@@ -77,17 +77,13 @@ namespace Engine2
 		auto pTransform = coordinator.GetComponent<Transform>(node.id);
 		auto pMatrix = coordinator.GetComponent<TransformMatrix>(node.id);
 
-		TransformMatrix matrix(*pTransform);
+		// update this matrix with it's transform and the parent
+		*pMatrix = TransformMatrix(*pTransform) * parentMatrix;
 
-		matrix.transformMatrix *= parentMatrix.transformMatrix;
-		matrix.rotationMatrix *= parentMatrix.rotationMatrix;
+		std::for_each(node.children.begin(), node.children.end(), [&](auto& child) {
+			UpdateTransformMatrix(child, *pMatrix);
+		});
 
-		pMatrix->SetTranspose(matrix);
-
-		for (auto& child : node.children)
-		{
-			UpdateTransformMatrix(child, matrix);
-		}
 	}
 
 	void SceneHierarchy::OnImgui()

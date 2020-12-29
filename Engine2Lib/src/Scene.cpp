@@ -63,7 +63,7 @@ namespace Engine2
 		auto pCamera = hierarchy.GetECSCoordinator().GetComponent<Camera>(viewCameraEntity);
 		auto pCameraTransform = hierarchy.GetECSCoordinator().GetComponent<TransformMatrix>(viewCameraEntity);
 
-		sun.ShadowPassStart(WorldCamera(*pCamera, pCameraTransform->MatrixTransposed()));
+		sun.ShadowPassStart(WorldCamera(*pCamera, pCameraTransform->GetTransform()));
 
 		//UpdateVSSceneConstBuffer(light.GetCamera(), *pTransform);
 		sun.GetCamera().LoadViewProjectionMatrixT(vsConstBuffer.data.cameraTransform);
@@ -166,7 +166,7 @@ namespace Engine2
 		for (auto e : entities)
 		{
 			const auto& gizmo = coordinator.GetComponent<Gizmo>(e);
-			const auto trans = coordinator.GetComponent<TransformMatrix>(e)->MatrixTransposed(); // undo the GPU transpose
+			const auto& trans = coordinator.GetComponent<TransformMatrix>(e)->GetTransform();
 
 			switch (gizmo->type)
 			{
@@ -257,7 +257,7 @@ namespace Engine2
 		for (auto e : entities)
 		{
 			auto* emitter = coordinator.GetComponent<ParticleEmitter>(e);
-			emitter->SetTransform(coordinator.GetComponent<TransformMatrix>(e)->MatrixTransposed()); // note: transposed as the matrix is ready for GPU
+			emitter->SetTransform(coordinator.GetComponent<TransformMatrix>(e)->GetTransform());
 			emitter->OnUpdate(dt);
 		}
 	}

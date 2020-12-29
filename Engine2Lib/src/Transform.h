@@ -3,8 +3,9 @@
 
 namespace Engine2
 {
-	struct Transform
+	class Transform
 	{
+	public:
 		DirectX::XMVECTOR position = { 0.0f, 0.0f, 0.0f, 1.0f };
 		DirectX::XMVECTOR scale = { 1.0f, 1.0f, 1.0f, 0.0f };
 		DirectX::XMVECTOR rotation = { 0.0f, 0.0f, 0.0f, 0.0f };
@@ -48,34 +49,37 @@ namespace Engine2
 		} Directions;
 	};
 
-	struct TransformMatrix
+	class TransformMatrix
 	{
-		// note: order is important for the constructor based on transform setting the rot matrix first then using it
-		DirectX::XMMATRIX rotationMatrix;
-		DirectX::XMMATRIX transformMatrix;
-
+	public:
 		TransformMatrix() = default;
 		TransformMatrix(Transform& transform);
 		TransformMatrix(DirectX::XMMATRIX transformMatrix, DirectX::XMMATRIX rotationMatrix);
 
 		void Set(Transform& transform);
 
-		//inline void SetTranspose(Transform& transform) { Set(transform); Transpose(); }
+		inline DirectX::XMVECTOR GetTranslation() { return GetTransform().r[3]; }
 
-		inline void SetTranspose(TransformMatrix& source) {
-			transformMatrix = DirectX::XMMatrixTranspose(source.transformMatrix);
-			rotationMatrix = DirectX::XMMatrixTranspose(source.rotationMatrix);
-		}
+		inline const DirectX::XMMATRIX& GetTransform() const { return transformMatrix; }
+		inline DirectX::XMMATRIX GetTransformTransposed() const { return DirectX::XMMatrixTranspose(transformMatrix); }
 
-		//inline void Transpose() {
-		//	transformMatrix = DirectX::XMMatrixTranspose(transformMatrix);
-		//	rotationMatrix = DirectX::XMMatrixTranspose(rotationMatrix);
-		//}
-
-		inline DirectX::XMVECTOR GetTranslation() { return DirectX::XMMatrixTranspose(transformMatrix).r[3]; }
-
-		inline DirectX::XMMATRIX MatrixTransposed() { return DirectX::XMMatrixTranspose(transformMatrix); }
+		inline const DirectX::XMMATRIX& GetRotation() const { return rotationMatrix; }
+		inline DirectX::XMMATRIX GetRotationTransposed() const { return DirectX::XMMatrixTranspose(rotationMatrix); }
 
 		void OnImgui();
+
+		inline TransformMatrix operator*(const TransformMatrix& rhs) const {
+			return TransformMatrix(transformMatrix * rhs.transformMatrix, rotationMatrix * rhs.rotationMatrix);
+		}
+
+		inline void operator=(const TransformMatrix& rhs) {
+			transformMatrix = rhs.transformMatrix;
+			rotationMatrix  = rhs.rotationMatrix;
+		}
+
+	protected:
+		// note: order is important for the constructor based on transform setting the rot matrix first then using it
+		DirectX::XMMATRIX rotationMatrix;
+		DirectX::XMMATRIX transformMatrix;
 	};
 }

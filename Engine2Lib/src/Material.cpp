@@ -65,7 +65,7 @@ namespace Engine2
 	{
 		auto ptr = std::make_shared<Material>(cloneName);
 
-		ptr->vertexShaderCB = std::make_shared<VSConstantBuffer<TransformMatrix>>(*vertexShaderCB); // vertexShaderCB->Clone();
+		ptr->vertexShaderCB = std::make_shared<VSConstantBuffer<StandardVSData>>(*vertexShaderCB); // vertexShaderCB->Clone();
 		ptr->vertexShader = vertexShader;
 		ptr->pixelShaderCB = pixelShaderCB->Clone();
 		ptr->pixelShader = pixelShader;

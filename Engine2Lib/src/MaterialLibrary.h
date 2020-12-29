@@ -7,7 +7,7 @@ namespace Engine2
 	// to do: namespace vs class... trying out namespace
 	namespace MaterialLibrary
 	{
-		struct StandardMaterial
+		struct StandardMaterialData
 		{
 			DirectX::XMFLOAT3 ambient = { 0.1f, 0.1f, 0.1f }; float pad1;
 			DirectX::XMFLOAT3 diffuse = { 1.0f, 1.0f, 1.0f }; float pad2;
@@ -18,18 +18,18 @@ namespace Engine2
 			//float transparency; DirectX::XMFLOAT3 transmissionFilterColor; float indexOfRefraciton; uint32_t illumination;
 		};
 
-		class StandardMaterialVSCB : public VSConstantBuffer<TransformMatrix>
+		class StandardMaterialVSCB : public VSConstantBuffer<Material::StandardVSData>
 		{
 		public:
-			StandardMaterialVSCB(unsigned int bindSlot) : VSConstantBuffer<TransformMatrix>(bindSlot) {}
+			StandardMaterialVSCB(unsigned int bindSlot) : VSConstantBuffer<Material::StandardVSData>(bindSlot) {}
 		protected:
 			StandardMaterialVSCB* CloneImpl() const { return new StandardMaterialVSCB(*this); }
 		};
 
-		class StandardMaterialPSCB : public PSConstantBuffer<StandardMaterial>
+		class StandardMaterialPSCB : public PSConstantBuffer<StandardMaterialData>
 		{
 		public:
-			StandardMaterialPSCB(unsigned int bindSlot) : PSConstantBuffer<StandardMaterial>(bindSlot) {}
+			StandardMaterialPSCB(unsigned int bindSlot) : PSConstantBuffer<StandardMaterialData>(bindSlot) {}
 			void OnImgui();
 		protected:
 			StandardMaterialPSCB* CloneImpl() const { return new StandardMaterialPSCB(*this); }
@@ -42,7 +42,7 @@ namespace Engine2
 		public:
 			PositionNormalColorMaterial(const std::string& name = "PositionNormalColorMaterial");
 
-			StandardMaterial* GetPSCB() { return &((StandardMaterialPSCB*)(pixelShaderCB.get()))->data; }
+			StandardMaterialData* GetPSCB() { return &((StandardMaterialPSCB*)(pixelShaderCB.get()))->data; }
 		};
 
 		//////////////////////////////////////////////////////////

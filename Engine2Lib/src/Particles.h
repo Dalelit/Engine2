@@ -34,7 +34,7 @@ namespace Engine2
 		inline bool IsActive() { return active; }
 		inline void SetActive(bool makeActive = true) { active = makeActive; }
 
-		inline void SetTransform(DirectX::XMMATRIX transform) { emitLocation = DirectX::XMVector4Transform(position, transform); }
+		inline void SetTransform(const DirectX::XMMATRIX& transform) { emitLocation = DirectX::XMVector4Transform(position, transform); }
 
 		void SetMaxParticles(size_t maxParticleCount);
 		size_t GetMaxParticles() { return maxParticles; }

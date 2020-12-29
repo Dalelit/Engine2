@@ -1,8 +1,6 @@
 Things that I want to work on...
 
 Near term / in progress
-- Clean up
-	- Transform - make it consistent and clear when the transposed or not version is being used
 - Scene serialisation
 - Mouse picking
 - Rendering, Materials and lighting
@@ -31,11 +29,13 @@ Near term / in progress
 	- Work out a way to register components better than current Componets class
 - Particle system
 	- add an emit direction, and use transform to change it
-- Bugs
+- Bugs/clean up
+	- Looks like there is constant memory allocation
 	- Skybox doesn't check that it's valid before rendering
 	- Deleting main camera causing things to crash
 	- Camera rotation around z. Gizmo changes but camera is locked.
 	- Offscreen targets need to render subdisplay using the aspect ratio
+	- Use std::for_each in more places to leverage parallel processing?
 - Proper error handling and logging
 	- use exceptions?
 	- add logging

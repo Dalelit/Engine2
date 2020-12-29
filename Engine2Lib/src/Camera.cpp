@@ -67,7 +67,7 @@ namespace Engine2
 		}
 	}
 
-	std::vector<DirectX::XMVECTOR> Camera::GetFrustrumPoints()
+	std::vector<DirectX::XMVECTOR> Camera::GetFrustrumPoints() const
 	{
 		if (orthographic)
 			return GetFrustrumPointsOrthographic();
@@ -75,13 +75,13 @@ namespace Engine2
 			return GetFrustrumPointsPerspective();
 	}
 
-	DirectX::XMVECTOR Camera::GetFrustrumCentre()
+	DirectX::XMVECTOR Camera::GetFrustrumCentre() const
 	{
 		float distance = ((farZ - nearZ) * 0.5f) + nearZ;
 		return FORWARD * distance;
 	}
 
-	std::vector<DirectX::XMVECTOR> Camera::GetFrustrumPointsOrthographic()
+	std::vector<DirectX::XMVECTOR> Camera::GetFrustrumPointsOrthographic() const
 	{
 		float ydist = viewHeight * 0.5f;
 		float xdist = viewWidth * 0.5f;
@@ -100,7 +100,7 @@ namespace Engine2
 		return points;
 	}
 
-	std::vector<DirectX::XMVECTOR> Camera::GetFrustrumPointsPerspective()
+	std::vector<DirectX::XMVECTOR> Camera::GetFrustrumPointsPerspective() const
 	{
 		float ydist = tanf(fov / 2.0f);
 		float xdist = ydist * aspectRatio;

@@ -79,7 +79,7 @@ namespace Engine2
 		{
 			auto ptr = Materials.CreateAsset<PositionNormalColorWireframe>(cloneName);
 
-			ptr->vertexShaderCB = std::make_shared<VSConstantBuffer<TransformMatrix>>(*vertexShaderCB); // vertexShaderCB->Clone();
+			ptr->vertexShaderCB = std::make_shared<VSConstantBuffer<Material::StandardVSData>>(*vertexShaderCB); // vertexShaderCB->Clone();
 			ptr->vertexShader = vertexShader;
 			ptr->pixelShaderCB = pixelShaderCB->Clone();
 			ptr->pixelShader = pixelShader;

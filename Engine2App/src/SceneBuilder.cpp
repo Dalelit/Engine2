@@ -31,7 +31,7 @@ SceneBuilder::SceneBuilder() : Layer("SceneBuilder")
 		auto t = mainCamera.GetComponent<Transform>();
 		t->SetPosition(5.0f, 5.0f, -5.0f);
 		t->LookAt(0.0f, 0.0f, 0.0f);
-		mainCamera.GetComponent<Camera>()->SetFarPlane(25.0f);
+		mainCamera.GetComponent<Camera>()->SetFarPlane(50.0f);
 
 		auto sc = mainCamera.AddComponent<ScriptComponent>();
 		sc->SetEntity(mainCamera);
@@ -124,7 +124,7 @@ void SceneBuilder::BuildTestScene()
 		auto mr = e.AddComponent<MeshRenderer>();
 		mr->mesh = Mesh::Assets["Cube"];
 		mr->material = Material::Materials["Default PNC"]->Clone();
-		auto cb = std::static_pointer_cast<PSConstantBuffer<MaterialLibrary::StandardMaterial>>(mr->material->pixelShaderCB);
+		auto cb = std::static_pointer_cast<PSConstantBuffer<MaterialLibrary::StandardMaterialData>>(mr->material->pixelShaderCB);
 		if (cb) cb->data.diffuse = { 0.8f, 0.2f, 0.2f };
 		e.GetComponent<Transform>()->position = { -2.0f, 2.0f, -1.0f, 1.0f };
 	}
@@ -134,7 +134,7 @@ void SceneBuilder::BuildTestScene()
 		auto mr = e.AddComponent<MeshRenderer>();
 		mr->mesh = Mesh::Assets["Plane"];
 		mr->material = Material::Materials["Default PNC"]->Clone();
-		auto cb = std::static_pointer_cast<PSConstantBuffer<MaterialLibrary::StandardMaterial>>(mr->material->pixelShaderCB);
+		auto cb = std::static_pointer_cast<PSConstantBuffer<MaterialLibrary::StandardMaterialData>>(mr->material->pixelShaderCB);
 		if (cb) cb->data.diffuse = { 0.2f, 0.8f, 0.2f };
 		auto tr = e.GetComponent<Transform>();
 		tr->SetPosition(0.0f, -2.0f, 0.0f);
