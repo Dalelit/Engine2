@@ -30,7 +30,6 @@ Near term / in progress
 - Particle system
 	- add an emit direction, and use transform to change it
 - Bugs/clean up
-	- Looks like there is constant memory allocation
 	- Skybox doesn't check that it's valid before rendering
 	- Deleting main camera causing things to crash
 	- Camera rotation around z. Gizmo changes but camera is locked.

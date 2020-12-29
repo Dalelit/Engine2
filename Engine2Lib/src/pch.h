@@ -19,6 +19,7 @@
 #include <bitset>
 #include <queue>
 #include <map>
+#include <array>
 
 #include <DirectXMath.h>
 #include <DirectXCollision.h>

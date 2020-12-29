@@ -175,7 +175,7 @@ namespace Engine2
 		addLine(3, 7);
 	}
 
-	void GizmoRender::DrawCamera(const DirectX::XMMATRIX& instance, const std::vector<DirectX::XMVECTOR> frustrumPoints, DirectX::XMFLOAT3 color)
+	void GizmoRender::DrawCamera(const DirectX::XMMATRIX& instance, const std::array<DirectX::XMVECTOR, 8> frustrumPoints, DirectX::XMFLOAT3 color)
 	{
 		Vertex verticies[9];
 		

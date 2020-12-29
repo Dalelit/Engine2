@@ -34,7 +34,7 @@ namespace Engine2
 		void DrawAxis(const DirectX::XMMATRIX& instance);
 		void DrawSphere(const DirectX::XMMATRIX& instance);
 		void DrawCube(const DirectX::XMMATRIX& instance, DirectX::XMFLOAT3 color = cubeColor);
-		void DrawCamera(const DirectX::XMMATRIX& instance, const std::vector<DirectX::XMVECTOR> frustrumPoints, DirectX::XMFLOAT3 color = cameraColor);
+		void DrawCamera(const DirectX::XMMATRIX& instance, const std::array<DirectX::XMVECTOR, 8> frustrumPoints, DirectX::XMFLOAT3 color = cameraColor);
 
 	protected:
 		size_t maxGizmos;

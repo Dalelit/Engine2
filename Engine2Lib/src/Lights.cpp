@@ -52,7 +52,7 @@ namespace Engine2
 	void DirectionalLight::ShadowPassStart(WorldCamera viewCamera)
 	{
 		CalcPosition(viewCamera);
-		auto device = DXDevice::Get();
+		auto& device = DXDevice::Get();
 		device.ClearShaderResource(shadowMapSlot); //offscreen.Unbind();
 		device.SetNoFaceCullingRenderState();
 		shadowMap.Clear();
@@ -62,7 +62,7 @@ namespace Engine2
 
 	void DirectionalLight::ShadowPassEnd()
 	{
-		auto device = DXDevice::Get();
+		auto& device = DXDevice::Get();
 		device.SetBackBufferAsRenderTarget();
 		device.SetDefaultRenderState();
 		device.SetDefaultViewport();

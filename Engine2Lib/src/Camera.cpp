@@ -67,7 +67,7 @@ namespace Engine2
 		}
 	}
 
-	std::vector<DirectX::XMVECTOR> Camera::GetFrustrumPoints() const
+	std::array<DirectX::XMVECTOR, 8> Camera::GetFrustrumPoints() const
 	{
 		if (orthographic)
 			return GetFrustrumPointsOrthographic();
@@ -81,26 +81,24 @@ namespace Engine2
 		return FORWARD * distance;
 	}
 
-	std::vector<DirectX::XMVECTOR> Camera::GetFrustrumPointsOrthographic() const
+	std::array<DirectX::XMVECTOR, 8> Camera::GetFrustrumPointsOrthographic() const
 	{
 		float ydist = viewHeight * 0.5f;
 		float xdist = viewWidth * 0.5f;
 
-		std::vector<DirectX::XMVECTOR> points = {
-			{ -xdist,  ydist, nearZ, 1.0f },
-			{  xdist,  ydist, nearZ, 1.0f },
-			{  xdist, -ydist, nearZ, 1.0f },
-			{ -xdist, -ydist, nearZ, 1.0f },
-			{ -xdist,  ydist, farZ, 1.0f },
-			{  xdist,  ydist, farZ, 1.0f },
-			{  xdist, -ydist, farZ, 1.0f },
-			{ -xdist, -ydist, farZ, 1.0f },
+		return {
+			XMVECTOR({-xdist,  ydist, nearZ, 1.0f}),
+			XMVECTOR({ xdist,  ydist, nearZ, 1.0f}),
+			XMVECTOR({ xdist, -ydist, nearZ, 1.0f}),
+			XMVECTOR({-xdist, -ydist, nearZ, 1.0f}),
+			XMVECTOR({-xdist, -ydist, farZ,  1.0f}),
+			XMVECTOR({-xdist,  ydist, farZ,  1.0f}),
+			XMVECTOR({ xdist,  ydist, farZ,  1.0f}),
+			XMVECTOR({ xdist, -ydist, farZ,  1.0f}),
 		};
-
-		return points;
 	}
 
-	std::vector<DirectX::XMVECTOR> Camera::GetFrustrumPointsPerspective() const
+	std::array<DirectX::XMVECTOR, 8> Camera::GetFrustrumPointsPerspective() const
 	{
 		float ydist = tanf(fov / 2.0f);
 		float xdist = ydist * aspectRatio;
@@ -110,21 +108,19 @@ namespace Engine2
 		float fydist = ydist * farZ;
 		float fxdist = xdist * farZ;
 
-		std::vector<DirectX::XMVECTOR> points = {
-			{ -nxdist,  nydist, nearZ, 1.0f },
-			{  nxdist,  nydist, nearZ, 1.0f },
-			{  nxdist, -nydist, nearZ, 1.0f },
-			{ -nxdist, -nydist, nearZ, 1.0f },
-			{ -fxdist,  fydist, farZ, 1.0f },
-			{  fxdist,  fydist, farZ, 1.0f },
-			{  fxdist, -fydist, farZ, 1.0f },
-			{ -fxdist, -fydist, farZ, 1.0f },
+		return {
+			XMVECTOR({ -nxdist,  nydist, nearZ, 1.0f }),
+			XMVECTOR({  nxdist,  nydist, nearZ, 1.0f }),
+			XMVECTOR({  nxdist, -nydist, nearZ, 1.0f }),
+			XMVECTOR({ -nxdist, -nydist, nearZ, 1.0f }),
+			XMVECTOR({ -fxdist,  fydist, farZ,  1.0f }),
+			XMVECTOR({  fxdist,  fydist, farZ,  1.0f }),
+			XMVECTOR({  fxdist, -fydist, farZ,  1.0f }),
+			XMVECTOR({ -fxdist, -fydist, farZ,  1.0f }),
 		};
-
-		return points;
 	}
 
-	std::vector<DirectX::XMVECTOR> WorldCamera::GetFrustrumPoints()
+	std::array<DirectX::XMVECTOR, 8> WorldCamera::GetFrustrumPoints()
 	{
 		auto points = camera.GetFrustrumPoints();
 

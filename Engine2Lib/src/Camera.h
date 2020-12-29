@@ -49,7 +49,7 @@ namespace Engine2
 		inline void SetFarPlane(float distance) { farZ = std::max<float>(distance, nearZ); }
 
 		// top-left, top-right, bottom-right, bottom-left for near then far
-		std::vector<DirectX::XMVECTOR> GetFrustrumPoints() const;
+		std::array<DirectX::XMVECTOR, 8> GetFrustrumPoints() const;
 
 		DirectX::XMVECTOR GetFrustrumCentre() const;
 
@@ -77,8 +77,8 @@ namespace Engine2
 		DirectX::XMMATRIX projectionMatrix;
 		DirectX::XMMATRIX viewProjectionMatrix;
 
-		std::vector<DirectX::XMVECTOR> GetFrustrumPointsOrthographic() const;
-		std::vector<DirectX::XMVECTOR> GetFrustrumPointsPerspective() const;
+		std::array<DirectX::XMVECTOR, 8> GetFrustrumPointsOrthographic() const;
+		std::array<DirectX::XMVECTOR, 8> GetFrustrumPointsPerspective() const;
 	};
 
 	// Helper class
@@ -90,7 +90,7 @@ namespace Engine2
 
 		WorldCamera(const Camera& camera, const DirectX::XMMATRIX& worldTransformMatrix) : camera(camera), worldTransform(worldTransformMatrix) {}
 
-		std::vector<DirectX::XMVECTOR> GetFrustrumPoints();
+		std::array<DirectX::XMVECTOR, 8> GetFrustrumPoints();
 
 		DirectX::XMVECTOR GetFrustrumCentre();
 	};
