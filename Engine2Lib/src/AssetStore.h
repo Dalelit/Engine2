@@ -44,6 +44,15 @@ namespace Engine2
 			return ptr;
 		}
 
+		void Clear()
+		{
+			// to do: check what happens to this loop in release mode
+			for (auto& [k, v] : map)
+				E2_ASSERT(v.use_count() == 1, "Trying to clear an asset store when an asset is still being referenced");
+
+			map.clear();
+		}
+
 		// Note: Does not check it exists.
 		TSharedPtr operator[](const std::string& name)
 		{
@@ -71,6 +80,7 @@ namespace Engine2
 			{
 				if (ImGui::TreeNode(k.c_str()))
 				{
+					ImGui::Text("Reference count %d", v.use_count());
 					v->OnImgui();
 					ImGui::TreePop();
 				}

@@ -36,7 +36,6 @@ namespace Engine2
 		Camera& GetMainSceneCamera() { return *hierarchy.GetECSCoordinator().GetComponent<Camera>(mainCameraEntity); }
 
 		void Clear();
-		void CreateEmptyScene();
 
 		void OnImgui();
 

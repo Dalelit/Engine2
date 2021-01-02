@@ -17,6 +17,10 @@ public:
 protected:
 	Engine2::Scene scene;
 
+	bool onClearIncludeAssets = true;
+
+	void CreateEmtpyScene();
 	void BuildTestScene();
 	void LoadPrimatives();
+	void ClearScene();
 };

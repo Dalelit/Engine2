@@ -15,6 +15,8 @@ Near term / in progress
 		- not just blindly use the view camera far plane distance
 	- Fix up directional lighting to work properly without a point light in the scene
 - Model/mesh loading
+- Scene
+	- Handle when there is no camera and/or ave a camera that always exists for the editor rather than needed an entity with a camera?
 - Scene UI work
 	- maintain focus on selected entity on destroy
 	- auto expand hierarchy on create

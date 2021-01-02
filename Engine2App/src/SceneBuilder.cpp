@@ -22,21 +22,7 @@ using namespace DirectX;
 
 SceneBuilder::SceneBuilder() : Layer("SceneBuilder")
 {
-	{
-		ScriptComponent::RegisterScript<InputControllerScript>("Input Controller");
-	}
-
-	{
-		auto mainCamera = scene.CreateSceneCamera("Main", true);
-		auto t = mainCamera.GetComponent<Transform>();
-		t->SetPosition(5.0f, 5.0f, -5.0f);
-		t->LookAt(0.0f, 0.0f, 0.0f);
-		mainCamera.GetComponent<Camera>()->SetFarPlane(50.0f);
-
-		auto sc = mainCamera.AddComponent<ScriptComponent>();
-		sc->SetEntity(mainCamera); // to do: shouldn't need to do this.
-		sc->CreateInstance("Input Controller");
-	}
+	CreateEmtpyScene();
 
 	LoadPrimatives();
 	BuildTestScene();
@@ -93,10 +79,30 @@ void SceneBuilder::OnImgui()
 			SceneSerialisation(scene).LoadScene(selectedFile);
 	if (ImGui::Button("Reload"))
 		SceneSerialisation(scene).LoadScene(selectedFile);
+
 	if (ImGui::Button("Clear Scene"))
-		scene.Clear();
+	{
+		ClearScene();
+		CreateEmtpyScene();
+	}
+	ImGui::SameLine();
+	ImGui::Checkbox("Also clear assets", &onClearIncludeAssets);
 
 	scene.OnImgui();
+}
+
+void SceneBuilder::CreateEmtpyScene()
+{
+	auto mainCamera = scene.CreateSceneCamera("Main", true);
+	auto t = mainCamera.GetComponent<Transform>();
+	t->SetPosition(5.0f, 5.0f, -5.0f);
+	t->LookAt(0.0f, 0.0f, 0.0f);
+	mainCamera.GetComponent<Camera>()->SetFarPlane(50.0f);
+
+	ScriptComponent::RegisterScript<InputControllerScript>("Input Controller");
+	auto sc = mainCamera.AddComponent<ScriptComponent>();
+	sc->SetEntity(mainCamera); // to do: shouldn't need to do this.
+	sc->CreateInstance("Input Controller");
 }
 
 void SceneBuilder::BuildTestScene()
@@ -172,4 +178,21 @@ void SceneBuilder::LoadPrimatives()
 
 	Material::Materials.CreateAsset<MaterialLibrary::PositionNormalColorMaterial>("Default PNC");
 	Material::Materials.CreateAsset<MaterialLibrary::PositionNormalColorWireframe>("Wireframe PNC");
+}
+
+void SceneBuilder::ClearScene()
+{
+	scene.Clear();
+
+	// clear all the assets.
+	// To do: should this be managed in an 'asset manager' class?
+
+	if (onClearIncludeAssets)
+	{
+		Mesh::Assets.Clear();
+		Material::Materials.Clear();
+		Material::VertexShaders.Clear();
+		Material::PixelShaders.Clear();
+		TextureLoader::Textures.Clear();
+	}
 }

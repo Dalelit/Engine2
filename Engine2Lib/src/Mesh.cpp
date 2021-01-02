@@ -5,12 +5,10 @@ namespace Engine2
 {
 	AssetStore<Mesh> Mesh::Assets;
 
-	void Mesh::OnImgui(bool assetInfo)
+	void Mesh::OnImgui()
 	{
 		if (ImGui::TreeNodeEx("Mesh", ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_DefaultOpen, name.c_str()))
 		{
-			if (assetInfo) ImGui::Text("Drawable references %i", drawable.use_count());
-
 			if (drawable) drawable->OnImgui();
 			else ImGui::Text("Drawable null");
 

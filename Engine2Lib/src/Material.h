@@ -37,7 +37,7 @@ namespace Engine2
 		std::shared_ptr<Material> Clone() { return Clone(name + std::to_string(Materials.Size())); }
 		virtual std::shared_ptr<Material> Clone(const std::string& cloneName);
 
-		void OnImgui(bool assetInfo = false);
+		void OnImgui();
 
 		const std::string& Name() const { return name; }
 

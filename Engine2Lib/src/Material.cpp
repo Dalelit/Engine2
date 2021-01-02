@@ -75,7 +75,7 @@ namespace Engine2
 		return ptr;
 	}
 
-	void Material::OnImgui(bool assetInfo)
+	void Material::OnImgui()
 	{
 		if (ImGui::TreeNodeEx("Material", ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_DefaultOpen, "Material %s", name.c_str()))
 		{
@@ -83,15 +83,6 @@ namespace Engine2
 			{
 				if (ImGui::MenuItem("Clone")) Clone();
 				ImGui::EndPopup();
-			}
-
-			if (assetInfo)
-			{
-				ImGui::Text("vertexShaderCB references %i", vertexShaderCB.use_count());
-				ImGui::Text("vertexShader references %i", vertexShader.use_count());
-				ImGui::Text("pixelShaderCB references %i", pixelShaderCB.use_count());
-				ImGui::Text("pixelShader references %i", pixelShader.use_count());
-				ImGui::Text("texture references %i", texture.use_count());
 			}
 
 			if (vertexShaderCB) vertexShaderCB->OnImgui();

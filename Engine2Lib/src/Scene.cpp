@@ -300,15 +300,6 @@ namespace Engine2
 	void Scene::Clear()
 	{
 		hierarchy.Clear();
-		CreateEmptyScene();
-	}
-
-	void Scene::CreateEmptyScene()
-	{
-		auto mainCamera = CreateSceneCamera("Main", true);
-		auto sc = mainCamera.AddComponent<ScriptComponent>();
-		sc->SetEntity(mainCamera); // to do: shouldn't need to do this.
-		sc->CreateInstance("Input Controller");
 	}
 
 	void Scene::OnImgui()

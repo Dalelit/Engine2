@@ -18,7 +18,7 @@ namespace Engine2
 		inline void Bind() { drawable->Bind(); }
 		inline void Draw() { drawable->Draw(); }
 
-		void OnImgui(bool assetInfo = false);
+		void OnImgui();
 
 		bool IsValid() { return drawable != nullptr; }
 
