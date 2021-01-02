@@ -35,6 +35,9 @@ namespace Engine2
 		void SetMainSceneCarmera(EngineECS::EntityId_t cameraEntityId) { mainCameraEntity = cameraEntityId; }
 		Camera& GetMainSceneCamera() { return *hierarchy.GetECSCoordinator().GetComponent<Camera>(mainCameraEntity); }
 
+		void Clear();
+		void CreateEmptyScene();
+
 		void OnImgui();
 
 		struct VSSceneData

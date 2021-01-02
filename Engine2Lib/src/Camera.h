@@ -65,7 +65,7 @@ namespace Engine2
 		float aspectRatio = 1.0f;
 		float fov = DirectX::XMConvertToRadians(75.0f);
 		float nearZ = 0.5f;
-		float farZ = 100.0f;
+		float farZ = 50.0f;
 		bool aspectRatioLockedToScreen = true;
 		float viewWidth = 20.0f; // updated when aspectRatio set
 		float viewHeight = 20.0f;

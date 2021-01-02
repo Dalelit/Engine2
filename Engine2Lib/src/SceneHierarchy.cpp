@@ -188,6 +188,14 @@ namespace Engine2
 		return true;
 	}
 
+	void SceneHierarchy::Clear()
+	{
+		while (sceneHierarchy.size() > 0)
+			DestroyEntity(nullptr, &sceneHierarchy.back());
+
+		selected = nullptr;
+	}
+
 	void SceneHierarchy::SceneNodeOnImGui(SceneNode& node)
 	{
 		ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;

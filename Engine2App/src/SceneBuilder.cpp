@@ -34,7 +34,7 @@ SceneBuilder::SceneBuilder() : Layer("SceneBuilder")
 		mainCamera.GetComponent<Camera>()->SetFarPlane(50.0f);
 
 		auto sc = mainCamera.AddComponent<ScriptComponent>();
-		sc->SetEntity(mainCamera);
+		sc->SetEntity(mainCamera); // to do: shouldn't need to do this.
 		sc->CreateInstance("Input Controller");
 	}
 
@@ -93,6 +93,8 @@ void SceneBuilder::OnImgui()
 			SceneSerialisation(scene).LoadScene(selectedFile);
 	if (ImGui::Button("Reload"))
 		SceneSerialisation(scene).LoadScene(selectedFile);
+	if (ImGui::Button("Clear Scene"))
+		scene.Clear();
 
 	scene.OnImgui();
 }

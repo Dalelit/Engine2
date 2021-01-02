@@ -26,6 +26,8 @@ namespace Engine2
 
 		bool LoadModel(const std::string& sourceFilename);
 
+		void Clear();
+
 		friend SceneSerialisation;
 
 	protected:

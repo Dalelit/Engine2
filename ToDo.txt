@@ -13,6 +13,7 @@ Near term / in progress
 		- cascading shadow maps
 		- enable shadowmap to be resized
 		- not just blindly use the view camera far plane distance
+	- Fix up directional lighting to work properly without a point light in the scene
 - Model/mesh loading
 - Scene UI work
 	- maintain focus on selected entity on destroy
@@ -27,6 +28,10 @@ Near term / in progress
 	- HasComponents test for multiple components at time
 	- Callback method for when a component is added to allow an initialisation if required. (e.g. via the gui adding a camera needs the aspect ratio set)
 	- Work out a way to register components better than current Componets class
+	- Add a method to clear?
+	- Add a way to get a list of all active entity ids?
+- Scripting
+	- Need to create the script with the entity id. Not needing to call SetEntity after AddComponent.
 - Particle system
 	- add an emit direction, and use transform to change it
 - Bugs/clean up
@@ -35,6 +40,7 @@ Near term / in progress
 	- Camera rotation around z. Gizmo changes but camera is locked.
 	- Offscreen targets need to render subdisplay using the aspect ratio
 	- Use std::for_each in more places to leverage parallel processing?
+	- Work out why compiled shaders v5.1 don't load
 - Proper error handling and logging
 	- use exceptions?
 	- add logging
