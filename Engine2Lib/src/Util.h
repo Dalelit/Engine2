@@ -10,6 +10,20 @@ namespace Engine2
 
 		inline DirectX::XMVECTOR ToXMVECTORw1(DirectX::XMFLOAT3& f3) { DirectX::XMVECTOR v = DirectX::XMLoadFloat3(&f3); v.m128_f32[3] = 1.0f; return v; }
 
+		template <typename T>
+		std::string TypeNameClean()
+		{
+			std::string_view view(typeid(T).name());
+			return std::string(view.substr(view.find_first_of(' ') + 1));
+		}
+
+		template <typename T>
+		std::string TypeNameClass()
+		{
+			std::string_view view(typeid(T).name());
+			return std::string(view.substr(view.find_last_of(':') + 1));
+		}
+
 		class Random
 		{
 		public:

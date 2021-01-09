@@ -150,6 +150,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\AssetManager.h" />
     <ClInclude Include="src\AssetStore.h" />
     <ClInclude Include="src\Components.h" />
     <ClInclude Include="src\DXBuffer.h" />
@@ -215,6 +216,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AssetLoaders\ObjLoader.cpp" />
+    <ClCompile Include="src\AssetManager.cpp" />
     <ClCompile Include="src\Components.cpp" />
     <ClCompile Include="src\Config.cpp" />
     <ClCompile Include="src\Gizmo.cpp" />

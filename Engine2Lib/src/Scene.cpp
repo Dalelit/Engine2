@@ -386,6 +386,9 @@ namespace Engine2
 		static bool open = true;
 		if (ImGui::Begin("Assets", &open))
 		{
+			assetMgr.OnImgui();
+			ImGui::Separator();
+
 			if (ImGui::TreeNode("Meshes"))
 			{
 				Mesh::Assets.OnImGui();

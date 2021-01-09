@@ -25,7 +25,7 @@ SceneBuilder::SceneBuilder() : Layer("SceneBuilder")
 	CreateEmtpyScene();
 
 	LoadPrimatives();
-	BuildTestScene();
+	//BuildTestScene();
 
 	scene.GetSkybox().Initialise("Assets\\Skyboxes\\Test");
 	//std::vector<std::string> files = {
@@ -48,6 +48,9 @@ SceneBuilder::SceneBuilder() : Layer("SceneBuilder")
 	//	tr->position = { 5.0f, 6.3f, 5.0f, 1.0f };
 	//	tr->LookAt(0.0f, 1.3f, 0.0f);
 	//}
+
+	MeshRenderer::defaultMesh = Mesh::Assets["Cube"];
+	MeshRenderer::defaultMaterial = Material::Materials["Default PNC"];
 }
 
 void SceneBuilder::OnUpdate(float dt)
@@ -169,12 +172,14 @@ void SceneBuilder::BuildTestScene()
 
 void SceneBuilder::LoadPrimatives()
 {
-	scene.LoadModel("Assets\\Models\\Cube.obj");
-	scene.LoadModel("Assets\\Models\\Cone.obj");
-	scene.LoadModel("Assets\\Models\\Cylinder.obj");
-	scene.LoadModel("Assets\\Models\\Plane.obj");
-	scene.LoadModel("Assets\\Models\\Sphere.obj");
-	scene.LoadModel("Assets\\Models\\Torus.obj");
+	scene.LoadModel("Assets\\Models\\Primatives.obj");
+
+	//scene.LoadModel("Assets\\Models\\Cube.obj");
+	//scene.LoadModel("Assets\\Models\\Cone.obj");
+	//scene.LoadModel("Assets\\Models\\Cylinder.obj");
+	//scene.LoadModel("Assets\\Models\\Plane.obj");
+	//scene.LoadModel("Assets\\Models\\Sphere.obj");
+	//scene.LoadModel("Assets\\Models\\Torus.obj");
 
 	Material::Materials.CreateAsset<MaterialLibrary::PositionNormalColorMaterial>("Default PNC");
 	Material::Materials.CreateAsset<MaterialLibrary::PositionNormalColorWireframe>("Wireframe PNC");

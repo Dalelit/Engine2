@@ -14,6 +14,7 @@
 #include <memory>
 #include <typeinfo>
 #include <cassert>
+#include <optional>
 
 #include <vector>
 #include <bitset>

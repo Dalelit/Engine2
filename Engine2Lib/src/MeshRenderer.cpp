@@ -3,6 +3,9 @@
 
 namespace Engine2
 {
+	std::shared_ptr<Mesh> MeshRenderer::defaultMesh;
+	std::shared_ptr<Material> MeshRenderer::defaultMaterial;
+
 	void MeshRenderer::BindAndDraw()
 	{
 		material->PreDraw();
@@ -26,12 +29,12 @@ namespace Engine2
 	{
 		if (mesh) mesh->OnImgui();
 		else ImGui::Text("Mesh null");
-		auto newMesh = Mesh::Assets.OnImguiSelector();
+		auto newMesh = Mesh::Assets.OnImguiSelector("Meshes");
 		if (newMesh) mesh = newMesh;
 
 		if (material) material->OnImgui();
 		else ImGui::Text("Material null");
-		auto newMat = Material::Materials.OnImguiSelector();
+		auto newMat = Material::Materials.OnImguiSelector("Materials");
 		if (newMat) material = newMat;
 	}
 }

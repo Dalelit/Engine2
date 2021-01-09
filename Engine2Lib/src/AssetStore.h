@@ -3,6 +3,7 @@
 #include <memory>
 #include <unordered_map>
 #include "common.h"
+#include "Util.h"
 
 
 namespace Engine2
@@ -17,6 +18,12 @@ namespace Engine2
 		using TSharedPtr = std::shared_ptr<T>;
 		using TMap = std::unordered_map<std::string, TSharedPtr>;
 
+		AssetStore()
+		{
+			displayName = Util::TypeNameClean<T>();
+		}
+
+		virtual ~AssetStore() = default;
 
 		template <typename... ARGS>
 		TSharedPtr CreateAsset(const std::string& name, ARGS... args)
@@ -87,11 +94,13 @@ namespace Engine2
 			}
 		}
 
-		TSharedPtr OnImguiSelector()
+		TSharedPtr OnImguiSelector() { return OnImguiSelector(displayName); }
+
+		TSharedPtr OnImguiSelector(const std::string label)
 		{
 			TSharedPtr result;
 
-			if (ImGui::BeginCombo(typeid(T).name(), nullptr))
+			if (ImGui::BeginCombo(label.c_str(), nullptr))
 			{
 				for (auto& [k, v] : map)
 				{
@@ -109,5 +118,6 @@ namespace Engine2
 
 	private:
 		TMap map;
+		std::string displayName;
 	};
 }

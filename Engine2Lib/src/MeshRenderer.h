@@ -8,6 +8,8 @@ namespace Engine2
 	{
 	public:
 
+		MeshRenderer() : mesh(defaultMesh), material(defaultMaterial) {}
+
 		void BindAndDraw();
 		void ShadowBindAndDraw();
 
@@ -17,6 +19,9 @@ namespace Engine2
 
 		std::shared_ptr<Mesh> mesh;
 		std::shared_ptr<Material> material;
+
+		static std::shared_ptr<Mesh> defaultMesh;
+		static std::shared_ptr<Material> defaultMaterial;
 
 	protected:
 	};
