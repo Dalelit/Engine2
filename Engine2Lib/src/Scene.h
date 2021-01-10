@@ -10,7 +10,6 @@
 #include "Engine2.h"
 #include "Camera.h"
 #include "Lights.h"
-#include "AssetManager.h"
 
 namespace Engine2
 {
@@ -54,8 +53,6 @@ namespace Engine2
 		};
 		PSConstantBuffer<PSSceneData> psConstBuffer;
 
-		bool LoadModel(const std::string& sourceFilename);
-
 		Skybox& GetSkybox() { return skybox; }
 
 		// returns the previous setting if you want to revert
@@ -65,7 +62,6 @@ namespace Engine2
 
 	protected:
 		SceneHierarchy hierarchy;
-		AssetManager assetMgr;
 		Skybox skybox;
 		DirectionalLight sun;
 		EngineECS::EntityId_t mainCameraEntity;

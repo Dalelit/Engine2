@@ -24,8 +24,6 @@ namespace Engine2
 		void OnImgui();
 		void SelectedEntityOnImgui();
 
-		bool LoadModel(const std::string& sourceFilename);
-
 		void Clear();
 
 		friend SceneSerialisation;

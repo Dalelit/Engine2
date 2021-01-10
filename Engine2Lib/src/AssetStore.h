@@ -114,6 +114,8 @@ namespace Engine2
 			return result;
 		}
 
+		TMap& Map() { return map; }
+
 		friend SceneSerialisation;
 
 	private:

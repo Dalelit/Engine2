@@ -1,5 +1,4 @@
 #pragma once
-#include "AssetStore.h"
 #include "Resources.h"
 
 namespace Engine2
@@ -7,8 +6,6 @@ namespace Engine2
 	class Mesh
 	{
 	public:
-		static AssetStore<Mesh> Assets;
-
 		Mesh() = default;
 		Mesh(const std::string& name) : name(name) {}
 

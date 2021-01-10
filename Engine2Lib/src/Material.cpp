@@ -3,7 +3,6 @@
 
 namespace Engine2
 {
-	AssetStore<Material>         Material::Materials;
 	AssetStore<VertexShaderFile> Material::VertexShaders;
 	AssetStore<PixelShaderFile>  Material::PixelShaders;
 
@@ -71,7 +70,6 @@ namespace Engine2
 		ptr->pixelShader = pixelShader;
 		ptr->texture = texture;
 
-		Materials.StoreAsset(cloneName, ptr);
 		return ptr;
 	}
 
@@ -79,11 +77,11 @@ namespace Engine2
 	{
 		if (ImGui::TreeNodeEx("Material", ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_DefaultOpen, "Material %s", name.c_str()))
 		{
-			if (ImGui::BeginPopupContextItem())
-			{
-				if (ImGui::MenuItem("Clone")) Clone();
-				ImGui::EndPopup();
-			}
+			//if (ImGui::BeginPopupContextItem())
+			//{
+			//	if (ImGui::MenuItem("Clone")) Clone();
+			//	ImGui::EndPopup();
+			//}
 
 			if (vertexShaderCB) vertexShaderCB->OnImgui();
 			else ImGui::Text("vertexShaderCB null");

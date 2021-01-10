@@ -160,7 +160,6 @@
     <ClInclude Include="src\Material.h" />
     <ClInclude Include="src\MaterialLibrary.h" />
     <ClInclude Include="src\Mesh.h" />
-    <ClInclude Include="src\MeshLoader.h" />
     <ClInclude Include="src\MeshRenderer.h" />
     <ClInclude Include="src\RigidBody.h" />
     <ClInclude Include="src\SceneHierarchy.h" />
@@ -227,7 +226,6 @@
     <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\MaterialLibrary.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
-    <ClCompile Include="src\MeshLoader.cpp" />
     <ClCompile Include="src\MeshRenderer.cpp" />
     <ClCompile Include="src\OffscreenOutliner.cpp" />
     <ClCompile Include="src\Particles.cpp" />

@@ -52,7 +52,6 @@
     <ClInclude Include="src\Serialiser.h" />
     <ClInclude Include="src\MaterialLibrary.h" />
     <ClInclude Include="src\TextureLoader.h" />
-    <ClInclude Include="src\MeshLoader.h" />
     <ClInclude Include="src\Skybox.h" />
     <ClInclude Include="src\SurfaceLoader.h" />
     <ClInclude Include="src\UtilFileDialog.h" />
@@ -102,7 +101,6 @@
     <ClCompile Include="src\Serialiser.cpp" />
     <ClCompile Include="src\MaterialLibrary.cpp" />
     <ClCompile Include="src\TextureLoader.cpp" />
-    <ClCompile Include="src\MeshLoader.cpp" />
     <ClCompile Include="src\VertexLayout.cpp" />
     <ClCompile Include="src\Skybox.cpp" />
     <ClCompile Include="src\SurfaceLoader.cpp" />

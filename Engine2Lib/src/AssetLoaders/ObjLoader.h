@@ -24,6 +24,9 @@ namespace Engine2
 			std::vector<unsigned int> facesVt;
 			std::vector<unsigned int> facesVn;
 			unsigned int vCount = 0, vtCount = 0, vnCount = 0;
+
+			inline bool HasPositionNormal() { return !facesV.empty() && !facesVn.empty(); }
+			inline bool HasPositionNormalTexture() { return !facesV.empty() && !facesVn.empty() && !facesVt.empty(); }
 		};
 
 		class ObjLoader
@@ -39,6 +42,8 @@ namespace Engine2
 			std::vector<DirectX::XMFLOAT2> textureCoords;
 
 			void ScaleVerticies(float scale);
+
+			inline bool IsValid() { return objects.size() > 0 && verticies.size() > 0; }
 
 		protected:
 			static void LoadObjects(ObjLoader& loader);

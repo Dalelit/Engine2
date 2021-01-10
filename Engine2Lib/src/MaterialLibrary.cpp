@@ -77,14 +77,14 @@ namespace Engine2
 
 		std::shared_ptr<Material> PositionNormalColorWireframe::Clone(const std::string& cloneName)
 		{
-			auto ptr = Materials.CreateAsset<PositionNormalColorWireframe>(cloneName);
+			auto ptr = std::make_shared<PositionNormalColorWireframe>(cloneName);
 
 			ptr->vertexShaderCB = std::make_shared<VSConstantBuffer<Material::StandardVSData>>(*vertexShaderCB); // vertexShaderCB->Clone();
 			ptr->vertexShader = vertexShader;
 			ptr->pixelShaderCB = pixelShaderCB->Clone();
 			ptr->pixelShader = pixelShader;
 
-			return std::shared_ptr<Material>();
+			return ptr;
 		}
 	}
 }

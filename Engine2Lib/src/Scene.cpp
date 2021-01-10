@@ -10,9 +10,9 @@
 #include "Lights.h"
 #include "OffscreenOutliner.h"
 #include "VertexLayout.h"
-#include "MeshLoader.h"
 #include "TextureLoader.h"
 #include "ScriptComponent.h"
+#include "AssetManager.h"
 
 using namespace EngineECS;
 
@@ -386,20 +386,8 @@ namespace Engine2
 		static bool open = true;
 		if (ImGui::Begin("Assets", &open))
 		{
-			assetMgr.OnImgui();
+			AssetManager::Manager().OnImgui();
 			ImGui::Separator();
-
-			if (ImGui::TreeNode("Meshes"))
-			{
-				Mesh::Assets.OnImGui();
-				ImGui::TreePop();
-			}
-
-			if (ImGui::TreeNode("Materials"))
-			{
-				Material::Materials.OnImGui();
-				ImGui::TreePop();
-			}
 
 			if (ImGui::TreeNode("Vertex Shaders"))
 			{
@@ -447,23 +435,5 @@ namespace Engine2
 			}
 		}
 		ImGui::End();
-	}
-
-	bool Scene::LoadModel(const std::string& sourceFilename)
-	{
-		bool result = false;
-
-		auto loadedModel = AssetLoaders::ObjLoader::Load(sourceFilename);
-
-		auto assets = MeshAssetLoader::CreateMeshAssetPositionNormalColor(*loadedModel);
-		if (assets.size() > 0) result = true;
-
-		if (loadedModel->textureCoords.size() > 0)
-		{
-			assets = MeshAssetLoader::CreateMeshAssetPositionNormalTexture(*loadedModel);
-			if (assets.size() > 0) result = true;
-		}
-
-		return result;
 	}
 }

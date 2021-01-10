@@ -6,7 +6,6 @@
 #include "VertexBuffer.h"
 #include "MeshRenderer.h"
 #include "MaterialLibrary.h"
-#include "MeshLoader.h"
 
 using namespace EngineECS;
 using namespace DirectX;
@@ -102,14 +101,6 @@ namespace Engine2
 		if (deleteEntity) DestroyEntity(deleteEntityParent, deleteEntity);
 
 		if (ImGui::Button("Add Entity")) NewEntity(std::string());
-
-		if (ImGui::CollapsingHeader("Loader"))
-		{
-			static char buffer[256] = "Assets\\Models\\Torus.obj";
-			ImGui::InputText("filename", buffer, sizeof(buffer));
-			if (ImGui::Button("Load")) LoadModel(buffer);
-		}
-
 	}
 
 	void SceneHierarchy::SelectedEntityOnImgui()
@@ -118,74 +109,6 @@ namespace Engine2
 		{
 			Components::OnImgui(selected->id, coordinator);
 		}
-	}
-
-	bool SceneHierarchy::LoadModel(const std::string& sourceFilename)
-	{
-		using Vertex = VertexLayout::PositionNormalColor;
-		auto vsLayout = VertexLayout::PositionNormalColor::Layout;
-
-		auto loadedModel = AssetLoaders::ObjLoader::Load(sourceFilename);
-
-		if (!loadedModel) return false;
-
-		auto root = NewEntity(sourceFilename);
-		coordinator.GetComponent<EntityInfo>(root->id)->tag = sourceFilename;
-
-		std::map<std::string, std::shared_ptr<MaterialLibrary::PositionNormalColorMaterial>> materials;
-		for (auto& [name, data] : loadedModel->materials)
-		{
-			auto mat = std::make_shared<MaterialLibrary::PositionNormalColorMaterial>();
-			auto cb = mat->GetPSCB();
-			cb->ambient = data.Ka;
-			cb->diffuse = data.Kd;
-			cb->emission = data.Ke;
-			cb->specular = data.Ks;
-			cb->specularExponent = data.Ns;
-
-			materials.insert({ name, mat });
-		}
-
-		for (auto& [name, data] : loadedModel->objects)
-		{
-			auto sn = NewEntity(name, root);
-			Entity entity(sn->id, coordinator);
-
-			entity.GetComponent<EntityInfo>()->tag = name;
-			auto mr = entity.AddComponent<MeshRenderer>();
-
-			// create the verticies from the loaded model
-			std::vector<Vertex> verticies;
-
-			if (data.facesV.size() != data.facesVn.size()) return false;
-
-			verticies.reserve(data.facesV.size()); // get the memory size
-
-			auto pos = data.facesV.data();
-			auto nor = data.facesVn.data();
-			size_t count = data.facesV.size();
-
-			Vertex v;
-			v.color = { 1.0f, 1.0f, 1.0f, 1.0f }; // always white color. shader sets the color
-			
-			while (count > 0)
-			{
-				v.position = loadedModel->verticies[*pos];
-				v.normal = loadedModel->normals[*nor];
-				verticies.push_back(v);
-				pos++;
-				nor++;
-				count--;
-			}
-
-			mr->material = materials[data.material];
-			mr->mesh = std::make_shared<Mesh>(name);
-			auto vb = std::make_shared<VertexBuffer>();
-			vb->Initialise<Vertex>(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST, verticies);
-			mr->mesh->SetDrawable(vb);
-		}
-
-		return true;
 	}
 
 	void SceneHierarchy::Clear()

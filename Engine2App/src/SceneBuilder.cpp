@@ -15,6 +15,7 @@
 #include "ScriptComponent.h"
 #include "ScriptComponents/InputControllerScript.h"
 #include "Offscreen.h"
+#include "AssetManager.h"
 
 using namespace Engine2;
 using namespace EngineECS;
@@ -22,9 +23,9 @@ using namespace DirectX;
 
 SceneBuilder::SceneBuilder() : Layer("SceneBuilder")
 {
+	CreateDefaultAssets();
 	CreateEmtpyScene();
 
-	LoadPrimatives();
 	//BuildTestScene();
 
 	scene.GetSkybox().Initialise("Assets\\Skyboxes\\Test");
@@ -49,8 +50,6 @@ SceneBuilder::SceneBuilder() : Layer("SceneBuilder")
 	//	tr->LookAt(0.0f, 1.3f, 0.0f);
 	//}
 
-	MeshRenderer::defaultMesh = Mesh::Assets["Cube"];
-	MeshRenderer::defaultMaterial = Material::Materials["Default PNC"];
 }
 
 void SceneBuilder::OnUpdate(float dt)
@@ -94,6 +93,16 @@ void SceneBuilder::OnImgui()
 	scene.OnImgui();
 }
 
+void SceneBuilder::CreateDefaultAssets()
+{
+	auto& asset = AssetManager::Manager().CreateAsset("Default");
+	
+	asset.Materials().CreateAsset<MaterialLibrary::PositionNormalColorMaterial>("Default PNC");
+	asset.Materials().CreateAsset<MaterialLibrary::PositionNormalColorWireframe>("Wireframe PNC");
+
+	MeshRenderer::defaultMaterial = asset.Materials()["Default PNC"];
+}
+
 void SceneBuilder::CreateEmtpyScene()
 {
 	auto mainCamera = scene.CreateSceneCamera("Main", true);
@@ -122,67 +131,22 @@ void SceneBuilder::BuildTestScene()
 		tr->SetScale(0.25f); // just to make the gizmo smaller
 	}
 
-	{
-		auto e = scene.CreateEntity("Sphere");
-		auto mr = e.AddComponent<MeshRenderer>();
-		mr->mesh = Mesh::Assets["Sphere"];
-		mr->material = Material::Materials["Default PNC"];
-		e.GetComponent<Transform>()->position = { 0.0f, 1.3f, 0.0f, 1.0f };
-	}
+	//{
+	//	// textured test
+	//	auto e = scene.CreateEntity("Texture plane");
+	//	auto mr = e.AddComponent<MeshRenderer>();
+	//	mr->mesh = Mesh::Assets["Plane_t"];
+	//	e.GetComponent<Transform>()->scale = { 4.0f, 4.0f, 4.0f, 1.0f };
 
-	{
-		auto e = scene.CreateEntity("Cube");
-		auto mr = e.AddComponent<MeshRenderer>();
-		mr->mesh = Mesh::Assets["Cube"];
-		mr->material = Material::Materials["Default PNC"]->Clone();
-		auto cb = std::static_pointer_cast<PSConstantBuffer<MaterialLibrary::StandardMaterialData>>(mr->material->pixelShaderCB);
-		if (cb) cb->data.diffuse = { 0.8f, 0.2f, 0.2f };
-		e.GetComponent<Transform>()->position = { -2.0f, 2.0f, -1.0f, 1.0f };
-	}
-
-	{
-		auto e = scene.CreateEntity("Plane plane");
-		auto mr = e.AddComponent<MeshRenderer>();
-		mr->mesh = Mesh::Assets["Plane"];
-		mr->material = Material::Materials["Default PNC"]->Clone();
-		auto cb = std::static_pointer_cast<PSConstantBuffer<MaterialLibrary::StandardMaterialData>>(mr->material->pixelShaderCB);
-		if (cb) cb->data.diffuse = { 0.2f, 0.8f, 0.2f };
-		auto tr = e.GetComponent<Transform>();
-		tr->SetPosition(0.0f, -2.0f, 0.0f);
-		tr->SetScale(20.0f);
-	}
-
-	{
-		// textured test
-		auto e = scene.CreateEntity("Texture plane");
-		auto mr = e.AddComponent<MeshRenderer>();
-		mr->mesh = Mesh::Assets["Plane_t"];
-		e.GetComponent<Transform>()->scale = { 4.0f, 4.0f, 4.0f, 1.0f };
-
-		mr->material = Material::Materials.CreateAsset("Textured");
-		mr->material->vertexShaderCB = std::make_shared<MaterialLibrary::StandardMaterialVSCB>(1);;
-		mr->material->vertexShader = Material::GetVertexShader(Config::directories["EngineShaderSourceDir"] + "PositionNormalTextureVS.hlsl", VertexLayout::PositionNormalTexture::Layout);
-		mr->material->pixelShaderCB = std::make_shared<MaterialLibrary::StandardMaterialPSCB>(1);
-		mr->material->pixelShader = Material::GetPixelShader(Config::directories["EngineShaderSourceDir"] + "PositionNormalTexturePS.hlsl");
-		mr->material->texture = TextureLoader::LoadTexture("Assets\\Textures\\NZ Small.jpg");
-		mr->material->texture->SetSampler(D3D11_FILTER::D3D11_FILTER_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_CLAMP);
-		mr->material->texture->SetSlot(2u);
-	}
-}
-
-void SceneBuilder::LoadPrimatives()
-{
-	scene.LoadModel("Assets\\Models\\Primatives.obj");
-
-	//scene.LoadModel("Assets\\Models\\Cube.obj");
-	//scene.LoadModel("Assets\\Models\\Cone.obj");
-	//scene.LoadModel("Assets\\Models\\Cylinder.obj");
-	//scene.LoadModel("Assets\\Models\\Plane.obj");
-	//scene.LoadModel("Assets\\Models\\Sphere.obj");
-	//scene.LoadModel("Assets\\Models\\Torus.obj");
-
-	Material::Materials.CreateAsset<MaterialLibrary::PositionNormalColorMaterial>("Default PNC");
-	Material::Materials.CreateAsset<MaterialLibrary::PositionNormalColorWireframe>("Wireframe PNC");
+	//	mr->material = Material::Materials.CreateAsset("Textured");
+	//	mr->material->vertexShaderCB = std::make_shared<MaterialLibrary::StandardMaterialVSCB>(1);;
+	//	mr->material->vertexShader = Material::GetVertexShader(Config::directories["EngineShaderSourceDir"] + "PositionNormalTextureVS.hlsl", VertexLayout::PositionNormalTexture::Layout);
+	//	mr->material->pixelShaderCB = std::make_shared<MaterialLibrary::StandardMaterialPSCB>(1);
+	//	mr->material->pixelShader = Material::GetPixelShader(Config::directories["EngineShaderSourceDir"] + "PositionNormalTexturePS.hlsl");
+	//	mr->material->texture = TextureLoader::LoadTexture("Assets\\Textures\\NZ Small.jpg");
+	//	mr->material->texture->SetSampler(D3D11_FILTER::D3D11_FILTER_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_CLAMP);
+	//	mr->material->texture->SetSlot(2u);
+	//}
 }
 
 void SceneBuilder::ClearScene()
@@ -194,8 +158,7 @@ void SceneBuilder::ClearScene()
 
 	if (onClearIncludeAssets)
 	{
-		Mesh::Assets.Clear();
-		Material::Materials.Clear();
+		AssetManager::Manager().Clear();
 		Material::VertexShaders.Clear();
 		Material::PixelShaders.Clear();
 		TextureLoader::Textures.Clear();

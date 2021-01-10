@@ -1,10 +1,10 @@
 #include "pch.h"
 #include "Mesh.h"
+#include "submodules/imgui/imgui.h"
+
 
 namespace Engine2
 {
-	AssetStore<Mesh> Mesh::Assets;
-
 	void Mesh::OnImgui()
 	{
 		if (ImGui::TreeNodeEx("Mesh", ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_DefaultOpen, name.c_str()))

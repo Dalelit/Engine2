@@ -7,7 +7,7 @@ namespace Engine2
 {
 	using namespace DirectX;
 
-	XMVECTOR RigidBody::gravity = { 0.0f, -9.8f, 0.0f, 1.0f };
+	XMVECTOR RigidBody::gravity = g_XMZero;
 
 	void RigidBody::OnUpdate(float dt, Transform* pTransform)
 	{

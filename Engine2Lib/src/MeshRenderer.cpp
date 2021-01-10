@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "MeshRenderer.h"
+#include "AssetManager.h"
 
 namespace Engine2
 {
@@ -27,14 +28,21 @@ namespace Engine2
 
 	void MeshRenderer::OnImgui()
 	{
-		if (mesh) mesh->OnImgui();
-		else ImGui::Text("Mesh null");
-		auto newMesh = Mesh::Assets.OnImguiSelector("Meshes");
+		if (ImGui::Button("Mesh")) AssetManager::Manager().OnImguiSelectMeshPopupOpen();
+		auto newMesh = AssetManager::Manager().OnImguiSelectMesh();
 		if (newMesh) mesh = newMesh;
 
+		ImGui::SameLine();
+		if (mesh) mesh->OnImgui();
+		else ImGui::Text("Mesh null");
+
+
+		if (ImGui::Button("Mat")) AssetManager::Manager().OnImguiSelectMaterialPopupOpen();
+		auto newMat = AssetManager::Manager().OnImguiSelectMaterial();
+		if (newMat) material = newMat;
+
+		ImGui::SameLine();
 		if (material) material->OnImgui();
 		else ImGui::Text("Material null");
-		auto newMat = Material::Materials.OnImguiSelector("Materials");
-		if (newMat) material = newMat;
 	}
 }

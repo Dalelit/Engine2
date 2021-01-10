@@ -12,7 +12,6 @@ namespace Engine2
 	{
 	public:
 
-		static AssetStore<Material>         Materials;
 		static AssetStore<VertexShaderFile> VertexShaders;
 		static AssetStore<PixelShaderFile>  PixelShaders;
 
@@ -34,7 +33,7 @@ namespace Engine2
 
 		bool IsValid() { return vertexShaderCB && vertexShader && pixelShader; }
 
-		std::shared_ptr<Material> Clone() { return Clone(name + std::to_string(Materials.Size())); }
+		std::shared_ptr<Material> Clone() { return Clone(name); }
 		virtual std::shared_ptr<Material> Clone(const std::string& cloneName);
 
 		void OnImgui();

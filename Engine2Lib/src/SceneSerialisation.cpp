@@ -113,24 +113,24 @@ namespace Engine2
 
 	void SceneSerialisation::SaveAssets(Serialisation::Serialiser::Node& node)
 	{
-		{
-			auto n = node.SubNode("Meshes");
-			for (auto [name, mesh] : Mesh::Assets.map)
-			{
-				auto m = n.SubNode(name);
-				m.Store("type", 0);
-				m.Store("filename", "to do");
-			}
-		}
-		{
-			auto n = node.SubNode("Materials");
-			for (auto [name, mat] : Material::Materials.map)
-			{
-				auto m = n.SubNode(name);
-				if (mat->pixelShader) m.Store("pixelShader", mat->pixelShader->GetName());
-				if (mat->vertexShader) m.Store("vertexShader", mat->vertexShader->GetName());
-				//m.Store("vertexShaderCB", mat->vertexShaderCB->);
-			}
-		}
+		//{
+		//	auto n = node.SubNode("Meshes");
+		//	for (auto [name, mesh] : Mesh::Assets.map)
+		//	{
+		//		auto m = n.SubNode(name);
+		//		m.Store("type", 0);
+		//		m.Store("filename", "to do");
+		//	}
+		//}
+		//{
+		//	auto n = node.SubNode("Materials");
+		//	for (auto [name, mat] : Material::Materials.map)
+		//	{
+		//		auto m = n.SubNode(name);
+		//		if (mat->pixelShader) m.Store("pixelShader", mat->pixelShader->GetName());
+		//		if (mat->vertexShader) m.Store("vertexShader", mat->vertexShader->GetName());
+		//		//m.Store("vertexShaderCB", mat->vertexShaderCB->);
+		//	}
+		//}
 	}
 }

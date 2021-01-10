@@ -19,8 +19,8 @@ protected:
 
 	bool onClearIncludeAssets = true;
 
+	void CreateDefaultAssets();
 	void CreateEmtpyScene();
 	void BuildTestScene();
-	void LoadPrimatives();
 	void ClearScene();
 };
