@@ -17,3 +17,7 @@ PS Constant Buffers
 PS Textures/Samplers
 0 = Skybox
 1 = Shadow map
+
+
+Notes:
+- Steps to get Nvidia PhysX working is in the Physics.h file.

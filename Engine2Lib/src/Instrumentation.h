@@ -61,7 +61,7 @@ namespace Engine2
 
 			unsigned int current = 0;
 			unsigned int size = SIZE;
-			T data[SIZE];
+			T data[SIZE] = {};
 		};
 
 		class Timer

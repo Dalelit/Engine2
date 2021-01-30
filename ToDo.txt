@@ -46,6 +46,11 @@ Near term / in progress
 - Proper error handling and logging
 	- use exceptions?
 	- add logging
+- Build/Project
+	- clean up how include and lib stuff is done with PhysX
+		- need to include directories in the Engine2App
+		- build is still in the src directory
+		- need to use the checked version rather than debug
 
 Long term
 - Rigid body and basic physics

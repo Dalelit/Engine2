@@ -63,6 +63,8 @@
     <ClInclude Include="src\ShadowMap.h" />
     <ClInclude Include="src\TextureGizmo.h" />
     <ClInclude Include="src\AssetManager.h" />
+    <ClInclude Include="src\Physics.h" />
+    <ClInclude Include="src\Logging.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\pch.cpp" />
@@ -112,6 +114,8 @@
     <ClCompile Include="src\ShadowMap.cpp" />
     <ClCompile Include="src\TextureGizmo.cpp" />
     <ClCompile Include="src\AssetManager.cpp" />
+    <ClCompile Include="src\Physics.cpp" />
+    <ClCompile Include="src\Logging.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Assets\Shaders\GizmosPS.hlsl" />

@@ -84,7 +84,7 @@ namespace Engine2
 
 		void Timer::OnImgui()
 		{
-			char buffer[13];
+			char buffer[64];
 			sprintf_s(buffer, ARRAYSIZE(buffer), "ms %.1f", times.Average());
 			ImGui::PlotLines("", times.data, times.size, times.current, buffer, 0.0f, 30.0f, { 0,40 });
 		}

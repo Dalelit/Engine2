@@ -10,6 +10,7 @@
 #include "Engine2.h"
 #include "Camera.h"
 #include "Lights.h"
+#include "Physics.h"
 
 namespace Engine2
 {
@@ -65,6 +66,7 @@ namespace Engine2
 		Skybox skybox;
 		DirectionalLight sun;
 		EngineECS::EntityId_t mainCameraEntity;
+		Physics physics;
 
 		GizmoRender gizmoRender;
 		bool gizmoEnabled = true;

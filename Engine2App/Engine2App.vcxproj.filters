@@ -3,12 +3,12 @@
   <ItemGroup>
     <ClCompile Include="src\winmain.cpp" />
     <ClCompile Include="src\pch.cpp" />
-    <ClCompile Include="src\Empty.cpp" />
     <ClCompile Include="src\SceneBuilder.cpp" />
+    <ClCompile Include="src\Empty.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h" />
-    <ClInclude Include="src\Empty.h" />
     <ClInclude Include="src\SceneBuilder.h" />
+    <ClInclude Include="src\Empty.h" />
   </ItemGroup>
 </Project>

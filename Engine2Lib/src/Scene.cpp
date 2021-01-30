@@ -22,6 +22,7 @@ namespace Engine2
 
 	Scene::Scene() : vsConstBuffer(0), psConstBuffer(0)
 	{
+		physics.Initialise();
 	}
 
 	void Scene::OnUpdate(float dt)
