@@ -78,6 +78,7 @@ namespace Engine2
 		void RenderParticles();
 		void RenderGizmos();
 		void RenderOutlines();
+		void RenderColliders();
 
 		void RenderImage(EngineECS::EntityId_t cameraEntity, bool mainCamera = true);
 

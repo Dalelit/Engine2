@@ -43,6 +43,7 @@ Near term / in progress
 	- Offscreen targets need to render subdisplay using the aspect ratio
 	- Use std::for_each in more places to leverage parallel processing?
 	- Work out why compiled shaders v5.1 don't load
+	- Change primiatives and colliders to be 1.0 size... so radius/extents 0.5
 - Proper error handling and logging
 	- use exceptions?
 	- add logging

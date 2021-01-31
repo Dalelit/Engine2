@@ -119,8 +119,6 @@ void SceneBuilder::CreateEmtpyScene()
 
 void SceneBuilder::BuildTestScene()
 {
-	RigidBody::gravity = g_XMZero;
-
 	 // add a light
 	{
 		auto e = scene.CreateEntity("Point light 1");

@@ -6,6 +6,7 @@
 #include "UtilMath.h"
 #include "MeshRenderer.h"
 #include "RigidBody.h"
+#include "Collider.h"
 #include "Particles.h"
 #include "Lights.h"
 #include "OffscreenOutliner.h"
@@ -65,8 +66,9 @@ namespace Engine2
 		coord.GetComponent<EntityInfo>(id)->OnImgui();
 		coord.GetComponent<Transform>(id)->OnImgui();
 		coord.GetComponent<TransformMatrix>(id)->OnImgui();
-		ComponentOnImgui<RigidBody>("RigidBody", id, coord);
 		ComponentOnImgui<MeshRenderer>("MeshRenderer", id, coord);
+		ComponentOnImgui<RigidBody>("RigidBody", id, coord);
+		ComponentOnImgui<Collider>("Collider", id, coord);
 		ComponentOnImgui<PointLight>("PointLight", id, coord);
 		ComponentOnImgui<ParticleEmitter>("ParticleEmitter", id, coord);
 		ComponentOnImgui<Gizmo>("Gizmo", id, coord);
@@ -77,8 +79,9 @@ namespace Engine2
 
 		if (ImGui::BeginCombo("Add Component", ""))
 		{
-			AddComponentOnImgui<RigidBody>("RigidBody", id, coord);
 			AddComponentOnImgui<MeshRenderer>("MeshRenderer", id, coord);
+			AddComponentOnImgui<RigidBody>("RigidBody", id, coord);
+			AddComponentOnImgui<Collider>("Collider", id, coord);
 			AddComponentOnImgui<PointLight>("PointLight", id, coord);
 			AddComponentOnImgui<ParticleEmitter>("ParticleEmitter", id, coord);
 			AddComponentOnImgui<Gizmo>("Gizmo", id, coord);

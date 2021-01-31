@@ -73,10 +73,6 @@ namespace Engine2
 		{
 			auto c = entity.GetComponent<RigidBody>();
 			auto n = node.SubNode("RigidBody");
-			n.Store("velocity", c->velocity);
-			n.Store("angularVelocity", c->angularVelocity);
-			n.Store("mass", c->mass);
-			n.Store("gravity", c->gravity);
 		}
 		if (entity.HasComponent<MeshRenderer>())
 		{

@@ -6,6 +6,7 @@
 #include "Transform.h"
 #include "MeshRenderer.h"
 #include "RigidBody.h"
+#include "Collider.h"
 #include "Particles.h"
 #include "Lights.h"
 #include "OffscreenOutliner.h"
@@ -55,7 +56,11 @@ namespace Engine2
 		if (mainCamera)
 		{
 			RenderOutlines();
-			if (gizmoEnabled) RenderGizmos();
+			if (gizmoEnabled)
+			{
+				RenderGizmos();
+				RenderColliders();
+			}
 		}
 	}
 
@@ -183,7 +188,6 @@ namespace Engine2
 		}
 
 		gizmoRender.Render();
-		
 	}
 
 	void Scene::RenderOutlines()
@@ -213,6 +217,26 @@ namespace Engine2
 				outliner->DrawToBackBuffer();
 			}
 		}
+	}
+
+	void Scene::RenderColliders()
+	{
+		Coordinator& coordinator = hierarchy.GetECSCoordinator();
+		View<Collider, TransformMatrix> entities(coordinator);
+		gizmoRender.NewFrame();
+		for (auto e : entities)
+		{
+			const auto& collider = coordinator.GetComponent<Collider>(e);
+			const auto& trans = coordinator.GetComponent<TransformMatrix>(e)->GetTransform();
+
+			switch (collider->GetType())
+			{
+			case Collider::ColliderType::sphere: gizmoRender.DrawSphere(trans, collider->Centre(), collider->Radius()); break;
+			case Collider::ColliderType::box :   gizmoRender.DrawCube(trans, collider->Centre(), collider->HalfExtents()); break;
+			}
+		}
+
+		gizmoRender.Render();
 	}
 
 	void Scene::CamerasRender()

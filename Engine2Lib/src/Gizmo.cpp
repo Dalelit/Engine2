@@ -79,35 +79,35 @@ namespace Engine2
 
 	}
 
-	void GizmoRender::DrawAxis(const DirectX::XMMATRIX& instance)
+	void GizmoRender::DrawAxis(const DirectX::XMMATRIX& transform)
 	{
 		Vertex v0, v1;
 
-		XMStoreFloat3(&v0.position, XMVector3Transform({ 0.0f, 0.0f, 0.0f, 1.0f }, instance));
+		XMStoreFloat3(&v0.position, XMVector3Transform({ 0.0f, 0.0f, 0.0f, 1.0f }, transform));
 
 		// x axis
 		v0.color = xAxisColor;
 		v1.color = xAxisColor;
-		XMStoreFloat3(&v1.position, XMVector3Transform({ 1.0f, 0.0f, 0.0f, 1.0f }, instance));
+		XMStoreFloat3(&v1.position, XMVector3Transform({ 1.0f, 0.0f, 0.0f, 1.0f }, transform));
 		lineBuffer.push_back(v0);
 		lineBuffer.push_back(v1);
 
 		// y axis
 		v0.color = yAxisColor;
 		v1.color = yAxisColor;
-		XMStoreFloat3(&v1.position, XMVector3Transform({ 0.0f, 1.0f, 0.0f, 1.0f }, instance));
+		XMStoreFloat3(&v1.position, XMVector3Transform({ 0.0f, 1.0f, 0.0f, 1.0f }, transform));
 		lineBuffer.push_back(v0);
 		lineBuffer.push_back(v1);
 
 		// z axis
 		v0.color = zAxisColor;
 		v1.color = zAxisColor;
-		XMStoreFloat3(&v1.position, XMVector3Transform({ 0.0f, 0.0f, 1.0f, 1.0f }, instance));
+		XMStoreFloat3(&v1.position, XMVector3Transform({ 0.0f, 0.0f, 1.0f, 1.0f }, transform));
 		lineBuffer.push_back(v0);
 		lineBuffer.push_back(v1);
 	}
 
-	void GizmoRender::DrawSphere(const DirectX::XMMATRIX& instance)
+	void GizmoRender::DrawSphere(const DirectX::XMMATRIX& transform, DirectX::XMFLOAT3 xColor, DirectX::XMFLOAT3 yColor, DirectX::XMFLOAT3 zColor)
 	{
 		auto position = spherePositions.begin();
 		Vertex vStart, vCurrent, vPrevious;
@@ -115,13 +115,13 @@ namespace Engine2
 		auto drawCircle = [&](XMFLOAT3 color) {
 			vStart.color = color;
 			vCurrent.color = color;
-			XMStoreFloat3(&vStart.position, XMVector3Transform(*position, instance));
+			XMStoreFloat3(&vStart.position, XMVector3Transform(*position, transform));
 			vPrevious = vStart;
 			++position;
 
 			for (UINT i = 1; i < pointsPerCircle; ++i)
 			{
-				XMStoreFloat3(&vCurrent.position, XMVector3Transform(*position, instance));
+				XMStoreFloat3(&vCurrent.position, XMVector3Transform(*position, transform));
 				lineBuffer.push_back(vPrevious);
 				lineBuffer.push_back(vCurrent);
 				vPrevious = vCurrent;
@@ -131,24 +131,31 @@ namespace Engine2
 			lineBuffer.push_back(vStart);
 		};
 
-		drawCircle(xAxisColor);
-		drawCircle(yAxisColor);
-		drawCircle(zAxisColor);
+		drawCircle(xColor);
+		drawCircle(yColor);
+		drawCircle(zColor);
 	}
 
-	void GizmoRender::DrawCube(const DirectX::XMMATRIX& instance, DirectX::XMFLOAT3 color)
+	void GizmoRender::DrawSphere(const DirectX::XMMATRIX& transform, const DirectX::XMFLOAT3& centre, const float radius, DirectX::XMFLOAT3 color)
+	{
+		XMMATRIX m = XMMatrixScaling(radius, radius, radius);
+		m *= XMMatrixTranslation(centre.x, centre.y, centre.z);
+		DrawSphere(m * transform, color, color, color);
+	}
+
+	void GizmoRender::DrawCube(const DirectX::XMMATRIX& transform, DirectX::XMFLOAT3 color)
 	{
 		XMFLOAT3 positions[8];
 
 		XMFLOAT3* pos = positions;
-		XMStoreFloat3(pos, XMVector3Transform({ -0.5f,  -0.5f,  -0.5f, 1.0f }, instance)); ++pos;
-		XMStoreFloat3(pos, XMVector3Transform({ -0.5f,   0.5f,  -0.5f, 1.0f }, instance)); ++pos;
-		XMStoreFloat3(pos, XMVector3Transform({  0.5f,   0.5f,  -0.5f, 1.0f }, instance)); ++pos;
-		XMStoreFloat3(pos, XMVector3Transform({  0.5f,  -0.5f,  -0.5f, 1.0f }, instance)); ++pos;
-		XMStoreFloat3(pos, XMVector3Transform({ -0.5f,  -0.5f,   0.5f, 1.0f }, instance)); ++pos;
-		XMStoreFloat3(pos, XMVector3Transform({ -0.5f,   0.5f,   0.5f, 1.0f }, instance)); ++pos;
-		XMStoreFloat3(pos, XMVector3Transform({  0.5f,   0.5f,   0.5f, 1.0f }, instance)); ++pos;
-		XMStoreFloat3(pos, XMVector3Transform({  0.5f,  -0.5f,   0.5f, 1.0f }, instance));
+		XMStoreFloat3(pos, XMVector3Transform({ -0.5f,  -0.5f,  -0.5f, 1.0f }, transform)); ++pos;
+		XMStoreFloat3(pos, XMVector3Transform({ -0.5f,   0.5f,  -0.5f, 1.0f }, transform)); ++pos;
+		XMStoreFloat3(pos, XMVector3Transform({  0.5f,   0.5f,  -0.5f, 1.0f }, transform)); ++pos;
+		XMStoreFloat3(pos, XMVector3Transform({  0.5f,  -0.5f,  -0.5f, 1.0f }, transform)); ++pos;
+		XMStoreFloat3(pos, XMVector3Transform({ -0.5f,  -0.5f,   0.5f, 1.0f }, transform)); ++pos;
+		XMStoreFloat3(pos, XMVector3Transform({ -0.5f,   0.5f,   0.5f, 1.0f }, transform)); ++pos;
+		XMStoreFloat3(pos, XMVector3Transform({  0.5f,   0.5f,   0.5f, 1.0f }, transform)); ++pos;
+		XMStoreFloat3(pos, XMVector3Transform({  0.5f,  -0.5f,   0.5f, 1.0f }, transform));
 
 		Vertex v1, v2;
 		v1.color = color;
@@ -175,18 +182,25 @@ namespace Engine2
 		addLine(3, 7);
 	}
 
-	void GizmoRender::DrawCamera(const DirectX::XMMATRIX& instance, const std::array<DirectX::XMVECTOR, 8> frustrumPoints, DirectX::XMFLOAT3 color)
+	void GizmoRender::DrawCube(const DirectX::XMMATRIX& transform, const DirectX::XMFLOAT3& centre, const DirectX::XMFLOAT3& extents, DirectX::XMFLOAT3 color)
+	{
+		XMMATRIX m = XMMatrixScaling(extents.x * 2.0f, extents.y * 2.0f, extents.z * 2.0f);
+		m *= XMMatrixTranslation(centre.x, centre.y, centre.z);
+		DrawCube(m * transform, color);
+	}
+
+	void GizmoRender::DrawCamera(const DirectX::XMMATRIX& transform, const std::array<DirectX::XMVECTOR, 8> frustrumPoints, DirectX::XMFLOAT3 color)
 	{
 		Vertex verticies[9];
 		
 		// origin
-		XMStoreFloat3(&verticies[0].position, XMVector3Transform({ 0.0f, 0.0f, 0.0f, 1.0f }, instance));
+		XMStoreFloat3(&verticies[0].position, XMVector3Transform({ 0.0f, 0.0f, 0.0f, 1.0f }, transform));
 		verticies[0].color = color;
 
 		int i = 1;
 		for (auto p : frustrumPoints)
 		{
-			XMStoreFloat3(&verticies[i].position, XMVector3Transform(p, instance));
+			XMStoreFloat3(&verticies[i].position, XMVector3Transform(p, transform));
 			verticies[i].color = color;
 			++i;
 		}

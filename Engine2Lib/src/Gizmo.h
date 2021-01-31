@@ -31,10 +31,23 @@ namespace Engine2
 
 		// Note - instance matrix is the transform (not transposed for the GPU)
 
-		void DrawAxis(const DirectX::XMMATRIX& instance);
-		void DrawSphere(const DirectX::XMMATRIX& instance);
-		void DrawCube(const DirectX::XMMATRIX& instance, DirectX::XMFLOAT3 color = cubeColor);
-		void DrawCamera(const DirectX::XMMATRIX& instance, const std::array<DirectX::XMVECTOR, 8> frustrumPoints, DirectX::XMFLOAT3 color = cameraColor);
+		void DrawAxis(const DirectX::XMMATRIX& transform);
+		
+		void DrawSphere(const DirectX::XMMATRIX& transform) { DrawSphere(transform, xAxisColor, yAxisColor, zAxisColor); }
+		void DrawSphere(const DirectX::XMMATRIX& transform, DirectX::XMFLOAT3 xColor, DirectX::XMFLOAT3 yColor, DirectX::XMFLOAT3 zColor);
+		void DrawSphere(const DirectX::XMMATRIX& transform, const DirectX::XMFLOAT3& centre, const float radius, DirectX::XMFLOAT3 color = colliderColor);
+		
+		void DrawCube(const DirectX::XMMATRIX& transform, DirectX::XMFLOAT3 color = white);
+		void DrawCube(const DirectX::XMMATRIX& transform, const DirectX::XMFLOAT3& centre, const DirectX::XMFLOAT3& extents, DirectX::XMFLOAT3 color = colliderColor);
+
+		void DrawCamera(const DirectX::XMMATRIX& transform, const std::array<DirectX::XMVECTOR, 8> frustrumPoints, DirectX::XMFLOAT3 color = cameraColor);
+
+		constexpr static DirectX::XMFLOAT3 xAxisColor = { 1.0f, 0.0f, 0.0f };
+		constexpr static DirectX::XMFLOAT3 yAxisColor = { 0.0f, 1.0f, 0.0f };
+		constexpr static DirectX::XMFLOAT3 zAxisColor = { 0.0f, 0.0f, 1.0f };
+		constexpr static DirectX::XMFLOAT3 white = { 1.0f, 1.0f, 1.0f };
+		constexpr static DirectX::XMFLOAT3 cameraColor = { 1.0f, 0.0f, 1.0f };
+		constexpr static DirectX::XMFLOAT3 colliderColor = { 1.0f, 1.0f, 0.5f };
 
 	protected:
 		size_t maxGizmos;
@@ -62,12 +75,5 @@ namespace Engine2
 		// line buffer
 		std::vector<Vertex> lineBuffer;
 		VertexBuffer lineVBuffer;
-
-
-		constexpr static DirectX::XMFLOAT3 xAxisColor = { 1.0f, 0.0f, 0.0f };
-		constexpr static DirectX::XMFLOAT3 yAxisColor = { 0.0f, 1.0f, 0.0f };
-		constexpr static DirectX::XMFLOAT3 zAxisColor = { 0.0f, 0.0f, 1.0f };
-		constexpr static DirectX::XMFLOAT3 cubeColor = { 1.0f, 1.0f, 1.0f };
-		constexpr static DirectX::XMFLOAT3 cameraColor = { 1.0f, 0.0f, 1.0f };
 	};
 }
