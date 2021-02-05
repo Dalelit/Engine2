@@ -136,13 +136,6 @@ namespace Engine2
 		drawCircle(zColor);
 	}
 
-	void GizmoRender::DrawSphere(const DirectX::XMMATRIX& transform, const DirectX::XMFLOAT3& centre, const float radius, DirectX::XMFLOAT3 color)
-	{
-		XMMATRIX m = XMMatrixScaling(radius, radius, radius);
-		m *= XMMatrixTranslation(centre.x, centre.y, centre.z);
-		DrawSphere(m * transform, color, color, color);
-	}
-
 	void GizmoRender::DrawCube(const DirectX::XMMATRIX& transform, DirectX::XMFLOAT3 color)
 	{
 		XMFLOAT3 positions[8];
@@ -180,13 +173,6 @@ namespace Engine2
 		addLine(1, 5);
 		addLine(2, 6);
 		addLine(3, 7);
-	}
-
-	void GizmoRender::DrawCube(const DirectX::XMMATRIX& transform, const DirectX::XMFLOAT3& centre, const DirectX::XMFLOAT3& extents, DirectX::XMFLOAT3 color)
-	{
-		XMMATRIX m = XMMatrixScaling(extents.x * 2.0f, extents.y * 2.0f, extents.z * 2.0f);
-		m *= XMMatrixTranslation(centre.x, centre.y, centre.z);
-		DrawCube(m * transform, color);
 	}
 
 	void GizmoRender::DrawCamera(const DirectX::XMMATRIX& transform, const std::array<DirectX::XMVECTOR, 8> frustrumPoints, DirectX::XMFLOAT3 color)

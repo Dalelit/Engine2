@@ -1,4 +1,5 @@
 #pragma once
+#include "UtilMath.h"
 
 namespace Engine2
 {
@@ -9,10 +10,10 @@ namespace Engine2
 	public:
 		enum class ColliderType { sphere, capsule, box, plane };
 
-		void Initialise();
+		Collider();
 		void OnImgui();
 
-		inline ColliderType GetType() { return type; }
+		inline ColliderType GetType() const { return type; }
 
 		void InitialiseAsSphere();
 		void InitialiseAsBox();
@@ -23,6 +24,7 @@ namespace Engine2
 
 		// sphere, capsule
 		inline float Radius() const { return extents.x; }
+		inline float Radius(DirectX::XMVECTOR scale) const { return extents.x * Math::GetMaxFloatVector3(scale); }
 		inline void SetRadius(float radius) { extents.x = radius; }
 
 		// capsule
@@ -31,6 +33,7 @@ namespace Engine2
 
 		// box
 		inline DirectX::XMFLOAT3 HalfExtents() const { return extents; }
+		inline DirectX::XMFLOAT3 HalfExtents(DirectX::XMVECTOR scale) const { return { extents.x * scale.m128_f32[0], extents.x * scale.m128_f32[1], extents.x * scale.m128_f32[2]}; } // to do: performance... load, simd, store better than this?
 		inline void SetHalfExtents(float halfExtents) { extents.x = halfExtents; extents.y = halfExtents; extents.z = halfExtents; }
 
 	protected:

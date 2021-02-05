@@ -4,7 +4,7 @@
 
 namespace Engine2
 {
-	void Collider::Initialise()
+	Collider::Collider()
 	{
 		InitialiseAsBox();
 	}

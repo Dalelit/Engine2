@@ -33,12 +33,11 @@ namespace Engine2
 
 		void DrawAxis(const DirectX::XMMATRIX& transform);
 		
-		void DrawSphere(const DirectX::XMMATRIX& transform) { DrawSphere(transform, xAxisColor, yAxisColor, zAxisColor); }
 		void DrawSphere(const DirectX::XMMATRIX& transform, DirectX::XMFLOAT3 xColor, DirectX::XMFLOAT3 yColor, DirectX::XMFLOAT3 zColor);
-		void DrawSphere(const DirectX::XMMATRIX& transform, const DirectX::XMFLOAT3& centre, const float radius, DirectX::XMFLOAT3 color = colliderColor);
-		
+		inline void DrawSphere(const DirectX::XMMATRIX& transform) { DrawSphere(transform, xAxisColor, yAxisColor, zAxisColor); }
+		inline void DrawSphere(const DirectX::XMMATRIX& transform, DirectX::XMFLOAT3 color) { DrawSphere(transform, color, color, color); }
+
 		void DrawCube(const DirectX::XMMATRIX& transform, DirectX::XMFLOAT3 color = white);
-		void DrawCube(const DirectX::XMMATRIX& transform, const DirectX::XMFLOAT3& centre, const DirectX::XMFLOAT3& extents, DirectX::XMFLOAT3 color = colliderColor);
 
 		void DrawCamera(const DirectX::XMMATRIX& transform, const std::array<DirectX::XMVECTOR, 8> frustrumPoints, DirectX::XMFLOAT3 color = cameraColor);
 

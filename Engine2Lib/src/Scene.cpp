@@ -20,6 +20,7 @@ using namespace EngineECS;
 namespace Engine2
 {
 	using namespace EngineECS;
+	using namespace DirectX;
 
 	Scene::Scene() : vsConstBuffer(0), psConstBuffer(0)
 	{
@@ -28,8 +29,18 @@ namespace Engine2
 
 	void Scene::OnUpdate(float dt)
 	{
-		UpdatePhysics(dt);
-		UpdateTransformMatrix();
+		if (running)
+		{
+			if (!paused)
+			{
+				UpdatePhysics(dt);
+				physics.UpdateTransforms(hierarchy.GetECSCoordinator());
+			}
+		}
+		else
+		{
+			UpdateTransformMatrix();
+		}
 		UpdateParticles(dt);
 		UpdateCameras();
 		UpdateScripts(dt);
@@ -222,17 +233,30 @@ namespace Engine2
 	void Scene::RenderColliders()
 	{
 		Coordinator& coordinator = hierarchy.GetECSCoordinator();
-		View<Collider, TransformMatrix> entities(coordinator);
+		View<Collider, Transform, TransformMatrix> entities(coordinator);
 		gizmoRender.NewFrame();
 		for (auto e : entities)
 		{
 			const auto& collider = coordinator.GetComponent<Collider>(e);
-			const auto& trans = coordinator.GetComponent<TransformMatrix>(e)->GetTransform();
+			const auto& trans = coordinator.GetComponent<Transform>(e);
+			const auto& transMatrix = coordinator.GetComponent<TransformMatrix>(e);
 
 			switch (collider->GetType())
 			{
-			case Collider::ColliderType::sphere: gizmoRender.DrawSphere(trans, collider->Centre(), collider->Radius()); break;
-			case Collider::ColliderType::box :   gizmoRender.DrawCube(trans, collider->Centre(), collider->HalfExtents()); break;
+			case Collider::ColliderType::sphere:
+			{
+				float radius = collider->Radius() * Math::GetMaxFloatVector3(trans->scale);
+				XMMATRIX m = XMMatrixScaling(radius, radius, radius) * transMatrix->GetRotation() * XMMatrixTranslationFromVector(transMatrix->GetTranslation());
+				gizmoRender.DrawSphere(m, GizmoRender::colliderColor);
+				break;
+			}
+			case Collider::ColliderType::box:
+			{
+				XMVECTOR scale = trans->scale * XMLoadFloat3(&collider->HalfExtents());
+				XMMATRIX m = XMMatrixScalingFromVector(scale * 2.0f) * transMatrix->GetRotation() * XMMatrixTranslationFromVector(transMatrix->GetTranslation());
+				gizmoRender.DrawCube(m, GizmoRender::colliderColor);
+				break;
+			}
 			}
 		}
 
@@ -258,16 +282,26 @@ namespace Engine2
 		DXDevice::Get().SetBackBufferAsRenderTarget();
 	}
 
-	void Scene::UpdatePhysics(float dt)
+	void Scene::LoadPhysics()
 	{
+		physics.CreateScene();
+
 		Coordinator& coordinator = hierarchy.GetECSCoordinator();
-		View<RigidBody, Transform> entities(coordinator);
+		View<Transform, RigidBody, Collider> entities(coordinator);
 		for (auto e : entities)
 		{
-			auto* rb = coordinator.GetComponent<RigidBody>(e);
-			auto* tr = coordinator.GetComponent<Transform>(e);
-			rb->OnUpdate(dt, tr);
+			physics.AddEntity(e, *coordinator.GetComponent<Transform>(e), *coordinator.GetComponent<RigidBody>(e), *coordinator.GetComponent<Collider>(e));
 		}
+	}
+
+	void Scene::ClearPhysics()
+	{
+		physics.ClearScene();
+	}
+
+	void Scene::UpdatePhysics(float dt)
+	{
+		physics.StepSimulation(dt);
 	}
 
 	void Scene::UpdateTransformMatrix()
@@ -329,10 +363,60 @@ namespace Engine2
 
 	void Scene::OnImgui()
 	{
+		ImGuiSceneControl();
 		ImGuiScene();
 		ImGuiEntities();
 		ImGuiAssets();
 		ImGuiCameras();
+	}
+
+	void Scene::Start()
+	{
+		running = true;
+		paused = false;
+		LoadPhysics();
+	}
+
+	void Scene::Stop()
+	{
+		running = false;
+		ClearPhysics();
+	}
+
+	void Scene::Pause()
+	{
+		paused = true;
+	}
+
+	void Scene::Resume()
+	{
+		paused = false;
+	}
+
+	void Scene::ImGuiSceneControl()
+	{
+		static bool controlOpen = true;
+		if (ImGui::Begin("Run control", &controlOpen))
+		{
+			if (running)
+			{
+				if (ImGui::Button("Stop")) Stop();
+				ImGui::SameLine();
+				if (paused)
+				{
+					if (ImGui::Button("Resume")) Resume();
+				}
+				else
+				{
+					if (ImGui::Button("Paused")) Pause();
+				}
+			}
+			else
+			{
+				if (ImGui::Button("Start")) Start();
+			}
+		}
+		ImGui::End();
 	}
 
 	void Scene::ImGuiScene()

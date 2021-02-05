@@ -40,6 +40,11 @@ namespace Engine2
 
 		void OnImgui();
 
+		void Start();
+		void Stop();
+		void Pause();
+		void Resume();
+
 		struct VSSceneData
 		{
 			DirectX::XMMATRIX cameraTransform;
@@ -66,6 +71,8 @@ namespace Engine2
 		Skybox skybox;
 		DirectionalLight sun;
 		EngineECS::EntityId_t mainCameraEntity;
+		bool running = false;
+		bool paused = false;
 		Physics physics;
 
 		GizmoRender gizmoRender;
@@ -86,12 +93,16 @@ namespace Engine2
 
 		void CamerasRender();
 
+		void LoadPhysics();
+		void ClearPhysics();
+
 		void UpdatePhysics(float dt);
 		void UpdateTransformMatrix();
 		void UpdateParticles(float dt);
 		void UpdateCameras();
 		void UpdateScripts(float dt);
 
+		void ImGuiSceneControl();
 		void ImGuiScene();
 		void ImGuiEntities();
 		void ImGuiAssets();

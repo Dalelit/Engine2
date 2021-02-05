@@ -115,6 +115,12 @@ namespace Engine2
 		transformMatrix = XMMatrixScalingFromVector(transform.scale) * rotationMatrix * XMMatrixTranslationFromVector(transform.position);
 	}
 
+	void TransformMatrix::Set(DirectX::XMVECTOR position, DirectX::XMVECTOR quaterion, DirectX::XMVECTOR scale)
+	{
+		rotationMatrix = XMMatrixRotationQuaternion(quaterion);
+		transformMatrix = XMMatrixScalingFromVector(scale) * rotationMatrix * XMMatrixTranslationFromVector(position);
+	}
+
 	void TransformMatrix::OnImgui()
 	{
 		if (ImGui::TreeNodeEx("TransformMatrix"))

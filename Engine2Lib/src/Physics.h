@@ -1,6 +1,4 @@
 #pragma once
-#include <PxPhysicsAPI.h>
-
 // nVidia PhysX setup included...
 // https://gameworksdocs.nvidia.com/PhysX/4.1/documentation/physxguide/Manual/BuildingWithPhysX.html
 // One file will fail with a missing include... remove the .h
@@ -20,6 +18,10 @@
 // To do: move this to build in the proper place, not a subdirectory of src.
 // To do: have debug use the 'checked' physx build
 
+#include <PxPhysicsAPI.h>
+#include "RigidBody.h"
+#include "Collider.h"
+#include "Entity.h"
 
 namespace Engine2
 {
@@ -30,12 +32,19 @@ namespace Engine2
 		~Physics();
 		void Initialise();
 
+		void CreateScene();
+		void AddEntity(EngineECS::EntityId_t entityId, const Transform& transform, const RigidBody& rigidBody, const Collider& collider);
+		void StepSimulation(float dt);
+		void UpdateTransforms(EngineECS::Coordinator& coordinator);
+		void ClearScene();
+
 	protected:
 		physx::PxFoundation* mpFoundation = nullptr;
 		//physx::PxPvd* mpPvd = nullptr;
 		physx::PxPhysics* mpPhysics = nullptr;
 		physx::PxDefaultCpuDispatcher* mpCpuDispatcher = nullptr;
 		physx::PxScene* mpScene = nullptr;
+		physx::PxMaterial* mpDefaultMaterial = nullptr;
 
 
 		physx::PxDefaultAllocator mDefaultAllocatorCallback;

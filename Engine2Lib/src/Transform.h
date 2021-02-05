@@ -57,6 +57,7 @@ namespace Engine2
 		TransformMatrix(DirectX::XMMATRIX transformMatrix, DirectX::XMMATRIX rotationMatrix);
 
 		void Set(Transform& transform);
+		void Set(DirectX::XMVECTOR position, DirectX::XMVECTOR quaterion, DirectX::XMVECTOR scale);
 
 		inline DirectX::XMVECTOR GetTranslation() { return GetTransform().r[3]; }
 

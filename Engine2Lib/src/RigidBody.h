@@ -9,6 +9,9 @@ namespace Engine2
 	public:
 		void OnUpdate(float dt, Transform* pTransform);
 
+		inline bool IsKinematic() const { return isKinematic; }
+		inline bool UseGravity() const { return useGravity; }
+
 		void OnImgui();
 
 	protected:
