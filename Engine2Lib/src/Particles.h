@@ -25,7 +25,7 @@ namespace Engine2
 	class ParticleEmitter
 	{
 	public:
-		ParticleEmitter(size_t maxParticleCount = 100);
+		ParticleEmitter(size_t maxParticles = 100) { DefaultInitialisation(maxParticles); }
 
 		void OnUpdate(float dt);
 		void OnRender();
@@ -48,9 +48,9 @@ namespace Engine2
 		bool active = true;
 		bool freeze = false;
 		DirectX::XMVECTOR position = { 0.0f, 0.0f, 0.0f, 1.0f };
-		DirectX::XMVECTOR emitLocation;
+		DirectX::XMVECTOR emitLocation{ 0.0f, 0.0f, 0.0f, 1.0f };
 		float rate = 10.0; // per second
-		size_t maxParticles;
+		size_t maxParticles = 100;
 		float timeSinceLastEmit = 0.0f;
 		std::vector<Particle> particles;
 		UINT activeCount = 0;
@@ -67,9 +67,9 @@ namespace Engine2
 		std::shared_ptr<VertexShader> pVS;
 		std::shared_ptr<PixelShader> pPS;
 
-		std::vector<std::string> pixelShaderNames;
+		std::vector<std::string> pixelShaderNames = { "Solid", "Circle", "Test" };
 		std::string currentPixelShader;
-		std::vector<std::string> meshNames;
+		std::vector<std::string> meshNames = { "Equilateral Triangle", "Square" };
 		std::string currentMesh;
 
 		Util::Random rng;
@@ -82,24 +82,21 @@ namespace Engine2
 
 		DirectX::XMVECTOR velocityStartMin = { -0.5f, 1.0f, -0.5f, 0.0f };
 		DirectX::XMVECTOR velocityStartMax = {  0.5f, 2.0f,  0.5f, 0.0f };
-		DirectX::XMVECTOR velocityStartVar; // calculated in onupdate
 		DirectX::XMVECTOR force = { 0.0f, -0.3f, 0.0f, 0.0f };
 
 		DirectX::XMVECTOR rotationSpeedStartMin = { -1.0f, -1.0f, -1.0f, 0.0f };
 		DirectX::XMVECTOR rotationSpeedStartMax = { 1.0f, 1.0f,  1.0f, 0.0f };
-		DirectX::XMVECTOR rotationSpeedStartVar; // calculated in onupdate
 
 		DirectX::XMVECTOR colorStartMin = { 1.0f, 0.0f, 0.0f, 1.0f };
 		DirectX::XMVECTOR colorStartMax = { 1.0f, 1.0f, 0.0f, 1.0f };
-		DirectX::XMVECTOR colorStartVar; // calculated in onupdate
 		DirectX::XMVECTOR colorEndMin = { 1.0f, 0.0f, 0.0f, 0.0f };
 		DirectX::XMVECTOR colorEndMax = { 1.0f, 1.0f, 0.0f, 0.0f };
-		DirectX::XMVECTOR colorEndVar; // calculated in onupdate
 
 		DirectX::XMVECTOR scaleStart = { 0.25f, 0.25f, 0.25f, 1.0f };
 		DirectX::XMVECTOR scaleEnd   = { 0.01f, 0.01f, 0.01f, 1.0f };
 
-		void InitStartParameters();
+		void DefaultInitialisation(size_t maxParticles = 100);
+
 		void CreateParticle(Particle* pParticle);
 		void UpdateParticle(Particle* pParticle, float dt);
 		void InstanceParticle(Particle* pParticle, InstanceInfo* pInstance);

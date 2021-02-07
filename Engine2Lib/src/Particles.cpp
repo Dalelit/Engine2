@@ -6,25 +6,6 @@ using namespace DirectX;
 
 namespace Engine2
 {
-	ParticleEmitter::ParticleEmitter(size_t maxParticleCount)
-	{
-		meshNames.emplace_back("Equilateral Triangle");
-		meshNames.emplace_back("Square");
-
-		pixelShaderNames.emplace_back("Solid");
-		pixelShaderNames.emplace_back("Circle");
-		pixelShaderNames.emplace_back("Test");
-
-		SetMaxParticles(maxParticleCount);
-
-		SetMeshAndVertexShader(meshNames[1]);
-		SetPixelShader(pixelShaderNames[1]);
-
-		position = emitLocation = { 0.0f, 0.0f, 0.0f, 1.0f};
-
-		InitStartParameters();
-	}
-
 	void ParticleEmitter::OnUpdate(float dt)
 	{
 		timerOnUpdate.Set();
@@ -141,16 +122,16 @@ namespace Engine2
 		}
 		ImGui::Text("Emit start params");
 		if (ImGui::DragFloat("Lifespan", &lifeSpan, 0.1f)) { if (lifeSpan < 0.0f) lifeSpan = 0.0f; }
-		if (ImGui::DragFloat3("Vel min", velocityStartMin.m128_f32, 0.01f)) { InitStartParameters(); }
-		if (ImGui::DragFloat3("Vel max", velocityStartMax.m128_f32, 0.01f)) { InitStartParameters(); }
-		if (ImGui::DragFloat3("Rot speed min", rotationSpeedStartMin.m128_f32, 0.01f)) { InitStartParameters(); }
-		if (ImGui::DragFloat3("Rot speed max", rotationSpeedStartMax.m128_f32, 0.01f)) { InitStartParameters(); }
-		if (ImGui::DragFloat3("Scale start", scaleStart.m128_f32, 0.01f)) { InitStartParameters(); }
-		if (ImGui::DragFloat3("Scale end", scaleEnd.m128_f32, 0.01f)) { InitStartParameters(); }
-		if (ImGui::ColorEdit4("Col start min", colorStartMin.m128_f32)) { InitStartParameters(); }
-		if (ImGui::ColorEdit4("Col start max", colorStartMax.m128_f32)) { InitStartParameters(); }
-		if (ImGui::ColorEdit4("Col end min", colorEndMin.m128_f32)) { InitStartParameters(); }
-		if (ImGui::ColorEdit4("Col end max", colorEndMax.m128_f32)) { InitStartParameters(); }
+		ImGui::DragFloat3("Vel min", velocityStartMin.m128_f32, 0.01f);
+		ImGui::DragFloat3("Vel max", velocityStartMax.m128_f32, 0.01f);
+		ImGui::DragFloat3("Rot speed min", rotationSpeedStartMin.m128_f32, 0.01f);
+		ImGui::DragFloat3("Rot speed max", rotationSpeedStartMax.m128_f32, 0.01f);
+		ImGui::DragFloat3("Scale start", scaleStart.m128_f32, 0.01f);
+		ImGui::DragFloat3("Scale end", scaleEnd.m128_f32, 0.01f);
+		ImGui::ColorEdit4("Col start min", colorStartMin.m128_f32);
+		ImGui::ColorEdit4("Col start max", colorStartMax.m128_f32);
+		ImGui::ColorEdit4("Col end min", colorEndMin.m128_f32);
+		ImGui::ColorEdit4("Col end max", colorEndMax.m128_f32);
 		ImGui::Text("Stats");
 		ImGui::Text("OnUpdate %fms", timerOnUpdate.Average());
 		ImGui::Text("OnRender %fms", timerOnRender.Average());
@@ -159,25 +140,24 @@ namespace Engine2
 		ImGui::Text("Buffer index %i", bufferIndex);
 	}
 
-	void ParticleEmitter::InitStartParameters()
+	void ParticleEmitter::DefaultInitialisation(size_t maxParticles)
 	{
-		velocityStartVar = velocityStartMax - velocityStartMin;
-		rotationSpeedStartVar = rotationSpeedStartMax - rotationSpeedStartMin;
-		colorStartVar = colorStartMax - colorStartMin;
-		colorEndVar = colorEndMax - colorEndMin;
+		SetMaxParticles(maxParticles);
+		SetMeshAndVertexShader(meshNames[1]);
+		SetPixelShader(pixelShaderNames[1]);
 	}
 
 	void ParticleEmitter::CreateParticle(Particle* pParticle)
 	{
 		pParticle->life = lifeSpan;
 		pParticle->position = emitLocation;
-		pParticle->velocity = velocityStartMin + velocityStartVar * rng.NextXMVECTORXYZ0();
+		pParticle->velocity = velocityStartMin + ((velocityStartMax - velocityStartMin) * rng.NextXMVECTORXYZ0());
 		pParticle->scale = scaleStart;
 		pParticle->scaleDelta = (scaleEnd - scaleStart) / pParticle->life;
 		pParticle->rotation = rng.NextXMVECTORXYZ0();
-		pParticle->rotationSpeed = rotationSpeedStartMin + rotationSpeedStartVar * rng.NextXMVECTORXYZ0();
-		pParticle->color = colorStartMin + colorStartVar * rng.NextXMVECTORXYZ1();
-		pParticle->colorDelta = ((colorEndMin + colorEndVar * rng.NextXMVECTORXYZ1()) - pParticle->color) / pParticle->life;
+		pParticle->rotationSpeed = rotationSpeedStartMin + ((rotationSpeedStartMax - rotationSpeedStartMin) * rng.NextXMVECTORXYZ0());
+		pParticle->color = colorStartMin + ((colorStartMax - colorStartMin) * rng.NextXMVECTORXYZ1());
+		pParticle->colorDelta = ((colorEndMin + ((colorEndMax - colorEndMin) * rng.NextXMVECTORXYZ1())) - pParticle->color) / pParticle->life;
 	}
 
 	void ParticleEmitter::UpdateParticle(Particle* pParticle, float dt)

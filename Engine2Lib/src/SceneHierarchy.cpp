@@ -42,6 +42,21 @@ namespace Engine2
 		return selected;
 	}
 
+	void SceneHierarchy::CloneEntity(SceneNode* parent, SceneNode* node)
+	{
+		EntityId_t id = coordinator.CloneEntity(node->id);
+
+		auto& vector = parent ? parent->children : sceneHierarchy;
+		vector.emplace_back(id);
+		selected = &vector.back();
+
+		for (auto& child : node->children)
+		{
+			CloneEntity(node, &child);
+		}
+	}
+
+
 	void SceneHierarchy::DestroyEntity(SceneNode* parent, SceneNode* node)
 	{
 		E2_ASSERT(node, "Null pointer for destroy entity");
@@ -92,6 +107,8 @@ namespace Engine2
 		addEntityInsertBefore = nullptr;
 		deleteEntity = nullptr;
 		deleteEntityParent = nullptr;
+		cloneEntity = nullptr;
+		cloneEntityParent = nullptr;
 
 		for (auto& sn : sceneHierarchy) SceneNodeOnImGui(sn);
 
@@ -99,6 +116,8 @@ namespace Engine2
 		if (addEntityParent || addEntityInsertBefore) NewEntity(std::string(), addEntityParent, addEntityInsertBefore);
 
 		if (deleteEntity) DestroyEntity(deleteEntityParent, deleteEntity);
+
+		if (cloneEntity) CloneEntity(cloneEntityParent, cloneEntity);
 
 		if (ImGui::Button("Add Entity")) NewEntity(std::string());
 	}
@@ -147,6 +166,12 @@ namespace Engine2
 			{
 				deleteEntityParent = onImguiParent;
 				deleteEntity = &node;
+			}
+
+			if (ImGui::MenuItem("Clone Entity"))
+			{
+				cloneEntityParent = onImguiParent;
+				cloneEntity = &node;
 			}
 
 			ImGui::EndPopup();

@@ -26,7 +26,7 @@ namespace Engine2
 	protected:
 		Entity entity;
 
-		using ScriptVector = std::vector<std::unique_ptr<Script>>;
+		using ScriptVector = std::vector<std::shared_ptr<Script>>; // note: made this shared_ptr rather than unique due to needing a default copy contructor to clone components. // To do: Should look into understanding this at some point.
 		ScriptVector scripts;
 
 		static std::map<std::string, void(*)(ScriptVector&)> constructors;

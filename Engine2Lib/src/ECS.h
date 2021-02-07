@@ -7,7 +7,8 @@
 // Usage:
 /*
 	Coordinator coord;                        // Declare the cooridnator.
-	EntityId_t e1 = coord.CreateEntity();     // Create Entities
+	EntityId_t e1 = coord.CreateEntity();     // Create an Entity
+	EntityId_t e1 = coord.CloneEntity(id);    // Clones an Entity
 	coord.AddComponent<Transform>(e1);        // Add a component to an entity
 	coord.GetComponent<Transform>(e1);        // Get a component for an entity
 	coord.HasComponent<Transform>(e1);        // Test is an entity has a component
@@ -56,6 +57,7 @@ namespace EngineECS
 		inline EntityId_t* EntitiesBegin() const { return indexToEntityMap; }
 		inline EntityId_t* EntitiesEnd() const { return indexToEntityMap + count; }
 
+		virtual void CloneComponent(EntityId_t idFrom, EntityId_t idTo) = 0;
 		virtual void DestroyComponent(EntityId_t id) = 0;
 
 		friend std::ostream& operator<<(std::ostream& out, const Storage& store) { store.print(out); return out; }
@@ -124,6 +126,22 @@ namespace EngineECS
 			next++;
 
 			return new(result) T(args...); // default construct in the required memory location
+		}
+
+		void CloneComponent(EntityId_t idFrom, EntityId_t idTo)
+		{
+			assert(count < capacity && "Exceeded storage capacity");
+
+			T* result = next;
+			uint32_t index = count;
+
+			entityToIndexMap[idTo] = index;
+			indexToEntityMap[index] = idTo;
+
+			count++;
+			next++;
+
+			new(result) T(*GetComponent(idFrom)); // copy construct in the required memory location
 		}
 
 		inline T* GetComponent(EntityId_t id)
@@ -244,6 +262,23 @@ namespace EngineECS
 			}
 
 			entitySignatures[id].reset();
+
+			return id;
+		}
+
+		EntityId_t CloneEntity(EntityId_t source)
+		{
+			EntityId_t id = CreateEntity();
+
+			ComponentId_t componentCount = GetComponentCount();
+			for (ComponentId_t cid = 0; cid < componentCount; ++cid)
+			{
+				if (HasComponent(source, cid))
+				{
+					GetComponentStore(cid)->CloneComponent(source, id);
+					entitySignatures[id].set(cid);
+				}
+			}
 
 			return id;
 		}

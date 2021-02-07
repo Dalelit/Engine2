@@ -42,6 +42,7 @@ namespace Engine2
 		std::vector<SceneNode> sceneHierarchy;
 
 		SceneNode* NewEntity(const std::string& name, SceneNode* parent = nullptr, SceneNode* insertBefore = nullptr);
+		void CloneEntity(SceneNode* parent, SceneNode* node);
 		void DestroyEntity(SceneNode* parent, SceneNode* node);
 
 		void UpdateTransformMatrix(SceneNode& node, TransformMatrix& parentMatrix);
@@ -52,5 +53,7 @@ namespace Engine2
 		SceneNode* addEntityInsertBefore = nullptr;
 		SceneNode* deleteEntity = nullptr;
 		SceneNode* deleteEntityParent = nullptr;
+		SceneNode* cloneEntity = nullptr;
+		SceneNode* cloneEntityParent = nullptr;
 	};
 }
