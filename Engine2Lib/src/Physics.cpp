@@ -99,8 +99,10 @@ namespace Engine2
 		}
 		E2_ASSERT(body, "createRigidDynamic failed");
 		body->attachShape(*shape);
-		body->userData = reinterpret_cast<void*>(entityId);
 
+		// track the user data
+		userDataHelper.data.id = entityId;
+		body->userData = userDataHelper.raw;
 
 		// Add to scene
 		mpScene->addActor(*body);
@@ -119,14 +121,19 @@ namespace Engine2
 	{
 		auto actorCount = mpScene->getNbActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC);
 		
+		static std::vector<PxRigidActor*> actors; // static to avoid memory allocations.
+
 		if (actorCount)
 		{
-			std::vector<PxRigidActor*> actors(actorCount);
+			actors.resize(actorCount); // Not clearing as we override values.
+
 			mpScene->getActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC, reinterpret_cast<PxActor**>(actors.data()), actorCount);
 
 			for (UINT32 i = 0; i < actorCount; ++i)
 			{
-				EngineECS::EntityId_t eid = reinterpret_cast<EngineECS::EntityId_t>(actors[i]->userData);
+				//EngineECS::EntityId_t eid = reinterpret_cast<EngineECS::EntityId_t>(actors[i]->userData);
+				userDataHelper.raw = actors[i]->userData;
+				EngineECS::EntityId_t eid = userDataHelper.data.id;
 
 				auto shapesCount = actors[i]->getNbShapes();
 

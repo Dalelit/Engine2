@@ -39,15 +39,20 @@ namespace Engine2
 		void ClearScene();
 
 	protected:
+		union {
+			void* raw = 0;
+			struct { EngineECS::EntityId_t id = 0; uint32_t padding = 0; } data;
+		} userDataHelper; // Helper used to map to the user data and hide warnings. To do: is there a better way?
+
 		physx::PxFoundation* mpFoundation = nullptr;
 		//physx::PxPvd* mpPvd = nullptr;
 		physx::PxPhysics* mpPhysics = nullptr;
 		physx::PxDefaultCpuDispatcher* mpCpuDispatcher = nullptr;
 		physx::PxScene* mpScene = nullptr;
 		physx::PxMaterial* mpDefaultMaterial = nullptr;
-
-
 		physx::PxDefaultAllocator mDefaultAllocatorCallback;
+
+
 
 		class ErrorCallback : public physx::PxErrorCallback
 		{
