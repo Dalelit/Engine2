@@ -9,6 +9,8 @@
 #define E2_STATS_PSCB_BIND     { Instrumentation::Drawing::psConstBufferCount++; }
 #define E2_STATS_GSCB_BIND     { Instrumentation::Drawing::gsConstBufferCount++; }
 
+#include <map>
+
 namespace Engine2
 {
 	namespace Instrumentation
@@ -83,6 +85,28 @@ namespace Engine2
 		protected:
 			clock_t startTime;
 			AverageTracker<float, 60> times;
+		};
+
+		// Use to capture a timer at the beginning, then tick when it goes out of scope at the end.
+		class TimerResource
+		{
+		public:
+			TimerResource(Timer& t) : timer(t) { timer.Set(); };
+			~TimerResource() { timer.Tick(); }
+		protected:
+			Timer& timer;
+		};
+
+		class TimerCollection
+		{
+		public:
+			TimerResource ScopeTimer(const char* name) { return TimerResource(timers[name]); }
+
+			void OnImgui();
+
+		protected:
+			// Using const char* as the key, as this is what __FUNCTION__ macro is. Saves memory allocations for creating std::strings
+			std::map<const char*, Timer> timers;
 		};
 
 		class MemoryTracker

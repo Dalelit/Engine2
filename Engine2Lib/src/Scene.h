@@ -78,6 +78,8 @@ namespace Engine2
 		GizmoRender gizmoRender;
 		bool gizmoEnabled = true;
 
+		Instrumentation::TimerCollection systemTimers;
+
 		void UpdateVSSceneConstBuffer(Camera& camera, Transform& transform);
 		void UpdatePSSceneConstBuffer(Camera& camera, Transform& transform);
 
@@ -107,6 +109,7 @@ namespace Engine2
 		void ImGuiEntities();
 		void ImGuiAssets();
 		void ImGuiCameras();
+		void ImGuiInstrumentation();
 
 	};
 

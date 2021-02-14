@@ -201,8 +201,8 @@ namespace Engine2
 			ImGui::Text("Render mallocs %.1f", renderMemory.allocations.Average());
 			ImGui::Text(" layer mallocs %.1f", renderLayersMemory.allocations.Average());
 			ImGui::Text(" Imgui mallocs %.1f", renderImguiMemory.allocations.Average());
-			ImGui::End();
 		}
+		ImGui::End();
 
 		ImGui::GetStyle().Colors[ImGuiCol_FrameBg] = bg; // recover the background color
 	}

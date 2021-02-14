@@ -24,6 +24,8 @@ Near term / in progress
 	- load new skybox textures
 	- model loading
 	- Texture gizmo add aspect ratio setting/locking
+- Physics
+	- move beyond the got-it-working beginnings
 - ECS
 	- create systems rather than hard coding in scene
 	- use case of mulitple components for a single entity
@@ -47,6 +49,8 @@ Near term / in progress
 - Proper error handling and logging
 	- use exceptions?
 	- add logging
+- Instrumentation
+	- proper timing for core methods/systems
 - Build/Project
 	- clean up how include and lib stuff is done with PhysX
 		- need to include directories in the Engine2App
@@ -54,8 +58,6 @@ Near term / in progress
 		- need to use the checked version rather than debug
 
 Long term
-- Rigid body and basic physics
-- shadows
 - water
 - boids
 

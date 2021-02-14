@@ -51,9 +51,8 @@ namespace Engine2
 				ImGui::Text("Allocated: %i", allocated);
 				ImGui::Text("Freed    : %i", freed);
 				ImGui::Text("Diff     : %i", allocated - freed);
-
-				ImGui::End();
 			}
+			ImGui::End();
 
 			ImGui::GetStyle().Colors[ImGuiCol_FrameBg] = bg; // recover the background color
 		}
@@ -75,9 +74,8 @@ namespace Engine2
 				ImGui::Text("   VS : %i", vsConstBufferCount);
 				ImGui::Text("   PS : %i", psConstBufferCount);
 				ImGui::Text("   GS : %i", gsConstBufferCount);
-
-				ImGui::End();
 			}
+			ImGui::End();
 
 			ImGui::GetStyle().Colors[ImGuiCol_FrameBg] = bg; // recover the background color
 		}
@@ -85,8 +83,24 @@ namespace Engine2
 		void Timer::OnImgui()
 		{
 			char buffer[64];
-			sprintf_s(buffer, ARRAYSIZE(buffer), "ms %.1f", times.Average());
+			sprintf_s(buffer, ARRAYSIZE(buffer), "ms %.2f", times.Average());
 			ImGui::PlotLines("", times.data, times.size, times.current, buffer, 0.0f, 30.0f, { 0,40 });
+		}
+
+		void TimerCollection::OnImgui()
+		{
+			for (auto [name, timer] : timers)
+			{
+				if (ImGui::CollapsingHeader(name))
+				{
+					timer.OnImgui();
+				}
+				else
+				{
+					ImGui::SameLine();
+					ImGui::Text("%.2f", timer.Average());
+				}
+			}
 		}
 	}
 }

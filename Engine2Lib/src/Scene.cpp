@@ -15,6 +15,10 @@
 #include "ScriptComponent.h"
 #include "AssetManager.h"
 
+//#define E2_SCENE_TIMING
+#define E2_SCENE_TIMING    auto timer##_COUNTER__ = systemTimers.ScopeTimer(__FUNCTION__);
+
+
 using namespace EngineECS;
 
 namespace Engine2
@@ -29,12 +33,13 @@ namespace Engine2
 
 	void Scene::OnUpdate(float dt)
 	{
+		E2_SCENE_TIMING;
+
 		if (running)
 		{
 			if (!paused)
 			{
 				UpdatePhysics(dt);
-				physics.UpdateTransforms(hierarchy.GetECSCoordinator());
 			}
 		}
 		else
@@ -48,6 +53,7 @@ namespace Engine2
 
 	void Scene::OnRender(EntityId_t cameraEntity)
 	{
+		E2_SCENE_TIMING;
 		ShadowPass(cameraEntity);
 		RenderImage(cameraEntity, true);
 		CamerasRender();
@@ -55,6 +61,7 @@ namespace Engine2
 
 	void Scene::RenderImage(EntityId_t cameraEntity, bool mainCamera)
 	{
+		E2_SCENE_TIMING;
 		auto pCamera = hierarchy.GetECSCoordinator().GetComponent<Camera>(cameraEntity);
 		auto pTransform = hierarchy.GetECSCoordinator().GetComponent<Transform>(cameraEntity);
 		UpdateVSSceneConstBuffer(*pCamera, *pTransform);
@@ -77,6 +84,7 @@ namespace Engine2
 
 	void Scene::ShadowPass(EntityId_t viewCameraEntity)
 	{
+		E2_SCENE_TIMING;
 		auto pCamera = hierarchy.GetECSCoordinator().GetComponent<Camera>(viewCameraEntity);
 		auto pCameraTransform = hierarchy.GetECSCoordinator().GetComponent<TransformMatrix>(viewCameraEntity);
 
@@ -150,6 +158,7 @@ namespace Engine2
 
 	void Scene::RenderMeshes()
 	{
+		E2_SCENE_TIMING;
 		Coordinator& coordinator = hierarchy.GetECSCoordinator();
 		View<MeshRenderer, Transform> entities(coordinator);
 		for (auto e : entities)
@@ -166,6 +175,7 @@ namespace Engine2
 
 	void Scene::RenderParticles()
 	{
+		E2_SCENE_TIMING;
 		Coordinator& coordinator = hierarchy.GetECSCoordinator();
 		View<ParticleEmitter, Transform> entities(coordinator);
 		for (auto e : entities)
@@ -177,6 +187,7 @@ namespace Engine2
 
 	void Scene::RenderGizmos()
 	{
+		E2_SCENE_TIMING;
 		Coordinator& coordinator = hierarchy.GetECSCoordinator();
 		View<Gizmo, TransformMatrix> entities(coordinator);
 		gizmoRender.NewFrame();
@@ -203,6 +214,7 @@ namespace Engine2
 
 	void Scene::RenderOutlines()
 	{
+		E2_SCENE_TIMING;
 		Coordinator& coordinator = hierarchy.GetECSCoordinator();
 		View<OffscreenOutliner, MeshRenderer, Transform> entities(coordinator);
 		for (auto e : entities)
@@ -232,6 +244,7 @@ namespace Engine2
 
 	void Scene::RenderColliders()
 	{
+		E2_SCENE_TIMING;
 		Coordinator& coordinator = hierarchy.GetECSCoordinator();
 		View<Collider, Transform, TransformMatrix> entities(coordinator);
 		gizmoRender.NewFrame();
@@ -265,6 +278,7 @@ namespace Engine2
 
 	void Scene::CamerasRender()
 	{
+		E2_SCENE_TIMING;
 		Coordinator& coordinator = hierarchy.GetECSCoordinator();
 		View<Camera, Offscreen> entities(coordinator);
 		for (auto e : entities)
@@ -301,16 +315,21 @@ namespace Engine2
 
 	void Scene::UpdatePhysics(float dt)
 	{
+		E2_SCENE_TIMING;
+
 		physics.StepSimulation(dt);
+		physics.UpdateTransforms(hierarchy.GetECSCoordinator());
 	}
 
 	void Scene::UpdateTransformMatrix()
 	{
+		E2_SCENE_TIMING;
 		hierarchy.UpdateTransformMatrix();
 	}
 
 	void Scene::UpdateParticles(float dt)
 	{
+		E2_SCENE_TIMING;
 		Coordinator& coordinator = hierarchy.GetECSCoordinator();
 		View<ParticleEmitter, TransformMatrix> entities(coordinator);
 		for (auto e : entities)
@@ -323,6 +342,7 @@ namespace Engine2
 
 	void Scene::UpdateCameras()
 	{
+		E2_SCENE_TIMING;
 		Coordinator& coordinator = hierarchy.GetECSCoordinator();
 
 		auto& cameras = coordinator.GetComponents<Camera>();
@@ -335,6 +355,7 @@ namespace Engine2
 
 	void Scene::UpdateScripts(float dt)
 	{
+		E2_SCENE_TIMING;
 		Coordinator& coordinator = hierarchy.GetECSCoordinator();
 
 		auto& scs = coordinator.GetComponents<ScriptComponent>();
@@ -368,6 +389,7 @@ namespace Engine2
 		ImGuiEntities();
 		ImGuiAssets();
 		ImGuiCameras();
+		ImGuiInstrumentation();
 	}
 
 	void Scene::Start()
@@ -544,5 +566,23 @@ namespace Engine2
 			}
 		}
 		ImGui::End();
+	}
+
+	void Scene::ImGuiInstrumentation()
+	{
+		ImGui::SetNextWindowBgAlpha(0.35f); // Transparent background
+		ImVec4 bg = ImGui::GetStyleColorVec4(ImGuiCol_FrameBg); // store the current background color
+		ImGui::GetStyle().Colors[ImGuiCol_FrameBg] = { 0,0,0,0 }; // set background to transparent
+
+		static bool open = true;
+
+		if (ImGui::Begin("Scene instrumentation", &open))
+		{
+			systemTimers.OnImgui();
+		}
+
+		ImGui::End();
+
+		ImGui::GetStyle().Colors[ImGuiCol_FrameBg] = bg; // recover the background color
 	}
 }
