@@ -15,8 +15,22 @@ namespace Engine2
 	protected:
 		Scene& m_scene;
 
-		void SaveSceneNode(Serialisation::Serialiser::Node& node, SceneHierarchy::SceneNode& sceneNode);
-		void SaveComponents(Serialisation::Serialiser::Node& node, Entity entity);
-		void SaveAssets(Serialisation::Serialiser::Node& node);
+		void SaveSceneNode(Serialisation::WriteNode& node, SceneHierarchy::SceneNode& sceneNode);
+		void SaveComponents(Serialisation::WriteNode& node, Entity entity);
+		void SaveAssets(Serialisation::WriteNode& node);
+
+		void LoadEntity(int spaces, Serialisation::LoadSerialiserStream& loader, Entity& entity);
+		std::map<std::string, std::string> m_attributes; // working space;
+
+		template <class T>
+		void SaveComponent(Serialisation::WriteNode& node, Entity& entity, const char* componentName)
+		{
+			if (entity.HasComponent<T>())
+			{
+				auto c = entity.GetComponent<T>();
+				auto n = node.ChildNode(componentName);
+				c->Serialise(n);
+			}
+		}
 	};
 }

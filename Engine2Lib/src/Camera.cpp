@@ -67,6 +67,19 @@ namespace Engine2
 		}
 	}
 
+	void Camera::Serialise(Serialisation::INode& node)
+	{
+		node.Attribute("name", name);
+		node.Attribute("orthographic", orthographic);
+		node.Attribute("aspectRatio", aspectRatio);
+		node.Attribute("fov", fov);
+		node.Attribute("nearZ", nearZ);
+		node.Attribute("farZ", farZ);
+		node.Attribute("aspectRatioLockedToScreen", aspectRatioLockedToScreen);
+		node.Attribute("viewWidth", viewWidth);
+		node.Attribute("viewHeight", viewHeight);
+	}
+
 	std::array<DirectX::XMVECTOR, 8> Camera::GetFrustrumPoints() const
 	{
 		if (orthographic)

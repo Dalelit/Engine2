@@ -1,6 +1,7 @@
 #pragma once
 #include "Components.h"
 #include "Transform.h"
+#include "Serialiser.h"
 
 namespace Engine2
 {
@@ -13,6 +14,8 @@ namespace Engine2
 		inline bool UseGravity() const { return useGravity; }
 
 		void OnImgui();
+
+		void Serialise(Serialisation::INode& node);
 
 	protected:
 		float mass = 1.0f;

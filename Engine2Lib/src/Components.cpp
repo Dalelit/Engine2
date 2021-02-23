@@ -27,6 +27,11 @@ namespace Engine2
 		}
 	}
 
+	void EntityInfo::Serialise(Serialisation::INode& node)
+	{
+		node.Attribute("tag", tag);
+	}
+
 	template <typename T>
 	void ComponentOnImgui(const char* displayName, EngineECS::EntityId_t id, EngineECS::Coordinator& coord)
 	{

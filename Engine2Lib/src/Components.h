@@ -2,6 +2,7 @@
 
 #include <string>
 #include "ECS.h"
+#include "Serialiser.h"
 
 namespace Engine2
 {
@@ -10,6 +11,8 @@ namespace Engine2
 		std::string tag;
 
 		void OnImgui();
+
+		void Serialise(Serialisation::INode& node);
 	};
 
 	class Components

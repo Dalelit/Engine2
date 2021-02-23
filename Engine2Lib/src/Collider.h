@@ -1,5 +1,6 @@
 #pragma once
 #include "UtilMath.h"
+#include "Serialiser.h"
 
 namespace Engine2
 {
@@ -12,6 +13,7 @@ namespace Engine2
 
 		Collider();
 		void OnImgui();
+		void Serialise(Serialisation::INode& node);
 
 		inline ColliderType GetType() const { return type; }
 

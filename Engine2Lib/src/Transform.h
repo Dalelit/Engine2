@@ -1,5 +1,6 @@
 #pragma once
 #include <d3d11.h>
+#include "Serialiser.h"
 
 namespace Engine2
 {
@@ -38,6 +39,8 @@ namespace Engine2
 		inline void Scale(DirectX::XMVECTOR vector) { scale = DirectX::XMVectorMultiply(scale, vector); } // scale *= vector
 
 		void OnImgui();
+
+		void Serialise(Serialisation::INode& node);
 
 		static struct {
 			static constexpr DirectX::XMVECTOR up = { 0.0f, 1.0f, 0.0f, 0.0f };

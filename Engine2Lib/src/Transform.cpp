@@ -97,6 +97,13 @@ namespace Engine2
 		}
 	}
 
+	void Transform::Serialise(Serialisation::INode& node)
+	{
+		node.Attribute("position", position);
+		node.Attribute("scale", scale);
+		node.Attribute("rotation", rotation);
+	}
+
 	TransformMatrix::TransformMatrix(Transform& transform) :
 		rotationMatrix(XMMatrixRotationRollPitchYawFromVector(transform.rotation)),
 		transformMatrix(XMMatrixScalingFromVector(transform.scale)* rotationMatrix* XMMatrixTranslationFromVector(transform.position))

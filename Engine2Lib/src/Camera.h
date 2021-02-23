@@ -1,6 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "Events.h"
+#include "Serialiser.h"
 
 namespace Engine2
 {
@@ -29,6 +30,7 @@ namespace Engine2
 		bool IsPerspective() { return !orthographic; }
 
 		virtual void OnImgui();
+		void Serialise(Serialisation::INode& node);
 
 		inline float AspectRatio() const { return aspectRatio; }
 		inline float NearPlane() const { return nearZ; }

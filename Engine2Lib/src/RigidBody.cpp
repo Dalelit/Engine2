@@ -18,4 +18,11 @@ namespace Engine2
 		ImGui::Checkbox("Use gravity", &useGravity);
 	}
 
+	void RigidBody::Serialise(Serialisation::INode& node)
+	{
+		//node.Attribute("mass", mass);
+		node.Attribute("isKinematic", isKinematic);
+		node.Attribute("useGravity", useGravity);
+	}
+
 }

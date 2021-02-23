@@ -57,6 +57,14 @@ namespace Engine2
 		}
 	}
 
+	void Collider::Serialise(Serialisation::INode& node)
+	{
+		node.Attribute("type", (int&)type);
+		node.Attribute("showCollider", showCollider);
+		node.Attribute("centre", centre);
+		node.Attribute("extents", extents);
+	}
+
 	void Collider::InitialiseAsSphere()
 	{
 		type = ColliderType::sphere;
