@@ -51,7 +51,7 @@ namespace Engine2
 		}
 	}
 
-	void ScriptComponent::CreateInstance(const std::string& scriptName)
+	std::shared_ptr<Script> ScriptComponent::CreateInstance(const std::string& scriptName)
 	{
 		auto func = constructors[scriptName];
 		if (func) func(scripts);
@@ -59,5 +59,7 @@ namespace Engine2
 		s->SetName(scriptName);
 		s->SetEntity(entity);
 		s->OnInitialise();
+
+		return s;
 	}
 }

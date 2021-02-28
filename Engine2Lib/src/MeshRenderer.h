@@ -20,8 +20,8 @@ namespace Engine2
 		std::shared_ptr<Mesh> mesh;
 		std::shared_ptr<Material> material;
 
-		static std::shared_ptr<Mesh> defaultMesh;
-		static std::shared_ptr<Material> defaultMaterial;
+		static std::weak_ptr<Mesh> defaultMesh;
+		static std::weak_ptr<Material> defaultMaterial;
 
 	protected:
 	};

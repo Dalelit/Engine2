@@ -21,12 +21,13 @@ namespace Engine2
 			constructors[scriptName] = func;
 		}
 
-		void CreateInstance(const std::string& scriptName);
+		std::shared_ptr<Script> CreateInstance(const std::string& scriptName);
+
+		using ScriptVector = std::vector<std::shared_ptr<Script>>; // note: made this shared_ptr rather than unique due to needing a default copy contructor to clone components. // To do: Should look into understanding this at some point.
+		ScriptVector& Scripts() { return scripts; }
 
 	protected:
 		Entity entity;
-
-		using ScriptVector = std::vector<std::shared_ptr<Script>>; // note: made this shared_ptr rather than unique due to needing a default copy contructor to clone components. // To do: Should look into understanding this at some point.
 		ScriptVector scripts;
 
 		static std::map<std::string, void(*)(ScriptVector&)> constructors;

@@ -8,6 +8,7 @@
 #include "Particles.h"
 #include "Lights.h"
 #include "OffscreenOutliner.h"
+#include "ScriptComponent.h"
 
 namespace Engine2
 {
@@ -56,28 +57,45 @@ namespace Engine2
 			{
 				E2_ASSERT(false, "Have not set up to load nested entities yet");
 			}
+			else if (loader.Name() == "Scripts")
+			{
+				auto sc = entity.AddComponent<ScriptComponent>();
+
+				loader.NextLine();
+
+				while (loader.Spaces() == spaces + 4)
+				{
+					std::string scriptName = loader.Name();
+					GetAttributes(spaces + 6, loader);
+					auto readNode = Serialisation::ReadNode(m_attributes);
+
+					sc->SetEntity(entity); // to do: shouldn't need to do this.
+					auto script = sc->CreateInstance(scriptName);
+					script->Serialise(readNode);
+				}
+			}
 			else
 			{
 				std::string componentName = loader.Name();
-				m_attributes.clear();
+				GetAttributes(spaces + 4, loader);
+				auto readNode = Serialisation::ReadNode(m_attributes);
 
-				while (loader.NextLine() && loader.Spaces() == spaces + 4)
-				{
-					E2_ASSERT(loader.HasValue(), "Expected an attribute");
-
-					m_attributes[loader.Name()] = loader.Value();
-				}
-
-				if (m_attributes.size() > 0)
-				{
-					auto readNode = Serialisation::ReadNode(m_attributes);
-					if (componentName == "EntityInfo") entity.GetComponent<EntityInfo>()->Serialise(readNode);
-					else if (componentName == "Transform") entity.GetComponent<Transform>()->Serialise(readNode);
-					else if (componentName == "RigidBody") entity.AddComponent<RigidBody>()->Serialise(readNode);
-					else if (componentName == "Collider") entity.AddComponent<Collider>()->Serialise(readNode);
-					else if (componentName == "Camera") entity.AddComponent<Camera>()->Serialise(readNode);
-				}
+				if (componentName == "EntityInfo") entity.GetComponent<EntityInfo>()->Serialise(readNode);
+				else if (componentName == "Transform") entity.GetComponent<Transform>()->Serialise(readNode);
+				else if (componentName == "RigidBody") entity.AddComponent<RigidBody>()->Serialise(readNode);
+				else if (componentName == "Collider") entity.AddComponent<Collider>()->Serialise(readNode);
+				else if (componentName == "Camera") entity.AddComponent<Camera>()->Serialise(readNode);
 			}
+		}
+	}
+
+	void SceneSerialisation::GetAttributes(int spaces, Serialisation::LoadSerialiserStream& loader)
+	{
+		m_attributes.clear();
+
+		while (loader.NextLine() && loader.Spaces() == spaces)
+		{
+			m_attributes[loader.Name()] = loader.Value();
 		}
 	}
 
@@ -126,6 +144,17 @@ namespace Engine2
 		SaveComponent<RigidBody>(node, entity, "RigidBody");
 		SaveComponent<Collider>(node, entity, "Collider");
 		SaveComponent<Camera>(node, entity, "Camera");
+
+		if (entity.HasComponent<ScriptComponent>())
+		{
+			auto scriptsNode = node.ChildNode("Scripts");
+			auto scripts = entity.GetComponent<ScriptComponent>();
+			for (auto& s : scripts->Scripts())
+			{
+				auto n = scriptsNode.ChildNode(s->Name().c_str());
+				s->Serialise(n);
+			}
+		}
 
 		//if (entity.HasComponent<MeshRenderer>())
 		//{

@@ -9,7 +9,7 @@ SceneHierarchy
     Transform
       position:5,5,-5,1
       scale:1,1,1,0
-      rotation:0.61548,-0.785398,0,0
+      rotation:0.78248,-0.893398,0,0
     Camera
       name:Main
       orthographic:false
@@ -20,6 +20,16 @@ SceneHierarchy
       aspectRatioLockedToScreen:true
       viewWidth:41.068
       viewHeight:20
+    Scripts
+      Input Controller
+        mouseLook:false
+        moveSpeed:1
+        mouseMoveSpeedX:-0.01
+        mouseMoveSpeedY:-0.01
+        mouseScrollSpeed:1.5
+        runMultiplier:3
+        yawSpeed:0.001
+        pitchSpeed:-0.001
   Entity
     EntityInfo
       tag:Ground

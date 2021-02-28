@@ -4,8 +4,8 @@
 
 namespace Engine2
 {
-	std::shared_ptr<Mesh> MeshRenderer::defaultMesh;
-	std::shared_ptr<Material> MeshRenderer::defaultMaterial;
+	std::weak_ptr<Mesh> MeshRenderer::defaultMesh;
+	std::weak_ptr<Material> MeshRenderer::defaultMaterial;
 
 	void MeshRenderer::BindAndDraw()
 	{

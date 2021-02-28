@@ -72,15 +72,27 @@ void SceneBuilder::OnImgui()
 	static std::string selectedFile = "Scenes//testScene.txt";
 	ImGui::Text("File: %s", selectedFile.c_str());
 	if (ImGui::Button("Save as..."))
+	{
 		if (Util::FileSelectionDialogue::SaveDialogue(selectedFile))
 			SceneSerialisation(scene).SaveScene(selectedFile);
+	}
 	if (ImGui::Button("Save"))
+	{
 		SceneSerialisation(scene).SaveScene(selectedFile);
+	}
 	if (ImGui::Button("Load file..."))
+	{
 		if (Util::FileSelectionDialogue::LoadDialogue(selectedFile))
+		{
+			ClearScene();
 			SceneSerialisation(scene).LoadScene(selectedFile);
+		}
+	}
 	if (ImGui::Button("Reload"))
+	{
+		ClearScene();
 		SceneSerialisation(scene).LoadScene(selectedFile);
+	}
 
 	if (ImGui::Button("Clear Scene"))
 	{

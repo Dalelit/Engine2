@@ -12,6 +12,18 @@ namespace Engine2
 		return entity.HasComponent<Transform>();
 	}
 
+	void InputControllerScript::Serialise(Serialisation::INode& node)
+	{
+		node.Attribute("mouseLook", MovementConfiguration.mouseLook);
+		node.Attribute("moveSpeed", MovementConfiguration.moveSpeed);
+		node.Attribute("mouseMoveSpeedX", MovementConfiguration.mouseMoveSpeedX);
+		node.Attribute("mouseMoveSpeedY", MovementConfiguration.mouseMoveSpeedY);
+		node.Attribute("mouseScrollSpeed", MovementConfiguration.mouseScrollSpeed);
+		node.Attribute("runMultiplier", MovementConfiguration.runMultiplier);
+		node.Attribute("yawSpeed", MovementConfiguration.yawSpeed);
+		node.Attribute("pitchSpeed", MovementConfiguration.pitchSpeed);
+	}
+
 	void InputControllerScript::OnUpdate(float dt)
 	{
 		auto& inputState = Engine::Get().InputState();

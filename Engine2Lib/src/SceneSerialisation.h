@@ -20,6 +20,7 @@ namespace Engine2
 		void SaveAssets(Serialisation::WriteNode& node);
 
 		void LoadEntity(int spaces, Serialisation::LoadSerialiserStream& loader, Entity& entity);
+		void GetAttributes(int spaces, Serialisation::LoadSerialiserStream& loader);
 		std::map<std::string, std::string> m_attributes; // working space;
 
 		template <class T>

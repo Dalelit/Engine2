@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Script.h"
+#include "Serialiser.h"
 
 namespace Engine2
 {
@@ -10,6 +11,7 @@ namespace Engine2
 		void OnUpdate(float dt);
 		void OnImgui();
 		bool IsValid();
+		void Serialise(Serialisation::INode& node);
 
 		struct {
 			DWORD forward = 'W';

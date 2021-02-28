@@ -1,6 +1,7 @@
 #pragma once
 #include "Events.h"
 #include "Entity.h"
+#include "Serialiser.h"
 
 namespace Engine2
 {
@@ -17,6 +18,8 @@ namespace Engine2
 		//virtual void OnApplicationEvent(ApplicationEvent& event) {}
 
 		virtual bool IsValid() { return true; } // Override if you need to check for SetActive. E.g. check entity has required components
+
+		virtual void Serialise(Serialisation::INode& node) {}
 
 		// Called by the engine, can be called by scripts
 
