@@ -183,6 +183,11 @@ namespace Engine2
 			m_out << m_indent << name << ":" << (value ? "true" : "false") << std::endl;
 		}
 
+		void WriteNode::Attribute(const char* name, size_t& value)
+		{
+			m_out << m_indent << name << ":" << value << std::endl;
+		}
+
 		void WriteNode::Attribute(const char* name, std::string& value)
 		{
 			m_out << m_indent << name << ":" << value << std::endl;
@@ -240,6 +245,11 @@ namespace Engine2
 		void ReadNode::Attribute(const char* name, bool& value)
 		{
 			value = (m_attributes[name] == "true");
+		}
+
+		void ReadNode::Attribute(const char* name, size_t& value)
+		{
+			value = std::stoull(m_attributes[name]);
 		}
 
 		void ReadNode::Attribute(const char* name, std::string& value)

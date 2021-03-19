@@ -9,6 +9,7 @@
 #include "Lights.h"
 #include "OffscreenOutliner.h"
 #include "ScriptComponent.h"
+#include "Particles.h"
 
 namespace Engine2
 {
@@ -85,6 +86,7 @@ namespace Engine2
 				else if (componentName == "RigidBody") entity.AddComponent<RigidBody>()->Serialise(readNode);
 				else if (componentName == "Collider") entity.AddComponent<Collider>()->Serialise(readNode);
 				else if (componentName == "Camera") entity.AddComponent<Camera>()->Serialise(readNode);
+				else if (componentName == "ParticleEmitter") entity.AddComponent<ParticleEmitter>()->Serialise(readNode);
 			}
 		}
 	}
@@ -144,6 +146,7 @@ namespace Engine2
 		SaveComponent<RigidBody>(node, entity, "RigidBody");
 		SaveComponent<Collider>(node, entity, "Collider");
 		SaveComponent<Camera>(node, entity, "Camera");
+		SaveComponent<ParticleEmitter>(node, entity, "ParticleEmitter");
 
 		if (entity.HasComponent<ScriptComponent>())
 		{

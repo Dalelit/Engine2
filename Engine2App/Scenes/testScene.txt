@@ -7,9 +7,9 @@ SceneHierarchy
     EntityInfo
       tag:Main
     Transform
-      position:5,5,-5,1
+      position:6.65776,7.11512,-6.33345,1
       scale:1,1,1,0
-      rotation:0.78248,-0.893398,0,0
+      rotation:0.55848,-1.1254,0,0
     Camera
       name:Main
       orthographic:false
@@ -49,7 +49,7 @@ SceneHierarchy
     EntityInfo
       tag:1
     Transform
-      position:0,3.6,0,1
+      position:0,3.2,0,1
       scale:0.3,0.3,0.3,0
       rotation:0,0,0,0
     RigidBody
@@ -72,6 +72,53 @@ SceneHierarchy
       useGravity:true
     Collider
       type:0
+      showCollider:false
+      centre:0,0,0
+      extents:1,1,1
+  Entity
+    EntityInfo
+      tag:4
+    Transform
+      position:2.4,1,1.9,1
+      scale:1,1,1,0
+      rotation:0,0,0,0
+  Entity
+    EntityInfo
+      tag:5
+    Transform
+      position:2.6,0,3.8,1
+      scale:1,1,1,0
+      rotation:0,0,0,0
+    ParticleEmitter
+      active:true
+      freeze:false
+      position:0,0,0,1
+      emitLocation:2.6,0,3.8,1
+      velocityStartMin:-0.5,1,-0.5,0
+      velocityStartMax:0.5,2,0.5,0
+      force:0,-0.3,0,0
+      rotationSpeedStartMin:-1,-1,-1,0
+      rotationSpeedStartMax:1,1,1,0
+      colorStartMin:0.262399,0.425317,0.588235,1
+      colorStartMax:0,1,0.205882,1
+      colorEndMin:0.77451,0.189831,0.688528,0
+      colorEndMax:0,1,0.735294,0
+      scaleStart:0.25,0.25,0.25,1
+      scaleEnd:0.01,0.01,0.01,1
+      rate:139.4
+      maxParticles:1861
+  Entity
+    EntityInfo
+      tag:6
+    Transform
+      position:-0.2,4.3,0.6,1
+      scale:0.6,0.6,0.6,0
+      rotation:0,0,0,0
+    RigidBody
+      isKinematic:false
+      useGravity:true
+    Collider
+      type:2
       showCollider:false
       centre:0,0,0
       extents:1,1,1

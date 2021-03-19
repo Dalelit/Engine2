@@ -263,4 +263,39 @@ namespace Engine2
 
 		currentPixelShader = shaderName;
 	}
+
+	void ParticleEmitter::Serialise(Serialisation::INode& node)
+	{
+		node.Attribute("active", active);
+		node.Attribute("freeze", freeze);
+		node.Attribute("position", position);
+		node.Attribute("emitLocation", emitLocation);
+		node.Attribute("velocityStartMin", velocityStartMin);
+		node.Attribute("velocityStartMax", velocityStartMax);
+		node.Attribute("force", force);
+		node.Attribute("rotationSpeedStartMin", rotationSpeedStartMin);
+		node.Attribute("rotationSpeedStartMax", rotationSpeedStartMax);
+		node.Attribute("colorStartMin", colorStartMin);
+		node.Attribute("colorStartMax", colorStartMax);
+		node.Attribute("colorEndMin", colorEndMin);
+		node.Attribute("colorEndMax", colorEndMax);
+		node.Attribute("scaleStart", scaleStart);
+		node.Attribute("scaleEnd", scaleEnd);
+
+		if (node.Saving())
+		{
+			node.Attribute("rate", rate);
+			node.Attribute("maxParticles", maxParticles);
+		}
+		else
+		{
+			float _r;
+			node.Attribute("rate", _r);
+			SetRate(_r);
+
+			size_t _mp;
+			node.Attribute("maxParticles", _mp);
+			SetMaxParticles(_mp);
+		}
+	}
 }

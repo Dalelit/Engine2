@@ -4,6 +4,14 @@
 #include <fstream>
 #include "Logging.h"
 
+/*
+To use this, include the header file and add a method
+		void Serialise(Serialisation::INode& node)
+		{
+			node.Attribute("name", value);
+		}
+*/
+
 namespace Engine2
 {
 	namespace Serialisation
@@ -17,6 +25,7 @@ namespace Engine2
 			virtual void Attribute(const char* name, float& value) = 0;
 			virtual void Attribute(const char* name, int& value) = 0;
 			virtual void Attribute(const char* name, bool& value) = 0;
+			virtual void Attribute(const char* name, size_t& value) = 0;
 			virtual void Attribute(const char* name, std::string& value) = 0;
 			virtual void Attribute(const char* name, DirectX::XMFLOAT3& value) = 0;
 			virtual void Attribute(const char* name, DirectX::XMVECTOR& value) = 0;
@@ -36,6 +45,7 @@ namespace Engine2
 			void Attribute(const char* name, float& value);
 			void Attribute(const char* name, int& value);
 			void Attribute(const char* name, bool& value);
+			void Attribute(const char* name, size_t& value);
 			void Attribute(const char* name, std::string& value);
 			void Attribute(const char* name, DirectX::XMFLOAT3& value);
 			void Attribute(const char* name, DirectX::XMVECTOR& value);
@@ -62,6 +72,7 @@ namespace Engine2
 			void Attribute(const char* name, float& value);
 			void Attribute(const char* name, int& value);
 			void Attribute(const char* name, bool& value);
+			void Attribute(const char* name, size_t& value);
 			void Attribute(const char* name, std::string& value);
 			void Attribute(const char* name, DirectX::XMFLOAT3& value);
 			void Attribute(const char* name, DirectX::XMVECTOR& value);

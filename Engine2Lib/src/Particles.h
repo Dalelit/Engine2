@@ -5,6 +5,7 @@
 #include "Shader.h"
 #include "Util.h"
 #include "Instrumentation.h"
+#include "Serialiser.h"
 
 namespace Engine2
 {
@@ -43,6 +44,8 @@ namespace Engine2
 
 		void SetMeshAndVertexShader(const std::string& meshName);
 		void SetPixelShader(const std::string& shaderName = "");
+
+		void Serialise(Serialisation::INode& node);
 
 	protected:
 		bool active = true;
