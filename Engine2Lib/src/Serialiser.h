@@ -8,7 +8,8 @@
 To use this, include the header file and add a method
 		void Serialise(Serialisation::INode& node)
 		{
-			node.Attribute("name", value);
+			node.Attribute("attribute", attribute);
+			node.Attribute("enum_attribute", (int&)enum_attribute);
 		}
 */
 

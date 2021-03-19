@@ -52,6 +52,12 @@ namespace Engine2
 		ImGui::ColorEdit4("Outline color", outlineColor.m128_f32);
 	}
 
+	void OffscreenOutliner::Serialise(Serialisation::INode& node)
+	{
+		node.Attribute("outlineScale", outlineScale);
+		node.Attribute("outlineColor", outlineColor);
+	}
+
 	void OffscreenOutliner::Initialise()
 	{
 		// shaders for outline

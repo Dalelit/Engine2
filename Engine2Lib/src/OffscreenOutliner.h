@@ -1,6 +1,7 @@
 #pragma once
 #include "Offscreen.h"
 #include "ConstantBuffer.h"
+#include "Serialiser.h"
 
 namespace Engine2
 {
@@ -27,6 +28,7 @@ namespace Engine2
 		void Reconfigure() { offscreen.Reconfigure(); Reset(); Configure(); }
 
 		void OnImgui();
+		void Serialise(Serialisation::INode& node);
 
 		inline float GetOutlineScale() { return outlineScale; }
 		inline DirectX::XMVECTOR GetOutlineColor() { return outlineColor; }

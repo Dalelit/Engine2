@@ -10,6 +10,7 @@
 #include "OffscreenOutliner.h"
 #include "ScriptComponent.h"
 #include "Particles.h"
+#include "Gizmo.h"
 
 namespace Engine2
 {
@@ -87,6 +88,8 @@ namespace Engine2
 				else if (componentName == "Collider") entity.AddComponent<Collider>()->Serialise(readNode);
 				else if (componentName == "Camera") entity.AddComponent<Camera>()->Serialise(readNode);
 				else if (componentName == "ParticleEmitter") entity.AddComponent<ParticleEmitter>()->Serialise(readNode);
+				else if (componentName == "Gizmo") entity.AddComponent<Gizmo>()->Serialise(readNode);
+				else if (componentName == "OffscreenOutliner") entity.AddComponent<OffscreenOutliner>()->Serialise(readNode);
 			}
 		}
 	}
@@ -147,6 +150,8 @@ namespace Engine2
 		SaveComponent<Collider>(node, entity, "Collider");
 		SaveComponent<Camera>(node, entity, "Camera");
 		SaveComponent<ParticleEmitter>(node, entity, "ParticleEmitter");
+		SaveComponent<Gizmo>(node, entity, "Gizmo");
+		SaveComponent<OffscreenOutliner>(node, entity, "OffscreenOutliner");
 
 		if (entity.HasComponent<ScriptComponent>())
 		{
@@ -171,17 +176,6 @@ namespace Engine2
 		//	auto c = entity.GetComponent<PointLight>();
 		//	auto n = node.SubNode("PointLight");
 		//	n.Store("color", c->color);
-		//}
-		//if (entity.HasComponent<ParticleEmitter>())
-		//{
-		//	auto c = entity.GetComponent<ParticleEmitter>();
-		//	auto n = node.SubNode("ParticleEmitter");
-		//}
-		//if (entity.HasComponent<Gizmo>())
-		//{
-		//	auto c = entity.GetComponent<Gizmo>();
-		//	auto n = node.SubNode("Gizmo");
-		//	n.Store("type", c->type);
 		//}
 		//if (entity.HasComponent<OffscreenOutliner>())
 		//{

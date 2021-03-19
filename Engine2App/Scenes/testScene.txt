@@ -45,6 +45,8 @@ SceneHierarchy
       showCollider:false
       centre:0,0,0
       extents:1,1,1
+    Gizmo
+      type:0
   Entity
     EntityInfo
       tag:1
@@ -75,13 +77,9 @@ SceneHierarchy
       showCollider:false
       centre:0,0,0
       extents:1,1,1
-  Entity
-    EntityInfo
-      tag:4
-    Transform
-      position:2.4,1,1.9,1
-      scale:1,1,1,0
-      rotation:0,0,0,0
+    OffscreenOutliner
+      outlineScale:1.125
+      outlineColor:0.8,0.570588,0.2,0.75
   Entity
     EntityInfo
       tag:5

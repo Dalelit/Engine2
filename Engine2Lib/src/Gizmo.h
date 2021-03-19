@@ -4,6 +4,7 @@
 #include "VertexBufferInstanced.h"
 #include "Shader.h"
 #include "ConstantBuffer.h"
+#include "Serialiser.h"
 
 namespace Engine2
 {
@@ -17,6 +18,7 @@ namespace Engine2
 		Types type;
 
 		void OnImgui();
+		void Serialise(Serialisation::INode& node) { node.Attribute("type", (int&)type); }
 	};
 
 	class GizmoRender
