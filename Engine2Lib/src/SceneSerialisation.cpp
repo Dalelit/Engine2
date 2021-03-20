@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "SceneSerialisation.h"
+#include "AssetManager.h"
 #include "Components.h"
 #include "Transform.h"
 #include "MeshRenderer.h"
@@ -22,8 +23,14 @@ namespace Engine2
 
 		if (loader.Spaces() == 0 && loader.Name() == "Assets")
 		{
-			while (loader.NextLine() && loader.Spaces() != 0);
-			// to do
+			while (loader.NextLine() && loader.Spaces() != 0)
+			{
+				if (loader.Name() == "Source")
+				{
+					AssetManager::Manager().LoadModel(loader.Value());
+				}
+				else { E2_ASSERT(false, "Expected the source when loading assets"); }
+			}
 		}
 
 		if (loader.Spaces() == 0 && loader.Name() == "SceneInformation")
@@ -86,6 +93,7 @@ namespace Engine2
 				else if (componentName == "Transform") entity.GetComponent<Transform>()->Serialise(readNode);
 				else if (componentName == "RigidBody") entity.AddComponent<RigidBody>()->Serialise(readNode);
 				else if (componentName == "Collider") entity.AddComponent<Collider>()->Serialise(readNode);
+				else if (componentName == "MeshRenderer") entity.AddComponent<MeshRenderer>()->Serialise(readNode);
 				else if (componentName == "Camera") entity.AddComponent<Camera>()->Serialise(readNode);
 				else if (componentName == "ParticleEmitter") entity.AddComponent<ParticleEmitter>()->Serialise(readNode);
 				else if (componentName == "Gizmo") entity.AddComponent<Gizmo>()->Serialise(readNode);
@@ -152,6 +160,8 @@ namespace Engine2
 		SaveComponent<ParticleEmitter>(node, entity, "ParticleEmitter");
 		SaveComponent<Gizmo>(node, entity, "Gizmo");
 		SaveComponent<OffscreenOutliner>(node, entity, "OffscreenOutliner");
+		SaveComponent<MeshRenderer>(node, entity, "MeshRenderer");
+		//SaveComponent<PointLight>(node, entity, "PointLight");
 
 		if (entity.HasComponent<ScriptComponent>())
 		{
@@ -163,49 +173,13 @@ namespace Engine2
 				s->Serialise(n);
 			}
 		}
-
-		//if (entity.HasComponent<MeshRenderer>())
-		//{
-		//	auto c = entity.GetComponent<MeshRenderer>();
-		//	auto n = node.SubNode("MeshRenderer");
-		//	n.Store("mesh", c->mesh->Name());
-		//	n.Store("material", c->material->Name());
-		//}
-		//if (entity.HasComponent<PointLight>())
-		//{
-		//	auto c = entity.GetComponent<PointLight>();
-		//	auto n = node.SubNode("PointLight");
-		//	n.Store("color", c->color);
-		//}
-		//if (entity.HasComponent<OffscreenOutliner>())
-		//{
-		//	auto c = entity.GetComponent<OffscreenOutliner>();
-		//	auto n = node.SubNode("OffscreenOutliner");
-		//	n.Store("outlineScale", c->GetOutlineScale());
-		//	n.Store("outlineColor", c->GetOutlineColor());
-		//}
 	}
 
 	void SceneSerialisation::SaveAssets(Serialisation::WriteNode& node)
 	{
-		//{
-		//	auto n = node.SubNode("Meshes");
-		//	for (auto [name, mesh] : Mesh::Assets.map)
-		//	{
-		//		auto m = n.SubNode(name);
-		//		m.Store("type", 0);
-		//		m.Store("filename", "to do");
-		//	}
-		//}
-		//{
-		//	auto n = node.SubNode("Materials");
-		//	for (auto [name, mat] : Material::Materials.map)
-		//	{
-		//		auto m = n.SubNode(name);
-		//		if (mat->pixelShader) m.Store("pixelShader", mat->pixelShader->GetName());
-		//		if (mat->vertexShader) m.Store("vertexShader", mat->vertexShader->GetName());
-		//		//m.Store("vertexShaderCB", mat->vertexShaderCB->);
-		//	}
-		//}
+		for (auto [name, asset] : AssetManager::Manager().GetMap())
+		{
+			node.Attribute("Source", asset.GetSource());
+		}
 	}
 }

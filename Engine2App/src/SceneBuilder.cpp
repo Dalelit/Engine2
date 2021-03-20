@@ -111,8 +111,6 @@ void SceneBuilder::CreateDefaultAssets()
 	
 	asset.Materials().CreateAsset<MaterialLibrary::PositionNormalColorMaterial>("Default PNC");
 	asset.Materials().CreateAsset<MaterialLibrary::PositionNormalColorWireframe>("Wireframe PNC");
-
-	MeshRenderer::defaultMaterial = asset.Materials()["Default PNC"];
 }
 
 void SceneBuilder::CreateEmtpyScene()

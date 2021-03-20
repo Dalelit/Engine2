@@ -182,7 +182,7 @@ namespace Engine2
 	{
 		for (auto& [name, data] : loader.materials)
 		{
-			auto mat = std::make_shared<MaterialLibrary::PositionNormalColorMaterial>();
+			auto mat = std::make_shared<MaterialLibrary::PositionNormalColorMaterial>(name);
 			auto cb = mat->GetPSCB();
 			cb->ambient = data.Ka;
 			cb->diffuse = data.Kd;
@@ -229,12 +229,12 @@ namespace Engine2
 		ImGui::OpenPopup("Meshes::AssetManager");
 	}
 
-	std::shared_ptr<Mesh> AssetManager::OnImguiSelectMesh()
+	std::pair<Asset*, std::shared_ptr<Mesh>> AssetManager::OnImguiSelectMesh()
 	{
+		std::pair<Asset*, std::shared_ptr<Mesh>> result(nullptr, nullptr);
+
 		if (ImGui::BeginPopup("Meshes::AssetManager"))
 		{
-			std::shared_ptr<Mesh> result;
-
 			for (auto& [ak, av] : assets)
 			{
 				if (ImGui::BeginMenu(ak.c_str()))
@@ -243,20 +243,17 @@ namespace Engine2
 					{
 						if (ImGui::MenuItem(mk.c_str()))
 						{
-							result = mv;
+							result.first = &av;
+							result.second = mv;
 						}
 					}
 					ImGui::EndMenu();
 				}
 			}
 			ImGui::EndPopup();
+		}
 
-			return result;
-		}
-		else
-		{
-			return nullptr;
-		}
+		return result;
 	}
 
 	void AssetManager::OnImguiSelectMaterialPopupOpen()
@@ -264,12 +261,12 @@ namespace Engine2
 		ImGui::OpenPopup("Material::AssetManager");
 	}
 
-	std::shared_ptr<Material> AssetManager::OnImguiSelectMaterial()
+	std::pair <Asset*, std::shared_ptr<Material>> AssetManager::OnImguiSelectMaterial()
 	{
+		std::pair < Asset*, std::shared_ptr<Material>> result(nullptr, nullptr);
+
 		if (ImGui::BeginPopup("Material::AssetManager"))
 		{
-			std::shared_ptr<Material> result;
-
 			for (auto& [ak, av] : assets)
 			{
 				if (ImGui::BeginMenu(ak.c_str()))
@@ -278,20 +275,17 @@ namespace Engine2
 					{
 						if (ImGui::MenuItem(mk.c_str()))
 						{
-							result = mv;
+							result.first = &av;
+							result.second = mv;
 						}
 					}
 					ImGui::EndMenu();
 				}
 			}
 			ImGui::EndPopup();
+		}
 
-			return result;
-		}
-		else
-		{
-			return nullptr;
-		}
+		return result;
 	}
 
 	void AssetManager::Clear()

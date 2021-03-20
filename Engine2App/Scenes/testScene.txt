@@ -1,5 +1,6 @@
 #  Add timestamp
 Assets
+  Source:Assets//Models//Primatives.obj
 SceneInformation
   # To do
 SceneHierarchy
@@ -9,7 +10,7 @@ SceneHierarchy
     Transform
       position:6.65776,7.11512,-6.33345,1
       scale:1,1,1,0
-      rotation:0.55848,-1.1254,0,0
+      rotation:0.61248,-1.0784,0,0
     Camera
       name:Main
       orthographic:false
@@ -45,8 +46,11 @@ SceneHierarchy
       showCollider:false
       centre:0,0,0
       extents:1,1,1
-    Gizmo
-      type:0
+    MeshRenderer
+      meshAsset:Assets//Models//Primatives.obj
+      mesh:Cube
+      materialAsset:Assets//Models//Primatives.obj
+      material:DefaultMaterial
   Entity
     EntityInfo
       tag:1
@@ -62,6 +66,11 @@ SceneHierarchy
       showCollider:false
       centre:0,0,0
       extents:1,1,1
+    MeshRenderer
+      meshAsset:Assets//Models//Primatives.obj
+      mesh:Cube
+      materialAsset:Assets//Models//Primatives.obj
+      material:DefaultMaterial
   Entity
     EntityInfo
       tag:2
@@ -77,9 +86,11 @@ SceneHierarchy
       showCollider:false
       centre:0,0,0
       extents:1,1,1
-    OffscreenOutliner
-      outlineScale:1.125
-      outlineColor:0.8,0.570588,0.2,0.75
+    MeshRenderer
+      meshAsset:Assets//Models//Primatives.obj
+      mesh:Sphere
+      materialAsset:Assets//Models//Primatives.obj
+      material:DefaultMaterial
   Entity
     EntityInfo
       tag:5
@@ -120,3 +131,8 @@ SceneHierarchy
       showCollider:false
       centre:0,0,0
       extents:1,1,1
+    MeshRenderer
+      meshAsset:Assets//Models//Primatives.obj
+      mesh:Cube
+      materialAsset:Assets//Models//Primatives.obj
+      material:DefaultMaterial

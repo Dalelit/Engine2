@@ -3,6 +3,7 @@
 #include <map>
 #include <fstream>
 #include "Logging.h"
+#include "Common.h"
 
 /*
 To use this, include the header file and add a method
@@ -28,6 +29,7 @@ namespace Engine2
 			virtual void Attribute(const char* name, bool& value) = 0;
 			virtual void Attribute(const char* name, size_t& value) = 0;
 			virtual void Attribute(const char* name, std::string& value) = 0;
+			virtual void Attribute(const char* name, const std::string& value) = 0;
 			virtual void Attribute(const char* name, DirectX::XMFLOAT3& value) = 0;
 			virtual void Attribute(const char* name, DirectX::XMVECTOR& value) = 0;
 			virtual void Attribute(const char* name, DirectX::XMMATRIX& value) = 0;
@@ -48,6 +50,7 @@ namespace Engine2
 			void Attribute(const char* name, bool& value);
 			void Attribute(const char* name, size_t& value);
 			void Attribute(const char* name, std::string& value);
+			void Attribute(const char* name, const std::string& value);
 			void Attribute(const char* name, DirectX::XMFLOAT3& value);
 			void Attribute(const char* name, DirectX::XMVECTOR& value);
 			void Attribute(const char* name, DirectX::XMMATRIX& value);
@@ -75,6 +78,7 @@ namespace Engine2
 			void Attribute(const char* name, bool& value);
 			void Attribute(const char* name, size_t& value);
 			void Attribute(const char* name, std::string& value);
+			void Attribute(const char* name, const std::string& value) { E2_ASSERT(false, "Cannot use for const"); }
 			void Attribute(const char* name, DirectX::XMFLOAT3& value);
 			void Attribute(const char* name, DirectX::XMVECTOR& value);
 			void Attribute(const char* name, DirectX::XMMATRIX& value);

@@ -24,6 +24,8 @@ namespace Engine2
 		inline AssetStore<Mesh>& Meshes() { return meshes; }
 		inline AssetStore<Material>& Materials() { return materials; }
 
+		inline const std::string& GetSource() const { return source; }
+
 	protected:
 		friend AssetManager;
 
@@ -43,6 +45,8 @@ namespace Engine2
 	{
 	public:
 
+		using AssetsMap = std::map<std::string, Asset>;
+
 		static inline AssetManager& Manager() { return *instance; }
 		static inline std::optional<AssetRef> FindAsset(const std::string& assetName) { return instance->GetAsset(assetName); }
 
@@ -55,17 +59,19 @@ namespace Engine2
 		void OnImgui();
 
 		void OnImguiSelectMeshPopupOpen();
-		std::shared_ptr<Mesh> OnImguiSelectMesh();
+
+		std::pair<Asset*, std::shared_ptr<Mesh>> OnImguiSelectMesh();
 
 		void OnImguiSelectMaterialPopupOpen();
-		std::shared_ptr<Material> OnImguiSelectMaterial();
+		std::pair < Asset*, std::shared_ptr<Material>> OnImguiSelectMaterial();
 
 		void Clear();
+
+		AssetsMap& GetMap() { return assets; }
 
 	protected:
 		static std::unique_ptr<AssetManager> instance;
 
-		using AssetsMap = std::map<std::string, Asset>;
 		AssetsMap assets;
 
 		std::string lastActionResult;

@@ -1,6 +1,8 @@
 #pragma once
 #include "Mesh.h"
 #include "Material.h"
+#include "Serialiser.h"
+#include "AssetManager.h"
 
 namespace Engine2
 {
@@ -8,20 +10,18 @@ namespace Engine2
 	{
 	public:
 
-		MeshRenderer() : mesh(defaultMesh), material(defaultMaterial) {}
-
 		void BindAndDraw();
 		void ShadowBindAndDraw();
 
 		bool IsValid() { return mesh && mesh->IsValid() && material && material->IsValid(); }
 
 		void OnImgui();
+		void Serialise(Serialisation::INode& node);
 
 		std::shared_ptr<Mesh> mesh;
+		Asset* meshAsset = nullptr;
 		std::shared_ptr<Material> material;
-
-		static std::weak_ptr<Mesh> defaultMesh;
-		static std::weak_ptr<Material> defaultMaterial;
+		Asset* materialAsset = nullptr;
 
 	protected:
 	};

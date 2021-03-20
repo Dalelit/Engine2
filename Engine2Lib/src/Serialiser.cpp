@@ -193,6 +193,11 @@ namespace Engine2
 			m_out << m_indent << name << ":" << value << std::endl;
 		}
 
+		void WriteNode::Attribute(const char* name, const std::string& value)
+		{
+			m_out << m_indent << name << ":" << value << std::endl;
+		}
+
 		void WriteNode::Attribute(const char* name, DirectX::XMFLOAT3& value)
 		{
 			m_out << m_indent << name << ":" << value.x << "," << value.y << "," << value.z << std::endl;
