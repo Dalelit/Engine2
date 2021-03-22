@@ -1,10 +1,12 @@
 #include "pch.h"
 #include "Components.h"
+#include "EntityInfo.h"
 #include "Transform.h"
 #include "Gizmo.h"
 #include "submodules/imgui/imgui.h"
 #include "UtilMath.h"
 #include "MeshRenderer.h"
+#include "MeshComponent.h"
 #include "RigidBody.h"
 #include "Collider.h"
 #include "Particles.h"
@@ -17,21 +19,35 @@ using namespace DirectX;
 
 namespace Engine2
 {
-	void EntityInfo::OnImgui()
+	//
+	// On component add. Called after component is created.
+	// Override for specific scenarios.
+	//
+	template <typename T>
+	void OnComponentAdded(T* componentPtr, EngineECS::EntityId_t id, EngineECS::Coordinator& coord) { }
+
+	template <>
+	void OnComponentAdded(MeshComponent* componentPtr, EngineECS::EntityId_t id, EngineECS::Coordinator& coord)
 	{
-		char buffer[256] = {};
-		strcpy_s(buffer, sizeof(buffer), tag.c_str());
-		if (ImGui::InputText("Tag", buffer, sizeof(buffer)))
-		{
-			tag = buffer;
-		}
+		if (coord.HasComponent<MeshRenderer>(id)) coord.GetComponent<MeshRenderer>(id)->SetMesh(componentPtr->GetMesh());
 	}
 
-	void EntityInfo::Serialise(Serialisation::INode& node)
+	//
+	// On component about to be removed. Called just before component is removed and destroyed.
+	// Override for specific scenarios.
+	//
+	template <typename T>
+	void OnComponentToBeRemoved(T* componentPtr, EngineECS::EntityId_t id, EngineECS::Coordinator& coord) { }
+
+	template <>
+	void OnComponentToBeRemoved(MeshComponent* componentPtr, EngineECS::EntityId_t id, EngineECS::Coordinator& coord)
 	{
-		node.Attribute("tag", tag);
+		if (coord.HasComponent<MeshRenderer>(id)) coord.GetComponent<MeshRenderer>(id)->ClearMesh();
 	}
 
+	//
+	// on component imgui
+	//
 	template <typename T>
 	void ComponentOnImgui(const char* displayName, EngineECS::EntityId_t id, EngineECS::Coordinator& coord)
 	{
@@ -55,15 +71,25 @@ namespace Engine2
 
 			if (destroy)
 			{
+				OnComponentToBeRemoved<T>(coord.GetComponent<T>(id), id, coord);
 				coord.DestroyComponent<T>(id);
 			}
 		}
 	}
 
 	template <typename T>
-	inline void AddComponentOnImgui(const char* displayName, EngineECS::EntityId_t id, EngineECS::Coordinator& coord)
+	inline T* AddComponentOnImgui(const char* displayName, EngineECS::EntityId_t id, EngineECS::Coordinator& coord)
 	{
-		if (!coord.HasComponent<T>(id) && ImGui::Selectable(displayName)) coord.AddComponent<T>(id);
+		if (!coord.HasComponent<T>(id) && ImGui::Selectable(displayName))
+		{
+			auto comp = coord.AddComponent<T>(id);
+			OnComponentAdded<T>(comp, id, coord);
+			return comp;
+		}
+		else
+		{
+			return nullptr;
+		}
 	}
 
 	void Components::OnImgui(EngineECS::EntityId_t id, EngineECS::Coordinator& coord)
@@ -72,6 +98,7 @@ namespace Engine2
 		coord.GetComponent<Transform>(id)->OnImgui();
 		coord.GetComponent<TransformMatrix>(id)->OnImgui();
 		ComponentOnImgui<MeshRenderer>("MeshRenderer", id, coord);
+		ComponentOnImgui<MeshComponent>("MeshComponent", id, coord);
 		ComponentOnImgui<RigidBody>("RigidBody", id, coord);
 		ComponentOnImgui<Collider>("Collider", id, coord);
 		ComponentOnImgui<PointLight>("PointLight", id, coord);
@@ -85,6 +112,7 @@ namespace Engine2
 		if (ImGui::BeginCombo("Add Component", ""))
 		{
 			AddComponentOnImgui<MeshRenderer>("MeshRenderer", id, coord);
+			AddComponentOnImgui<MeshComponent>("MeshComponent", id, coord);
 			AddComponentOnImgui<RigidBody>("RigidBody", id, coord);
 			AddComponentOnImgui<Collider>("Collider", id, coord);
 			AddComponentOnImgui<PointLight>("PointLight", id, coord);

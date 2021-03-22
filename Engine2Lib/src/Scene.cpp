@@ -3,6 +3,7 @@
 #include "Camera.h"
 #include "Engine2.h"
 #include "Components.h"
+#include "EntityInfo.h"
 #include "Transform.h"
 #include "MeshRenderer.h"
 #include "RigidBody.h"

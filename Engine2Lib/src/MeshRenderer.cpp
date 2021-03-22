@@ -84,4 +84,16 @@ namespace Engine2
 
 		}
 	}
+
+	void MeshRenderer::SetMesh(std::shared_ptr<Mesh>& srcMesh, Asset* srcAsset)
+	{
+		mesh = srcMesh;
+		meshAsset = srcAsset;
+	}
+
+	void MeshRenderer::ClearMesh()
+	{
+		mesh = nullptr;
+		meshAsset = nullptr;
+	}
 }

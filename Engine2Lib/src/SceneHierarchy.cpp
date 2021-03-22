@@ -2,6 +2,7 @@
 #include "Common.h"
 #include "SceneHierarchy.h"
 #include "submodules/imgui/imgui.h"
+#include "EntityInfo.h"
 #include "VertexLayout.h"
 #include "VertexBuffer.h"
 #include "MeshRenderer.h"

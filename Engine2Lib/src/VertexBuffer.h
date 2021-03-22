@@ -6,6 +6,7 @@
 #include "DXBuffer.h"
 #include "Resources.h"
 #include "Instrumentation.h"
+#include "VertexBufferData.h"
 
 namespace Engine2
 {
@@ -19,22 +20,40 @@ namespace Engine2
 		template <typename V>
 		void Initialise(D3D11_PRIMITIVE_TOPOLOGY top, std::vector<V>& verticies, bool updatable = false) {
 			SetTopology(top);
-			InitialiseVertexBuffer(verticies, updatable);
+			InitialiseVertexBuffer(verticies.data(), verticies.size(), updatable);
 		}
 
 		template <typename V>
-		void Update(std::vector<V>& verticies) {
+		void Initialise(D3D11_PRIMITIVE_TOPOLOGY top, VertexBufferData<V>& verticies, bool updatable = false) {
+			SetTopology(top);
+			InitialiseVertexBuffer(verticies.VertexBegin(), verticies.VertexCount(), updatable);
+		}
+
+		template <typename V>
+		void Initialise(D3D11_PRIMITIVE_TOPOLOGY top, V* verticies, size_t vCount, bool updatable = false) {
+			SetTopology(top);
+			InitialiseVertexBuffer(verticies, vCount, updatable);
+		}
+
+		template <typename V>
+		void Update(std::vector<V>& verticies) { Update(verticies.data(), verticies.size()); }
+
+		template <typename V>
+		void Update(VertexBufferData<V>& verticies) { Update(verticies.VertexBegin(), verticies.VertexCount()); }
+
+		template <typename V>
+		void Update(V* verticies, size_t vCount) {
 			// to do: D3D11_MAP_WRITE_DISCARD v D3D11_MAP_WRITE_NO_OVERWRITE ?
 
-			if (vertexCapacity < verticies.size()) // recreate as it's not big enough
+			if (vertexCapacity < vCount) // recreate as it's not big enough
 			{
-				Initialise(topology, verticies, true);
+				Initialise(topology, verticies, vCount, true);
 			}
 			else // update it
 			{
 				HRESULT hr;
 
-				vertexCount = (UINT)verticies.size();
+				vertexCount = (UINT)vCount;
 
 				auto& context = DXDevice::GetContext();
 				auto ptrBuffer = pVertexBuffer.Get();
@@ -44,9 +63,11 @@ namespace Engine2
 
 				E2_ASSERT_HR(hr, "VertexBufferDynamic Map failed");
 
-				memcpy(mappedSubResource.pData, verticies.data(), sizeof(V) * verticies.size());
+				memcpy(mappedSubResource.pData, verticies, sizeof(V) * vCount);
 
 				context.Unmap(ptrBuffer, 0);
+
+				info = "VertexBuffer vertex count: " + std::to_string(vertexCount);
 			}
 		}
 
@@ -86,19 +107,19 @@ namespace Engine2
 		UINT vertexCapacity = 0;
 
 		template <typename V>
-		void InitialiseVertexBuffer(std::vector<V>& verticies, bool updatable) {
+		void InitialiseVertexBuffer(V* verticies, size_t vCount, bool updatable) {
 			if (pVertexBuffer) pVertexBuffer.Reset();
 
 			bufferStrides[0] = sizeof(V);
 			bufferOffsets[0] = 0;
 
-			vertexCount = (UINT)verticies.size();
+			vertexCount = (UINT)vCount;
 			vertexCapacity = vertexCount;
 
 			D3D11_SUBRESOURCE_DATA data = {};
 			data.SysMemPitch = 0;
 			data.SysMemSlicePitch = 0;
-			data.pSysMem = verticies.data();
+			data.pSysMem = verticies;
 
 			D3D11_BUFFER_DESC bufferDesc = {};
 			bufferDesc.ByteWidth = sizeof(V) * vertexCount;
@@ -126,18 +147,38 @@ namespace Engine2
 		template <typename V>
 		void Initialise(D3D11_PRIMITIVE_TOPOLOGY top, std::vector<V>& verticies, std::vector<unsigned int>& indicies, bool updatable = false) {
 			SetTopology(top);
-			InitialiseVertexBuffer(verticies, updatable);
-			InitialiseIndexBuffer(indicies, updatable);
+			InitialiseVertexBuffer(verticies.data(), verticies.size(), updatable);
+			InitialiseIndexBuffer(indicies.data(), indicies.size(), updatable);
 		}
 
 		template <typename V>
-		void Update(std::vector<V>& verticies, std::vector<unsigned int>& indicies) {
+		void Initialise(D3D11_PRIMITIVE_TOPOLOGY top, VertexIndexBufferData<V>& data, bool updatable = false) {
+			SetTopology(top);
+			InitialiseVertexBuffer(data.VertexBegin(), data.VertexCount(), updatable);
+			InitialiseIndexBuffer(data.IndexBegin(), data.IndexCount(), updatable);
+		}
 
-			VertexBuffer::Update<V>(verticies);
+		template <typename V>
+		void Initialise(D3D11_PRIMITIVE_TOPOLOGY top, V* verticies, size_t vCount, uint32_t* indicies, size_t iCount, bool updatable = false) {
+			SetTopology(top);
+			InitialiseVertexBuffer(verticies, vCount, updatable);
+			InitialiseIndexBuffer(indicies, iCount, updatable);
+		}
 
-			if (indxCapacity < indicies.size()) // recreate as it's not big enough
+		template <typename V>
+		void Update(std::vector<V>& verticies, std::vector<unsigned int>& indicies) { Update(verticies.data(), verticies.size(), indicies.data(), indicies.size()); }
+
+		template <typename V>
+		void Update(VertexIndexBufferData<V>& data) { Update(data.VertexBegin(), data.VertexCount(), data.IndexBegin(), data.IndexCount()); }
+
+		template <typename V>
+		void Update(V* verticies, size_t vertexCount, uint32_t* indicies, size_t iCount) {
+
+			VertexBuffer::Update<V>(verticies, vertexCount);
+
+			if (indxCapacity < iCount) // recreate as it's not big enough
 			{
-				InitialiseIndexBuffer(indicies, true);
+				InitialiseIndexBuffer(indicies, iCount, true);
 			}
 			else // update
 			{
@@ -145,7 +186,7 @@ namespace Engine2
 
 				HRESULT hr;
 
-				indxCount = (unsigned int)indicies.size();
+				indxCount = (UINT)iCount;
 
 				auto& context = DXDevice::GetContext();
 				auto ptrBuffer = pIndexBuffer.Get();
@@ -155,9 +196,11 @@ namespace Engine2
 
 				E2_ASSERT_HR(hr, "VertexBufferIndex Map failed");
 
-				memcpy(mappedSubResource.pData, indicies.data(), sizeof(unsigned int) * indicies.size());
+				memcpy(mappedSubResource.pData, indicies, sizeof(uint32_t) * indxCount);
 
 				context.Unmap(ptrBuffer, 0);
+
+				this->info += " index count: " + std::to_string(indxCount);
 			}
 		}
 
@@ -183,19 +226,19 @@ namespace Engine2
 		UINT indxCount = 0;
 		UINT indxCapacity = 0;
 
-		void InitialiseIndexBuffer(std::vector<unsigned int>& indicies, bool updatable) {
+		void InitialiseIndexBuffer(uint32_t* indicies, size_t iCount, bool updatable) {
 
 			if (pIndexBuffer) pIndexBuffer.Reset();
 
 			HRESULT hr;
 
-			indxCount = (unsigned int)indicies.size();
+			indxCount = (UINT)iCount;
 			indxCapacity = indxCount;
 
 			D3D11_SUBRESOURCE_DATA data = {};
 			data.SysMemPitch = 0;
 			data.SysMemSlicePitch = 0;
-			data.pSysMem = indicies.data();
+			data.pSysMem = indicies;
 
 			D3D11_BUFFER_DESC bufferDesc = {};
 			bufferDesc.ByteWidth = sizeof(unsigned int) * indxCount;

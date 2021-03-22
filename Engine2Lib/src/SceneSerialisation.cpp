@@ -2,6 +2,7 @@
 #include "SceneSerialisation.h"
 #include "AssetManager.h"
 #include "Components.h"
+#include "EntityInfo.h"
 #include "Transform.h"
 #include "MeshRenderer.h"
 #include "RigidBody.h"

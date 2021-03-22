@@ -66,6 +66,9 @@
     <ClInclude Include="src\Physics.h" />
     <ClInclude Include="src\Logging.h" />
     <ClInclude Include="src\Collider.h" />
+    <ClInclude Include="src\MeshComponent.h" />
+    <ClInclude Include="src\EntityInfo.h" />
+    <ClInclude Include="src\VertexBufferData.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\pch.cpp" />
@@ -118,6 +121,8 @@
     <ClCompile Include="src\Physics.cpp" />
     <ClCompile Include="src\Logging.cpp" />
     <ClCompile Include="src\Collider.cpp" />
+    <ClCompile Include="src\MeshComponent.cpp" />
+    <ClCompile Include="src\EntityInfo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Assets\Shaders\GizmosPS.hlsl" />

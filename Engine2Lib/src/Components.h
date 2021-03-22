@@ -2,17 +2,26 @@
 
 #include <string>
 #include "ECS.h"
-#include "Serialiser.h"
+#include "Entity.h"
 
 namespace Engine2
 {
-	struct EntityInfo
+	class Component
 	{
-		std::string tag;
+	public:
+		void SetEntity(const Entity& e) { entity = e; }
 
-		void OnImgui();
+		template <typename T, typename... ARGS>
+		T* AddComponent(ARGS... args) { return entity.AddComponent<T>(args...); }
 
-		void Serialise(Serialisation::INode& node);
+		template <typename T>
+		T* GetComponent() { return entity.GetComponent<T>(); }
+
+		template <typename T>
+		bool HasComponent() { return entity.HasComponent<T>(); }
+
+	protected:
+		Entity entity;
 	};
 
 	class Components

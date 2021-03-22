@@ -161,12 +161,14 @@
     <ClInclude Include="src\Components.h" />
     <ClInclude Include="src\DXBuffer.h" />
     <ClInclude Include="src\ECS.h" />
+    <ClInclude Include="src\EntityInfo.h" />
     <ClInclude Include="src\Gizmo.h" />
     <ClInclude Include="src\Instances.h" />
     <ClInclude Include="src\Logging.h" />
     <ClInclude Include="src\Material.h" />
     <ClInclude Include="src\MaterialLibrary.h" />
     <ClInclude Include="src\Mesh.h" />
+    <ClInclude Include="src\MeshComponent.h" />
     <ClInclude Include="src\MeshRenderer.h" />
     <ClInclude Include="src\Physics.h" />
     <ClInclude Include="src\RigidBody.h" />
@@ -218,6 +220,7 @@
     <ClInclude Include="src\Surface.h" />
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\Util.h" />
+    <ClInclude Include="src\VertexBufferData.h" />
     <ClInclude Include="src\VertexBufferInstanced.h" />
     <ClInclude Include="src\VertexLayout.h" />
   </ItemGroup>
@@ -227,6 +230,7 @@
     <ClCompile Include="src\Collider.cpp" />
     <ClCompile Include="src\Components.cpp" />
     <ClCompile Include="src\Config.cpp" />
+    <ClCompile Include="src\EntityInfo.cpp" />
     <ClCompile Include="src\Gizmo.cpp" />
     <ClCompile Include="src\InputController.cpp" />
     <ClCompile Include="src\Instances.cpp" />
@@ -236,6 +240,7 @@
     <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\MaterialLibrary.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
+    <ClCompile Include="src\MeshComponent.cpp" />
     <ClCompile Include="src\MeshRenderer.cpp" />
     <ClCompile Include="src\OffscreenOutliner.cpp" />
     <ClCompile Include="src\Particles.cpp" />
