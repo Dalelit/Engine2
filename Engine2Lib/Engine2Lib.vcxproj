@@ -169,6 +169,7 @@
     <ClInclude Include="src\MaterialLibrary.h" />
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\MeshComponent.h" />
+    <ClInclude Include="src\MeshGenerator.h" />
     <ClInclude Include="src\MeshRenderer.h" />
     <ClInclude Include="src\Physics.h" />
     <ClInclude Include="src\RigidBody.h" />
@@ -241,6 +242,7 @@
     <ClCompile Include="src\MaterialLibrary.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\MeshComponent.cpp" />
+    <ClCompile Include="src\MeshGenerator.cpp" />
     <ClCompile Include="src\MeshRenderer.cpp" />
     <ClCompile Include="src\OffscreenOutliner.cpp" />
     <ClCompile Include="src\Particles.cpp" />

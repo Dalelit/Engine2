@@ -14,7 +14,7 @@ namespace Engine2
 
 		void Resize(size_t vertexCount)
 		{
-			E2_ASSERT(vertexCount > 0, "VertexBufferData invalid size");
+			assert(vertexCount > 0 && "VertexBufferData invalid size");
 
 			size_t vertexSize = vertexCount * sizeof(V);
 
@@ -56,7 +56,7 @@ namespace Engine2
 
 		void Resize(size_t vertexCount, size_t indexCount)
 		{
-			E2_ASSERT(vertexCount > 0 && indexCount > 0, "VertexBufferData invalid size");
+			assert(vertexCount > 0 && indexCount > 0 && "VertexBufferData invalid size");
 
 			size_t vertexSize = vertexCount * sizeof(V);
 			size_t indexSize = indexCount * sizeof(I);
