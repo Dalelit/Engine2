@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Engine2.h"
 #include "SceneBuilder.h"
+#include "CSTest.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -224,7 +225,8 @@ int WINAPI WinMain(
 	OnInputEventFunc = [](Engine2::InputEvent& event) { Engine2::Engine::Get().OnInputEvent(event); };
 
 	// reminder: camera position is set by last layer
-	Engine2::Engine::Get().AttachLayer(new SceneBuilder());
+	Engine2::Engine::Get().AttachLayer(new SceneBuilder(), false);
+	Engine2::Engine::Get().AttachLayer(new CSTest());
 
 	clock_t lastTime = clock();
 

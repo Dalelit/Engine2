@@ -13,19 +13,9 @@ namespace Engine2
 	{
 		ImGui::Checkbox("Show texture", &active);
 
-		if (ImGui::DragFloat2("Left, top", leftTop, 0.01f))
-		{
-			leftTop[0] = std::clamp(leftTop[0], -1.0f, 1.0f - widthHeight[0]);
-			leftTop[1] = std::clamp(leftTop[1], -1.0f + widthHeight[1], 1.0f);
-			CreateVertexBuffer();
-		}
-
-		if (ImGui::DragFloat2("Width, Height", widthHeight, 0.01f))
-		{
-			widthHeight[0] = std::clamp(widthHeight[0], 0.0f, 1.0f - leftTop[0]);
-			widthHeight[1] = std::clamp(widthHeight[1], 0.0f, 1.0f + leftTop[1]);
-			CreateVertexBuffer();
-		}
+		if (ImGui::DragFloat2("Left, top", leftTop, 0.01f)) SetLeftTop(leftTop[0], leftTop[1]);
+		if (ImGui::DragFloat2("Width, Height", widthHeight, 0.01f)) SetWidthHeight(widthHeight[0], widthHeight[1]);
+		if (ImGui::Checkbox("Depth texture", &isDepthTexture)) InitialisePixelShader();
 
 		if (active) RenderTexture();
 	}
@@ -39,6 +29,20 @@ namespace Engine2
 		pVB->BindAndDraw();
 
 		DXDevice::Get().SetDefaultDepthStencilState();
+	}
+
+	void TextureGizmo::SetLeftTop(float left, float top)
+	{
+		leftTop[0] = std::clamp(left, -1.0f, 1.0f - widthHeight[0]);
+		leftTop[1] = std::clamp(top, -1.0f + widthHeight[1], 1.0f);
+		CreateVertexBuffer();
+	}
+
+	void TextureGizmo::SetWidthHeight(float width, float height)
+	{
+		widthHeight[0] = std::clamp(width, 0.0f, 1.0f - leftTop[0]);
+		widthHeight[1] = std::clamp(height, 0.0f, 1.0f + leftTop[1]);
+		CreateVertexBuffer();
 	}
 
 	void TextureGizmo::InitialiseShaders()
@@ -68,10 +72,18 @@ namespace Engine2
 
 		pVS = VertexShader::CreateFromString(VSsrc, layout);
 
+		InitialisePixelShader();
+	}
+
+	void TextureGizmo::InitialisePixelShader()
+	{
 		std::string PSsrc;
 		PSsrc = "Texture2D tex : register (t" + std::to_string(slot) + ");\n";
 		PSsrc += "SamplerState smplr : register (s" + std::to_string(slot) + ");\n";
-		PSsrc += R"(
+
+		if (isDepthTexture)
+		{
+			PSsrc += R"(
 
 				float4 main(float2 texCoord : TexCoord) : SV_TARGET
 				{
@@ -79,6 +91,17 @@ namespace Engine2
 					return float4(depth, depth, depth, 1.0);
 				}
 			)";
+		}
+		else
+		{
+			PSsrc += R"(
+
+				float4 main(float2 texCoord : TexCoord) : SV_TARGET
+				{
+					return float4(tex.Sample(smplr, texCoord));
+				}
+			)";
+		}
 
 		pPS = PixelShader::CreateFromString(PSsrc);
 	}

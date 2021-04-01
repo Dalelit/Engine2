@@ -5,10 +5,14 @@
     <ClCompile Include="src\pch.cpp" />
     <ClCompile Include="src\SceneBuilder.cpp" />
     <ClCompile Include="src\Empty.cpp" />
+    <ClCompile Include="src\CSTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h" />
     <ClInclude Include="src\SceneBuilder.h" />
     <ClInclude Include="src\Empty.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Assets\Shaders\CSTest1.hlsl" />
   </ItemGroup>
 </Project>

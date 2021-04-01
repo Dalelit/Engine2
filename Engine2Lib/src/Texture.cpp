@@ -3,7 +3,7 @@
 
 namespace Engine2
 {
-	Texture::Texture(unsigned int slot, Surface& surface, DXGI_FORMAT format) :
+	Texture::Texture(unsigned int slot, Surface& surface, DXGI_FORMAT format, bool unorderedAccess) :
 		slot(slot)
 	{
 		D3D11_TEXTURE2D_DESC1 texDesc = {};
@@ -16,6 +16,7 @@ namespace Engine2
 		texDesc.SampleDesc.Quality = 0u;
 		texDesc.Usage = D3D11_USAGE_DEFAULT;
 		texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+		if (unorderedAccess) texDesc.BindFlags |= D3D11_BIND_UNORDERED_ACCESS;
 		//texDesc.CPUAccessFlags;
 		//texDesc.TextureLayout = D3D11_TEXTURE_LAYOUT_UNDEFINED;
 

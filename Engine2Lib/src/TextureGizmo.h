@@ -15,9 +15,13 @@ namespace Engine2
 
 		UINT GetTextureSlot() { return slot; }
 
+		void SetLeftTop(float left, float top);
+		void SetWidthHeight(float width, float height);
+
 	private:
 		UINT slot = 2;
 		bool active = true;
+		bool isDepthTexture = false;
 
 		std::shared_ptr<VertexBuffer> pVB;
 		std::shared_ptr<VertexShader> pVS;
@@ -27,6 +31,7 @@ namespace Engine2
 		float widthHeight[2] = { 0.25f, 0.25f };
 
 		void InitialiseShaders();
+		void InitialisePixelShader();
 
 		inline void CreateVertexBuffer() { CreateVertexBuffer(leftTop[0], leftTop[1], leftTop[0] + widthHeight[0], leftTop[1] - widthHeight[1]); };
 		void CreateVertexBuffer(float left, float top, float right, float bottom);

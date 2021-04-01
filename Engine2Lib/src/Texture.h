@@ -21,7 +21,7 @@ namespace Engine2
 	class Texture : public Bindable
 	{
 	public:
-		Texture(unsigned int slot, Surface& surface, DXGI_FORMAT format);
+		Texture(unsigned int slot, Surface& surface, DXGI_FORMAT format, bool unorderedAccess = false);
 		Texture(unsigned int slot, Surface& surface, D3D11_TEXTURE2D_DESC1& texDesc, D3D11_SHADER_RESOURCE_VIEW_DESC& srvDesc);
 		Texture(unsigned int slot, std::vector<std::shared_ptr<Surface>> surfaces, D3D11_TEXTURE2D_DESC1& texDesc, D3D11_SHADER_RESOURCE_VIEW_DESC& srvDesc);
 		Texture(unsigned int slot, Microsoft::WRL::ComPtr<ID3D11Texture2D> pTextureToWrap);
@@ -37,6 +37,9 @@ namespace Engine2
 
 		void SetName(const std::string& newName) { name = newName; }
 		void SetSlot(unsigned int newSlot) { slot = newSlot; }
+
+		inline Microsoft::WRL::ComPtr<ID3D11Texture2D1> GetBuffer() { return pTexture; }
+		inline Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> GetSRV() { return pSRView; }
 
 	protected:
 		unsigned int slot;
