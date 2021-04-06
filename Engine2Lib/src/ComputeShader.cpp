@@ -39,7 +39,13 @@ namespace Engine2
 
 		HRESULT hr = D3DCompileFromFile(Util::ToWString(filename).c_str(), 0, D3D_COMPILE_STANDARD_FILE_INCLUDE, entryPoint.c_str(), target.c_str(), 0, 0, &pBlob, &pErrBlob);
 
-		if (FAILED(hr)) return nullptr;
+		if (FAILED(hr))
+		{
+			std::string errorMsg = (char*)pErrBlob->GetBufferPointer();
+			Logging::LogError("Compute shader failed.");
+			Logging::LogError(errorMsg);
+			return nullptr;
+		}
 
 		return std::make_shared<ComputeShader>(*pBlob.Get(), "Source file: " + filename + "\n" + entryPoint + " " + target);
 	}

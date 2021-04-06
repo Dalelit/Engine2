@@ -131,4 +131,32 @@ namespace Engine2
 		GSConstantBuffer<T>* CloneImpl() const { return new GSConstantBuffer(*this); }
 	};
 
+	template <typename T>
+	class CSConstantBuffer : public ConstantBuffer<T>
+	{
+	public:
+		CSConstantBuffer(unsigned int bindSlot = 0) : ConstantBuffer<T>(bindSlot) {}
+
+		void Bind()
+		{
+			// To Do: instrumentation E2_STATS_CSCB_BIND;
+			this->UpdateBuffer();
+			DXDevice::GetContext().CSSetConstantBuffers(this->slot, 1u, this->pConstantBuffer.GetAddressOf());
+		}
+
+		void Unbind() { DXDevice::GetContext().CSSetConstantBuffers(this->slot, 0u, nullptr); }
+
+		void OnImgui()
+		{
+			if (ImGui::TreeNode("Compute Shader Constant buffer"))
+			{
+				ImGui::Text("No override");
+				ImGui::TreePop();
+			}
+		}
+
+	protected:
+		CSConstantBuffer<T>* CloneImpl() const { return new CSConstantBuffer(*this); }
+	};
+
 }

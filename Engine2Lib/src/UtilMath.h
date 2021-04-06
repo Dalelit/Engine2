@@ -79,5 +79,7 @@ namespace Engine2
 		inline float RadToDeg(float f) { return f * (180.0f / XM_PI); }
 
 		inline float GetMaxFloatVector3(XMVECTOR v) { return std::max<float>(v.m128_f32[0], std::max<float>(v.m128_f32[1], v.m128_f32[2])); }
+
+		inline XMFLOAT2 Normalize(XMFLOAT2 value) { XMFLOAT2 v = value; float length = sqrtf(v.x * v.x + v.y + v.y); v.x /= length; v.y /= length;  return v; }
 	}
 }

@@ -1,6 +1,5 @@
 #pragma once
 #include "Shader.h"
-#include "ComputeShaderBuffer.h"
 
 namespace Engine2
 {
@@ -27,12 +26,15 @@ namespace Engine2
 
 	class ComputeShaderFile : public ComputeShader
 	{
-		ComputeShaderFile(const std::string& filename, const std::string entryPoint = "main", const std::string target = "ps_5_0");
+	public:
+		ComputeShaderFile(const std::string& filename, const std::string entryPoint = "main", const std::string target = "cs_5_0");
 
 		void Bind() { if (autoReload) Reload(); ComputeShader::Bind(); }
 		void Reload(); // only reloads if the file has changed
 		inline bool IsValid() { return (pComputeShader); }
 		void OnImgui();
+
+		void AutoUpdate(bool turnOn = true) { autoReload = turnOn; }
 
 	protected:
 		std::string filename;

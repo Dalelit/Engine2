@@ -18,6 +18,8 @@ namespace Engine2
 		void SetLeftTop(float left, float top);
 		void SetWidthHeight(float width, float height);
 
+		void SetActive(bool isActive = true) { active = isActive; }
+
 	private:
 		UINT slot = 2;
 		bool active = true;

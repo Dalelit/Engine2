@@ -2,6 +2,7 @@
 #include "Common.h"
 #include "DXDevice.h"
 #include "DXBuffer.h"
+#include "Resources.h"
 
 namespace Engine2
 {
@@ -45,7 +46,7 @@ namespace Engine2
 
 		void OnImgui() { ImGui::Text("ComputeShaderUAV"); }
 
-		void Initialise(wrl::ComPtr<ID3D11Texture2D1> pTargetBuffer) {
+		void Initialise(wrl::ComPtr<ID3D11Texture2D> pTargetBuffer) {
 
 			D3D11_UNORDERED_ACCESS_VIEW_DESC viewDesc = {};
 
@@ -58,9 +59,24 @@ namespace Engine2
 			E2_ASSERT_HR(hr, "Computer Shader output view CreateUnorderedAccessView failed");
 		}
 
+		void InitialiseTest(wrl::ComPtr<ID3D11Buffer> pTargetBuffer, UINT capacity) {
+
+			D3D11_UNORDERED_ACCESS_VIEW_DESC viewDesc = {};
+
+			viewDesc.ViewDimension = D3D11_UAV_DIMENSION::D3D11_UAV_DIMENSION_BUFFER;
+			viewDesc.Format = DXGI_FORMAT::DXGI_FORMAT_UNKNOWN;
+			viewDesc.Buffer.FirstElement = 0;
+			viewDesc.Buffer.NumElements = capacity;
+
+			HRESULT hr = DXDevice::GetDevice().CreateUnorderedAccessView(pTargetBuffer.Get(), &viewDesc, &pUnorderedAccessView);
+
+			E2_ASSERT_HR(hr, "Computer Shader output view CreateUnorderedAccessView failed");
+		}
+
 	protected:
 		UINT slot = 0;
 
 		wrl::ComPtr<ID3D11UnorderedAccessView> pUnorderedAccessView = nullptr;
 	};
+
 }

@@ -16,6 +16,7 @@ namespace Engine2
 		virtual void OnImgui();
 
 		inline std::string& GetName() { return name; }
+		inline void SetName(const std::string& newName) { name = newName; }
 
 	protected:
 		std::string name;

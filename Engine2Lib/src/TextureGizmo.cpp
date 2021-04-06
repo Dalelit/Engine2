@@ -22,13 +22,16 @@ namespace Engine2
 
 	void TextureGizmo::RenderTexture()
 	{
-		DXDevice::Get().SetDepthStencilStateDepthDisabled();
+		if (active)
+		{
+			DXDevice::Get().SetDepthStencilStateDepthDisabled();
 
-		pVS->Bind();
-		pPS->Bind();
-		pVB->BindAndDraw();
+			pVS->Bind();
+			pPS->Bind();
+			pVB->BindAndDraw();
 
-		DXDevice::Get().SetDefaultDepthStencilState();
+			DXDevice::Get().SetDefaultDepthStencilState();
+		}
 	}
 
 	void TextureGizmo::SetLeftTop(float left, float top)
