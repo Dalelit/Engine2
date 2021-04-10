@@ -69,17 +69,24 @@ void AntSlime::OnApplicationEvent(Engine2::ApplicationEvent& event)
 void AntSlime::OnImgui()
 {
 	if (ImGui::DragInt("Number of ants", &antCount, 10)) if (antCount < 1) antCount = 1;
-	if (ImGui::Button("Restart")) Initialise();
+	if (ImGui::DragInt("Types 1-2-3", &antTypes, 1, 1, 3)) if (antTypes < 1) antTypes = 1; else if (antTypes > 3) antTypes = 3;
+	if (ImGui::Button("All")) Initialise(0);
+	ImGui::SameLine();
+	if (ImGui::Button("Ring")) Initialise(1);
+	ImGui::SameLine();
+	if (ImGui::Button("Circle")) Initialise(2);
 	ImGui::Checkbox("Pause", &pause);
+	ImGui::Separator();
 	ImGui::DragFloat("Location range", &controlBuffer.data.locationRange, 0.25f);
 	ImGui::DragFloat("Diffuse Loss", &controlBuffer.data.diffuseLoss, 0.005f, 0.0f, 1.0f);
 	ImGui::DragFloat("Diffuse Fade", &controlBuffer.data.diffuseFade, 0.005f, 0.0f, 1.0f);
 	float degrees = Math::RadToDeg(controlBuffer.data.senseAngle);
 	if (ImGui::DragFloat("Sense Angle", &degrees, 0.5f)) controlBuffer.data.senseAngle = Math::DegToRad(degrees);
 	ImGui::DragFloat("Sense Range", &controlBuffer.data.senseRange, 0.005f);
+	if (ImGui::DragInt("Sense Radius", &controlBuffer.data.senseRadius, 1)) controlBuffer.data.senseRadius = max(1, controlBuffer.data.senseRadius);
+	ImGui::DragFloat("Replusion", &controlBuffer.data.replusion, 0.05f);
 	ImGui::DragFloat("Speed", &controlBuffer.data.speed, 0.05f);
 	ImGui::DragFloat("Steering Strength", &controlBuffer.data.steeringStrength, 0.05f);
-	ImGui::DragFloat("Boundary Force", &controlBuffer.data.boundaryForce, 0.05f);
 	ImGui::DragFloat("Boundary Range", &controlBuffer.data.boundaryRange, 0.05f);
 
 	if (ImGui::TreeNode("Tex1"))
@@ -98,7 +105,7 @@ void AntSlime::OnImgui()
 	pComputeShaderAnts->OnImgui();
 }
 
-void AntSlime::Initialise()
+void AntSlime::Initialise(int startPattern)
 {
 	using SurfaceType = Engine2::Surface2D<DirectX::XMFLOAT4>;
 
@@ -152,6 +159,7 @@ void AntSlime::Initialise()
 
 	struct Ant
 	{
+		int32_t type;
 		DirectX::XMFLOAT2 position;
 		float angle;
 	};
@@ -166,14 +174,29 @@ void AntSlime::Initialise()
 	Util::Random rngVel(-1.0f, 1.0f);
 	float xmid = xmax * 0.5f;
 	float ymid = ymax * 0.5f;
+	float radius = min(xmax, ymax) / 2.0f * 0.9f;
 	Ant a;
 
 	for (int i = 0; i < antCount; i++)
 	{
-		a.position = { rngPos.Next() * w , rngPos.Next() * h };
+		a.type = i % antTypes;
 
-		//a.angle = rngVel.Next() * XM_PI;
-		a.angle = atan2f(ymid - a.position.y, xmid - a.position.x);
+		if (startPattern == 0)
+		{
+			a.position = { rngPos.Next() * w , rngPos.Next() * h };
+			a.angle = atan2f(ymid - a.position.y, xmid - a.position.x);
+		}
+		else if (startPattern == 1)
+		{
+			a.angle = rngVel.Next() * XM_2PI;
+			a.position = { xmid - cosf(a.angle) * radius, ymid - sinf(a.angle) * radius };
+		}
+		else // if (startPattern == 2)
+		{
+		a.angle = rngVel.Next() * XM_2PI;
+		float r = radius * rngPos.Next();
+		a.position = { xmid - cosf(a.angle) * r, ymid - sinf(a.angle) * r };
+		}
 
 		ant1data.emplace_back(a);
 	}

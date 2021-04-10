@@ -21,7 +21,8 @@ public:
 protected:
 	
 	int antCount = 10000;
-	void Initialise();
+	int antTypes = 3;
+	void Initialise(int startPattern = 0);
 
 	Engine2::DXBuffer ants1;
 	Engine2::ComputeShaderUAV antuav1;
@@ -53,13 +54,14 @@ protected:
 		float diffuseFade = 0.99f;
 		float senseAngle = 30.0f / 360.0f * DirectX::XM_2PI;
 		float senseRange = 6.0f;
+		int32_t senseRadius = 1;
+		float replusion = 0.1f;
 		float speed = 50.0f;
 		float steeringStrength = 50.0f;
-		float boundaryForce = 10.0f;
 		float boundaryRange = 10.0f;
 		float time;
 		float deltaTime;
-		float padding[3];
+		float padding[2];
 	};
 
 	Engine2::CSConstantBuffer<ControlInfo> controlBuffer;

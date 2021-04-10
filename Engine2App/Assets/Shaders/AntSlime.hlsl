@@ -3,12 +3,10 @@ RWTexture2D<float4> buffer2out : register(u0);
 
 static const float PI = 3.141592654;
 static const float TWOPI = 6.283185307;
-static const float ONEQTRPI = PI * 0.25;
-static const float HALFPI = PI * 0.5;
-static const float THREEHALFPI = PI * 1.5;
 
 struct Ant
 {
+	int    type;
 	float2 position;
 	float  angle;
 };
@@ -24,9 +22,10 @@ cbuffer ControlInfo : register(b3)
 	float diffuseFade;
 	float senseAngle;
 	float senseRange;
+	int   senseRadius;
+	float replusion;
 	float speed;
 	float steeringStrength;
-	float boundaryForce;
 	float boundaryRange;
 	float time;
 	float deltaTime;
@@ -65,7 +64,6 @@ void main(uint3 DTid : SV_DispatchThreadID)
 	// fade the total amount
 	pixel *= diffuseFade;
 
-	pixel.z = 0.0;
 	pixel.a = 1.0;
 
 	buffer2out[int2(x, y)] = pixel;
@@ -73,15 +71,28 @@ void main(uint3 DTid : SV_DispatchThreadID)
 
 float4 GetLocationInfo(float2 location)
 {
-	uint2 indx = uint2(location);
+	int startx = max(0, location.x - senseRadius);
+	int starty = max(0, location.y - senseRadius);
 
-	if (indx.x < 0) indx.x += xmax;
-	else if (indx.x >= (uint)xmax) indx.x -= xmax;
+	int endx = min(xmax - 1, location.x + senseRadius);
+	int endy = min(ymax - 1, location.y + senseRadius);
 
-	if (indx.y < 0) indx.y += ymax;
-	else if (indx.y >= (uint)ymax) indx.y -= ymax;
+	int2 indx = int2(startx, starty);
+	float4 value = 0.0;
 
-	return buffer1in[indx];
+	while (indx.y <= endy)
+	{
+		while (indx.x <= endx)
+		{
+			value += buffer1in[indx];
+			indx.x++;
+		}
+
+		indx.x = startx;
+		indx.y++;
+	}
+
+	return value;
 }
 
 float2 RotateVector(float2 vec, float radians)
@@ -112,9 +123,32 @@ float GetAntDirectionChange(Ant ant)
 	float2 leftDir = Direction(ant.angle + senseAngle);
 	float2 rightDir = Direction(ant.angle - senseAngle);
 
-	float front = GetLocationInfo(ant.position + frontDir * senseRange).x;
-	float left = GetLocationInfo(ant.position + leftDir * senseRange).x;
-	float right = GetLocationInfo(ant.position + rightDir * senseRange).x;
+	float4 frontInfo = GetLocationInfo(ant.position + frontDir * senseRange);
+	float4 leftInfo = GetLocationInfo(ant.position + leftDir * senseRange);
+	float4 rightInfo = GetLocationInfo(ant.position + rightDir * senseRange);
+
+	float front = 0;
+	float left = 0;
+	float right = 0;
+
+	if (ant.type == 0)
+	{
+		front = frontInfo.x - (frontInfo.y + frontInfo.z) * replusion;
+		left  = leftInfo.x  - (leftInfo.y  + frontInfo.z) * replusion;
+		right = rightInfo.x - (rightInfo.y + frontInfo.z) * replusion;
+	}
+	else if (ant.type == 1)
+	{
+		front = frontInfo.y - (frontInfo.x + frontInfo.z) * replusion;
+		left  = leftInfo.y  - (leftInfo.x  + frontInfo.z) * replusion;
+		right = rightInfo.y - (rightInfo.x + frontInfo.z) * replusion;
+	}
+	else // type == 2
+	{
+		front = frontInfo.z - (frontInfo.x + frontInfo.y) * replusion;
+		left =  leftInfo.z  - (leftInfo.x  + frontInfo.y) * replusion;
+		right = rightInfo.z - (rightInfo.x + frontInfo.y) * replusion;
+	}
 
 	if (front > max(left, right)) return 0.0;
 	else if (front < min(left, right)) return (Random(ant.position) - 0.5) * 2.0 * steeringStrength * deltaTime;
@@ -148,6 +182,9 @@ void UpdateAnts(uint3 DTid : SV_DispatchThreadID)
 
 	bufferAnts[indx] = a;
 
-	// put it on the map.
-	buffer2out[int2(a.position)] = float4(1.0, 1.0, 1.0, 1.0);
+	float4 val = buffer2out[int2(a.position)];
+	if (a.type == 0) val.x = 1.0;
+	else if (a.type == 1) val.y = 1.0;
+	else val.z = 1.0;
+	buffer2out[int2(a.position)] = val;
 }
