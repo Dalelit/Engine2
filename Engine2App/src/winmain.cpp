@@ -2,6 +2,7 @@
 #include "Engine2.h"
 #include "SceneBuilder.h"
 #include "AntSlime.h"
+#include "Boids\Boids2D.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -226,7 +227,8 @@ int WINAPI WinMain(
 
 	// reminder: camera position is set by last layer
 	Engine2::Engine::Get().AttachLayer(new SceneBuilder(), false);
-	Engine2::Engine::Get().AttachLayer(new AntSlime());
+	Engine2::Engine::Get().AttachLayer(new AntSlime(), false);
+	Engine2::Engine::Get().AttachLayer(new Boids2D());
 
 	clock_t lastTime = clock();
 

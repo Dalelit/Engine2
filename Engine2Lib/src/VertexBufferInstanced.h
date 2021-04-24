@@ -33,10 +33,13 @@ namespace Engine2
 		}
 
 		template <typename I>
-		void SetInstances(std::vector<I>& bufferData) {
+		void SetInstances(std::vector<I>& bufferData, bool dynamic = true, bool unorderedAcces = false) {
 			instanceCount = (UINT)bufferData.size();
 
-			instanceBuffer.InitBuffer<I>(bufferData, true, D3D11_BIND_FLAG::D3D11_BIND_VERTEX_BUFFER);
+			UINT bindFlags = D3D11_BIND_FLAG::D3D11_BIND_VERTEX_BUFFER;
+			if (unorderedAcces) bindFlags |= D3D11_BIND_FLAG::D3D11_BIND_UNORDERED_ACCESS;
+			
+			instanceBuffer.InitBuffer<I>(bufferData, dynamic, bindFlags);
 			vertexBuffersPtrs[1] = instanceBuffer.GetPtr();
 			bufferStrides[1] = sizeof(I);
 			bufferOffsets[1] = 0;
@@ -56,6 +59,8 @@ namespace Engine2
 		void UpdateInstanceBuffer(std::vector<I>& source, size_t size) {
 			instanceBuffer.UpdateBuffer(source, size);
 		}
+
+		DXBuffer& GetInstanceBuffer() { return instanceBuffer; }
 
 		virtual void Bind() {
 			DXDevice::GetContext().IASetPrimitiveTopology(topology);

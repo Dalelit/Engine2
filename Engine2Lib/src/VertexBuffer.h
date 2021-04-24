@@ -89,6 +89,13 @@ namespace Engine2
 			DXDevice::GetContext().Draw(vertexCount, 0u);
 		}
 
+		virtual void Draw(UINT instances) {
+			E2_ASSERT(instances > 0, "Instance count should be greater than 0");
+
+			E2_STATS_INSTANCEDRAW(instances);
+			DXDevice::GetContext().DrawInstanced(vertexCount, instances, 0u, 0u);
+		}
+
 		virtual void OnImgui() { ImGui::Text(info.c_str()); }
 
 		UINT slot = 0u;
@@ -220,6 +227,14 @@ namespace Engine2
 			E2_STATS_INDEXDRAW(indxCount);
 			DXDevice::GetContext().DrawIndexed(indxCount, 0u, 0u);
 		}
+
+		void Draw(UINT instances) {
+			E2_ASSERT(instances > 0, "Instance count should be greater than 0");
+
+			E2_STATS_INDEXINSTANCEDRAW(indxCount, instances);
+			DXDevice::GetContext().DrawIndexedInstanced(indxCount, instances, 0u, 0u, 0u);
+		}
+
 
 	protected:
 		wrl::ComPtr<ID3D11Buffer> pIndexBuffer = nullptr;

@@ -76,9 +76,20 @@ namespace Engine2
 		}
 	}
 
-	Offscreen::Offscreen(bool hasRenderTarget, bool hasDepthBuffer, unsigned int slot) :
-		hasRenderTarget(hasRenderTarget), hasDepthBuffer(hasDepthBuffer)
+	Offscreen::Offscreen(bool hasRenderTarget, bool hasDepthBuffer, unsigned int slot)
 	{
+		Descriptor desc = {};
+		desc.hasRenderTarget = hasRenderTarget;
+		desc.hasDepthBuffer = hasDepthBuffer;
+		desc.slot = slot;
+
+		Initialise(desc);
+	}
+
+	void Offscreen::Initialise(Descriptor desc)
+	{
+		descriptor = desc;
+
 		auto bufferTexureDesc = DXDevice::Get().GetBackBufferTextureDesc();  // to do: will change this for more flexible dimensions
 		width = bufferTexureDesc.Width;
 		height = bufferTexureDesc.Height;
@@ -109,7 +120,7 @@ namespace Engine2
 
 	void Offscreen::Unbind()
 	{
-		DXDevice::Get().ClearShaderResource(slot);
+		DXDevice::Get().ClearShaderResource(descriptor.slot);
 	}
 
 	void Offscreen::SetAsTarget()
@@ -168,10 +179,10 @@ namespace Engine2
 
 	void Offscreen::Configure()
 	{
-		if (hasRenderTarget)
+		if (descriptor.hasRenderTarget)
 			InitialiseBuffer();
 
-		if (hasDepthBuffer)
+		if (descriptor.hasDepthBuffer)
 			InitialiseDepthBuffer();
 	}
 
@@ -185,19 +196,19 @@ namespace Engine2
 	{
 		if (ImGui::TreeNode("Offscreen target"))
 		{
-			ImGui::Text("Slot %i, width %i, height %i", slot, width, height);
+			ImGui::Text("Slot %i, width %i, height %i", descriptor.slot, width, height);
 
-			if (ImGui::Checkbox("Render Target", &hasRenderTarget))
+			if (ImGui::Checkbox("Render Target", &descriptor.hasRenderTarget))
 			{
-				if (hasRenderTarget)
+				if (descriptor.hasRenderTarget)
 					InitialiseBuffer();
 				else
 					ReleaseBuffer();
 			}
 
-			if (ImGui::Checkbox("Depth Buffer", &hasDepthBuffer))
+			if (ImGui::Checkbox("Depth Buffer", &descriptor.hasDepthBuffer))
 			{
-				if (hasDepthBuffer)
+				if (descriptor.hasDepthBuffer)
 					InitialiseDepthBuffer();
 				else
 					ReleaseDepthBuffer();
@@ -214,7 +225,7 @@ namespace Engine2
 				ImGui::EndCombo();
 			}
 
-			if (hasRenderTarget && ImGui::TreeNode("Render target"))
+			if (descriptor.hasRenderTarget && ImGui::TreeNode("Render target"))
 			{
 				ImGui::Checkbox("Show", &subDisplay.show);
 				if (ImGui::DragFloat2("Left,Top", subDisplay.leftTop, 0.05f, -1.0f, 1.0f)) InitialiseSubDisplayVB();
@@ -222,7 +233,7 @@ namespace Engine2
 				ImGui::TreePop();
 			}
 
-			if (hasDepthBuffer && ImGui::TreeNode("Depth buffer"))
+			if (descriptor.hasDepthBuffer && ImGui::TreeNode("Depth buffer"))
 			{
 				ImGui::Checkbox("Show", &subDisplayDepthBuffer.show);
 				ImGui::Checkbox("Raw pixels", &subDisplayDepthBuffer.displayRaw);
@@ -240,7 +251,11 @@ namespace Engine2
 		HRESULT hr;
 
 		D3D11_TEXTURE2D_DESC bufferTexureDesc = DXDevice::Get().GetBackBufferTextureDesc();  // default to the back buffer desc
-		bufferTexureDesc.BindFlags = bufferTexureDesc.BindFlags | D3D11_BIND_FLAG::D3D11_BIND_SHADER_RESOURCE;
+		bufferTexureDesc.BindFlags = D3D11_BIND_FLAG::D3D11_BIND_RENDER_TARGET | D3D11_BIND_FLAG::D3D11_BIND_SHADER_RESOURCE;
+		if (descriptor.unorderedAccess) bufferTexureDesc.BindFlags |= D3D11_BIND_FLAG::D3D11_BIND_UNORDERED_ACCESS;
+
+		if (descriptor.DXGIFormat >= 0) bufferTexureDesc.Format = (DXGI_FORMAT)descriptor.DXGIFormat;
+		// else defaults to back buffer format
 
 		hr = DXDevice::GetDevice().CreateTexture2D(&bufferTexureDesc, nullptr, &pBuffer);
 
@@ -291,6 +306,7 @@ namespace Engine2
 		dtDesc.SampleDesc.Quality = 0u;
 		dtDesc.Usage = D3D11_USAGE::D3D11_USAGE_DEFAULT;
 		dtDesc.BindFlags = D3D11_BIND_FLAG::D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_FLAG::D3D11_BIND_SHADER_RESOURCE; // so we can also draw it
+		if (descriptor.unorderedAccess) dtDesc.BindFlags |= D3D11_BIND_FLAG::D3D11_BIND_UNORDERED_ACCESS;
 		dtDesc.CPUAccessFlags = 0u;
 		dtDesc.MiscFlags = 0u;
 
@@ -394,12 +410,12 @@ namespace Engine2
 			DXDevice::Get().SetBackBufferAsRenderTargetNoDepthCheck();
 
 			// bind buffer as resource
-			BindBuffer(slot);
+			BindBuffer(descriptor.slot);
 			
 			Common.ForDrawToSubDisplay.pVS->Bind();
 			Common.ForDrawToSubDisplay.pPSBuffer->Bind();
 			subDisplay.pVB->BindAndDraw();
-			DXDevice::Get().ClearShaderResource(slot); // Unbind();
+			DXDevice::Get().ClearShaderResource(descriptor.slot); // Unbind();
 			DXDevice::Get().SetBackBufferAsRenderTarget();
 		}
 
@@ -407,7 +423,7 @@ namespace Engine2
 		{
 			DXDevice::Get().SetBackBufferAsRenderTargetNoDepthCheck();
 
-			BindDepthBuffer(slot);
+			BindDepthBuffer(descriptor.slot);
 
 			Common.ForDrawToSubDisplay.pVS->Bind();
 			if (subDisplayDepthBuffer.displayRaw)
@@ -415,7 +431,7 @@ namespace Engine2
 			else
 				 Common.ForDrawToSubDisplay.pPSDepthBuffer->Bind();
 			subDisplayDepthBuffer.pVB->BindAndDraw();
-			DXDevice::Get().ClearShaderResource(slot); // Unbind();
+			DXDevice::Get().ClearShaderResource(descriptor.slot); // Unbind();
 			DXDevice::Get().SetBackBufferAsRenderTarget();
 		}
 	}

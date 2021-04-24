@@ -12,11 +12,23 @@ namespace Engine2
 		// Default shaders in here use 0.
 		// If needed to be bound for other shaders in a different slot, need to update these shaders
 
+		struct Descriptor
+		{
+			UINT slot = 0;
+			bool hasRenderTarget = true;
+			bool hasDepthBuffer = true;
+			bool unorderedAccess = false;
+			int  DXGIFormat = -1; // -1 will use back buffer format
+		};
+
 		Offscreen(unsigned int slot = 0) : Offscreen(true, true, slot) {}
 		Offscreen(bool hasRenderTarget, bool hasDepthBuffer, unsigned int slot = 0);
+		Offscreen(Descriptor desc) { Initialise(desc); }
+
+		void Initialise(Descriptor desc);
 
 		// use as a shader resource
-		inline void Bind() { BindBuffer(slot); }   // binds as a resource. defaults to binding the render target
+		inline void Bind() { BindBuffer(descriptor.slot); }   // binds as a resource. defaults to binding the render target
 		void BindBuffer(unsigned int textureSlot);
 		void BindDepthBuffer(unsigned int textureSlot);
 		void Unbind(); // unbinds as a resource
@@ -37,22 +49,22 @@ namespace Engine2
 		inline UINT GetHeight() { return height; }
 		inline wrl::ComPtr<ID3D11RenderTargetView>& GetRenderTargetView() { return pTargetView; }
 
-		inline bool HasRenderTarget() { return hasRenderTarget; }
-		inline bool HasDepthBuffer() { return hasDepthBuffer; }
+		inline bool HasRenderTarget() { return descriptor.hasRenderTarget; }
+		inline bool HasDepthBuffer()  { return descriptor.hasDepthBuffer; }
 
 		inline void SetPixelShader(std::shared_ptr<PixelShader> pNewPixelShader) { pPS = pNewPixelShader; }
 
 		void OnImgui();
 		void ShowSubDisplay();
 
+		inline Microsoft::WRL::ComPtr<ID3D11Texture2D> GetBuffer() { return pBuffer; }
+		inline Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> GetSRV() { return pBufferResourceView; }
+		// note: will add the depth buffer Get's if ever needed in the future
+
 		static std::map<std::string, std::shared_ptr<PixelShader>> pixelShaders; // Public so can add to this. Populated with AddSampleFilters on constructuion.
 
 	protected:
-		bool hasRenderTarget;
-		bool hasDepthBuffer;
-
-		// shader resources
-		unsigned int slot;
+		Descriptor descriptor;
 
 		// render target
 		wrl::ComPtr<ID3D11Texture2D> pBuffer = nullptr;

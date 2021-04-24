@@ -59,7 +59,7 @@ namespace Engine2
 			E2_ASSERT_HR(hr, "Computer Shader output view CreateUnorderedAccessView failed");
 		}
 
-		void InitialiseTest(wrl::ComPtr<ID3D11Buffer> pTargetBuffer, UINT capacity) {
+		void Initialise(wrl::ComPtr<ID3D11Buffer> pTargetBuffer, UINT capacity) {
 
 			D3D11_UNORDERED_ACCESS_VIEW_DESC viewDesc = {};
 

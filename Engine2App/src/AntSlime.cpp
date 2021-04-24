@@ -202,6 +202,6 @@ void AntSlime::Initialise(int startPattern)
 	}
 
 	ants1.InitBuffer<Ant>(ant1data, false, D3D11_BIND_FLAG::D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_FLAG::D3D11_BIND_UNORDERED_ACCESS, D3D11_RESOURCE_MISC_FLAG::D3D11_RESOURCE_MISC_BUFFER_STRUCTURED);
-	antuav1.InitialiseTest(ants1.Get(), antCount);
+	antuav1.Initialise(ants1.Get(), antCount);
 	antuav1.SetSlot(1);
 }

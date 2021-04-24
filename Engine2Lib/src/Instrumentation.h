@@ -2,6 +2,7 @@
 
 #define E2_STATS_VERTEXDRAW(x)                 { Instrumentation::Drawing::drawCount++; Instrumentation::Drawing::vertexCount += x; }
 #define E2_STATS_INDEXDRAW(x)                  { Instrumentation::Drawing::drawCount++; Instrumentation::Drawing::indexCount += x; }
+#define E2_STATS_INSTANCEDRAW(inst)            { Instrumentation::Drawing::drawCount++; Instrumentation::Drawing::instanceCount += inst; }
 #define E2_STATS_INDEXINSTANCEDRAW(indx, inst) { Instrumentation::Drawing::drawCount++; Instrumentation::Drawing::indexCount += indx; Instrumentation::Drawing::instanceCount += inst; }
 
 
