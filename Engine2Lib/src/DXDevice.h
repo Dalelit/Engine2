@@ -12,7 +12,7 @@ namespace Engine2
 		static DXDevice& CreateDevice(HWND hwnd);
 		inline static DXDevice& Get() { return *instance; }
 		inline static ID3D11Device3& GetDevice() { return *instance->pDevice.Get(); }
-		inline static ID3D11DeviceContext3& GetContext() { return *instance->pImmediateContext.Get(); }
+		inline static ID3D11DeviceContext4& GetContext() { return *instance->pImmediateContext.Get(); }
 
 		DXDevice(HWND hwnd);
 		~DXDevice() = default;
@@ -92,9 +92,9 @@ namespace Engine2
 		HWND hwnd;
 
 		// core device resources
-		wrl::ComPtr<IDXGISwapChain1>      pSwapChain = nullptr;
+		wrl::ComPtr<IDXGISwapChain2>      pSwapChain = nullptr;
 		wrl::ComPtr<ID3D11Device3>        pDevice = nullptr;
-		wrl::ComPtr<ID3D11DeviceContext3> pImmediateContext = nullptr;
+		wrl::ComPtr<ID3D11DeviceContext4> pImmediateContext = nullptr;
 		D3D11_VIEWPORT					  viewport;
 
 		// back buffer
