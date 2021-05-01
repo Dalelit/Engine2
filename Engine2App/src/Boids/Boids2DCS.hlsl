@@ -3,21 +3,6 @@
 Texture2D<float4> textureIn : register(t0);
 RWTexture2D<float4> textureOut : register(u0);
 
-cbuffer ControlInfo : register(b3)
-{
-	float time;
-	float deltaTime;
-	int   xmax;
-	int   ymax;
-	int   diffuseRadius;
-	float diffuseRate;
-	float diffuseFade;
-	int   xMouse;
-	int   yMouse;
-	int   boidCount;
-};
-
-
 RWStructuredBuffer<Boid> boidBuffer : register(u1);
 
 [numthreads(1024, 1, 1)]
@@ -27,9 +12,22 @@ void BoidsUpdate(uint3 DTid : SV_DispatchThreadID)
 
 	Boid b = boidBuffer[indx];
 
-	b.rotation += deltaTime * 1.5;
-	b.color.b = (float)indx / (float)boidCount;
-	if (b.color.b > 1.0) b.color.b = 0.0;
+	float2 realPosition = b.position.xy;
+	
+	realPosition += UnitVector(b.rotation) * boidSpeed * deltaTime;
+
+	if (realPosition.x < 0.0) realPosition.x += worldDimension.x;
+	else if (realPosition.x > worldDimension.x) realPosition.x -= worldDimension.x;
+
+	if (realPosition.y < 0.0) realPosition.y += worldDimension.y;
+	else if (realPosition.y > worldDimension.y) realPosition.y -= worldDimension.y;
+
+	b.position = float3(realPosition, 0.0);
+	//b.rotation += deltaTime * PI * 0.25;
+	b.scale = boidScale;
+
+	uint2 bufferCoord = WorldToBufferSpace(realPosition);
+	textureOut[bufferCoord] = float4(1.0, 1.0, 1.0, 1.0);
 
 	boidBuffer[indx] = b;
 }
@@ -66,8 +64,8 @@ float4 AreaDiffuseSample(int x, int y)
 
 	int startx = max(0, x - diffuseRadius);
 	int starty = max(0, y - diffuseRadius);
-	int endx = min(xmax, x + diffuseRadius);
-	int endy = min(ymax, y + diffuseRadius);
+	int endx = min(screenDimension.x, x + diffuseRadius);
+	int endy = min(screenDimension.y, y + diffuseRadius);
 	float area = (float)((endx - startx + 1) * (endy - starty + 1));
 
 	int2 indx = int2(startx, starty);
@@ -106,15 +104,8 @@ void main( uint3 DTid : SV_DispatchThreadID )
 
 	float4 pixel;
 
-	if (abs(xMouse - x) < 5 && abs(yMouse - y) < 5)
-	{
-		pixel = float4(1.0, 0.0, 0.0, 1.0);
-	}
-	else
-	{
-		pixel = SimpleDiffuseSample(x, y);
-		//pixel = AreaDiffuseSample(x, y);
-	}
+	pixel = SimpleDiffuseSample(x, y);
+	//pixel = AreaDiffuseSample(x, y);
 
 	textureOut[int2(x, y)] = pixel;
 }

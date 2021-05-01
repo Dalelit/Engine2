@@ -8,8 +8,11 @@ using namespace DirectX;
 
 Boids2D::Boids2D() : Layer("Boids2D")
 {
-	controlBuffer.data.time = 0.0f;
-	controlBuffer.data.deltaTime = 0.0f;
+	worldCB.slot = 1;
+	controlCB.slot = 3u;
+
+	controlCB.data.time = 0.0f;
+	controlCB.data.deltaTime = 0.0f;
 
 	InitialiseGfx();
 	InitialiseCS();
@@ -19,17 +22,15 @@ void Boids2D::OnUpdate(float dt)
 {
 	input.OnUpdate(dt);
 
-	controlBuffer.data.time += dt;
-	controlBuffer.data.deltaTime = dt;
-	controlBuffer.data.xMouse = input.State.MouseClientPosition.x;
-	controlBuffer.data.yMouse = input.State.MouseClientPosition.y;
-	controlBuffer.Bind(); // does the update buffer before binding
+	worldCB.CSBind();
 
-	boiduav.Bind();
-	pCSBoids->Bind();
-	pCSBoids->Dispatch();
-	boiduav.Unbind();
+	controlCB.data.time += dt;
+	controlCB.data.deltaTime = dt;
+	controlCB.data.xMouse = input.State.MouseClientPosition.x;
+	controlCB.data.yMouse = input.State.MouseClientPosition.y;
+	controlCB.Bind(); // does the update buffer before binding
 
+	// bind and process buffer for trails
 	if (state == 1)
 	{
 		// in
@@ -40,12 +41,7 @@ void Boids2D::OnUpdate(float dt)
 		texuav2.Bind();
 
 		pCSTrails->Bind();
-		//pCSTrails->Dispatch();
-
-		texsrv1.Unbind();
-		texuav2.Unbind();
-
-		state = 2;
+		pCSTrails->Dispatch();
 	}
 	else
 	{
@@ -57,13 +53,29 @@ void Boids2D::OnUpdate(float dt)
 		texuav1.Bind();
 
 		pCSTrails->Bind();
-		//pCSTrails->Dispatch();
+		pCSTrails->Dispatch();
+	}
 
+	// update boids
+	boiduav.Bind();
+	pCSBoids->Bind();
+	pCSBoids->Dispatch();
+	boiduav.Unbind();
+
+	// clean up buffer for trails
+	if (state == 1)
+	{
+		texsrv1.Unbind();
+		texuav2.Unbind();
+		state = 2;
+	}
+	else
+	{
 		texsrv2.Unbind();
 		texuav1.Unbind();
-
 		state = 1;
 	}
+
 }
 
 void Boids2D::OnRender()
@@ -79,6 +91,7 @@ void Boids2D::OnRender()
 
 	DXDevice::GetContext().VSSetShaderResources(boidSlot, 1, pBoidVSSRV.GetAddressOf());
 
+	worldCB.VSBind();
 	pPS->Bind();
 	pVS->Bind();
 	pVB.Bind();
@@ -92,9 +105,10 @@ void Boids2D::OnRender()
 void Boids2D::OnApplicationEvent(Engine2::ApplicationEvent& event)
 {
 	input.OnApplicationEvent(event);
-	//if (event.GetType() == EventType::WindowResize)
-	//{
-	//}
+	if (event.GetType() == EventType::WindowResize)
+	{
+		CalcWorldWidth();
+	}
 }
 
 void Boids2D::OnInputEvent(InputEvent& event)
@@ -104,16 +118,29 @@ void Boids2D::OnInputEvent(InputEvent& event)
 
 void Boids2D::OnImgui()
 {
+	if (ImGui::DragScalar("Boid count", ImGuiDataType_::ImGuiDataType_U32, &boidCount, 1.0f)) { if (boidCount < 1) boidCount = 1; }
 	if (ImGui::Button("Restart")) InitialiseCS();
 
-	ImGui::DragInt("Diffuse radius", &controlBuffer.data.diffuseRadius, 1.0f, 0, 10);
-	ImGui::DragFloat("Diffuse rate", &controlBuffer.data.diffuseRate, 0.005f, 0.0f, 1.0f);
-	ImGui::DragFloat("Diffuse fade", &controlBuffer.data.diffuseFade, 0.005f, 0.0f, 1.0f);
-	ImGui::Text("Mouse x %u y %u", controlBuffer.data.xMouse, controlBuffer.data.yMouse);
+	ImGui::DragFloat("Boid Speed", &controlCB.data.boidSpeed, 0.05f);
+	ImGui::DragFloat("Boid Scale", &controlCB.data.boidScale, 0.05f);
+	if (ImGui::DragFloat("World Height", &worldCB.data.worldDimension.y, 0.05f)) { CalcWorldWidth(); }
+	ImGui::Text("World Width %f", worldCB.data.worldDimension.x);
+	ImGui::Spacing();
+	ImGui::DragInt("Diffuse radius", &controlCB.data.diffuseRadius, 1.0f, 0, 10);
+	ImGui::DragFloat("Diffuse rate", &controlCB.data.diffuseRate, 0.005f, 0.0f, 1.0f);
+	ImGui::DragFloat("Diffuse fade", &controlCB.data.diffuseFade, 0.005f, 0.0f, 1.0f);
+	ImGui::Text("Mouse x %u y %u", controlCB.data.xMouse, controlCB.data.yMouse);
+	ImGui::Text("Screen %u x %u", worldCB.data.screenDimension.x, worldCB.data.screenDimension.y);
+	pCSBoids->OnImgui();
+	pCSTrails->OnImgui();
+	pVS->OnImgui();
+	pPS->OnImgui();
 }
 
 void Boids2D::InitialiseGfx()
 {
+	CalcWorldWidth();
+
 	struct Vertex {
 		XMFLOAT3 position;
 		XMFLOAT2 uv;
@@ -129,9 +156,9 @@ void Boids2D::InitialiseGfx()
 
 	// triangle
 	verticies = {
-		{ { -0.5f, -0.5f, 0.0f}, {0.0f, 0.0f} },
-		{ { -0.5f,  0.5f, 0.0f}, {0.0f, 1.0f} },
-		{ {  0.5f,  0.0f, 0.0f}, {1.0f, 0.5f} },
+		{ { -1.0f, -1.0f, 0.0f}, {0.0f, 0.0f} },
+		{ { -1.0f,  1.0f, 0.0f}, {0.0f, 1.0f} },
+		{ {  1.0f,  0.0f, 0.0f}, {1.0f, 0.5f} },
 	};
 	indicies = { 0, 1, 2 };
 
@@ -152,19 +179,20 @@ void Boids2D::InitialiseGfx()
 
 void Boids2D::InitialiseCS(int startPattern)
 {
-	controlBuffer.slot = 3u;
-	controlBuffer.data.time = 0.0f;
-	controlBuffer.data.boidCount = boidCount;
+	controlCB.data.time = 0.0f;
+	controlCB.data.boidCount = boidCount;
 
 	Offscreen::Descriptor desc = {};
 	desc.hasDepthBuffer = false;
 	desc.unorderedAccess = true;
 	desc.DXGIFormat = DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT;
+	desc.height = 300;
+	desc.width = (int)((float)desc.height * DXDevice::Get().GetAspectRatio());
 	tgt1 = std::make_unique<Offscreen>(desc);
 	tgt2 = std::make_unique<Offscreen>(desc);
 
-	controlBuffer.data.xmax = tgt1->GetWidth() - 1;
-	controlBuffer.data.ymax = tgt1->GetHeight() - 1;
+	worldCB.data.screenDimension.x = tgt1->GetWidth() - 1;
+	worldCB.data.screenDimension.y = tgt1->GetHeight() - 1;
 
 	pCSTrails = std::make_shared<ComputeShaderFile>("src\\Boids\\Boids2DCS.hlsl");
 	pCSTrails->SetThreadGroupCount(tgt1->GetWidth(), tgt1->GetHeight(), 1);
@@ -188,15 +216,16 @@ void Boids2D::InitialiseCS(int startPattern)
 
 	std::vector<Boid> boids;
 	boids.reserve(boidCount);
+	Util::Random rng;
+	Util::Random rngColor(0.1f, 1.0f);
 	for (float i = 0.0f; i < boidCount; i++)
 	{
 		Boid b;
-		float r = i / (float)boidCount;
 
-		b.position = { r, r, 0.0f };
-		b.rotation = XM_2PI / 12.0f * i;
-		b.scale = 0.1f + 0.01f * i;
-		b.color = { 0.1f * i, 1.0f, 0.0f };
+		b.position = { rng.Next() * worldCB.data.worldDimension.x, rng.Next() * worldCB.data.worldDimension.y, 0.0f };
+		b.rotation = rng.Next() * XM_2PI;
+		//b.scale = 1.0f; // set in CS anyway
+		b.color = { rngColor.Next(), rngColor.Next(), rngColor.Next() };
 
 		boids.push_back(b);
 	}

@@ -15,7 +15,9 @@ VSOut main(float3 pos : Position, float2 uv : UV, uint instId : SV_InstanceID)
 
 	Boid b = boidBuffer[instId];
 
-	vso.posSS = float4(RotateVector(pos.xy * b.scale, b.rotation) + b.position.xy, 0.0, 1.0);
+	float2 posWS = RotateVector(pos.xy * b.scale, b.rotation) + b.position.xy;
+
+	vso.posSS = float4(WorldToScreenSpace(posWS), 0.0, 1.0);
 	vso.uv = uv;
 	vso.col = b.color;
 

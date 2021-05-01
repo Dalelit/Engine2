@@ -19,6 +19,8 @@ namespace Engine2
 			bool hasDepthBuffer = true;
 			bool unorderedAccess = false;
 			int  DXGIFormat = -1; // -1 will use back buffer format
+			int  height = -1; // -1 will use device height and width
+			int  width = -1;
 		};
 
 		Offscreen(unsigned int slot = 0) : Offscreen(true, true, slot) {}

@@ -33,6 +33,13 @@ protected:
 	std::shared_ptr<Engine2::VertexShader> pVS;
 	std::shared_ptr<Engine2::PixelShader>  pPS;
 
+	struct VSCBData
+	{
+		float worldHeight = 100.0f;
+		float worldWidth;
+		float padding[2];
+	};
+
 	//--------------------------------------------------------
 	void InitialiseCS(int startPattern = 0);
 
@@ -53,20 +60,30 @@ protected:
 	Engine2::ComputeShaderUAV texuav2;
 	Engine2::ComputeShaderUAV boiduav;
 
+	struct WorldInfo
+	{
+		DirectX::XMFLOAT2 worldDimension = {100.0f, 80.0f};
+		DirectX::XMUINT2  screenDimension;
+		//float   padding[2];
+	};
+
 	struct ControlInfo
 	{
 		float   time;
 		float   deltaTime;
-		int32_t xmax;
-		int32_t ymax;
 		int32_t diffuseRadius = 2;
 		float   diffuseRate = 0.2f;
 		float   diffuseFade = 0.01f;
 		int32_t xMouse = -1;
 		int32_t yMouse = -1;
 		int32_t boidCount;
+		float   boidSpeed = 35.0f;
+		float   boidScale = 1.0f;
 		float   padding[2];
 	};
 
-	Engine2::CSConstantBuffer<ControlInfo> controlBuffer;
+	Engine2::ConstantBuffer<WorldInfo> worldCB;
+	Engine2::CSConstantBuffer<ControlInfo> controlCB;
+
+	inline void CalcWorldWidth() { worldCB.data.worldDimension.x = worldCB.data.worldDimension.y * Engine2::DXDevice::Get().GetAspectRatio(); }
 };

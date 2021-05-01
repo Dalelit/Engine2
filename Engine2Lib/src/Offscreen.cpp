@@ -90,9 +90,17 @@ namespace Engine2
 	{
 		descriptor = desc;
 
-		auto bufferTexureDesc = DXDevice::Get().GetBackBufferTextureDesc();  // to do: will change this for more flexible dimensions
-		width = bufferTexureDesc.Width;
-		height = bufferTexureDesc.Height;
+		if (descriptor.height <= 0 || descriptor.width <= 0)
+		{
+			auto bufferTexureDesc = DXDevice::Get().GetBackBufferTextureDesc();  // to do: will change this for more flexible dimensions
+			width = bufferTexureDesc.Width;
+			height = bufferTexureDesc.Height;
+		}
+		else
+		{
+			width = descriptor.width;
+			height = descriptor.height;
+		}
 
 		InitialiseCommon();
 
@@ -256,6 +264,9 @@ namespace Engine2
 
 		if (descriptor.DXGIFormat >= 0) bufferTexureDesc.Format = (DXGI_FORMAT)descriptor.DXGIFormat;
 		// else defaults to back buffer format
+
+		bufferTexureDesc.Width = width;
+		bufferTexureDesc.Height = height;
 
 		hr = DXDevice::GetDevice().CreateTexture2D(&bufferTexureDesc, nullptr, &pBuffer);
 

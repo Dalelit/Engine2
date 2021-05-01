@@ -11,6 +11,8 @@ namespace Engine2
 	public:
 		std::shared_ptr<ConstantBufferBase> Clone() const { return std::shared_ptr<ConstantBufferBase>(CloneImpl()); }
 
+		void OnImgui() { ImGui::Text("Shader Constant buffer"); }
+
 	protected:
 		virtual ConstantBufferBase* CloneImpl() const = 0;
 	};
@@ -22,7 +24,7 @@ namespace Engine2
 		T data = {};
 		unsigned int slot;
 
-		ConstantBuffer(unsigned int bindSlot) :
+		ConstantBuffer(unsigned int bindSlot = 0) :
 			slot(bindSlot)
 		{
 			D3D11_SUBRESOURCE_DATA constBufferData = {};
@@ -52,8 +54,49 @@ namespace Engine2
 			DXDevice::GetContext().Unmap(pConstantBuffer.Get(), 0);
 		}
 
+		void Bind() { throw std::exception("Use specific type of Constant buffer"); }
+		void Unbind() { throw std::exception("Use specific type of Constant buffer"); }
+
+		void PSBind()
+		{
+			E2_STATS_PSCB_BIND;
+			this->UpdateBuffer();
+			DXDevice::GetContext().PSSetConstantBuffers(this->slot, 1u, this->pConstantBuffer.GetAddressOf());
+		}
+
+		void PSUnbind() { DXDevice::GetContext().PSSetConstantBuffers(this->slot, 0u, nullptr); }
+
+		void VSBind()
+		{
+			E2_STATS_VSCB_BIND;
+			this->UpdateBuffer();
+			DXDevice::GetContext().VSSetConstantBuffers(this->slot, 1u, this->pConstantBuffer.GetAddressOf());
+		}
+
+		void VSUnbind() { DXDevice::GetContext().VSSetConstantBuffers(this->slot, 0u, nullptr); }
+
+		void GSBind()
+		{
+			E2_STATS_GSCB_BIND;
+			this->UpdateBuffer();
+			DXDevice::GetContext().GSSetConstantBuffers(this->slot, 1u, this->pConstantBuffer.GetAddressOf());
+		}
+
+		void GSUnbind() { DXDevice::GetContext().GSSetConstantBuffers(this->slot, 0u, nullptr); }
+
+		void CSBind()
+		{
+			// To Do: instrumentation E2_STATS_CSCB_BIND;
+			this->UpdateBuffer();
+			DXDevice::GetContext().CSSetConstantBuffers(this->slot, 1u, this->pConstantBuffer.GetAddressOf());
+		}
+
+		void CSUnbind() { DXDevice::GetContext().CSSetConstantBuffers(this->slot, 0u, nullptr); }
+
 	protected:
 		wrl::ComPtr<ID3D11Buffer> pConstantBuffer = nullptr;
+
+		ConstantBuffer<T>* CloneImpl() const { return new ConstantBuffer<T>(*this); }
 	};
 
 	template <typename T>
@@ -62,23 +105,9 @@ namespace Engine2
 	public:
 		PSConstantBuffer(unsigned int bindSlot = 0) : ConstantBuffer<T>(bindSlot) {}
 
-		void Bind()
-		{
-			E2_STATS_PSCB_BIND;
-			this->UpdateBuffer();
-			DXDevice::GetContext().PSSetConstantBuffers(this->slot, 1u, this->pConstantBuffer.GetAddressOf());
-		}
+		inline void Bind() { this->PSBind(); }
 
-		void Unbind() { DXDevice::GetContext().PSSetConstantBuffers(this->slot, 0u, nullptr); }
-
-		void OnImgui()
-		{
-			if (ImGui::TreeNode("Pixel Shader Constant buffer"))
-			{
-				ImGui::Text("No override");
-				ImGui::TreePop();
-			}
-		}
+		inline void Unbind() { this->PSUnbind(); }
 
 	protected:
 		PSConstantBuffer<T>* CloneImpl() const { return new PSConstantBuffer(*this); }
@@ -90,23 +119,9 @@ namespace Engine2
 	public:
 		VSConstantBuffer(unsigned int bindSlot = 0) : ConstantBuffer<T>(bindSlot) {}
 
-		void Bind()
-		{
-			E2_STATS_VSCB_BIND;
-			this->UpdateBuffer();
-			DXDevice::GetContext().VSSetConstantBuffers(this->slot, 1u, this->pConstantBuffer.GetAddressOf());
-		}
+		void Bind() { this->VSBind(); }
 
-		void Unbind() { DXDevice::GetContext().VSSetConstantBuffers(this->slot, 0u, nullptr); }
-
-		void OnImgui()
-		{
-			if (ImGui::TreeNode("Vertex Shader Constant buffer"))
-			{
-				ImGui::Text("No override");
-				ImGui::TreePop();
-			}
-		}
+		void Unbind() { this->VSUnbind(); }
 
 	protected:
 		VSConstantBuffer<T>* CloneImpl() const { return new VSConstantBuffer(*this); }
@@ -118,14 +133,9 @@ namespace Engine2
 	public:
 		GSConstantBuffer(unsigned int bindSlot = 0) : ConstantBuffer<T>(bindSlot) {}
 
-		void Bind()
-		{
-			E2_STATS_GSCB_BIND;
-			this->UpdateBuffer();
-			DXDevice::GetContext().GSSetConstantBuffers(this->slot, 1u, this->pConstantBuffer.GetAddressOf());
-		}
+		void Bind() { this->GSBind(); }
 
-		void Unbind() { DXDevice::GetContext().GSSetConstantBuffers(this->slot, 0u, nullptr); }
+		void Unbind() { this->GSUnbind(); }
 
 	protected:
 		GSConstantBuffer<T>* CloneImpl() const { return new GSConstantBuffer(*this); }
@@ -137,23 +147,9 @@ namespace Engine2
 	public:
 		CSConstantBuffer(unsigned int bindSlot = 0) : ConstantBuffer<T>(bindSlot) {}
 
-		void Bind()
-		{
-			// To Do: instrumentation E2_STATS_CSCB_BIND;
-			this->UpdateBuffer();
-			DXDevice::GetContext().CSSetConstantBuffers(this->slot, 1u, this->pConstantBuffer.GetAddressOf());
-		}
+		void Bind() { this->CSBind(); }
 
-		void Unbind() { DXDevice::GetContext().CSSetConstantBuffers(this->slot, 0u, nullptr); }
-
-		void OnImgui()
-		{
-			if (ImGui::TreeNode("Compute Shader Constant buffer"))
-			{
-				ImGui::Text("No override");
-				ImGui::TreePop();
-			}
-		}
+		void Unbind() { this->CSUnbind(); }
 
 	protected:
 		CSConstantBuffer<T>* CloneImpl() const { return new CSConstantBuffer(*this); }
