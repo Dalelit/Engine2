@@ -30,8 +30,17 @@ protected:
 	void InitialiseGfx();
 
 	Engine2::VertexBufferIndex pVB;
-	std::shared_ptr<Engine2::VertexShader> pVS;
-	std::shared_ptr<Engine2::PixelShader>  pPS;
+	std::shared_ptr<Engine2::VertexShaderFile> pVS;
+	std::shared_ptr<Engine2::PixelShaderFile>  pPS;
+
+	Engine2::VertexBufferIndex pVBSense;
+	std::shared_ptr<Engine2::VertexShaderFile> pVSSense;
+	std::shared_ptr<Engine2::PixelShaderFile>  pPSSense;
+
+	Engine2::VertexBuffer pVBSenseLines;
+	std::shared_ptr<Engine2::VertexShaderFile> pVSSenseLines;
+	std::shared_ptr<Engine2::PixelShaderFile>  pPSSenseLines;
+	std::shared_ptr<Engine2::GeometryShader>   pGSSenseLines;
 
 	struct VSCBData
 	{
@@ -74,12 +83,11 @@ protected:
 		int32_t diffuseRadius = 2;
 		float   diffuseRate = 0.2f;
 		float   diffuseFade = 0.01f;
-		int32_t xMouse = -1;
-		int32_t yMouse = -1;
 		int32_t boidCount;
-		float   boidSpeed = 35.0f;
+		float   boidSpeed = 10.0f;
 		float   boidScale = 1.0f;
-		float   padding[2];
+		float   boidSenseRadius = 10.0f;
+		float   padding[3];
 	};
 
 	Engine2::ConstantBuffer<WorldInfo> worldCB;

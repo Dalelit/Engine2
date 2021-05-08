@@ -19,6 +19,7 @@
     <FxCompile Include="src\Boids\Boids2DCS.hlsl" />
     <FxCompile Include="src\Boids\Boids2DPS.hlsl" />
     <FxCompile Include="src\Boids\Boids2DVS.hlsl" />
+    <FxCompile Include="src\Boids\Boids2DGS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Boids\Boids2D.hlsli" />

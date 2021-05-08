@@ -23,12 +23,12 @@ void Boids2D::OnUpdate(float dt)
 	input.OnUpdate(dt);
 
 	worldCB.CSBind();
+	worldCB.GSBind();
 
 	controlCB.data.time += dt;
 	controlCB.data.deltaTime = dt;
-	controlCB.data.xMouse = input.State.MouseClientPosition.x;
-	controlCB.data.yMouse = input.State.MouseClientPosition.y;
 	controlCB.Bind(); // does the update buffer before binding
+	controlCB.GSBind();
 
 	// bind and process buffer for trails
 	if (state == 1)
@@ -90,16 +90,34 @@ void Boids2D::OnRender()
 	}
 
 	DXDevice::GetContext().VSSetShaderResources(boidSlot, 1, pBoidVSSRV.GetAddressOf());
+	DXDevice::GetContext().GSSetShaderResources(boidSlot, 1, pBoidVSSRV.GetAddressOf());
 
 	worldCB.VSBind();
+	controlCB.VSBind();
+
+	pPSSense->Bind();
+	pVSSense->Bind();
+	pVBSense.Bind();
+	pVBSense.Draw(boidCount);
+
+	pVSSenseLines->Bind();
+	pPSSenseLines->Bind();
+	pGSSenseLines->Bind();
+	pVBSenseLines.Bind();
+	pVBSenseLines.Draw(boidCount);
+	//DXDevice::GetContext().IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+	//DXDevice::GetContext().IASetVertexBuffers(0u, 0, nullptr, 0, 0);
+	//DXDevice::GetContext().DrawInstanced(0u, boidCount, 0u, 0u);
+	pGSSenseLines->Unbind();
+
 	pPS->Bind();
 	pVS->Bind();
 	pVB.Bind();
 	pVB.Draw(boidCount);
 
-
 	ID3D11ShaderResourceView* const srv[1] = { nullptr };
 	DXDevice::GetContext().VSSetShaderResources(boidSlot, 1, srv);
+	DXDevice::GetContext().GSSetShaderResources(boidSlot, 1, srv);
 }
 
 void Boids2D::OnApplicationEvent(Engine2::ApplicationEvent& event)
@@ -123,18 +141,20 @@ void Boids2D::OnImgui()
 
 	ImGui::DragFloat("Boid Speed", &controlCB.data.boidSpeed, 0.05f);
 	ImGui::DragFloat("Boid Scale", &controlCB.data.boidScale, 0.05f);
+	ImGui::DragFloat("Boid Sense Radius", &controlCB.data.boidSenseRadius, 0.05f);
 	if (ImGui::DragFloat("World Height", &worldCB.data.worldDimension.y, 0.05f)) { CalcWorldWidth(); }
 	ImGui::Text("World Width %f", worldCB.data.worldDimension.x);
 	ImGui::Spacing();
 	ImGui::DragInt("Diffuse radius", &controlCB.data.diffuseRadius, 1.0f, 0, 10);
 	ImGui::DragFloat("Diffuse rate", &controlCB.data.diffuseRate, 0.005f, 0.0f, 1.0f);
 	ImGui::DragFloat("Diffuse fade", &controlCB.data.diffuseFade, 0.005f, 0.0f, 1.0f);
-	ImGui::Text("Mouse x %u y %u", controlCB.data.xMouse, controlCB.data.yMouse);
 	ImGui::Text("Screen %u x %u", worldCB.data.screenDimension.x, worldCB.data.screenDimension.y);
 	pCSBoids->OnImgui();
 	pCSTrails->OnImgui();
 	pVS->OnImgui();
 	pPS->OnImgui();
+	pVSSense->OnImgui();
+	pPSSense->OnImgui();
 }
 
 void Boids2D::InitialiseGfx()
@@ -151,30 +171,43 @@ void Boids2D::InitialiseGfx()
 		{"UV"      , 0, DXGI_FORMAT::DXGI_FORMAT_R32G32_FLOAT   , 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
 	};
 
-	std::vector<Vertex> verticies;
-	std::vector<unsigned int> indicies;
-
 	// triangle
-	verticies = {
+	std::vector<Vertex> verticiesTri = {
 		{ { -1.0f, -1.0f, 0.0f}, {0.0f, 0.0f} },
 		{ { -1.0f,  1.0f, 0.0f}, {0.0f, 1.0f} },
 		{ {  1.0f,  0.0f, 0.0f}, {1.0f, 0.5f} },
 	};
-	indicies = { 0, 1, 2 };
+	std::vector<unsigned int> indiciesTri = { 0, 1, 2 };
 
 	// square
-	//verticies = {
-	//	{ { -0.5f, -0.5f, 0.0f}, {0.0f, 0.0f} },
-	//	{ { -0.5f,  0.5f, 0.0f}, {0.0f, 1.0f} },
-	//	{ {  0.5f,  0.5f, 0.0f}, {1.0f, 1.0f} },
-	//	{ {  0.5f, -0.5f, 0.0f}, {1.0f, 0.0f} },
-	//};
-	//indicies = { 0, 1, 2, 0, 2, 3 };
+	std::vector<Vertex> verticiesSqr = {
+		{ { -0.5f, -0.5f, 0.0f}, {0.0f, 0.0f} },
+		{ { -0.5f,  0.5f, 0.0f}, {0.0f, 1.0f} },
+		{ {  0.5f,  0.5f, 0.0f}, {1.0f, 1.0f} },
+		{ {  0.5f, -0.5f, 0.0f}, {1.0f, 0.0f} },
+	};
+	std::vector<unsigned int> indiciesSqr = { 0, 1, 2, 0, 2, 3 };
 
-	pVB.Initialise<Vertex>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, verticies, indicies);
+	pVB.Initialise<Vertex>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, verticiesTri, indiciesTri);
+	pVS = std::make_shared<VertexShaderFile>("src\\Boids\\Boids2DVS.hlsl", vsLayout);
+	pPS = std::make_shared<PixelShaderFile>("src\\Boids\\Boids2DPS.hlsl");
 
-	pVS = VertexShader::CreateFromSourceFile("src\\Boids\\Boids2DVS.hlsl", vsLayout);
-	pPS = PixelShader::CreateFromSourceFile("src\\Boids\\Boids2DPS.hlsl");
+	pVBSense.Initialise<Vertex>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, verticiesSqr, indiciesSqr);
+	pVSSense = std::make_shared<VertexShaderFile>("src\\Boids\\Boids2DVS.hlsl", vsLayout, "sense");
+	pPSSense = std::make_shared<PixelShaderFile>("src\\Boids\\Boids2DPS.hlsl", "sense");
+
+
+	std::vector<D3D11_INPUT_ELEMENT_DESC> vsLayoutSenseLines = {
+		{"Position", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
+	};
+
+	// create this just to have a basic vertex buffer
+	std::vector<XMFLOAT3> linesPoint = { {0.0f,0.0f,0.0f} };
+	pVBSenseLines.Initialise<XMFLOAT3>(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_POINTLIST, linesPoint);
+
+	pVSSenseLines = std::make_shared<VertexShaderFile>("src\\Boids\\Boids2DVS.hlsl", vsLayoutSenseLines, "senseLines");
+	pPSSenseLines = std::make_shared<PixelShaderFile>("src\\Boids\\Boids2DPS.hlsl", "senseLines");
+	pGSSenseLines = GeometryShader::CreateFromSourceFile("src\\Boids\\Boids2DGS.hlsl");
 }
 
 void Boids2D::InitialiseCS(int startPattern)

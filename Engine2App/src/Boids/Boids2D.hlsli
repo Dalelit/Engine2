@@ -21,16 +21,23 @@ cbuffer ControlInfo : register(b3)
 	int   diffuseRadius;
 	float diffuseRate;
 	float diffuseFade;
-	int   xMouse;
-	int   yMouse;
 	int   boidCount;
 	float boidSpeed;
 	float boidScale;
+	float boidSenseRadius;
+};
+
+struct VSOutSenseLines
+{
+	uint index : Index;
+	float4 posWS : SV_POSITION;
 };
 
 float2 RotateVector(float2 vec, float radians)
 {
-	return float2(vec.x * cos(radians) - vec.y * sin(radians), vec.x * sin(radians) + vec.y * cos(radians));
+	float c = cos(radians);
+	float s = sin(radians);
+	return float2(vec.x * c - vec.y * s, vec.x * s + vec.y * c);
 }
 
 float2 UnitVector(float angle)

@@ -5,12 +5,32 @@ RWTexture2D<float4> textureOut : register(u0);
 
 RWStructuredBuffer<Boid> boidBuffer : register(u1);
 
+uint CountNear(uint indx, float3 position)
+{
+	uint count = 0;
+
+	for (int i = 0; i < boidCount; i++)
+	{
+		if ((uint)i != indx)
+		{
+			Boid b = boidBuffer[i];
+			float dist = length(b.position - position);
+
+			if (dist <= boidSenseRadius) count++;
+		}
+	}
+
+	return count;
+}
+
 [numthreads(1024, 1, 1)]
 void BoidsUpdate(uint3 DTid : SV_DispatchThreadID)
 {
 	uint indx = DTid.x;
 
 	Boid b = boidBuffer[indx];
+
+	int neighbours = CountNear(indx, b.position);
 
 	float2 realPosition = b.position.xy;
 	
@@ -25,6 +45,9 @@ void BoidsUpdate(uint3 DTid : SV_DispatchThreadID)
 	b.position = float3(realPosition, 0.0);
 	//b.rotation += deltaTime * PI * 0.25;
 	b.scale = boidScale;
+
+	if (neighbours > 0) b.color.b = 1.0;
+	else b.color.b = 0.0;
 
 	uint2 bufferCoord = WorldToBufferSpace(realPosition);
 	textureOut[bufferCoord] = float4(1.0, 1.0, 1.0, 1.0);
