@@ -24,12 +24,12 @@ void main(
 	for (uint i = instId + 1; i < (uint)boidCount; i++)
 	{
 		Boid other = boidBuffer[i];
-		float dist = length(input[0].posWS.xyz - other.position);
+		float dist = length(input[0].posWS.xy - other.position);
 
 		if (dist <= boidSenseRadius)
 		{
 			output.Append(startPoint);
-			endPoint.pos = float4(WorldToScreenSpace(other.position.xy), 0.0, 1.0);
+			endPoint.pos = float4(WorldToScreenSpace(other.position), 0.0, 1.0);
 			output.Append(endPoint);
 			output.RestartStrip();
 		}

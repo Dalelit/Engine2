@@ -5,22 +5,43 @@ RWTexture2D<float4> textureOut : register(u0);
 
 RWStructuredBuffer<Boid> boidBuffer : register(u1);
 
-uint CountNear(uint indx, float3 position)
+float2 Force(uint indx, Boid boid)
 {
-	uint count = 0;
+	float count = 1.0;
+	float2 groupCentre = boid.position;
+	float2 groupDirection = boid.direction;
+	float2 groupRepulsion = float2(0.0, 0.0);
 
 	for (int i = 0; i < boidCount; i++)
 	{
 		if ((uint)i != indx)
 		{
-			Boid b = boidBuffer[i];
-			float dist = length(b.position - position);
+			Boid other = boidBuffer[i];
+			float dist = length(other.position - boid.position);
 
-			if (dist <= boidSenseRadius) count++;
+			if (dist <= boidSenseRadius)
+			{
+				count++;
+				groupCentre += other.position;
+				groupDirection += other.direction;
+
+				// add the inverse sqr of the distance
+				float2 toBoid = boid.position - other.position;
+				float toBoidDistInv = boidSenseRadius - length(toBoid);
+				groupRepulsion += normalize(toBoid) * toBoidDistInv * toBoidDistInv;
+			}
 		}
 	}
 
-	return count;
+	groupCentre /= count;
+	groupCentre = groupCentre - boid.position;
+
+	groupDirection /= count;
+	groupDirection = groupDirection - boid.direction;
+
+	if (count > 1.0) groupRepulsion /= (count - 1.0);
+
+	return groupCentre * centreStrength + groupDirection * directionStrength + groupRepulsion * repulsionStrength;
 }
 
 [numthreads(1024, 1, 1)]
@@ -30,28 +51,24 @@ void BoidsUpdate(uint3 DTid : SV_DispatchThreadID)
 
 	Boid b = boidBuffer[indx];
 
-	int neighbours = CountNear(indx, b.position);
+	// update direciton
+	b.direction = normalize(b.direction + Force(indx, b) * deltaTime);
 
-	float2 realPosition = b.position.xy;
-	
-	realPosition += UnitVector(b.rotation) * boidSpeed * deltaTime;
+	// move forward
+	b.position += b.direction * boidSpeed * deltaTime;
 
-	if (realPosition.x < 0.0) realPosition.x += worldDimension.x;
-	else if (realPosition.x > worldDimension.x) realPosition.x -= worldDimension.x;
+	// handle world bounds... simply
+	if (b.position.x < 0.0) b.position.x += worldDimension.x;
+	else if (b.position.x > worldDimension.x) b.position.x -= worldDimension.x;
 
-	if (realPosition.y < 0.0) realPosition.y += worldDimension.y;
-	else if (realPosition.y > worldDimension.y) realPosition.y -= worldDimension.y;
+	if (b.position.y < 0.0) b.position.y += worldDimension.y;
+	else if (b.position.y > worldDimension.y) b.position.y -= worldDimension.y;
 
-	b.position = float3(realPosition, 0.0);
-	//b.rotation += deltaTime * PI * 0.25;
-	b.scale = boidScale;
+	// update the trails texture
+	uint2 bufferCoord = WorldToBufferSpace(b.position);
+	textureOut[bufferCoord] = float4(b.color, 1.0);
 
-	if (neighbours > 0) b.color.b = 1.0;
-	else b.color.b = 0.0;
-
-	uint2 bufferCoord = WorldToBufferSpace(realPosition);
-	textureOut[bufferCoord] = float4(1.0, 1.0, 1.0, 1.0);
-
+	// update the boid
 	boidBuffer[indx] = b;
 }
 

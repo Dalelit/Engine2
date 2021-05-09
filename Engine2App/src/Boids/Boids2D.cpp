@@ -80,41 +80,45 @@ void Boids2D::OnUpdate(float dt)
 
 void Boids2D::OnRender()
 {
+	// draw trails
 	if (state == 1)
-	{
 		tgt1->DrawToBackBuffer();
-	}
 	else
-	{
 		tgt2->DrawToBackBuffer();
-	}
 
+	// bind common resources
 	DXDevice::GetContext().VSSetShaderResources(boidSlot, 1, pBoidVSSRV.GetAddressOf());
 	DXDevice::GetContext().GSSetShaderResources(boidSlot, 1, pBoidVSSRV.GetAddressOf());
-
 	worldCB.VSBind();
 	controlCB.VSBind();
 
-	pPSSense->Bind();
-	pVSSense->Bind();
-	pVBSense.Bind();
-	pVBSense.Draw(boidCount);
-
-	pVSSenseLines->Bind();
-	pPSSenseLines->Bind();
-	pGSSenseLines->Bind();
-	pVBSenseLines.Bind();
-	pVBSenseLines.Draw(boidCount);
-	//DXDevice::GetContext().IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
-	//DXDevice::GetContext().IASetVertexBuffers(0u, 0, nullptr, 0, 0);
-	//DXDevice::GetContext().DrawInstanced(0u, boidCount, 0u, 0u);
-	pGSSenseLines->Unbind();
-
+	// draw boids
 	pPS->Bind();
 	pVS->Bind();
 	pVB.Bind();
 	pVB.Draw(boidCount);
 
+	// draw sense lines
+	if (showSenseLines)
+	{
+		pVSSenseLines->Bind();
+		pPSSenseLines->Bind();
+		pGSSenseLines->Bind();
+		pVBSenseLines.Bind();
+		pVBSenseLines.Draw(boidCount);
+		pGSSenseLines->Unbind();
+	}
+
+	// draw sense radius
+	if (showSenseRadius)
+	{
+		pPSSense->Bind();
+		pVSSense->Bind();
+		pVBSense.Bind();
+		pVBSense.Draw(boidCount);
+	}
+
+	// clean up
 	ID3D11ShaderResourceView* const srv[1] = { nullptr };
 	DXDevice::GetContext().VSSetShaderResources(boidSlot, 1, srv);
 	DXDevice::GetContext().GSSetShaderResources(boidSlot, 1, srv);
@@ -138,13 +142,20 @@ void Boids2D::OnImgui()
 {
 	if (ImGui::DragScalar("Boid count", ImGuiDataType_::ImGuiDataType_U32, &boidCount, 1.0f)) { if (boidCount < 1) boidCount = 1; }
 	if (ImGui::Button("Restart")) InitialiseCS();
-
-	ImGui::DragFloat("Boid Speed", &controlCB.data.boidSpeed, 0.05f);
-	ImGui::DragFloat("Boid Scale", &controlCB.data.boidScale, 0.05f);
-	ImGui::DragFloat("Boid Sense Radius", &controlCB.data.boidSenseRadius, 0.05f);
+	ImGui::Separator();
+	ImGui::Text("Boid");
+	ImGui::DragFloat("Speed", &controlCB.data.boidSpeed, 0.05f);
+	ImGui::DragFloat("Scale", &controlCB.data.boidScale, 0.05f);
+	ImGui::DragFloat("Sense Radius", &controlCB.data.boidSenseRadius, 0.05f);
+	ImGui::DragFloat("Centre strength", &controlCB.data.centreStrength, 0.05f);
+	ImGui::DragFloat("Direction strength", &controlCB.data.directionStrength, 0.05f);
+	ImGui::DragFloat("Repulsion strength", &controlCB.data.repulsionStrength, 0.05f);
+	ImGui::Checkbox("Show sense radius", &showSenseRadius);
+	ImGui::Checkbox("Show sense lines", &showSenseLines);
+	ImGui::Separator();
 	if (ImGui::DragFloat("World Height", &worldCB.data.worldDimension.y, 0.05f)) { CalcWorldWidth(); }
 	ImGui::Text("World Width %f", worldCB.data.worldDimension.x);
-	ImGui::Spacing();
+	ImGui::Separator();
 	ImGui::DragInt("Diffuse radius", &controlCB.data.diffuseRadius, 1.0f, 0, 10);
 	ImGui::DragFloat("Diffuse rate", &controlCB.data.diffuseRate, 0.005f, 0.0f, 1.0f);
 	ImGui::DragFloat("Diffuse fade", &controlCB.data.diffuseFade, 0.005f, 0.0f, 1.0f);
@@ -162,29 +173,29 @@ void Boids2D::InitialiseGfx()
 	CalcWorldWidth();
 
 	struct Vertex {
-		XMFLOAT3 position;
+		XMFLOAT2 position;
 		XMFLOAT2 uv;
 	};
 
 	std::vector<D3D11_INPUT_ELEMENT_DESC> vsLayout = {
-		{"Position", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"UV"      , 0, DXGI_FORMAT::DXGI_FORMAT_R32G32_FLOAT   , 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"Position", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"UV"      , 0, DXGI_FORMAT::DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
 	};
 
 	// triangle
 	std::vector<Vertex> verticiesTri = {
-		{ { -1.0f, -1.0f, 0.0f}, {0.0f, 0.0f} },
-		{ { -1.0f,  1.0f, 0.0f}, {0.0f, 1.0f} },
-		{ {  1.0f,  0.0f, 0.0f}, {1.0f, 0.5f} },
+		{ { -1.0f, -1.0f}, {0.0f, 0.0f} },
+		{ { -1.0f,  1.0f}, {0.0f, 1.0f} },
+		{ {  1.0f,  0.0f}, {1.0f, 0.5f} },
 	};
 	std::vector<unsigned int> indiciesTri = { 0, 1, 2 };
 
 	// square
 	std::vector<Vertex> verticiesSqr = {
-		{ { -0.5f, -0.5f, 0.0f}, {0.0f, 0.0f} },
-		{ { -0.5f,  0.5f, 0.0f}, {0.0f, 1.0f} },
-		{ {  0.5f,  0.5f, 0.0f}, {1.0f, 1.0f} },
-		{ {  0.5f, -0.5f, 0.0f}, {1.0f, 0.0f} },
+		{ { -0.5f, -0.5f}, {0.0f, 0.0f} },
+		{ { -0.5f,  0.5f}, {0.0f, 1.0f} },
+		{ {  0.5f,  0.5f}, {1.0f, 1.0f} },
+		{ {  0.5f, -0.5f}, {1.0f, 0.0f} },
 	};
 	std::vector<unsigned int> indiciesSqr = { 0, 1, 2, 0, 2, 3 };
 
@@ -198,12 +209,12 @@ void Boids2D::InitialiseGfx()
 
 
 	std::vector<D3D11_INPUT_ELEMENT_DESC> vsLayoutSenseLines = {
-		{"Position", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"Position", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
 	};
 
 	// create this just to have a basic vertex buffer
-	std::vector<XMFLOAT3> linesPoint = { {0.0f,0.0f,0.0f} };
-	pVBSenseLines.Initialise<XMFLOAT3>(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_POINTLIST, linesPoint);
+	std::vector<XMFLOAT2> linesPoint = { {0.0f,0.0f} };
+	pVBSenseLines.Initialise<XMFLOAT2>(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_POINTLIST, linesPoint);
 
 	pVSSenseLines = std::make_shared<VertexShaderFile>("src\\Boids\\Boids2DVS.hlsl", vsLayoutSenseLines, "senseLines");
 	pPSSenseLines = std::make_shared<PixelShaderFile>("src\\Boids\\Boids2DPS.hlsl", "senseLines");
@@ -241,9 +252,8 @@ void Boids2D::InitialiseCS(int startPattern)
 	texuav2.Initialise(tgt2->GetBuffer());
 
 	struct Boid {
-		XMFLOAT3 position;
-		float    rotation;
-		float    scale;
+		XMFLOAT2 position;
+		XMFLOAT2 direction;
 		XMFLOAT3 color;
 	};
 
@@ -255,9 +265,11 @@ void Boids2D::InitialiseCS(int startPattern)
 	{
 		Boid b;
 
-		b.position = { rng.Next() * worldCB.data.worldDimension.x, rng.Next() * worldCB.data.worldDimension.y, 0.0f };
-		b.rotation = rng.Next() * XM_2PI;
-		//b.scale = 1.0f; // set in CS anyway
+		b.position = { rng.Next() * worldCB.data.worldDimension.x, rng.Next() * worldCB.data.worldDimension.y };
+
+		float angle = rng.Next() * XM_2PI;
+		b.direction = { cosf(angle), sinf(angle) };
+		
 		b.color = { rngColor.Next(), rngColor.Next(), rngColor.Next() };
 
 		boids.push_back(b);

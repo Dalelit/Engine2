@@ -22,9 +22,12 @@ public:
 
 protected:
 	int state = 1;
-	uint32_t boidCount = 10;
+	uint32_t boidCount = 400;
 
 	Engine2::InputController input;
+
+	bool showSenseRadius = false;
+	bool showSenseLines  = false;
 
 	//--------------------------------------------------------
 	void InitialiseGfx();
@@ -84,10 +87,13 @@ protected:
 		float   diffuseRate = 0.2f;
 		float   diffuseFade = 0.01f;
 		int32_t boidCount;
-		float   boidSpeed = 10.0f;
+		float   boidSpeed = 25.0f;
 		float   boidScale = 1.0f;
 		float   boidSenseRadius = 10.0f;
-		float   padding[3];
+		float   centreStrength = 0.9f;
+		float   directionStrength = 0.9f;
+		float   repulsionStrength = 0.2f;
+		//float   padding[];
 	};
 
 	Engine2::ConstantBuffer<WorldInfo> worldCB;

@@ -9,13 +9,13 @@ struct VSOut
 	float4 posSS : SV_POSITION;
 };
 
-VSOut main(float3 pos : Position, float2 uv : UV, uint instId : SV_InstanceID)
+VSOut main(float2 pos : Position, float2 uv : UV, uint instId : SV_InstanceID)
 {
 	VSOut vso;
 
 	Boid b = boidBuffer[instId];
 
-	float2 posWS = RotateVector(pos.xy * b.scale, b.rotation) + b.position.xy;
+	float2 posWS = RotateVector(pos * boidScale, b.direction) + b.position;
 
 	vso.posSS = float4(WorldToScreenSpace(posWS), 0.0, 1.0);
 	vso.uv = uv;
@@ -30,13 +30,13 @@ struct VSSenseOut
 	float4 posSS : SV_POSITION;
 };
 
-VSSenseOut sense(float3 pos : Position, float2 uv : UV, uint instId : SV_InstanceID)
+VSSenseOut sense(float2 pos : Position, float2 uv : UV, uint instId : SV_InstanceID)
 {
 	VSSenseOut vso;
 
 	Boid b = boidBuffer[instId];
 
-	float2 posWS = RotateVector(pos.xy * boidSenseRadius, b.rotation) + b.position.xy;
+	float2 posWS = RotateVector(pos * boidSenseRadius, b.direction) + b.position;
 
 	vso.posSS = float4(WorldToScreenSpace(posWS), 0.0, 1.0);
 	vso.uv = uv;
@@ -44,11 +44,11 @@ VSSenseOut sense(float3 pos : Position, float2 uv : UV, uint instId : SV_Instanc
 	return vso;
 }
 
-VSOutSenseLines senseLines(float3 pos : Position, uint instId : SV_InstanceID)
+VSOutSenseLines senseLines(float2 pos : Position, uint instId : SV_InstanceID)
 {
 	Boid b = boidBuffer[instId];
 	VSOutSenseLines vsout;
 	vsout.index = instId;
-	vsout.posWS = float4(b.position, 1.0);
+	vsout.posWS = float4(b.position, 0.0, 1.0);
 	return vsout;
 }

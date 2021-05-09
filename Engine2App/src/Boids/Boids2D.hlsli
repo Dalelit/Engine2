@@ -2,9 +2,8 @@ static const float PI = 3.141592654;
 static const float TwoPI = 6.283185307;
 
 struct Boid {
-	float3 position;
-	float  rotation;
-	float  scale;
+	float2 position;
+	float2 direction;
 	float3 color;
 };
 
@@ -25,6 +24,9 @@ cbuffer ControlInfo : register(b3)
 	float boidSpeed;
 	float boidScale;
 	float boidSenseRadius;
+	float centreStrength;
+	float directionStrength;
+	float repulsionStrength;
 };
 
 struct VSOutSenseLines
@@ -38,6 +40,13 @@ float2 RotateVector(float2 vec, float radians)
 	float c = cos(radians);
 	float s = sin(radians);
 	return float2(vec.x * c - vec.y * s, vec.x * s + vec.y * c);
+}
+
+// direction should be unit vector
+float2 RotateVector(float2 vec, float2 direction)
+{
+	// as above, c = direciton.x, s = direction.y
+	return float2(vec.x * direction.x - vec.y * direction.y, vec.x * direction.y + vec.y * direction.x);
 }
 
 float2 UnitVector(float angle)
