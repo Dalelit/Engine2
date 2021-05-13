@@ -14,22 +14,19 @@ float2 Force(uint indx, Boid boid)
 
 	for (int i = 0; i < boidCount; i++)
 	{
-		if ((uint)i != indx)
+		Boid other = boidBuffer[i];
+		float dist = length(other.position - boid.position);
+
+		if (dist > 0.0 && dist <= boidSenseRadius) // dist == 0 when indx == i
 		{
-			Boid other = boidBuffer[i];
-			float dist = length(other.position - boid.position);
+			count++;
+			groupCentre += other.position;
+			groupDirection += other.direction;
 
-			if (dist <= boidSenseRadius)
-			{
-				count++;
-				groupCentre += other.position;
-				groupDirection += other.direction;
-
-				// add the inverse sqr of the distance
-				float2 toBoid = boid.position - other.position;
-				float toBoidDistInv = boidSenseRadius - length(toBoid);
-				groupRepulsion += normalize(toBoid) * toBoidDistInv * toBoidDistInv;
-			}
+			// add the inverse sqr of the distance
+			float2 toBoid = boid.position - other.position;
+			float toBoidDistInv = boidSenseRadius - length(toBoid);
+			groupRepulsion += normalize(toBoid) * toBoidDistInv * toBoidDistInv;
 		}
 	}
 
@@ -39,7 +36,8 @@ float2 Force(uint indx, Boid boid)
 	groupDirection /= count;
 	groupDirection = groupDirection - boid.direction;
 
-	if (count > 1.0) groupRepulsion /= (count - 1.0);
+	count -= 1.0; // don't include this one in the count
+	groupRepulsion /= max(count,1.0); // don't divide by zero
 
 	return groupCentre * centreStrength + groupDirection * directionStrength + groupRepulsion * repulsionStrength;
 }

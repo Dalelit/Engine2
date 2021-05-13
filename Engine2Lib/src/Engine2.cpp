@@ -180,6 +180,20 @@ namespace Engine2
 			{
 				for (auto layer : layers) ImGui::Checkbox(layer->GetName().c_str(), &layer->imguiOpen);
 			}
+
+			if (ImGui::CollapsingHeader("Create Layer"))
+			{
+				std::string toErase;
+				for (auto [k,v] : layerRegister)
+				{
+					if (ImGui::Selectable(k.c_str()))
+					{
+						toErase = k;
+						v();
+					}
+				}
+				if (!toErase.empty()) layerRegister.erase(toErase);
+			}
 		}
 
 		ImGui::End();

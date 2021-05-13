@@ -226,9 +226,9 @@ int WINAPI WinMain(
 	OnInputEventFunc = [](Engine2::InputEvent& event) { Engine2::Engine::Get().OnInputEvent(event); };
 
 	// reminder: camera position is set by last layer
-	Engine2::Engine::Get().AttachLayer(new SceneBuilder(), false);
-	Engine2::Engine::Get().AttachLayer(new AntSlime(), false);
-	Engine2::Engine::Get().AttachLayer(new Boids2D());
+	Engine2::Engine::Get().RegisterLayer<SceneBuilder>("SceneBuilder");
+	Engine2::Engine::Get().RegisterLayer<AntSlime>("AntSlime");
+	Engine2::Engine::Get().RegisterLayer<Boids2D>("Boids2D", true);
 
 	clock_t lastTime = clock();
 
