@@ -136,14 +136,12 @@ void AntSlime::Initialise(int startPattern)
 	tex2Gizmo.SetWidthHeight(relH * aspectRatio, relH);
 	tex2Gizmo.SetActive(false);
 
-	//pComputeShader = ComputeShader::CreateFromSourceFile("Assets\\Shaders\\AntSlime.hlsl");
-	pComputeShader = std::make_shared<ComputeShaderFile>("Assets\\Shaders\\AntSlime.hlsl");
+	pComputeShader = std::make_shared<ComputeShaderFile>("src\\AntSlime\\AntSlime.hlsl");
 	pComputeShader->SetThreadGroupCount(w, h, 1);
 	pComputeShader->SetName("Environment");
 	pComputeShader->AutoUpdate();
 
-	//pComputeShaderAnts = ComputeShader::CreateFromSourceFile("Assets\\Shaders\\AntSlime.hlsl", "UpdateAnts");
-	pComputeShaderAnts = std::make_shared<ComputeShaderFile>("Assets\\Shaders\\AntSlime.hlsl", "UpdateAnts");
+	pComputeShaderAnts = std::make_shared<ComputeShaderFile>("src\\AntSlime\\AntSlime.hlsl", "UpdateAnts");
 	pComputeShaderAnts->SetThreadGroupCount(1024, 1, 1);
 	pComputeShaderAnts->SetName("Ants");
 	pComputeShaderAnts->AutoUpdate();

@@ -3,23 +3,23 @@
   <ItemGroup>
     <ClCompile Include="src\winmain.cpp" />
     <ClCompile Include="src\pch.cpp" />
-    <ClCompile Include="src\SceneBuilder.cpp" />
     <ClCompile Include="src\Empty.cpp" />
-    <ClCompile Include="src\AntSlime.cpp" />
     <ClCompile Include="src\Boids\Boids2D.cpp" />
+    <ClCompile Include="src\AntSlime\AntSlime.cpp" />
+    <ClCompile Include="src\SceneBuilder\SceneBuilder.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h" />
-    <ClInclude Include="src\SceneBuilder.h" />
     <ClInclude Include="src\Empty.h" />
     <ClInclude Include="src\Boids\Boids2D.h" />
+    <ClInclude Include="src\SceneBuilder\SceneBuilder.h" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Assets\Shaders\AntSlime.hlsl" />
     <FxCompile Include="src\Boids\Boids2DCS.hlsl" />
     <FxCompile Include="src\Boids\Boids2DPS.hlsl" />
     <FxCompile Include="src\Boids\Boids2DVS.hlsl" />
     <FxCompile Include="src\Boids\Boids2DGS.hlsl" />
+    <FxCompile Include="src\AntSlime\AntSlime.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Boids\Boids2D.hlsli" />

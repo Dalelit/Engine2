@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Engine2.h"
-#include "SceneBuilder.h"
-#include "AntSlime.h"
+#include "SceneBuilder\SceneBuilder.h"
+#include "AntSlime\AntSlime.h"
 #include "Boids\Boids2D.h"
 
 #define WIN32_LEAN_AND_MEAN

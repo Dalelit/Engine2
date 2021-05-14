@@ -166,24 +166,24 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\AntSlime.cpp" />
+    <ClCompile Include="src\AntSlime\AntSlime.cpp" />
     <ClCompile Include="src\Boids\Boids2D.cpp" />
     <ClCompile Include="src\Empty.cpp" />
     <ClCompile Include="src\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="src\SceneBuilder.cpp" />
+    <ClCompile Include="src\SceneBuilder\SceneBuilder.cpp" />
     <ClCompile Include="src\winmain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Boids\Boids2D.h" />
     <ClInclude Include="src\Empty.h" />
     <ClInclude Include="src\pch.h" />
-    <ClInclude Include="src\SceneBuilder.h" />
+    <ClInclude Include="src\SceneBuilder\SceneBuilder.h" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Assets\Shaders\AntSlime.hlsl">
+    <FxCompile Include="src\AntSlime\AntSlime.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compute</ShaderType>
