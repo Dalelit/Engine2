@@ -39,7 +39,6 @@
     <ClInclude Include="src\UtilMath.h" />
     <ClInclude Include="src\ECS.h" />
     <ClInclude Include="src\Components.h" />
-    <ClInclude Include="src\Instances.h" />
     <ClInclude Include="src\DXBuffer.h" />
     <ClInclude Include="src\RigidBody.h" />
     <ClInclude Include="src\Mesh.h" />
@@ -100,7 +99,6 @@
     <ClCompile Include="src\OffscreenOutliner.cpp" />
     <ClCompile Include="src\Particles.cpp" />
     <ClCompile Include="src\Components.cpp" />
-    <ClCompile Include="src\Instances.cpp" />
     <ClCompile Include="src\RigidBody.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\MeshRenderer.cpp" />
