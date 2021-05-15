@@ -13,10 +13,6 @@ namespace Engine2
 	class VertexBuffer : public Drawable
 	{
 	public:
-		VertexBuffer() {
-			info = "Uninitialised vertex buffer";
-		}
-
 		template <typename V>
 		void Initialise(D3D11_PRIMITIVE_TOPOLOGY top, std::vector<V>& verticies, bool updatable = false) {
 			SetTopology(top);
@@ -66,8 +62,6 @@ namespace Engine2
 				memcpy(mappedSubResource.pData, verticies, sizeof(V) * vCount);
 
 				context.Unmap(ptrBuffer, 0);
-
-				info = "VertexBuffer vertex count: " + std::to_string(vertexCount);
 			}
 		}
 
@@ -96,13 +90,12 @@ namespace Engine2
 			DXDevice::GetContext().DrawInstanced(vertexCount, instances, 0u, 0u);
 		}
 
-		virtual void OnImgui() { ImGui::Text(info.c_str()); }
+		virtual void OnImgui() { ImGui::Text("VertexBuffer"); }
 
 		UINT slot = 0u;
 		UINT numberOfBuffers = 1u;
 
 	protected:
-		std::string info;
 		wrl::ComPtr<ID3D11Buffer> pVertexBuffer = nullptr;
 
 		D3D11_PRIMITIVE_TOPOLOGY topology;
@@ -139,18 +132,12 @@ namespace Engine2
 			HRESULT hr = DXDevice::GetDevice().CreateBuffer(&bufferDesc, &data, &pVertexBuffer);
 
 			E2_ASSERT_HR(hr, "VertexBuffer CreateBuffer failed");
-
-			info = "VertexBuffer vertex count: " + std::to_string(vertexCount);
 		}
 	};
 
 	class VertexBufferIndex : public VertexBuffer
 	{
 	public:
-		VertexBufferIndex() {
-			this->info = "Uninitialised vertex buffer index";
-		}
-
 		template <typename V>
 		void Initialise(D3D11_PRIMITIVE_TOPOLOGY top, std::vector<V>& verticies, std::vector<unsigned int>& indicies, bool updatable = false) {
 			SetTopology(top);
@@ -206,8 +193,6 @@ namespace Engine2
 				memcpy(mappedSubResource.pData, indicies, sizeof(uint32_t) * indxCount);
 
 				context.Unmap(ptrBuffer, 0);
-
-				this->info += " index count: " + std::to_string(indxCount);
 			}
 		}
 
@@ -235,6 +220,7 @@ namespace Engine2
 			DXDevice::GetContext().DrawIndexedInstanced(indxCount, instances, 0u, 0u, 0u);
 		}
 
+		virtual void OnImgui() { ImGui::Text("VertexBufferIndex"); }
 
 	protected:
 		wrl::ComPtr<ID3D11Buffer> pIndexBuffer = nullptr;
@@ -266,8 +252,6 @@ namespace Engine2
 			hr = DXDevice::GetDevice().CreateBuffer(&bufferDesc, &data, &pIndexBuffer);
 
 			E2_ASSERT_HR(hr, "VertexBufferIndex CreateBuffer failed");
-
-			this->info += " index count: " + std::to_string(indxCount);
 		}
 	};
 }

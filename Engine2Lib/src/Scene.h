@@ -77,6 +77,7 @@ namespace Engine2
 
 		GizmoRender gizmoRender;
 		bool gizmoEnabled = true;
+		bool gizmoCollidersEnabled = true;
 
 		Instrumentation::TimerCollection systemTimers;
 

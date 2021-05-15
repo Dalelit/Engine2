@@ -75,11 +75,8 @@ namespace Engine2
 		if (mainCamera)
 		{
 			RenderOutlines();
-			if (gizmoEnabled)
-			{
-				RenderGizmos();
-				RenderColliders();
-			}
+			if (gizmoEnabled) RenderGizmos();
+			if (gizmoCollidersEnabled) RenderColliders();
 		}
 	}
 
@@ -450,6 +447,7 @@ namespace Engine2
 			hierarchy.OnImgui();
 			ImGui::Separator();
 			ImGui::Checkbox("Show Gizmos", &gizmoEnabled);
+			ImGui::Checkbox("Show Collider Gizmos", &gizmoCollidersEnabled);
 			if (ImGui::TreeNode("Sun"))
 			{
 				sun.OnImgui();
