@@ -8,8 +8,8 @@ using namespace DirectX;
 
 Boids2D::Boids2D() : Layer("Boids2D")
 {
-	worldCB.slot = 1;
-	controlCB.slot = 3u;
+	worldCB.SetSlot(1);
+	controlCB.SetSlot(3);
 
 	controlCB.data.time = 0.0f;
 	controlCB.data.deltaTime = 0.0f;

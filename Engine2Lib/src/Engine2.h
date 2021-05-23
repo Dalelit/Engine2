@@ -8,6 +8,7 @@
 #include "Layer.h"
 #include "Instrumentation.h"
 #include "InputController.h"
+#include "UID.h"
 
 namespace Engine2 {
 
@@ -46,6 +47,8 @@ namespace Engine2 {
 
 		void ImguiActive(bool isActive = true) { imguiActive = isActive; }
 
+		UID GenerateId() { return idGenerator.Next(); } // note: really basic implementation - not thread safe.
+
 	private:
 		static std::unique_ptr<Engine> instance;
 		std::unique_ptr<InputController> inputController;
@@ -69,6 +72,8 @@ namespace Engine2 {
 		Instrumentation::MemoryTracker renderMemory;
 		Instrumentation::MemoryTracker renderLayersMemory;
 		Instrumentation::MemoryTracker renderImguiMemory;
+
+		UIDGenerator idGenerator;
 	};
 
 }

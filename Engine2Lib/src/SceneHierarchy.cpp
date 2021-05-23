@@ -6,7 +6,6 @@
 #include "VertexLayout.h"
 #include "VertexBuffer.h"
 #include "MeshRenderer.h"
-#include "MaterialLibrary.h"
 
 using namespace EngineECS;
 using namespace DirectX;

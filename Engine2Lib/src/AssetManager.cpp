@@ -4,7 +4,7 @@
 #include "AssetLoaders/ObjLoader.h"
 #include "VertexLayout.h"
 #include "VertexBuffer.h"
-#include "MaterialLibrary.h"
+#include "Materials/StandardMaterial.h"
 
 namespace Engine2
 {
@@ -62,7 +62,7 @@ namespace Engine2
 
 		if (loadedModel->IsValid())
 		{
-			CreatePositionNormalColorMaterial(*loadedModel);
+			CreatePositionNormalMaterial(*loadedModel);
 
 			for (auto& [name, object] : loadedModel->objects)
 			{
@@ -178,17 +178,17 @@ namespace Engine2
 		m->SetDrawable(vb);
 	}
 
-	void Asset::CreatePositionNormalColorMaterial(AssetLoaders::ObjLoader& loader)
+	void Asset::CreatePositionNormalMaterial(AssetLoaders::ObjLoader& loader)
 	{
 		for (auto& [name, data] : loader.materials)
 		{
-			auto mat = std::make_shared<MaterialLibrary::PositionNormalColorMaterial>(name);
-			auto cb = mat->GetPSCB();
-			cb->ambient = data.Ka;
-			cb->diffuse = data.Kd;
-			cb->emission = data.Ke;
-			cb->specular = data.Ks;
-			cb->specularExponent = data.Ns;
+			auto mat = std::make_shared<Materials::StandardMaterial>(name);
+			auto cb = mat->GetMaterialData();
+			cb.ambient = data.Ka;
+			cb.diffuse = data.Kd;
+			cb.emission = data.Ke;
+			cb.specular = data.Ks;
+			cb.specularExponent = data.Ns;
 
 			materials.StoreAsset(name, mat);
 		}
@@ -261,9 +261,9 @@ namespace Engine2
 		ImGui::OpenPopup("Material::AssetManager");
 	}
 
-	std::pair <Asset*, std::shared_ptr<Material>> AssetManager::OnImguiSelectMaterial()
+	std::pair <Asset*, std::shared_ptr<Materials::StandardMaterial>> AssetManager::OnImguiSelectMaterial()
 	{
-		std::pair < Asset*, std::shared_ptr<Material>> result(nullptr, nullptr);
+		std::pair < Asset*, std::shared_ptr<Materials::StandardMaterial>> result(nullptr, nullptr);
 
 		if (ImGui::BeginPopup("Material::AssetManager"))
 		{

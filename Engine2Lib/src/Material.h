@@ -1,10 +1,8 @@
 #pragma once
-#include "AssetStore.h"
-#include "Components.h"
-#include "Transform.h"
-#include "ConstantBuffer.h"
+#include "ConstantBuffer2.h"
 #include "Shader.h"
 #include "Texture.h"
+#include "UID.h"
 
 namespace Engine2
 {
@@ -12,54 +10,33 @@ namespace Engine2
 	{
 	public:
 
-		static AssetStore<VertexShaderFile> VertexShaders;
-		static AssetStore<PixelShaderFile>  PixelShaders;
+		void Bind() {
+			vertexShaderCB.VSBind();
+			vertexShader->Bind();
+			pixelShaderCB.PSBind();
+			pixelShader->Bind();
+			if (texture) texture->Bind();
+		}
 
-		// Retrieve existing, or create and stores, a shader
-		static std::shared_ptr<VertexShaderFile> GetVertexShader(const std::string& filename, VertexShaderLayoutDesc& layout);
-		static std::shared_ptr<PixelShaderFile> GetPixelShader(const std::string& filename);
+		inline void BindVSCB() { vertexShaderCB.VSBind(); }
 
-		Material() = default;
-		Material(const std::string& name) : name(name) {}
-		virtual ~Material() = default;
+		virtual void OnImgui() = 0;
 
-
-		virtual void PreDraw() {} // called before bind and draw
-		void Bind();
-		void ShadowBind();
-		virtual void PostDraw() {} // called after bind and draw
-
-		void SetTransform(TransformMatrix& transform);
-
-		bool IsValid() { return vertexShaderCB && vertexShader && pixelShader; }
-
-		std::shared_ptr<Material> Clone() { return Clone(name); }
-		virtual std::shared_ptr<Material> Clone(const std::string& cloneName);
-
-		void OnImgui();
+		virtual std::shared_ptr<Material> Clone() = 0;
 
 		const std::string& Name() const { return name; }
 
-		struct StandardVSData {
-			DirectX::XMMATRIX rotationMatrix;
-			DirectX::XMMATRIX transformMatrix;
-
-			inline StandardVSData& operator=(const TransformMatrix& rhs) {
-				rotationMatrix = rhs.GetRotationTransposed();
-				transformMatrix = rhs.GetTransformTransposed();
-				return *this;
-			}
-		};
-
-		std::shared_ptr<VSConstantBuffer<StandardVSData>> vertexShaderCB;
-		std::shared_ptr<VertexShader> vertexShader;
-
-		std::shared_ptr<ConstantBufferBase> pixelShaderCB;
-		std::shared_ptr<PixelShader> pixelShader;
-
-		std::shared_ptr<Texture> texture;
+		inline UID GetId() const { return id; }
+		inline void SetId(UID newId) { id = newId; }
 
 	protected:
 		std::string name;
+		UID id;
+
+		ConstantBuffer2 vertexShaderCB;
+		std::shared_ptr<VertexShader> vertexShader;
+		ConstantBuffer2 pixelShaderCB;
+		std::shared_ptr<PixelShader> pixelShader;
+		std::shared_ptr<Texture> texture;
 	};
 }

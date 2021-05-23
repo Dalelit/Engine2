@@ -1,7 +1,8 @@
 #pragma once
 #include "pch.h"
+#include "AssetStore.h"
 #include "Mesh.h"
-#include "Material.h"
+#include "Materials/StandardMaterial.h"
 #include "AssetLoaders/ObjLoader.h"
 
 namespace Engine2
@@ -22,7 +23,7 @@ namespace Engine2
 		void OnImgui();
 
 		inline AssetStore<Mesh>& Meshes() { return meshes; }
-		inline AssetStore<Material>& Materials() { return materials; }
+		inline AssetStore<Materials::StandardMaterial>& Materials() { return materials; }
 
 		inline const std::string& GetSource() const { return source; }
 
@@ -32,11 +33,11 @@ namespace Engine2
 		std::string source;
 		AssetStore<Mesh> meshes;
 		AssetStore<std::string> meshesMaterial;
-		AssetStore<Material> materials;
+		AssetStore<Materials::StandardMaterial> materials;
 
 		void CreateMeshAssetPositionNormalColor(AssetLoaders::ObjLoader& loader, AssetLoaders::Object& object);
 		void CreateMeshAssetPositionNormalTexture(AssetLoaders::ObjLoader& loader, AssetLoaders::Object& object);
-		void CreatePositionNormalColorMaterial(AssetLoaders::ObjLoader& loader);
+		void CreatePositionNormalMaterial(AssetLoaders::ObjLoader& loader);
 	};
 
 	using AssetRef = std::reference_wrapper<Asset>;
@@ -63,7 +64,7 @@ namespace Engine2
 		std::pair<Asset*, std::shared_ptr<Mesh>> OnImguiSelectMesh();
 
 		void OnImguiSelectMaterialPopupOpen();
-		std::pair < Asset*, std::shared_ptr<Material>> OnImguiSelectMaterial();
+		std::pair < Asset*, std::shared_ptr<Materials::StandardMaterial>> OnImguiSelectMaterial();
 
 		void Clear();
 

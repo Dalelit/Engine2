@@ -6,7 +6,7 @@ namespace Engine2
 	OffscreenOutliner::OffscreenOutliner() :
 		psOutlineCB(2u)
 	{
-		vsOutlineCB.slot = 2;
+		vsOutlineCB.SetSlot(2);
 		Initialise();
 		Configure();
 	}

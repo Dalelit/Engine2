@@ -9,13 +9,13 @@
 #include "Lights.h"
 #include "VertexLayout.h"
 #include "SceneSerialisation.h"
-#include "MaterialLibrary.h"
 #include "TextureLoader.h"
 #include "UtilFileDialog.h"
 #include "ScriptComponent.h"
 #include "ScriptComponents/InputControllerScript.h"
 #include "Offscreen.h"
 #include "AssetManager.h"
+#include "ShaderCache.h"
 
 using namespace Engine2;
 using namespace EngineECS;
@@ -49,7 +49,6 @@ SceneBuilder::SceneBuilder() : Layer("SceneBuilder")
 	//	tr->position = { 5.0f, 6.3f, 5.0f, 1.0f };
 	//	tr->LookAt(0.0f, 1.3f, 0.0f);
 	//}
-
 }
 
 void SceneBuilder::OnUpdate(float dt)
@@ -109,8 +108,7 @@ void SceneBuilder::CreateDefaultAssets()
 {
 	auto& asset = AssetManager::Manager().CreateAsset("Default");
 	
-	asset.Materials().CreateAsset<MaterialLibrary::PositionNormalColorMaterial>("Default PNC");
-	asset.Materials().CreateAsset<MaterialLibrary::PositionNormalColorWireframe>("Wireframe PNC");
+	asset.Materials().CreateAsset<Materials::StandardMaterial>("Default Material");
 }
 
 void SceneBuilder::CreateEmtpyScene()
@@ -167,8 +165,8 @@ void SceneBuilder::ClearScene()
 	if (onClearIncludeAssets)
 	{
 		AssetManager::Manager().Clear();
-		Material::VertexShaders.Clear();
-		Material::PixelShaders.Clear();
+		ShaderCache::VertexShaders.Clear();
+		ShaderCache::PixelShaders.Clear();
 		TextureLoader::Textures.Clear();
 	}
 }

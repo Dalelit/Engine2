@@ -161,13 +161,15 @@
     <ClInclude Include="src\Components.h" />
     <ClInclude Include="src\ComputeShader.h" />
     <ClInclude Include="src\ComputeShaderBuffer.h" />
+    <ClInclude Include="src\ConstantBuffer2.h" />
     <ClInclude Include="src\DXBuffer.h" />
     <ClInclude Include="src\ECS.h" />
     <ClInclude Include="src\EntityInfo.h" />
     <ClInclude Include="src\Gizmo.h" />
     <ClInclude Include="src\Logging.h" />
     <ClInclude Include="src\Material.h" />
-    <ClInclude Include="src\MaterialLibrary.h" />
+    <ClInclude Include="src\Materials\StandardMaterial.h" />
+    <ClInclude Include="src\Materials\WireframeMaterial.h" />
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\MeshComponent.h" />
     <ClInclude Include="src\MeshGenerator.h" />
@@ -180,12 +182,14 @@
     <ClInclude Include="src\ScriptComponent.h" />
     <ClInclude Include="src\ScriptComponents\InputControllerScript.h" />
     <ClInclude Include="src\Serialiser.h" />
+    <ClInclude Include="src\ShaderCache.h" />
     <ClInclude Include="src\ShadowMap.h" />
     <ClInclude Include="src\Skybox.h" />
     <ClInclude Include="src\SurfaceLoader.h" />
     <ClInclude Include="src\TextureGizmo.h" />
     <ClInclude Include="src\TextureLoader.h" />
     <ClInclude Include="src\Transform.h" />
+    <ClInclude Include="src\UID.h" />
     <ClInclude Include="src\UtilFileDialog.h" />
     <ClInclude Include="src\UtilMath.h" />
     <ClInclude Include="src\AssetLoaders\ObjLoader.h" />
@@ -239,8 +243,8 @@
     <ClCompile Include="src\Instrumentation.cpp" />
     <ClCompile Include="src\Lights.cpp" />
     <ClCompile Include="src\Logging.cpp" />
-    <ClCompile Include="src\Material.cpp" />
-    <ClCompile Include="src\MaterialLibrary.cpp" />
+    <ClCompile Include="src\Materials\StandardMaterial.cpp" />
+    <ClCompile Include="src\Materials\WireframeMaterial.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\MeshComponent.cpp" />
     <ClCompile Include="src\MeshGenerator.cpp" />
@@ -267,6 +271,7 @@
     <ClCompile Include="src\ScriptComponents\InputControllerScript.cpp" />
     <ClCompile Include="src\Serialiser.cpp" />
     <ClCompile Include="src\Shader.cpp" />
+    <ClCompile Include="src\ShaderCache.cpp" />
     <ClCompile Include="src\ShadowMap.cpp" />
     <ClCompile Include="src\Skybox.cpp" />
     <ClCompile Include="src\submodules\imgui\imgui.cpp">
@@ -298,6 +303,7 @@
     <ClCompile Include="src\TextureGizmo.cpp" />
     <ClCompile Include="src\TextureLoader.cpp" />
     <ClCompile Include="src\Transform.cpp" />
+    <ClCompile Include="src\UID.cpp" />
     <ClCompile Include="src\Util.cpp" />
     <ClCompile Include="src\UtilFileDialog.cpp" />
     <ClCompile Include="src\VertexLayout.cpp" />
@@ -369,6 +375,14 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
     </FxCompile>
+    <FxCompile Include="Assets\Shaders\PositionNormalPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.1</ShaderModel>
+    </FxCompile>
     <FxCompile Include="Assets\Shaders\PositionNormalTexturePS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
@@ -383,6 +397,14 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
+    <FxCompile Include="Assets\Shaders\PositionNormalVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.1</ShaderModel>
+    </FxCompile>
     <FxCompile Include="Assets\Shaders\PositionShadowVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
@@ -392,6 +414,14 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.1</ShaderModel>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)$(Platform)\Shaders\%(Filename).cso</ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)$(Platform)\Shaders\%(Filename).cso</ObjectFileOutput>
+    </FxCompile>
+    <FxCompile Include="Assets\Shaders\PositionVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.1</ShaderModel>
     </FxCompile>
     <FxCompile Include="Assets\Shaders\SkyboxPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>

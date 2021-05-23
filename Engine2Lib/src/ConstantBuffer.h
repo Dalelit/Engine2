@@ -11,26 +11,17 @@ namespace Engine2
 	public:
 		std::shared_ptr<ConstantBufferBase> Clone() const { return std::shared_ptr<ConstantBufferBase>(CloneImpl()); }
 
-		void OnImgui() { ImGui::Text("Shader Constant buffer"); }
+		inline void SetSlot(UINT newSlot) { slot = newSlot; }
+		inline UINT GetSlot() { return slot; }
 
-	protected:
-		virtual ConstantBufferBase* CloneImpl() const = 0;
-	};
+		void OnImgui() {}
 
-	template <typename T>
-	class ConstantBuffer : public ConstantBufferBase
-	{
-	public:
-		T data = {};
-		unsigned int slot;
-
-		ConstantBuffer(unsigned int bindSlot = 0) :
-			slot(bindSlot)
-		{
-			D3D11_SUBRESOURCE_DATA constBufferData = {};
+		template <typename T>
+		void Initialise() {
+			//D3D11_SUBRESOURCE_DATA constBufferData = {};
 			//constBufferData.SysMemPitch = 0;
 			//constBufferData.SysMemSlicePitch = 0;
-			constBufferData.pSysMem = &data;
+			//constBufferData.pSysMem = &data;
 
 			D3D11_BUFFER_DESC bufferDesc = {};
 			bufferDesc.ByteWidth = sizeof(T);
@@ -40,9 +31,39 @@ namespace Engine2
 			//bufferDesc.MiscFlags = 0;
 			//bufferDesc.StructureByteStride = 0; // sizeof(T);
 
-			HRESULT hr = DXDevice::GetDevice().CreateBuffer(&bufferDesc, &constBufferData, &pConstantBuffer);
+			HRESULT hr = DXDevice::GetDevice().CreateBuffer(&bufferDesc, nullptr, &pConstantBuffer);
+			//HRESULT hr = DXDevice::GetDevice().CreateBuffer(&bufferDesc, &constBufferData, &pConstantBuffer);
 
 			E2_ASSERT_HR(hr, "ConstantBuffer CreateBuffer failed");
+		}
+
+		template <typename T>
+		void UpdateBuffer(T& data)
+		{
+			D3D11_MAPPED_SUBRESOURCE mappedSubResource;
+			HRESULT hr = DXDevice::GetContext().Map(pConstantBuffer.Get(), 0u, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubResource);
+			E2_ASSERT_HR(hr, "ConstantBuffer Map failed");
+			memcpy(mappedSubResource.pData, &data, sizeof(T)); //*(T*)mappedSubResource.pData = data;
+			DXDevice::GetContext().Unmap(pConstantBuffer.Get(), 0);
+		}
+
+	protected:
+		UINT slot;
+		wrl::ComPtr<ID3D11Buffer> pConstantBuffer = nullptr;
+
+		virtual ConstantBufferBase* CloneImpl() const = 0;
+	};
+
+	template <typename T>
+	class ConstantBuffer : public ConstantBufferBase
+	{
+	public:
+		T data = {};
+
+		ConstantBuffer(unsigned int bindSlot = 0)
+		{
+			SetSlot(bindSlot);
+			Initialise<T>();
 		}
 
 		void UpdateBuffer()
@@ -94,8 +115,6 @@ namespace Engine2
 		void CSUnbind() { DXDevice::GetContext().CSSetConstantBuffers(this->slot, 0u, nullptr); }
 
 	protected:
-		wrl::ComPtr<ID3D11Buffer> pConstantBuffer = nullptr;
-
 		ConstantBuffer<T>* CloneImpl() const { return new ConstantBuffer<T>(*this); }
 	};
 

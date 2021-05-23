@@ -1,5 +1,6 @@
 #pragma once
 #include "Resources.h"
+#include "UID.h"
 
 namespace Engine2
 {
@@ -24,8 +25,12 @@ namespace Engine2
 		void SetName(std::string str) { name = str; }
 		const std::string& Name() const { return name; }
 
+		UID GetId() const { return id; }
+		void SetId(UID newId) { id = newId; }
+
 	protected:
 		std::string name;
 		std::shared_ptr<Drawable> drawable;
+		UID id;
 	};
 }

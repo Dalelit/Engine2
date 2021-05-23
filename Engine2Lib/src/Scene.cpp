@@ -15,6 +15,7 @@
 #include "TextureLoader.h"
 #include "ScriptComponent.h"
 #include "AssetManager.h"
+#include "ShaderCache.h"
 
 //#define E2_SCENE_TIMING
 #define E2_SCENE_TIMING    auto timer##_COUNTER__ = systemTimers.ScopeTimer(__FUNCTION__);
@@ -104,12 +105,12 @@ namespace Engine2
 
 			if (mr->IsValid())
 			{
-				mr->material->SetTransform(*coordinator.GetComponent<TransformMatrix>(e));
+				mr->material->SetModelData(*coordinator.GetComponent<TransformMatrix>(e));
 				mr->ShadowBindAndDraw();
 			}
 		}
 
-		//RenderParticles();
+		RenderParticles();
 
 		sun.ShadowPassEnd();
 		sun.BindShadowMap();
@@ -165,7 +166,7 @@ namespace Engine2
 
 			if (mr->IsValid())
 			{
-				mr->material->SetTransform(*coordinator.GetComponent<TransformMatrix>(e));
+				mr->material->SetModelData(*coordinator.GetComponent<TransformMatrix>(e));
 				mr->BindAndDraw();
 			}
 		}
@@ -221,8 +222,8 @@ namespace Engine2
 			auto mr = coordinator.GetComponent<MeshRenderer>(e);
 			if (mr->IsValid())
 			{
-				mr->material->SetTransform(*coordinator.GetComponent<TransformMatrix>(e));
-				mr->material->vertexShaderCB->Bind();
+				mr->material->SetModelData(*coordinator.GetComponent<TransformMatrix>(e));
+				mr->material->BindVSCB();
 
 				// binds the vertex buffer
 				auto drawable = mr->mesh;
@@ -521,13 +522,13 @@ namespace Engine2
 
 			if (ImGui::TreeNode("Vertex Shaders"))
 			{
-				Material::VertexShaders.OnImGui();
+				ShaderCache::VertexShaders.OnImGui();
 				ImGui::TreePop();
 			}
 
 			if (ImGui::TreeNode("Pixel Shaders"))
 			{
-				Material::PixelShaders.OnImGui();
+				ShaderCache::PixelShaders.OnImGui();
 				ImGui::TreePop();
 			}
 

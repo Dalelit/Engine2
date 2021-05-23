@@ -70,6 +70,8 @@ namespace Engine2
 		inline const DirectX::XMMATRIX& GetRotation() const { return rotationMatrix; }
 		inline DirectX::XMMATRIX GetRotationTransposed() const { return DirectX::XMMatrixTranspose(rotationMatrix); }
 
+		inline TransformMatrix GetTransposed() const { return TransformMatrix(GetTransformTransposed(), GetRotationTransposed()); }
+
 		void OnImgui();
 
 		inline TransformMatrix operator*(const TransformMatrix& rhs) const {
