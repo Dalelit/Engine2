@@ -24,20 +24,6 @@ namespace Engine2
 
 	typedef std::vector<D3D11_INPUT_ELEMENT_DESC> VertexShaderLayoutDesc;
 
-	// Helpers to do some simpler vertex only layouts
-	namespace VertexLayoutSimple
-	{
-		struct VertexShaderLayoutElement
-		{
-			std::string name;
-			DXGI_FORMAT format;
-		};
-
-		typedef std::vector<VertexShaderLayoutElement> VertexShaderLayout;
-
-		VertexShaderLayoutDesc ToDescriptor(VertexShaderLayout& layout);
-	}
-
 	/////////////////// vertex shader ///////////////////
 
 	class VertexShader : public Shader

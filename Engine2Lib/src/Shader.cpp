@@ -13,24 +13,6 @@ namespace Engine2
 		}
 	}
 
-	VertexShaderLayoutDesc VertexLayoutSimple::ToDescriptor(VertexShaderLayout& layout)
-	{
-		VertexShaderLayoutDesc inputDesc(layout.size());
-
-		for (int i = 0; i < layout.size(); i++)
-		{
-			inputDesc[i].SemanticName = layout[i].name.c_str();
-			inputDesc[i].SemanticIndex = 0;
-			inputDesc[i].Format = layout[i].format;
-			inputDesc[i].InputSlot = 0u;
-			inputDesc[i].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-			inputDesc[i].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-			inputDesc[i].InstanceDataStepRate = 0u;
-		}
-
-		return inputDesc;
-	}
-
 	///////////////// Vertex shaders /////////////////
 
 	VertexShader::VertexShader(ID3DBlob& shaderBlob, VertexShaderLayoutDesc& layout, std::string info)

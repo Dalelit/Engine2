@@ -31,7 +31,7 @@ struct VSOutTextured
 	float4 posSS : SV_POSITION;
 };
 
-VSOutTextured mainTextured(float3 pos : Position, float3 nor : Normal, float2 tex : Texcoord)
+VSOutTextured mainTextured(float3 pos : Position, float3 nor : Normal, float2 tex : TexCoord)
 {
 	VSOutTextured vso;
 
