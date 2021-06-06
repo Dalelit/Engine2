@@ -65,6 +65,8 @@ namespace Engine2
 		instanceCount = (UINT)(pInstance - instances.data());
 		bufferIndex = (UINT)(pParticle - particles.data());
 
+		VB.UpdateInstanceBuffer(instances, instanceCount);
+
 		timerOnUpdate.Tick();
 	}
 
@@ -79,8 +81,6 @@ namespace Engine2
 			pVS->Bind();
 			pPS->Bind();
 
-			//DXDevice::UpdateBuffer(instanceBuffer.GetRawPointer(), instances, instanceCount);
-			VB.UpdateInstanceBuffer(instances, instanceCount);
 			VB.Bind();
 			VB.Draw(instanceCount);
 			DXDevice::Get().SetDefaultRenderState();
@@ -88,6 +88,15 @@ namespace Engine2
 		}
 
 		timerOnRender.Tick();
+	}
+
+	void ParticleEmitter::OnRenderShadowPass()
+	{
+		if (instanceCount > 0)
+		{
+			VB.Bind();
+			VB.Draw(instanceCount);
+		}
 	}
 
 	void ParticleEmitter::OnImgui()

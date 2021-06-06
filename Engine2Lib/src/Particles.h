@@ -30,6 +30,7 @@ namespace Engine2
 
 		void OnUpdate(float dt);
 		void OnRender();
+		void OnRenderShadowPass();
 		void OnImgui();
 
 		inline bool IsActive() { return active; }

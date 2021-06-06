@@ -87,14 +87,17 @@ namespace Engine2
 		}
 
 		template <typename T>
-		inline void UpdateBuffer(std::vector<T>& source) { UpdateBuffer(source, source.size()); }
+		inline void UpdateBuffer(std::vector<T>& source) { UpdateBuffer(source.data(), source.size()); }
 
 		template <typename T>
-		void UpdateBuffer(std::vector<T>& source, size_t size) {
+		void UpdateBuffer(std::vector<T>& source, size_t size) { UpdateBuffer(source.data(), size); }
+
+		template <typename T>
+		void UpdateBuffer(T* pSource, size_t size) {
 			E2_ASSERT(size > 0 && size <= capacity, "Update buffer size invalid");
 			D3D11_MAPPED_SUBRESOURCE mappedSubResource;
 			DXDevice::GetContext().Map(GetPtr(), 0u, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubResource);
-			memcpy(mappedSubResource.pData, source.data(), sizeof(T) * size);
+			memcpy(mappedSubResource.pData, pSource, sizeof(T) * size);
 			DXDevice::GetContext().Unmap(GetPtr(), 0);
 		}
 
@@ -108,6 +111,8 @@ namespace Engine2
 
 		inline wrl::ComPtr<ID3D11Buffer>& Get() { return comptrBuffer; };
 		inline ID3D11Buffer* GetPtr() { return comptrBuffer.Get(); }
+
+		inline size_t GetCapacity() { return capacity; }
 
 	protected:
 		wrl::ComPtr<ID3D11Buffer> comptrBuffer;

@@ -1,41 +1,63 @@
-#include "PS_Shadow.hlsli"
-#include "PS_Lighting.hlsli"
+#include "Common.hlsli"
 #include "PSCB0_Scene.hlsli"
 #include "PSCB1_Material.hlsli"
+#include "PS_Shadow.hlsli"
+#include "PS_Lighting.hlsli"
 
-float4 main(float3 posWS : WSPosition, float3 norWS : WSNormal) : SV_TARGET
+Texture2D tex : register (t2);
+SamplerState smplr : register (s2);
+
+
+float4 processPixel(float3 materialColor, float3 posWS, float3 norWS)
 {
 	float4 target = 0.0;
 
-	target += ShadowLighting(posWS, norWS);
-
 	norWS = normalize(norWS);
-	float3 toLight = pointLightPosition.xyz - posWS.xyz;
-	float norDotLight = dot(norWS, normalize(toLight));
 
-	// If facing the light
-	if (norDotLight > 0.0)
+	// do the sun with shadows
+	target += ShadowLighting(posWS, norWS) * float4(mat_diffuse, 1.0);
+
+	// do specular off the sun if not in shadow
+	if (length(target.xyz) > 0.0)
 	{
-		const float PI = 3.14159565359;
+		target += target * specular(posWS.xyz, norWS.xyz, shadowLightDirection.xyz, cameraPosition.xyz, mat_specularExponent) * float4(mat_specular * materialColor, 1.0);
+	}
 
-		// calc the light
-		float att = attenuation(length(toLight)) * norDotLight;
-		att /= PI;
-		target += att; // defer *col, defer *pointLightColor
+	// Add each point light
+	for (uint i = 0; i < numberOfPointLights; i++)
+	{
+		pointLightData pl = pointLights[i];
+		
+		float3 toLight = pl.position - posWS.xyz;
+		float dist = length(toLight);
+		toLight = normalize(toLight);
+		float dotNorLight = dot(norWS, toLight);
 
-		// calc the specular light strength, then add it to the pixel with the specular color
-		float specStrength = specular(posWS.xyz, norWS.xyz, pointLightPosition.xyz, cameraPosition.xyz, mat_specularExponent);
-		target += specStrength * float4(mat_specular, 1.0); // defer *col, defer *pointLightColor
+		// if facing the light
+		if (dotNorLight > 0.0)
+		{
+			float atten = dotNorLight * attenuation(dist); // light strength from source attenuated for distance
+			float spec = specular(posWS.xyz, norWS.xyz, -toLight, cameraPosition.xyz, mat_specularExponent); // specular strength from the light
 
-		target *= pointLightColor;
+			target += float4(pl.color, 0.0) * (atten * float4(mat_diffuse, 1.0) + spec * float4(mat_specular, 1.0));
+		}
 	}
 
 	// Add ambient
-	target += float4(mat_ambient, 1.0); // defer *col;
+	target += float4(mat_ambient * materialColor, 1.0); // defer *col;
 
-	target *= float4(mat_diffuse, 1.0);; // do the deferred *col
-
+	// Add emission
 	target += float4(mat_emission, 1.0);
 
 	return target;
+}
+
+float4 main(float3 posWS : WSPosition, float3 norWS : WSNormal) : SV_TARGET
+{
+	return processPixel(mat_diffuse, posWS, norWS);
+}
+
+float4 mainTextured(float3 posWS : WSPosition, float3 norWS : WSNormal, float2 tc : Texcoord) : SV_TARGET
+{
+	return processPixel(tex.Sample(smplr, tc).rgb, posWS, norWS);
 }

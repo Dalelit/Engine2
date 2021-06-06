@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "Lights.h"
 #include "UtilMath.h"
-#include "VertexLayout.h"
 
 namespace Engine2
 {
@@ -32,7 +31,23 @@ namespace Engine2
 		pscbShadowCamera.data.lightColor = { 0.5f, 0.5f, 0.5f, 1.0f };
 		pscbShadowCamera.data.shadowBias = 0.005f;
 
-		pVSShader = std::make_unique<VertexShaderFile>(Config::directories["EngineShaderSourceDir"] + "PositionShadowVS.hlsl", VertexLayout::Position::Layout);
+		// to do: these may need to move into the various components so they can have their own versions of a shadow vs. Currently relies on name conventions
+
+		std::vector<D3D11_INPUT_ELEMENT_DESC> vsLayout = {
+			{"Position", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
+		};
+
+		pVSShader = VertexShader::CreateFromSourceFile(Config::directories["EngineShaderSourceDir"] + "PositionShadowVS.hlsl", vsLayout, "main");
+
+		std::vector<D3D11_INPUT_ELEMENT_DESC> vsInstancedLayout = {
+			{"Position", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"InstanceTransform", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_INSTANCE_DATA, 1},
+			{"InstanceTransform", 1, DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_INSTANCE_DATA, 1},
+			{"InstanceTransform", 2, DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_INSTANCE_DATA, 1},
+			{"InstanceTransform", 3, DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_INSTANCE_DATA, 1},
+		};
+
+		pVSShaderInstanced = VertexShader::CreateFromSourceFile(Config::directories["EngineShaderSourceDir"] + "PositionShadowVS.hlsl", vsInstancedLayout, "mainInstanced");
 	}
 
 	void DirectionalLight::OnImgui()

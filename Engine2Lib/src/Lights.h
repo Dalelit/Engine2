@@ -5,6 +5,7 @@
 #include "Shader.h"
 #include "ConstantBuffer.h"
 #include "ShadowMap.h"
+#include "Serialiser.h"
 
 namespace Engine2
 {
@@ -15,6 +16,8 @@ namespace Engine2
 		PointLight(DirectX::XMVECTOR color) : color(color) {}
 
 		void OnImgui();
+
+		void Serialise(Serialisation::INode& node) { node.Attribute("color", color); }
 
 		DirectX::XMVECTOR color = { 1.0f, 1.0f, 1.0f, 1.0f};
 	};
@@ -35,7 +38,13 @@ namespace Engine2
 		void ShadowPassEnd();
 		void BindShadowMap();
 
+		void BindShadowVS() { pVSShader->Bind(); }
+		void BindShadowVSInstanced() { pVSShaderInstanced->Bind(); }
+
 		DirectX::XMVECTOR GetCentre() { return centre; }
+
+		DirectX::XMVECTOR GetDireciton() { return pscbShadowCamera.data.lightDirection; }
+		DirectX::XMVECTOR GetColor()     { return pscbShadowCamera.data.lightColor; }
 
 	protected:
 		DirectX::XMVECTOR rotation;
@@ -44,7 +53,8 @@ namespace Engine2
 
 		Camera camera;
 		ShadowMap shadowMap;
-		std::unique_ptr<VertexShaderFile> pVSShader;
+		std::shared_ptr<VertexShader> pVSShader;
+		std::shared_ptr<VertexShader> pVSShaderInstanced;
 
 		UINT32 shadowMapSlot = 1u;
 		struct ShadowPSCBData

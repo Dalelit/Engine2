@@ -31,6 +31,8 @@ namespace Engine2
 	Scene::Scene() : vsConstBuffer(0), psConstBuffer(0)
 	{
 		physics.Initialise();
+
+		pointLightsBuffer.Initialise(1); // To Do: think through what is a good size to initialise this to
 	}
 
 	void Scene::OnUpdate(float dt)
@@ -87,7 +89,7 @@ namespace Engine2
 		auto pCamera = hierarchy.GetECSCoordinator().GetComponent<Camera>(viewCameraEntity);
 		auto pCameraTransform = hierarchy.GetECSCoordinator().GetComponent<TransformMatrix>(viewCameraEntity);
 
-		sun.ShadowPassStart(WorldCamera(*pCamera, pCameraTransform->GetTransform()));
+		sun.ShadowPassStart(WorldCamera(*pCamera, pCameraTransform->GetTransform())); // includes binding the VS shadow shader
 
 		//UpdateVSSceneConstBuffer(light.GetCamera(), *pTransform);
 		sun.GetCamera().LoadViewProjectionMatrixT(vsConstBuffer.data.cameraTransform);
@@ -110,7 +112,14 @@ namespace Engine2
 			}
 		}
 
-		RenderParticles();
+		//RenderParticles();
+		sun.BindShadowVSInstanced();
+		View<ParticleEmitter, Transform> emitterEntities(coordinator);
+		for (auto e : emitterEntities)
+		{
+			const auto& emitter = coordinator.GetComponent<ParticleEmitter>(e);
+			emitter->OnRenderShadowPass();
+		}
 
 		sun.ShadowPassEnd();
 		sun.BindShadowMap();
@@ -136,20 +145,26 @@ namespace Engine2
 
 	void Scene::UpdatePSSceneConstBuffer(Camera& camera, Transform& transform)
 	{
-		psConstBuffer.data.CameraPosition = transform.position;
+		psConstBuffer.data.cameraPosition = transform.position;
 
 		Coordinator& coordinator = hierarchy.GetECSCoordinator();
 		auto& pointLights = coordinator.GetComponents<PointLight>();
 
+		psConstBuffer.data.numberOfPointLights = pointLights.Count();
+
 		if (pointLights.Count() > 0)
 		{
-			auto position = coordinator.GetComponent<TransformMatrix>(pointLights.GetEntity(0))->GetTranslation();
-			psConstBuffer.data.pointLightPosition = position;
-			psConstBuffer.data.pointLightColor = pointLights[0].color;
-		}
-		else
-		{
-			psConstBuffer.data.pointLightColor = {};
+			pointLightsBuffer.CheckGrowCapacity(pointLights.Count());
+
+			// move the point light data into the buffer used by the pixel shaders for point lights
+			for (uint32_t i = 0; i < pointLights.Count(); i++)
+			{
+				XMStoreFloat3(&pointLightsBuffer[i].color, pointLights[i].color);
+				XMStoreFloat3(&pointLightsBuffer[i].position, coordinator.GetComponent<TransformMatrix>(pointLights.GetEntity(i))->GetTranslation());
+			}
+
+			pointLightsBuffer.Update(pointLights.Count());
+			pointLightsBuffer.BindPS(2);
 		}
 
 		psConstBuffer.Bind();

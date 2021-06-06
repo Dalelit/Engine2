@@ -75,6 +75,7 @@
     <ClInclude Include="src\Materials\WireframeMaterial.h" />
     <ClInclude Include="src\ShaderCache.h" />
     <ClInclude Include="src\Material.h" />
+    <ClInclude Include="src\StructuredBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\pch.cpp" />
@@ -141,10 +142,6 @@
     <FxCompile Include="Assets\Shaders\ParticlePS.hlsl" />
     <FxCompile Include="Assets\Shaders\ParticlePSCircle.hlsl" />
     <FxCompile Include="Assets\Shaders\ParticleVS.hlsl" />
-    <FxCompile Include="Assets\Shaders\PositionNormalColorPS.hlsl" />
-    <FxCompile Include="Assets\Shaders\PositionNormalColorVS.hlsl" />
-    <FxCompile Include="Assets\Shaders\PositionNormalTextureVS.hlsl" />
-    <FxCompile Include="Assets\Shaders\PositionNormalTexturePS.hlsl" />
     <FxCompile Include="Assets\Shaders\SkyboxPS.hlsl" />
     <FxCompile Include="Assets\Shaders\SkyboxVS.hlsl" />
     <FxCompile Include="Assets\Shaders\PositionShadowVS.hlsl" />
@@ -159,5 +156,6 @@
     <None Include="Assets\Shaders\PS_Shadow.hlsli" />
     <None Include="Assets\Shaders\PSCB0_Scene.hlsli" />
     <None Include="Assets\Shaders\PSCB1_Material.hlsli" />
+    <None Include="Assets\Shaders\Common.hlsli" />
   </ItemGroup>
 </Project>

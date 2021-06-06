@@ -10,6 +10,7 @@
 #include "Engine2.h"
 #include "Camera.h"
 #include "Lights.h"
+#include "StructuredBuffer.h"
 #include "Physics.h"
 
 namespace Engine2
@@ -53,9 +54,8 @@ namespace Engine2
 
 		struct PSSceneData
 		{
-			DirectX::XMVECTOR CameraPosition;
-			DirectX::XMVECTOR pointLightPosition;
-			DirectX::XMVECTOR pointLightColor;
+			DirectX::XMVECTOR cameraPosition;
+			uint32_t numberOfPointLights;
 		};
 		PSConstantBuffer<PSSceneData> psConstBuffer;
 
@@ -67,9 +67,18 @@ namespace Engine2
 		friend SceneSerialisation;
 
 	protected:
+		struct PointLightBufferData
+		{
+			DirectX::XMFLOAT3 position;
+			DirectX::XMFLOAT3 color;
+		};
+
 		SceneHierarchy hierarchy;
+
 		Skybox skybox;
 		DirectionalLight sun;
+		StructuredBufferLocalData<PointLightBufferData> pointLightsBuffer;
+
 		EngineECS::EntityId_t mainCameraEntity;
 		bool running = false;
 		bool paused = false;
@@ -77,7 +86,7 @@ namespace Engine2
 
 		GizmoRender gizmoRender;
 		bool gizmoEnabled = true;
-		bool gizmoCollidersEnabled = true;
+		bool gizmoCollidersEnabled = false;
 
 		Instrumentation::TimerCollection systemTimers;
 

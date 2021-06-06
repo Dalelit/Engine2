@@ -99,6 +99,7 @@ namespace Engine2
 				else if (componentName == "ParticleEmitter") entity.AddComponent<ParticleEmitter>()->Serialise(readNode);
 				else if (componentName == "Gizmo") entity.AddComponent<Gizmo>()->Serialise(readNode);
 				else if (componentName == "OffscreenOutliner") entity.AddComponent<OffscreenOutliner>()->Serialise(readNode);
+				else if (componentName == "PointLight") entity.AddComponent<PointLight>()->Serialise(readNode);
 			}
 		}
 	}
@@ -162,7 +163,7 @@ namespace Engine2
 		SaveComponent<Gizmo>(node, entity, "Gizmo");
 		SaveComponent<OffscreenOutliner>(node, entity, "OffscreenOutliner");
 		SaveComponent<MeshRenderer>(node, entity, "MeshRenderer");
-		//SaveComponent<PointLight>(node, entity, "PointLight");
+		SaveComponent<PointLight>(node, entity, "PointLight");
 
 		if (entity.HasComponent<ScriptComponent>())
 		{

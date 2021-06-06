@@ -1,6 +1,13 @@
 cbuffer sceneConst : register (b0)
 {
 	float4 cameraPosition;
-	float4 pointLightPosition;
-	float4 pointLightColor;
+	uint   numberOfPointLights;
 };
+
+struct pointLightData
+{
+	float3 position;
+	float3 color;
+};
+
+StructuredBuffer<pointLightData> pointLights : register(t2);

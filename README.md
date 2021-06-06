@@ -17,6 +17,7 @@ PS Constant Buffers
 PS Textures/Samplers
 0 = Skybox
 1 = Shadow map
+2 = Point lights (structured buffer)
 
 
 Notes:

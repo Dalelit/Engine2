@@ -4,6 +4,10 @@
 
 float4 main(float3 pos : Position) : SV_POSITION
 {
-	float4 p = mul(mul(float4(pos, 1.0f), modelTransform), cameraTransform);
-	return p;
+	return mul(mul(float4(pos, 1.0f), modelTransform), cameraTransform);
+}
+
+float4 mainInstanced(float3 pos : POSITION, matrix instTransform : InstanceTransform) : SV_POSITION
+{
+	return mul(mul(float4(pos, 1.0f), instTransform), cameraTransform);
 }
