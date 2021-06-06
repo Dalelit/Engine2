@@ -4,13 +4,12 @@
 #include "Common.h"
 #include "DXDevice.h"
 #include "DXBuffer.h"
-#include "Resources.h"
 #include "Instrumentation.h"
 #include "VertexBufferData.h"
 
 namespace Engine2
 {
-	class VertexBuffer : public Drawable
+	class VertexBuffer
 	{
 	public:
 		template <typename V>
@@ -89,6 +88,8 @@ namespace Engine2
 			E2_STATS_INSTANCEDRAW(instances);
 			DXDevice::GetContext().DrawInstanced(vertexCount, instances, 0u, 0u);
 		}
+
+		inline void BindAndDraw() { Bind(); Draw(); }
 
 		virtual void OnImgui() { ImGui::Text("VertexBuffer"); }
 

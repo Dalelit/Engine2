@@ -1,12 +1,11 @@
 #pragma once
 #include "Common.h"
 #include "DXDevice.h"
-#include "Resources.h"
 #include "Instrumentation.h"
 
 namespace Engine2
 {
-	class ConstantBufferBase : public Bindable
+	class ConstantBufferBase
 	{
 	public:
 		std::shared_ptr<ConstantBufferBase> Clone() const { return std::shared_ptr<ConstantBufferBase>(CloneImpl()); }

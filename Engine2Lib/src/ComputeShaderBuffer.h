@@ -2,11 +2,10 @@
 #include "Common.h"
 #include "DXDevice.h"
 #include "DXBuffer.h"
-#include "Resources.h"
 
 namespace Engine2
 {
-	class ComputeShaderSRV : public Bindable
+	class ComputeShaderSRV
 	{
 	public:
 		void Bind() {
@@ -30,7 +29,7 @@ namespace Engine2
 		wrl::ComPtr<ID3D11ShaderResourceView> pShaderResourceView = nullptr;
 	};
 
-	class ComputeShaderUAV : public Bindable
+	class ComputeShaderUAV
 	{
 	public:
 		void Bind() {

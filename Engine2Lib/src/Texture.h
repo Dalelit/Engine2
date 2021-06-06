@@ -1,7 +1,6 @@
 #pragma once
 #include "pch.h"
 #include "DXDevice.h"
-#include "Resources.h"
 #include "Surface.h"
 
 namespace Engine2
@@ -18,7 +17,7 @@ namespace Engine2
 		Microsoft::WRL::ComPtr<ID3D11SamplerState> pSamplerState = nullptr;
 	};
 
-	class Texture : public Bindable
+	class Texture
 	{
 	public:
 		Texture(unsigned int slot, Surface& surface, DXGI_FORMAT format, bool unorderedAccess = false);

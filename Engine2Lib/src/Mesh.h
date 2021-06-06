@@ -1,5 +1,5 @@
 #pragma once
-#include "Resources.h"
+#include "VertexBuffer.h"
 #include "UID.h"
 
 namespace Engine2
@@ -20,7 +20,7 @@ namespace Engine2
 
 		bool IsValid() { return drawable != nullptr; }
 
-		void SetDrawable(std::shared_ptr<Drawable> vertexBuffer) { drawable = vertexBuffer; }
+		void SetDrawable(std::shared_ptr<VertexBuffer> vertexBuffer) { drawable = vertexBuffer; }
 
 		void SetName(std::string str) { name = str; }
 		const std::string& Name() const { return name; }
@@ -30,7 +30,7 @@ namespace Engine2
 
 	protected:
 		std::string name;
-		std::shared_ptr<Drawable> drawable;
+		std::shared_ptr<VertexBuffer> drawable;
 		UID id;
 	};
 }

@@ -2,14 +2,13 @@
 
 #include "pch.h"
 #include "Common.h"
-#include "Resources.h"
 #include "DXDevice.h"
 #include "DXBuffer.h"
 #include "Instrumentation.h"
 
 namespace Engine2
 {
-	class VertexBufferIndexInstanced : public Drawable
+	class VertexBufferIndexInstanced
 	{
 	public:
 		VertexBufferIndexInstanced()

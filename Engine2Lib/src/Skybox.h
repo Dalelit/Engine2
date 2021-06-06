@@ -1,5 +1,4 @@
 #pragma once
-#include "Resources.h"
 #include "VertexBuffer.h"
 #include "Shader.h"
 #include "Texture.h"
@@ -17,7 +16,7 @@ namespace Engine2
 		std::vector<std::string> filenames;
 	};
 
-	class Skybox : public Drawable
+	class Skybox
 	{
 	public:
 
@@ -26,6 +25,7 @@ namespace Engine2
 
 		void Bind();
 		void Draw();
+		inline void BindAndDraw() { Bind(); Draw(); }
 		void Unbind() {}
 		void OnImgui();
 

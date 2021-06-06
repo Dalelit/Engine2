@@ -3,11 +3,10 @@
 #include "pch.h"
 #include "Common.h"
 #include "DXDevice.h"
-#include "Resources.h"
 
 namespace Engine2
 {
-	class Shader : public Bindable
+	class Shader
 	{
 	public:
 		virtual ~Shader() = default;
