@@ -5,8 +5,10 @@ namespace Engine2
 {
 	namespace Util
 	{
-		std::wstring ToWString(std::string str);
-		std::string  ToString(std::wstring wstr);
+		std::wstring ToWString(const std::string& str);
+		std::string  ToString(const std::wstring& wstr);
+
+		inline bool FileExists(const std::string& filename) { return std::filesystem::exists(filename); }
 
 		// check if the 'value' ends with the 'ending'
 		inline bool StringEndsWith(const std::string& value, const std::string& ending)
@@ -14,8 +16,6 @@ namespace Engine2
 			if (value.size() < ending.size()) return false;
 			return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
 		}
-
-		inline DirectX::XMVECTOR ToXMVECTORw1(DirectX::XMFLOAT3& f3) { DirectX::XMVECTOR v = DirectX::XMLoadFloat3(&f3); v.m128_f32[3] = 1.0f; return v; }
 
 		template <typename T>
 		std::string TypeNameClean()

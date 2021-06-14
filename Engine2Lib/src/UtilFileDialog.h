@@ -12,6 +12,8 @@ namespace Engine2
 
 			static bool SelectFilesDialogue(std::vector<std::string>& files);
 
+			static bool SelectFolderDialogue(std::string& directoryName);
+
 		protected:
 			static bool OpenDialogue(std::string& filename, bool fileMustExist);
 		};

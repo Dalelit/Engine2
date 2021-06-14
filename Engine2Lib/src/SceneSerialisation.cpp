@@ -18,6 +18,12 @@ namespace Engine2
 {
 	bool SceneSerialisation::LoadScene(const std::string& filename)
 	{
+		if (!Util::FileExists(filename))
+		{
+			E2_LOG_WARNING("LoadScene file does not exist: " + filename);
+			return false;
+		}
+			
 		auto loader = Serialisation::LoadSerialiserStream(filename);
 
 		if (!loader.NextLine()) return false;

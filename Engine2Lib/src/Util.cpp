@@ -6,7 +6,7 @@ namespace Engine2
 {
 	namespace Util
 	{
-		std::wstring ToWString(std::string str)
+		std::wstring ToWString(const std::string& str)
 		{
 			int tgtlength;
 			int srclength = (int)str.length();
@@ -16,7 +16,7 @@ namespace Engine2
 			return r;
 		}
 
-		std::string ToString(std::wstring wstr)
+		std::string ToString(const std::wstring& wstr)
 		{
 			int tgtlength;
 			int srclength = (int)wstr.length();

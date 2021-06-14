@@ -9,6 +9,8 @@ namespace Engine2
 {
 	namespace Primatives
 	{
+		inline DirectX::XMVECTOR ToXMVECTORw1(DirectX::XMFLOAT3& f3) { DirectX::XMVECTOR v = DirectX::XMLoadFloat3(&f3); v.m128_f32[3] = 1.0f; return v; }
+
 		///////////////////////////////////////
 		// Utils
 		///////////////////////////////////////
@@ -41,9 +43,9 @@ namespace Engine2
 
 			while (currentIndx != indicies.end())
 			{
-				XMVECTOR p0 = Util::ToXMVECTORw1(verticies[*currentIndx++].position);
-				XMVECTOR p1 = Util::ToXMVECTORw1(verticies[*currentIndx++].position);
-				XMVECTOR p2 = Util::ToXMVECTORw1(verticies[*currentIndx++].position);
+				XMVECTOR p0 = ToXMVECTORw1(verticies[*currentIndx++].position);
+				XMVECTOR p1 = ToXMVECTORw1(verticies[*currentIndx++].position);
+				XMVECTOR p2 = ToXMVECTORw1(verticies[*currentIndx++].position);
 
 				AddIfMissing(p0, p1);
 				AddIfMissing(p1, p2);

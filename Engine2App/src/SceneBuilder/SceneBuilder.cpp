@@ -68,6 +68,53 @@ void SceneBuilder::OnApplicationEvent(Engine2::ApplicationEvent& event)
 
 void SceneBuilder::OnImgui()
 {
+	static std::string selectedSceneDir = "";
+	ImGui::Text("File: %s", selectedSceneDir.c_str());
+
+	constexpr const char* sceneFilename = "\\Scene.txt";
+
+	auto LoadSceneHelper = [&]() {
+		std::string filename = selectedSceneDir + sceneFilename;
+		if (Util::FileExists(filename))
+		{
+			ClearScene(true);
+			SceneSerialisation(scene).LoadScene(selectedSceneDir + sceneFilename);
+		}
+	};
+
+	if (ImGui::Button("Scene Open..."))
+	{
+		if (Util::FileSelectionDialogue::SelectFolderDialogue(selectedSceneDir))
+		{
+			LoadSceneHelper();
+		}
+	}
+	if (!selectedSceneDir.empty())
+	{
+		ImGui::SameLine();
+		if (ImGui::Button("Scene Reload"))
+		{
+			LoadSceneHelper();
+		}
+	}
+
+	if (ImGui::Button("Scene Save as..."))
+	{
+		if (Util::FileSelectionDialogue::SelectFolderDialogue(selectedSceneDir))
+		{
+			SceneSerialisation(scene).SaveScene(selectedSceneDir + sceneFilename);
+		}
+	}
+	if (!selectedSceneDir.empty())
+	{
+		ImGui::SameLine();
+		if (ImGui::Button("Scene Save"))
+		{
+			SceneSerialisation(scene).SaveScene(selectedSceneDir + sceneFilename);
+		}
+	}
+
+
 	static std::string selectedFile = "Scenes//testScene.txt";
 	ImGui::Text("File: %s", selectedFile.c_str());
 	if (ImGui::Button("Save as..."))
@@ -155,14 +202,14 @@ void SceneBuilder::BuildTestScene()
 	//}
 }
 
-void SceneBuilder::ClearScene()
+void SceneBuilder::ClearScene(bool forceClearAsset)
 {
 	scene.Clear();
 
 	// clear all the assets.
 	// To do: should this be managed in an 'asset manager' class?
 
-	if (onClearIncludeAssets)
+	if (forceClearAsset || onClearIncludeAssets)
 	{
 		AssetManager::Manager().Clear();
 		ShaderCache::VertexShaders.Clear();

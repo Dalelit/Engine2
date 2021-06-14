@@ -70,6 +70,56 @@ namespace Engine2
 			return result;
 		}
 
+        bool FileSelectionDialogue::SelectFolderDialogue(std::string& directoryName)
+        {
+            // https://docs.microsoft.com/en-us/windows/win32/learnwin32/example--the-open-dialog-box
+
+            bool result = false;
+
+            HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+            if (SUCCEEDED(hr))
+            {
+                IFileOpenDialog* pFileOpen;
+
+                // Create the FileOpenDialog object.
+                hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL,
+                    IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen));
+
+                if (SUCCEEDED(hr))
+                {
+                    // https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/ne-shobjidl_core-_fileopendialogoptions
+                    pFileOpen->SetOptions(FOS_PICKFOLDERS);
+
+                    // Show the Open dialog box.
+                    hr = pFileOpen->Show(NULL);
+
+                    // Get the file name from the dialog box.
+                    if (SUCCEEDED(hr))
+                    {
+                        IShellItem* pItem;
+                        hr = pFileOpen->GetResult(&pItem);
+                        if (SUCCEEDED(hr))
+                        {
+                            PWSTR pszFilePath;
+                            hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+
+
+                            if (SUCCEEDED(hr))
+                            {
+                                directoryName = Util::ToString(pszFilePath);
+                                CoTaskMemFree(pszFilePath);
+                                result = true;
+                            }
+                            pItem->Release();
+                        }
+                    }
+                    pFileOpen->Release();
+                }
+                CoUninitialize();
+            }
+            return result;
+        }
+
 		bool FileSelectionDialogue::OpenDialogue(std::string& filename, bool fileMustExist)
 		{
 			OPENFILENAMEA ofn;
@@ -87,7 +137,7 @@ namespace Engine2
 			ofn.lpstrFileTitle = NULL;
 			ofn.nMaxFileTitle = 0;
 			ofn.lpstrInitialDir = NULL;
-			ofn.Flags = OFN_PATHMUSTEXIST;
+			ofn.Flags = OFN_PATHMUSTEXIST | OFN_EXPLORER;
 			if (fileMustExist) ofn.Flags |= OFN_FILEMUSTEXIST;
 
 			BOOL result = GetOpenFileNameA(&ofn);

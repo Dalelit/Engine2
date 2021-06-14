@@ -22,5 +22,5 @@ protected:
 	void CreateDefaultAssets();
 	void CreateEmtpyScene();
 	void BuildTestScene();
-	void ClearScene();
+	void ClearScene(bool forceClearAsset = false);
 };
