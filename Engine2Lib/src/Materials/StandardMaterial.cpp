@@ -51,8 +51,8 @@ namespace Engine2
 
 				if (ImGui::TreeNode("Info"))
 				{
-					ImGui::Text("Vertex shader: %s", vertexShader->GetName().c_str());
-					ImGui::Text("Pixel shader: %s", pixelShader->GetName().c_str());
+					vertexShader->OnImgui();
+					pixelShader->OnImgui();
 					ImGui::TreePop();
 				}
 

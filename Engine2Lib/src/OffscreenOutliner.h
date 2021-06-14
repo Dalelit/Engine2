@@ -46,11 +46,11 @@ namespace Engine2
 
 		float outlineScale = 1.1f;
 		VSConstantBuffer<DirectX::XMVECTOR> vsOutlineCB;
-		std::shared_ptr<Engine2::VertexShader> pVSOutline;
+		static VertexShader vsOutline;
 
 		DirectX::XMVECTOR outlineColor = { 0.8f, 0.8f, 0.2f, 0.75f };
 		PSConstantBuffer<DirectX::XMVECTOR> psOutlineCB;
-		std::shared_ptr<Engine2::PixelShader> pPSOutline;
+		static PixelShader psOutline;
 
 		void Initialise();
 	};

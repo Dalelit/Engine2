@@ -12,112 +12,172 @@ namespace Engine2
 		virtual ~Shader() = default;
 		virtual void Bind() = 0;
 		virtual void Unbind() = 0;
-		virtual void OnImgui();
 
-		inline std::string& GetName() { return name; }
-		inline void SetName(const std::string& newName) { name = newName; }
+		void OnImgui();
+		void Reload();
+
+		void LoadFromFile(const std::string& filename); // .cso
+		void CompileFromFile(const std::string& filename, const std::string& entryPoint, const std::string& target); // .hlsl
+		void CompileFromSource(const std::string& source, const std::string& entryPoint, const std::string& target);
+
+		void SetName(const std::string& name) { mName = name; }
+
+		virtual bool IsValid() = 0;
 
 	protected:
-		std::string name;
-		std::string info;
+		std::string mName;
+		std::string mFilename;
+		std::string mEntryPoint;
+		std::string mTarget;
+
+		void LoadFromFile(); // .cso
+		void CompileFromFile(); // .hlsl
+
+		virtual void Initialise(const wrl::ComPtr<ID3DBlob>& pBlob) = 0;
 	};
-
-	typedef std::vector<D3D11_INPUT_ELEMENT_DESC> VertexShaderLayoutDesc;
-
-	/////////////////// vertex shader ///////////////////
 
 	class VertexShader : public Shader
 	{
 	public:
-		VertexShader(ID3DBlob& shaderBlob, VertexShaderLayoutDesc& layout, std::string info);
-		void Bind();
-		void Unbind();
+		using VertexShaderLayoutDesc = std::vector<D3D11_INPUT_ELEMENT_DESC>;
 
-		static std::shared_ptr<VertexShader> CreateFromString(const std::string& src, VertexShaderLayoutDesc& layout, const std::string entryPoint = "main", const std::string target = "vs_5_0");
-		static std::shared_ptr<VertexShader> CreateFromCompiledFile(const std::string& filename, VertexShaderLayoutDesc& layout);
-		static std::shared_ptr<VertexShader> CreateFromSourceFile(const std::string& filename, VertexShaderLayoutDesc& layout, const std::string entryPoint = "main", const std::string target = "vs_5_0");
+		void Bind()
+		{
+			DXDevice::GetContext().VSSetShader(pVertexShader.Get(), nullptr, 0u);
+			DXDevice::GetContext().IASetInputLayout(pInputLayout.Get());
+		}
+
+		void Unbind()
+		{
+			DXDevice::GetContext().VSSetShader(nullptr, nullptr, 0u);
+			DXDevice::GetContext().IASetInputLayout(nullptr);
+		}
+
+		void LoadFromFile(const std::string& filename, const VertexShaderLayoutDesc& layout)
+		{
+			mLayout = layout;
+			Shader::LoadFromFile(filename);
+		}
+
+		void CompileFromFile(const std::string& filename, const VertexShaderLayoutDesc& layout, const std::string& entryPoint = "main", const std::string& target = "vs_5_0")
+		{
+			mLayout = layout;
+			Shader::CompileFromFile(filename, entryPoint, target);
+		}
+
+		void CompileFromSource(const std::string& source, const VertexShaderLayoutDesc& layout, const std::string& entryPoint = "main", const std::string& target = "vs_5_0")
+		{
+			mLayout = layout;
+			Shader::CompileFromSource(source, entryPoint, target);
+		}
+
+		bool IsValid() { return pVertexShader != nullptr; }
+
+		static std::shared_ptr<VertexShader> MakeShared() { return std::make_shared<VertexShader>(); }
 
 	protected:
-		VertexShader() = default;
+		VertexShaderLayoutDesc mLayout;
 		wrl::ComPtr<ID3D11VertexShader> pVertexShader = nullptr;
 		wrl::ComPtr<ID3D11InputLayout> pInputLayout = nullptr;
+
+		void Initialise(const wrl::ComPtr<ID3DBlob>& pBlob);
 	};
-
-	class VertexShaderFile : public VertexShader
-	{
-	public:
-		VertexShaderFile(const std::string& filename, VertexShaderLayoutDesc& layout, const std::string entryPoint = "main", const std::string target = "vs_5_0");
-		
-		void Bind() { if (autoReload) Reload(); VertexShader::Bind(); }
-		void Reload(); // only reloads if the file has changed
-		inline bool IsValid() { return (pVertexShader && pInputLayout); }
-		void OnImgui();
-
-	protected:
-		std::string filename;
-		std::string entryPoint;
-		std::string target;
-		VertexShaderLayoutDesc layout;
-		FileWatcher fileWatcher;
-		std::string status;
-		bool autoReload = false;
-
-		void Load();
-	};
-
-	/////////////////// pixel shader ///////////////////
 
 	class PixelShader : public Shader
 	{
 	public:
-		PixelShader(ID3DBlob& shaderBlob, std::string info);
-		void Bind();
-		void Unbind();
+		void Bind() { DXDevice::GetContext().PSSetShader(pPixelShader.Get(), nullptr, 0u); }
+		void Unbind() { DXDevice::GetContext().PSSetShader(nullptr, nullptr, 0u); }
 
-		static std::shared_ptr<PixelShader> CreateFromString(const std::string& src, const std::string entryPoint = "main", const std::string target = "ps_5_0");
-		static std::shared_ptr<PixelShader> CreateFromCompiledFile(const std::string& filename);
-		static std::shared_ptr<PixelShader> CreateFromSourceFile(const std::string& filename, const std::string entryPoint = "main", const std::string target = "ps_5_0");
+		void LoadFromFile(const std::string& filename)
+		{
+			Shader::LoadFromFile(filename);
+		}
+
+		void CompileFromFile(const std::string& filename, const std::string& entryPoint = "main", const std::string& target = "ps_5_0")
+		{
+			Shader::CompileFromFile(filename, entryPoint, target);
+		}
+
+		void CompileFromSource(const std::string& source, const std::string& entryPoint = "main", const std::string& target = "ps_5_0")
+		{
+			Shader::CompileFromSource(source, entryPoint, target);
+		}
+
+		bool IsValid() { return pPixelShader != nullptr; }
+
+		static std::shared_ptr<PixelShader> MakeShared() { return std::make_shared<PixelShader>(); }
 
 	protected:
-		PixelShader() = default;
 		wrl::ComPtr<ID3D11PixelShader> pPixelShader = nullptr;
+
+		void Initialise(const wrl::ComPtr<ID3DBlob>& pBlob);
 	};
-
-	class PixelShaderFile : public PixelShader
-	{
-	public:
-		PixelShaderFile(const std::string& filename, const std::string entryPoint = "main", const std::string target = "ps_5_0");
-
-		void Bind() { if (autoReload) Reload(); PixelShader::Bind(); }
-		void Reload(); // only reloads if the file has changed
-		inline bool IsValid() { return (pPixelShader); }
-		void OnImgui();
-
-	protected:
-		std::string filename;
-		std::string entryPoint;
-		std::string target;
-		FileWatcher fileWatcher;
-		std::string status;
-		bool autoReload = false;
-
-		void Load();
-	};
-
-	/////////////////// geometry shader ///////////////////
 
 	class GeometryShader : public Shader
 	{
 	public:
-		GeometryShader(ID3DBlob& shaderBlob, std::string info);
-		void Bind();
-		void Unbind();
+		void Bind() { DXDevice::GetContext().GSSetShader(pGeometryShader.Get(), nullptr, 0u); }
+		void Unbind() { DXDevice::GetContext().GSSetShader(nullptr, nullptr, 0u); }
 
-		static std::shared_ptr<GeometryShader> CreateFromSourceFile(const std::string& filename, const std::string entryPoint = "main", const std::string target = "gs_5_0");
+		void LoadFromFile(const std::string& filename)
+		{
+			Shader::LoadFromFile(filename);
+		}
+
+		void CompileFromFile(const std::string& filename, const std::string& entryPoint = "main", const std::string& target = "gs_5_0")
+		{
+			Shader::CompileFromFile(filename, entryPoint, target);
+		}
+
+		void CompileFromSource(const std::string& source, const std::string& entryPoint = "main", const std::string& target = "gs_5_0")
+		{
+			Shader::CompileFromSource(source, entryPoint, target);
+		}
+
+		bool IsValid() { return pGeometryShader != nullptr; }
+
+		static std::shared_ptr<GeometryShader> MakeShared() { return std::make_shared<GeometryShader>(); }
 
 	protected:
-		GeometryShader() = default;
 		wrl::ComPtr<ID3D11GeometryShader> pGeometryShader = nullptr;
+
+		void Initialise(const wrl::ComPtr<ID3DBlob>& pBlob);
 	};
 
+	class ComputeShader : public Shader
+	{
+	public:
+		void Dispatch() { DXDevice::GetContext().Dispatch(threadGroupCount[0], threadGroupCount[1], threadGroupCount[2]); }
+
+		void Bind() { DXDevice::GetContext().CSSetShader(pComputeShader.Get(), nullptr, 0u); }
+		void Unbind() { DXDevice::GetContext().CSSetShader(nullptr, nullptr, 0u); }
+
+		void SetThreadGroupCount(UINT x, UINT y, UINT z) { threadGroupCount[0] = x; threadGroupCount[1] = y; threadGroupCount[2] = z; }
+
+		void LoadFromFile(const std::string& filename)
+		{
+			Shader::LoadFromFile(filename);
+		}
+
+		void CompileFromFile(const std::string& filename, const std::string& entryPoint = "main", const std::string& target = "cs_5_0")
+		{
+			Shader::CompileFromFile(filename, entryPoint, target);
+		}
+
+		void CompileFromSource(const std::string& source, const std::string& entryPoint = "main", const std::string& target = "cs_5_0")
+		{
+			Shader::CompileFromSource(source, entryPoint, target);
+		}
+
+		bool IsValid() { return pComputeShader != nullptr; }
+
+		static std::shared_ptr<ComputeShader> MakeShared() { return std::make_shared<ComputeShader>(); }
+
+	protected:
+		wrl::ComPtr<ID3D11ComputeShader> pComputeShader = nullptr;
+		UINT threadGroupCount[3] = { 1,1,1 };
+
+		void Initialise(const wrl::ComPtr<ID3DBlob>& pBlob);
+	};
 }

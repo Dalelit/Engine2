@@ -6,14 +6,15 @@ namespace Engine2
 	AssetStore<VertexShader> ShaderCache::VertexShaders;
 	AssetStore<PixelShader>  ShaderCache::PixelShaders;
 
-	std::shared_ptr<VertexShader> ShaderCache::GetVertexShader(const std::string& filename, VertexShaderLayoutDesc& layout)
+	std::shared_ptr<VertexShader> ShaderCache::GetVertexShader(const std::string& filename, VertexShader::VertexShaderLayoutDesc& layout)
 	{
 		// retrieve it if already loaded
 		auto existing = VertexShaders.GetAsset(filename);
 		if (existing) return existing;
 
 		// create
-		auto ptr = VertexShader::CreateFromSourceFile(filename, layout);
+		auto ptr = std::make_shared<VertexShader>();
+		ptr->CompileFromFile(filename, layout);
 
 		if (!ptr) return nullptr; // failed to load
 
@@ -30,7 +31,8 @@ namespace Engine2
 		if (existing) return existing;
 
 		// create
-		auto ptr = PixelShader::CreateFromSourceFile(filename);
+		auto ptr = std::make_shared<PixelShader>();
+		ptr->CompileFromFile(filename);
 
 		if (!ptr) return nullptr; // failed to load
 

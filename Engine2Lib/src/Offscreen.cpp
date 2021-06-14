@@ -15,7 +15,7 @@ namespace Engine2
 		{
 			AddSampleFilters();
 
-			Common.ForDrawToBackBuffer.pVB = CreateVertexBuffer(-1.0f, 1.0f, 1.0f, -1.0f);
+			CreateVertexBuffer(-1.0f, 1.0f, 1.0f, -1.0f, Common.ForDrawToBackBuffer.vb);
 
 			std::vector<D3D11_INPUT_ELEMENT_DESC> layout = {
 				{"Position", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
@@ -40,7 +40,7 @@ namespace Engine2
 				}
 			)";
 
-			Common.ForDrawToBackBuffer.pVS = VertexShader::CreateFromString(VSsrc, layout);
+			Common.ForDrawToBackBuffer.vs.CompileFromSource(VSsrc, layout);
 
 			// pixel shader specific for depth buffer
 			std::string PSsrc = R"(
@@ -66,10 +66,10 @@ namespace Engine2
 				}
 			)";
 
-			Common.ForDrawToSubDisplay.pVS = Common.ForDrawToBackBuffer.pVS; // same simple VS.
+			Common.ForDrawToSubDisplay.vs = Common.ForDrawToBackBuffer.vs; // same simple VS.
 			Common.ForDrawToSubDisplay.pPSBuffer = pixelShaders["Copy"];
-			Common.ForDrawToSubDisplay.pPSDepthBuffer = PixelShader::CreateFromString(PSsrc);
-			Common.ForDrawToSubDisplay.pPSDepthBufferRaw = PixelShader::CreateFromString(PSRawsrc);
+			Common.ForDrawToSubDisplay.psDepthBuffer.CompileFromSource(PSsrc);
+			Common.ForDrawToSubDisplay.psDepthBufferRaw.CompileFromSource(PSRawsrc);
 
 			Common.initialised = true;
 		}
@@ -160,9 +160,9 @@ namespace Engine2
 
 		DXDevice::Get().SetBackBufferAsRenderTargetNoDepthCheck();
 		Bind(); // bind this as resource
-		Common.ForDrawToBackBuffer.pVS->Bind();
+		Common.ForDrawToBackBuffer.vs.Bind();
 		pPS->Bind();
-		Common.ForDrawToBackBuffer.pVB->BindAndDraw();
+		Common.ForDrawToBackBuffer.vb.BindAndDraw();
 		Unbind();
 		DXDevice::Get().SetBackBufferAsRenderTarget();
 	}
@@ -372,7 +372,7 @@ namespace Engine2
 		pDepthBufferSamplerState.Reset();
 	}
 
-	std::shared_ptr<VertexBuffer> Offscreen::CreateVertexBuffer(float left, float top, float right, float bottom)
+	void Offscreen::CreateVertexBuffer(float left, float top, float right, float bottom, VertexBuffer& vb)
 	{
 		struct Vertex {
 			float position[3];
@@ -388,9 +388,7 @@ namespace Engine2
 			{ {right, bottom, 0.0f}, {1.0f, 1.0f} },
 		};
 
-		auto vb = std::make_shared<VertexBuffer>();
-		vb->Initialise<Vertex>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, verticies);
-		return vb;
+		vb.Initialise<Vertex>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, verticies);
 	}
 
 	void Offscreen::InitialiseSubDisplayVB()
@@ -400,7 +398,7 @@ namespace Engine2
 		float right = subDisplay.leftTop[0] + subDisplay.size;
 		float bottom = subDisplay.leftTop[1] - subDisplay.size;
 
-		subDisplay.pVB = CreateVertexBuffer(left, top, right, bottom);
+		CreateVertexBuffer(left, top, right, bottom, subDisplay.vb);
 	}
 
 	void Offscreen::InitialiseSubDisplayDepthBufferVB()
@@ -410,7 +408,7 @@ namespace Engine2
 		float right = subDisplayDepthBuffer.leftTop[0] + subDisplayDepthBuffer.size;
 		float bottom = subDisplayDepthBuffer.leftTop[1] - subDisplayDepthBuffer.size;
 
-		subDisplayDepthBuffer.pVB = CreateVertexBuffer(left, top, right, bottom);
+		CreateVertexBuffer(left, top, right, bottom, subDisplayDepthBuffer.vb);
 	}
 
 	void Offscreen::ShowSubDisplay()
@@ -422,9 +420,9 @@ namespace Engine2
 			// bind buffer as resource
 			BindBuffer(descriptor.slot);
 			
-			Common.ForDrawToSubDisplay.pVS->Bind();
+			Common.ForDrawToSubDisplay.vs.Bind();
 			Common.ForDrawToSubDisplay.pPSBuffer->Bind();
-			subDisplay.pVB->BindAndDraw();
+			subDisplay.vb.BindAndDraw();
 			DXDevice::Get().ClearShaderResource(descriptor.slot); // Unbind();
 			DXDevice::Get().SetBackBufferAsRenderTarget();
 		}
@@ -435,12 +433,12 @@ namespace Engine2
 
 			BindDepthBuffer(descriptor.slot);
 
-			Common.ForDrawToSubDisplay.pVS->Bind();
+			Common.ForDrawToSubDisplay.vs.Bind();
 			if (subDisplayDepthBuffer.displayRaw)
-				Common.ForDrawToSubDisplay.pPSDepthBufferRaw->Bind();
+				Common.ForDrawToSubDisplay.psDepthBufferRaw.Bind();
 			else
-				 Common.ForDrawToSubDisplay.pPSDepthBuffer->Bind();
-			subDisplayDepthBuffer.pVB->BindAndDraw();
+				 Common.ForDrawToSubDisplay.psDepthBuffer.Bind();
+			subDisplayDepthBuffer.vb.BindAndDraw();
 			DXDevice::Get().ClearShaderResource(descriptor.slot); // Unbind();
 			DXDevice::Get().SetBackBufferAsRenderTarget();
 		}
@@ -450,6 +448,11 @@ namespace Engine2
 	// Note: would pass in pixel width/height as a parameter if using seriously
 	void Offscreen::AddSampleFilters()
 	{
+		auto AddPS = [&](const char* label, const std::string& source) {
+			pixelShaders[label] = PixelShader::MakeShared();
+			pixelShaders[label]->CompileFromSource(source);
+		};
+
 		std::string PSsrc = R"(
 			Texture2D tex;
 			SamplerState smplr;
@@ -460,7 +463,7 @@ namespace Engine2
 			}
 		)";
 
-		pixelShaders["Copy"] = PixelShader::CreateFromString(PSsrc);
+		AddPS("Copy", PSsrc);
 
 		PSsrc = R"(
 			Texture2D tex;
@@ -486,7 +489,7 @@ namespace Engine2
 			}
 		)";
 
-		pixelShaders["Edge detection"] = PixelShader::CreateFromString(PSsrc);
+		AddPS("Edge detection", PSsrc);
 
 		PSsrc = R"(
 			Texture2D tex;
@@ -508,7 +511,7 @@ namespace Engine2
 			}
 		)";
 
-		pixelShaders["Sharpen"] = PixelShader::CreateFromString(PSsrc);
+		AddPS("Sharpen", PSsrc);
 
 		PSsrc = R"(
 			Texture2D tex;
@@ -535,7 +538,7 @@ namespace Engine2
 			}
 		)";
 
-		pixelShaders["Box blur 3x3"] = PixelShader::CreateFromString(PSsrc);
+		AddPS("Box blur 3x3", PSsrc);
 
 		PSsrc = R"(
 			Texture2D tex;
@@ -562,7 +565,7 @@ namespace Engine2
 			}
 		)";
 
-		pixelShaders["Gaussian blur 3x3"] = PixelShader::CreateFromString(PSsrc);
+		AddPS("Gaussian blur 3x3", PSsrc);
 
 		PSsrc = R"(
 			Texture2D tex;
@@ -586,7 +589,7 @@ namespace Engine2
 			}
 		)";
 
-		pixelShaders["Emboss 3x3"] = PixelShader::CreateFromString(PSsrc);
+		AddPS("Emboss 3x3", PSsrc);
 
 		PSsrc = R"(
 			Texture2D tex;
@@ -610,7 +613,7 @@ namespace Engine2
 			}
 		)";
 
-		pixelShaders["Motion blur"] = PixelShader::CreateFromString(PSsrc);
+		AddPS("Motion blur", PSsrc);
 
 		PSsrc = R"(
 			Texture2D tex;
@@ -624,7 +627,7 @@ namespace Engine2
 			}
 		)";
 
-		pixelShaders["Greyscale 1/3"] = PixelShader::CreateFromString(PSsrc);
+		AddPS("Greyscale 1/3", PSsrc);
 
 		PSsrc = R"(
 			Texture2D tex;
@@ -639,7 +642,7 @@ namespace Engine2
 			}
 		)";
 
-		pixelShaders["Greyscale luma gamma corrected"] = PixelShader::CreateFromString(PSsrc);
+		AddPS("Greyscale luma gamma corrected", PSsrc);
 
 		PSsrc = R"(
 			Texture2D tex;
@@ -652,7 +655,7 @@ namespace Engine2
 			}
 		)";
 
-		pixelShaders["Gamma correction"] = PixelShader::CreateFromString(PSsrc);
+		AddPS("Gamma correction", PSsrc);
 
 		PSsrc = R"(
 			Texture2D tex;
@@ -665,6 +668,6 @@ namespace Engine2
 			}
 		)";
 
-		pixelShaders["Invert"] = PixelShader::CreateFromString(PSsrc);
+		AddPS("Invert", PSsrc);
 	}
 }

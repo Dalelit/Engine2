@@ -16,6 +16,7 @@
 #include "ScriptComponent.h"
 #include "AssetManager.h"
 #include "ShaderCache.h"
+#include "Filewatcher.h"
 
 //#define E2_SCENE_TIMING
 #define E2_SCENE_TIMING    auto timer##_COUNTER__ = systemTimers.ScopeTimer(__FUNCTION__);
@@ -32,12 +33,14 @@ namespace Engine2
 	{
 		physics.Initialise();
 
-		pointLightsBuffer.Initialise(1); // To Do: think through what is a good size to initialise this to
+		pointLightsBuffer.Initialise(10); // To Do: think through what is a good size to initialise this to
 	}
 
 	void Scene::OnUpdate(float dt)
 	{
 		E2_SCENE_TIMING;
+
+		FileWatcher::Check();
 
 		if (running)
 		{
@@ -552,6 +555,8 @@ namespace Engine2
 				TextureLoader::Textures.OnImGui();
 				ImGui::TreePop();
 			}
+
+			FileWatcher::OnImgui();
 		}
 		ImGui::End();
 	}

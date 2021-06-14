@@ -40,8 +40,8 @@ void Boids2D::OnUpdate(float dt)
 		tgt2->Clear();
 		texuav2.Bind();
 
-		pCSTrails->Bind();
-		pCSTrails->Dispatch();
+		csTrails.Bind();
+		csTrails.Dispatch();
 	}
 	else
 	{
@@ -52,14 +52,14 @@ void Boids2D::OnUpdate(float dt)
 		tgt1->Clear();
 		texuav1.Bind();
 
-		pCSTrails->Bind();
-		pCSTrails->Dispatch();
+		csTrails.Bind();
+		csTrails.Dispatch();
 	}
 
 	// update boids
 	boiduav.Bind();
-	pCSBoids->Bind();
-	pCSBoids->Dispatch();
+	csBoids.Bind();
+	csBoids.Dispatch();
 	boiduav.Unbind();
 
 	// clean up buffer for trails
@@ -93,29 +93,29 @@ void Boids2D::OnRender()
 	controlCB.VSBind();
 
 	// draw boids
-	pPS->Bind();
-	pVS->Bind();
-	pVB.Bind();
-	pVB.Draw(boidCount);
+	ps.Bind();
+	vs.Bind();
+	vb.Bind();
+	vb.Draw(boidCount);
 
 	// draw sense lines
 	if (showSenseLines)
 	{
-		pVSSenseLines->Bind();
-		pPSSenseLines->Bind();
-		pGSSenseLines->Bind();
-		pVBSenseLines.Bind();
-		pVBSenseLines.Draw(boidCount);
-		pGSSenseLines->Unbind();
+		vsSenseLines.Bind();
+		psSenseLines.Bind();
+		gsSenseLines.Bind();
+		vbSenseLines.Bind();
+		vbSenseLines.Draw(boidCount);
+		gsSenseLines.Unbind();
 	}
 
 	// draw sense radius
 	if (showSenseRadius)
 	{
-		pPSSense->Bind();
-		pVSSense->Bind();
-		pVBSense.Bind();
-		pVBSense.Draw(boidCount);
+		psSense.Bind();
+		vsSense.Bind();
+		vbSense.Bind();
+		vbSense.Draw(boidCount);
 	}
 
 	// clean up
@@ -160,12 +160,12 @@ void Boids2D::OnImgui()
 	ImGui::DragFloat("Diffuse rate", &controlCB.data.diffuseRate, 0.005f, 0.0f, 1.0f);
 	ImGui::DragFloat("Diffuse fade", &controlCB.data.diffuseFade, 0.005f, 0.0f, 1.0f);
 	ImGui::Text("Screen %u x %u", worldCB.data.screenDimension.x, worldCB.data.screenDimension.y);
-	pCSBoids->OnImgui();
-	pCSTrails->OnImgui();
-	pVS->OnImgui();
-	pPS->OnImgui();
-	pVSSense->OnImgui();
-	pPSSense->OnImgui();
+	csBoids.OnImgui();
+	csTrails.OnImgui();
+	vs.OnImgui();
+	ps.OnImgui();
+	vsSense.OnImgui();
+	psSense.OnImgui();
 }
 
 void Boids2D::InitialiseGfx()
@@ -199,13 +199,13 @@ void Boids2D::InitialiseGfx()
 	};
 	std::vector<unsigned int> indiciesSqr = { 0, 1, 2, 0, 2, 3 };
 
-	pVB.Initialise<Vertex>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, verticiesTri, indiciesTri);
-	pVS = std::make_shared<VertexShaderFile>("src\\Boids\\Boids2DVS.hlsl", vsLayout);
-	pPS = std::make_shared<PixelShaderFile>("src\\Boids\\Boids2DPS.hlsl");
+	vb.Initialise<Vertex>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, verticiesTri, indiciesTri);
+	vs.CompileFromFile("src\\Boids\\Boids2DVS.hlsl", vsLayout);
+	ps.CompileFromFile("src\\Boids\\Boids2DPS.hlsl");
 
-	pVBSense.Initialise<Vertex>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, verticiesSqr, indiciesSqr);
-	pVSSense = std::make_shared<VertexShaderFile>("src\\Boids\\Boids2DVS.hlsl", vsLayout, "sense");
-	pPSSense = std::make_shared<PixelShaderFile>("src\\Boids\\Boids2DPS.hlsl", "sense");
+	vbSense.Initialise<Vertex>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, verticiesSqr, indiciesSqr);
+	vsSense.CompileFromFile("src\\Boids\\Boids2DVS.hlsl", vsLayout, "sense");
+	psSense.CompileFromFile("src\\Boids\\Boids2DPS.hlsl", "sense");
 
 
 	std::vector<D3D11_INPUT_ELEMENT_DESC> vsLayoutSenseLines = {
@@ -214,11 +214,11 @@ void Boids2D::InitialiseGfx()
 
 	// create this just to have a basic vertex buffer
 	std::vector<XMFLOAT2> linesPoint = { {0.0f,0.0f} };
-	pVBSenseLines.Initialise<XMFLOAT2>(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_POINTLIST, linesPoint);
+	vbSenseLines.Initialise<XMFLOAT2>(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_POINTLIST, linesPoint);
 
-	pVSSenseLines = std::make_shared<VertexShaderFile>("src\\Boids\\Boids2DVS.hlsl", vsLayoutSenseLines, "senseLines");
-	pPSSenseLines = std::make_shared<PixelShaderFile>("src\\Boids\\Boids2DPS.hlsl", "senseLines");
-	pGSSenseLines = GeometryShader::CreateFromSourceFile("src\\Boids\\Boids2DGS.hlsl");
+	vsSenseLines.CompileFromFile("src\\Boids\\Boids2DVS.hlsl", vsLayoutSenseLines, "senseLines");
+	psSenseLines.CompileFromFile("src\\Boids\\Boids2DPS.hlsl", "senseLines");
+	gsSenseLines.CompileFromFile("src\\Boids\\Boids2DGS.hlsl");
 }
 
 void Boids2D::InitialiseCS(int startPattern)
@@ -238,12 +238,12 @@ void Boids2D::InitialiseCS(int startPattern)
 	worldCB.data.screenDimension.x = tgt1->GetWidth() - 1;
 	worldCB.data.screenDimension.y = tgt1->GetHeight() - 1;
 
-	pCSTrails = std::make_shared<ComputeShaderFile>("src\\Boids\\Boids2DCS.hlsl");
-	pCSTrails->SetThreadGroupCount(tgt1->GetWidth(), tgt1->GetHeight(), 1);
+	csTrails.CompileFromFile("src\\Boids\\Boids2DCS.hlsl");
+	csTrails.SetThreadGroupCount(tgt1->GetWidth(), tgt1->GetHeight(), 1);
 
-	pCSBoids = std::make_shared<ComputeShaderFile>("src\\Boids\\Boids2DCS.hlsl", "BoidsUpdate");
-	pCSBoids->SetThreadGroupCount(1024, 1, 1);
-	pCSBoids->SetName("Boids CS");
+	csBoids.CompileFromFile("src\\Boids\\Boids2DCS.hlsl", "BoidsUpdate");
+	csBoids.SetThreadGroupCount(1024, 1, 1);
+	csBoids.SetName("Boids CS");
 
 	texsrv1.Initialise(tgt1->GetSRV());
 	texsrv2.Initialise(tgt2->GetSRV());

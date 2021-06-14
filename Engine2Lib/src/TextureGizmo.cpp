@@ -26,9 +26,9 @@ namespace Engine2
 		{
 			DXDevice::Get().SetDepthStencilStateDepthDisabled();
 
-			pVS->Bind();
-			pPS->Bind();
-			pVB->BindAndDraw();
+			vs.Bind();
+			ps.Bind();
+			vb.BindAndDraw();
 
 			DXDevice::Get().SetDefaultDepthStencilState();
 		}
@@ -73,7 +73,7 @@ namespace Engine2
 				}
 			)";
 
-		pVS = VertexShader::CreateFromString(VSsrc, layout);
+		vs.CompileFromSource(VSsrc, layout);
 
 		InitialisePixelShader();
 	}
@@ -106,7 +106,7 @@ namespace Engine2
 			)";
 		}
 
-		pPS = PixelShader::CreateFromString(PSsrc);
+		ps.CompileFromSource(PSsrc);
 	}
 
 	void TextureGizmo::CreateVertexBuffer(float left, float top, float right, float bottom)
@@ -125,8 +125,7 @@ namespace Engine2
 			{ {right, bottom, 0.0f}, {1.0f, 1.0f} },
 		};
 
-		pVB = std::make_shared<VertexBuffer>();
-		pVB->Initialise<Vertex>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, verticies);
+		vb.Initialise<Vertex>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, verticies);
 	}
 
 }

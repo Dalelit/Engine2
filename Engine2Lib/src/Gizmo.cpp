@@ -38,11 +38,8 @@ namespace Engine2
 			{"Color",         0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
 		};
 
-		std::string vsFileName = Config::directories["ShaderCompiledDir"] + "GizmosVS.cso";
-		pVS = VertexShader::CreateFromCompiledFile(vsFileName, vsLayout);
-
-		std::string psFileName = Config::directories["ShaderCompiledDir"] + "GizmosPS.cso";
-		pPS = PixelShader::CreateFromCompiledFile(psFileName);
+		vs.LoadFromFile(Config::directories["ShaderCompiledDir"] + "GizmosVS.cso", vsLayout);
+		ps.LoadFromFile(Config::directories["ShaderCompiledDir"] + "GizmosPS.cso");
 
 		D3D11_DEPTH_STENCIL_DESC desc = CD3D11_DEPTH_STENCIL_DESC(CD3D11_DEFAULT());
 		desc.DepthFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_GREATER;
@@ -58,14 +55,14 @@ namespace Engine2
 	void GizmoRender::Render()
 	{
 		// Note: Assuming the scene has already bound the camera matrix to VS constant buffer 0
-		pPS->Bind();
+		ps.Bind();
 
 		// draw hidden lines
 
 		DXDevice::GetContext().OMSetDepthStencilState(pBackDrawDSS.Get(), 0);
 		psCB.data = hiddenColor;
 		psCB.Bind();
-		pVS->Bind();
+		vs.Bind();
 		Draw();
 
 		// draw visible lines
@@ -74,7 +71,7 @@ namespace Engine2
 
 		psCB.data = visibleColor;
 		psCB.Bind();
-		pVS->Bind();
+		vs.Bind();
 		Draw();
 
 	}

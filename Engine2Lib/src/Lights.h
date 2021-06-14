@@ -38,8 +38,8 @@ namespace Engine2
 		void ShadowPassEnd();
 		void BindShadowMap();
 
-		void BindShadowVS() { pVSShader->Bind(); }
-		void BindShadowVSInstanced() { pVSShaderInstanced->Bind(); }
+		void BindShadowVS() { vsShader.Bind(); }
+		void BindShadowVSInstanced() { vsShaderInstanced.Bind(); }
 
 		DirectX::XMVECTOR GetCentre() { return centre; }
 
@@ -53,8 +53,8 @@ namespace Engine2
 
 		Camera camera;
 		ShadowMap shadowMap;
-		std::shared_ptr<VertexShader> pVSShader;
-		std::shared_ptr<VertexShader> pVSShaderInstanced;
+		VertexShader vsShader;
+		VertexShader vsShaderInstanced;
 
 		UINT32 shadowMapSlot = 1u;
 		struct ShadowPSCBData

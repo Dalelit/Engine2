@@ -78,8 +78,8 @@ namespace Engine2
 		{
 			DXDevice::Get().SetNoFaceCullingRenderState();
 			DXDevice::Get().SetAlphaBlendState();
-			pVS->Bind();
-			pPS->Bind();
+			vs.Bind();
+			ps.Bind();
 
 			VB.Bind();
 			VB.Draw(instanceCount);
@@ -249,24 +249,23 @@ namespace Engine2
 							  verticies, indicies);
 		VB.SetInstances<InstanceInfo>(maxParticles);
 
-		//pVS = std::make_shared<VertexShaderDynamic>(Config::directories["ShaderSourceDir"] + "ParticleVS.hlsl", vsLayout);
-		pVS = VertexShader::CreateFromCompiledFile(Config::directories["ShaderCompiledDir"] + "ParticleVS.cso", vsLayout);
+		vs.LoadFromFile(Config::directories["ShaderCompiledDir"] + "ParticleVS.cso", vsLayout);
 	}
 
 	void ParticleEmitter::SetPixelShader(const std::string& shaderName)
 	{
 		if (shaderName.empty() || shaderName == "Solid") // default
 		{
-			pPS = PixelShader::CreateFromCompiledFile(Config::directories["ShaderCompiledDir"] + "ParticlePS.cso");
+			ps.LoadFromFile(Config::directories["ShaderCompiledDir"] + "ParticlePS.cso");
 		}
 		else if (shaderName == "Circle")
 		{
-			pPS = PixelShader::CreateFromCompiledFile(Config::directories["ShaderCompiledDir"] + "ParticlePSCircle.cso");
+			ps.LoadFromFile(Config::directories["ShaderCompiledDir"] + "ParticlePSCircle.cso");
 		}
 		else if (shaderName == "Test")
 		{
 			// to do: this is in the lib, but uses a shader file in the app directories...
-			pPS = std::make_shared<PixelShaderFile>(Config::directories["ShaderSourceDir"] + "ParticlePSTest.hlsl");
+			ps.CompileFromFile(Config::directories["ShaderSourceDir"] + "ParticlePSTest.hlsl");
 		}
 		else { E2_ASSERT(false, "Unknwon pixel shader name for partcile system"); }
 

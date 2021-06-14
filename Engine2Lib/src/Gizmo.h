@@ -52,8 +52,8 @@ namespace Engine2
 
 	protected:
 		size_t maxGizmos;
-		std::shared_ptr<PixelShader> pPS;
-		std::shared_ptr<VertexShader> pVS;
+		PixelShader ps;
+		VertexShader vs;
 		PSConstantBuffer<DirectX::XMVECTOR> psCB;
 		DirectX::XMVECTOR visibleColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 		DirectX::XMVECTOR hiddenColor = { 0.3f, 0.3f, 0.3f, 1.0f };

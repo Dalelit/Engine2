@@ -25,9 +25,9 @@ namespace Engine2
 		bool active = true;
 		bool isDepthTexture = false;
 
-		std::shared_ptr<VertexBuffer> pVB;
-		std::shared_ptr<VertexShader> pVS;
-		std::shared_ptr<PixelShader>  pPS;
+		VertexBuffer vb;
+		VertexShader vs;
+		PixelShader  ps;
 
 		float leftTop[2] = { 0.5f, -0.5f };
 		float widthHeight[2] = { 0.25f, 0.25f };

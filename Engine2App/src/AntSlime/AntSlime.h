@@ -2,7 +2,7 @@
 
 #include "Layer.h"
 #include "Scene.h"
-#include "ComputeShader.h"
+#include "Shader.h"
 #include "ComputeShaderBuffer.h"
 #include "Texture.h"
 #include "TextureGizmo.h"
@@ -27,8 +27,8 @@ protected:
 	Engine2::DXBuffer ants1;
 	Engine2::ComputeShaderUAV antuav1;
 
-	std::shared_ptr<Engine2::ComputeShaderFile> pComputeShader;
-	std::shared_ptr<Engine2::ComputeShaderFile> pComputeShaderAnts;
+	Engine2::ComputeShader computeShader;
+	Engine2::ComputeShader computeShaderAnts;
 
 	std::unique_ptr<Engine2::Texture> tex1;
 	std::unique_ptr<Engine2::Texture> tex2;

@@ -19,7 +19,7 @@ namespace Engine2
 
 			if (!colorPS)
 			{
-				colorPS = PixelShader::CreateFromString(R"(
+				colorPS->CompileFromSource(R"(
 					cbuffer wireframeConst : register (b1)
 					{
 						float4 lineColor;

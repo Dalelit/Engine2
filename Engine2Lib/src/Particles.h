@@ -68,8 +68,8 @@ namespace Engine2
 		UINT instanceCount = 0;
 
 		VertexBufferIndexInstanced VB;
-		std::shared_ptr<VertexShader> pVS;
-		std::shared_ptr<PixelShader> pPS;
+		VertexShader vs;
+		PixelShader ps;
 
 		std::vector<std::string> pixelShaderNames = { "Solid", "Circle", "Test" };
 		std::string currentPixelShader;

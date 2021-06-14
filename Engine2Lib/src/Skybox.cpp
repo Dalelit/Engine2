@@ -50,9 +50,9 @@ namespace Engine2
 		vertexBuffer = std::make_unique<VertexBufferIndex>();
 		vertexBuffer->Initialise<Vertex>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, verticies, indicies);
 
-		vertexShader = std::make_unique<VertexShaderFile>(Config::directories["EngineShaderSourceDir"] + "SkyboxVS.hlsl", layout);
+		vertexShader.CompileFromFile(Config::directories["EngineShaderSourceDir"] + "SkyboxVS.hlsl", layout);
 		
-		pixelShader = std::make_unique<PixelShaderFile>(Config::directories["EngineShaderSourceDir"] + "SkyboxPS.hlsl");
+		pixelShader.CompileFromFile(Config::directories["EngineShaderSourceDir"] + "SkyboxPS.hlsl");
 
 		status = "";
 		SetActive();
@@ -123,10 +123,10 @@ namespace Engine2
 		texture->Bind();
 
 		// pixel shader
-		pixelShader->Bind();
+		pixelShader.Bind();
 
 		// vertex shader - assumes the camera transform is already bound in slot 0... so not binding a const buffer
-		vertexShader->Bind();
+		vertexShader.Bind();
 		
 		// vertex indexed buffer
 		vertexBuffer->Bind();
@@ -154,8 +154,8 @@ namespace Engine2
 			ImGui::Checkbox("Active", &active);
 			ImGui::Text("Status: %s", status.c_str());
 			if (texture) texture->OnImgui();
-			if (vertexShader) vertexShader->OnImgui();
-			if (pixelShader) pixelShader->OnImgui();
+			vertexShader.OnImgui();
+			pixelShader.OnImgui();
 			if (vertexBuffer) vertexBuffer->OnImgui();
 			fileSelection.OnImgui();
 			if (fileSelection.GetFilenames().size() == 6 &&  ImGui::Button("Update Skybox textures"))

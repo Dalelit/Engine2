@@ -1,143 +1,128 @@
 #include "pch.h"
 #include "Common.h"
 #include "Shader.h"
+#include "Filewatcher.h"
 
 namespace Engine2
 {
 	void Shader::OnImgui()
 	{
-		if (ImGui::TreeNode(name.c_str()))
+		if (ImGui::TreeNode(mName.c_str()))
 		{
-			ImGui::Text(info.c_str());
+			ImGui::Text("Filename %s", mFilename.c_str());
+			ImGui::Text("Entry point %s", mEntryPoint.c_str());
+			ImGui::Text("Target %s", mTarget.c_str());
+			if (!mFilename.empty())
+			{
+				if (ImGui::Button("Reload")) Reload();
+				ImGui::SameLine();
+
+				if (FileWatcher::IsRegistered(mFilename))
+				{
+					if (ImGui::Button("Stop auto reload")) FileWatcher::Unregister(mFilename);
+				}
+				else
+				{
+					if (ImGui::Button("Auto reload")) FileWatcher::Register(mFilename, [this]() { Reload(); });
+				}
+			}
 			ImGui::TreePop();
 		}
 	}
 
-	///////////////// Vertex shaders /////////////////
-
-	VertexShader::VertexShader(ID3DBlob& shaderBlob, VertexShaderLayoutDesc& layout, std::string info)
+	void Shader::Reload()
 	{
-		this->name = "VertexShader";
-		this->info = info;
-
-		HRESULT hr;
-
-		hr = DXDevice::GetDevice().CreateVertexShader(
-			shaderBlob.GetBufferPointer(),
-			shaderBlob.GetBufferSize(),
-			nullptr,
-			&pVertexShader);
-
-		E2_ASSERT_HR(hr, "VertexShader CreateVertexShader failed");
-
-		hr = DXDevice::GetDevice().CreateInputLayout(
-			layout.data(),
-			(UINT)layout.size(),
-			shaderBlob.GetBufferPointer(),
-			shaderBlob.GetBufferSize(),
-			&pInputLayout);
-
-		E2_ASSERT_HR(hr, "VertexShader CreateInputLayout failed");
+		if (!mFilename.empty())
+		{
+			if (Util::StringEndsWith(mFilename, ".cso"))
+			{
+				LoadFromFile();
+			}
+			else // assume ends in .hlsl
+			{
+				CompileFromFile();
+			}
+		}
 	}
 
-	void VertexShader::Bind()
+	void Shader::LoadFromFile(const std::string& filename)
 	{
-		DXDevice::GetContext().VSSetShader(pVertexShader.Get(), nullptr, 0u);
-		DXDevice::GetContext().IASetInputLayout(pInputLayout.Get());
+		mFilename = filename;
+		mEntryPoint = "";
+		mTarget = "";
+
+		LoadFromFile();
 	}
 
-	void VertexShader::Unbind()
-	{
-		DXDevice::GetContext().VSSetShader(nullptr, nullptr, 0u);
-		DXDevice::GetContext().IASetInputLayout(nullptr);
-	}
-
-	std::shared_ptr<VertexShader> VertexShader::CreateFromString(const std::string& src, VertexShaderLayoutDesc& layout, const std::string entryPoint, const std::string target)
+	void Shader::LoadFromFile()
 	{
 		wrl::ComPtr<ID3DBlob> pBlob;
-		wrl::ComPtr<ID3DBlob> pErrBlob;
-
-		HRESULT hr = D3DCompile(src.data(), src.length(), NULL, NULL, NULL, entryPoint.data(), target.data(), 0, 0, &pBlob, &pErrBlob);
-
-		E2_ASSERT_HR(hr, "VertexShader D3DCompile failed");
-
-		return std::make_shared<VertexShader>(*pBlob.Get(), layout, entryPoint + " " + target + "\nSource string\n" + src);
-	}
-
-	std::shared_ptr<VertexShader> VertexShader::CreateFromCompiledFile(const std::string& filename, VertexShaderLayoutDesc& layout)
-	{
-		wrl::ComPtr<ID3DBlob> pBlob;
-
-		HRESULT hr = D3DReadFileToBlob(Util::ToWString(filename).c_str(), &pBlob);
-
-		E2_ASSERT_HR(hr, "VertexShader D3DReadFileToBlob failed");
-
-		return std::make_shared<VertexShader>(*pBlob.Get(), layout, "Compiled file: " + filename);
-	}
-
-	std::shared_ptr<VertexShader> VertexShader::CreateFromSourceFile(const std::string& filename, VertexShaderLayoutDesc& layout, const std::string entryPoint, const std::string target)
-	{
-		wrl::ComPtr<ID3DBlob> pBlob;
-		wrl::ComPtr<ID3DBlob> pErrBlob;
-
-		HRESULT hr = D3DCompileFromFile(Util::ToWString(filename).c_str(), 0, D3D_COMPILE_STANDARD_FILE_INCLUDE, entryPoint.c_str(), target.c_str(), 0, 0, &pBlob, &pErrBlob);
+		HRESULT hr = D3DReadFileToBlob(Util::ToWString(mFilename).c_str(), &pBlob);
 
 		if (FAILED(hr))
 		{
-			std::string errorMsg = (char*)pErrBlob->GetBufferPointer();
-			Logging::LogError("Vertex shader failed.");
-			Logging::LogError(errorMsg);
-			return nullptr;
+			Logging::LogError("Failed to load file: " + mFilename);
 		}
-
-		return std::make_shared<VertexShader>(*pBlob.Get(), layout, "Source file: " + filename + "\n" + entryPoint + " " + target);
-	}
-
-	VertexShaderFile::VertexShaderFile(const std::string& filename, VertexShaderLayoutDesc& layout, const std::string entryPoint, const std::string target) :
-		filename(filename), layout(layout), entryPoint(entryPoint), target(target), fileWatcher(filename)
-	{
-		this->name = "VertexShaderFile";
-		this->info = "Source file: " + filename + "\n" + entryPoint + " " + target;
-
-		Load();
-	}
-
-	void VertexShaderFile::Reload()
-	{
-		if (fileWatcher.Check())
+		else
 		{
-			pVertexShader.Reset();
-			pInputLayout.Reset();
-			Load();
+			Initialise(pBlob);
 		}
 	}
 
-	void VertexShaderFile::OnImgui()
+	void Shader::CompileFromFile(const std::string& filename, const std::string& entryPoint, const std::string& target)
 	{
-		if (ImGui::TreeNode(name.c_str()))
-		{
-			ImGui::Text(info.c_str());
-			ImGui::Text(status.c_str());
-			ImGui::Checkbox("Auto update", &autoReload);
-			ImGui::TreePop();
-		}
+		mFilename = filename;
+		mEntryPoint = entryPoint;
+		mTarget = target;
+
+		CompileFromFile();
 	}
 
-	void VertexShaderFile::Load()
+	void Shader::CompileFromFile()
 	{
-		status = "";
-
-		HRESULT hr;
 		wrl::ComPtr<ID3DBlob> pBlob;
 		wrl::ComPtr<ID3DBlob> pErrBlob;
-
-		hr = D3DCompileFromFile(Util::ToWString(filename).c_str(), 0, D3D_COMPILE_STANDARD_FILE_INCLUDE, entryPoint.c_str(), target.c_str(), 0, 0, &pBlob, &pErrBlob);
+		HRESULT hr = D3DCompileFromFile(Util::ToWString(mFilename).c_str(), 0, D3D_COMPILE_STANDARD_FILE_INCLUDE, mEntryPoint.c_str(), mTarget.c_str(), 0, 0, &pBlob, &pErrBlob);
 
 		if (FAILED(hr))
 		{
-			status = "Failed to compile file " + filename;
-			return;
+			Logging::LogError("Failed to compile file: " + mFilename);
+			if (pErrBlob) Logging::LogError((char*)pErrBlob->GetBufferPointer());
 		}
+		else
+		{
+			Initialise(pBlob);
+		}
+	}
+
+	void Shader::CompileFromSource(const std::string& source, const std::string& entryPoint, const std::string& target)
+	{
+		mFilename = "";
+		mEntryPoint = entryPoint;
+		mTarget = target;
+
+		wrl::ComPtr<ID3DBlob> pBlob;
+		wrl::ComPtr<ID3DBlob> pErrBlob;
+
+		HRESULT hr = D3DCompile(source.data(), source.length(), NULL, NULL, NULL, mEntryPoint.c_str(), mTarget.c_str(), 0, 0, &pBlob, &pErrBlob);
+
+		if (FAILED(hr))
+		{
+			Logging::LogError("Failed to compile source string.");
+			if (pErrBlob) Logging::LogError((char*)pErrBlob->GetBufferPointer());
+		}
+		else
+		{
+			Initialise(pBlob);
+		}
+	}
+
+	void VertexShader::Initialise(const wrl::ComPtr<ID3DBlob>& pBlob)
+	{
+		E2_ASSERT(pBlob, "Blob is null");
+		mName = "VertexShader";
+
+		HRESULT hr;
 
 		hr = DXDevice::GetDevice().CreateVertexShader(
 			pBlob->GetBufferPointer(),
@@ -145,192 +130,82 @@ namespace Engine2
 			nullptr,
 			&pVertexShader);
 
+		//E2_ASSERT_HR(hr, "VertexShader CreateVertexShader failed");
 		if (FAILED(hr))
 		{
-			status = "Failed to CreateVertexShader";
+			Logging::LogError("VertexShader CreateVertexShader failed");
 			return;
 		}
 
 		hr = DXDevice::GetDevice().CreateInputLayout(
-			layout.data(),
-			(UINT)layout.size(),
+			mLayout.data(),
+			(UINT)mLayout.size(),
 			pBlob->GetBufferPointer(),
 			pBlob->GetBufferSize(),
 			&pInputLayout);
 
+		//E2_ASSERT_HR(hr, "VertexShader CreateInputLayout failed");
 		if (FAILED(hr))
 		{
-			status = "Failed to CreateInputLayout";
+			Logging::LogError("VertexShader CreateInputLayout failed");
 			return;
 		}
-
-		status = "Loaded";
 	}
 
-	///////////////// Pixel shaders /////////////////
-
-	PixelShader::PixelShader(ID3DBlob& shaderBlob, const std::string info)
+	void PixelShader::Initialise(const wrl::ComPtr<ID3DBlob>& pBlob)
 	{
-		this->name = "PixelShader";
-		this->info = info;
+		E2_ASSERT(pBlob, "Blob is null");
+		mName = "PixelShader";
 
 		HRESULT hr = DXDevice::GetDevice().CreatePixelShader(
-			shaderBlob.GetBufferPointer(),
-			shaderBlob.GetBufferSize(),
-			nullptr,
-			&pPixelShader);
-
-		E2_ASSERT_HR(hr, "PixelShader CreatePixelShader failed");
-	}
-
-	void PixelShader::Bind()
-	{
-		DXDevice::GetContext().PSSetShader(pPixelShader.Get(), nullptr, 0u);
-	}
-
-	void PixelShader::Unbind()
-	{
-		DXDevice::GetContext().PSSetShader(nullptr, nullptr, 0u);
-	}
-
-	std::shared_ptr<PixelShader> PixelShader::CreateFromString(const std::string& src, const std::string entryPoint, const std::string target)
-	{
-		wrl::ComPtr<ID3DBlob> pBlob;
-		wrl::ComPtr<ID3DBlob> pErrBlob;
-
-		HRESULT hr = D3DCompile(src.data(), src.length(), NULL, NULL, NULL, entryPoint.data(), target.data(), 0, 0, &pBlob, &pErrBlob);
-
-		E2_ASSERT_HR(hr, "PixelShader D3DCompile failed");
-
-		return std::make_shared<PixelShader>(*pBlob.Get(), entryPoint + " " + target + "\nSource\n" + src);
-	}
-
-	std::shared_ptr<PixelShader> PixelShader::CreateFromCompiledFile(const std::string& filename)
-	{
-		wrl::ComPtr<ID3DBlob> pBlob;
-
-		HRESULT hr = D3DReadFileToBlob(Util::ToWString(filename).c_str(), &pBlob);
-
-		E2_ASSERT_HR(hr, "PixelShader D3DReadFileToBlob failed");
-
-		return std::make_shared<PixelShader>(*pBlob.Get(), "Compiled file: " + filename);
-	}
-
-	std::shared_ptr<PixelShader> PixelShader::CreateFromSourceFile(const std::string& filename, const std::string entryPoint, const std::string target)
-	{
-		wrl::ComPtr<ID3DBlob> pBlob;
-		wrl::ComPtr<ID3DBlob> pErrBlob;
-
-		HRESULT hr = D3DCompileFromFile(Util::ToWString(filename).c_str(), 0, D3D_COMPILE_STANDARD_FILE_INCLUDE, entryPoint.c_str(), target.c_str(), 0, 0, &pBlob, &pErrBlob);
-
-		if (FAILED(hr))
-		{
-			std::string errorMsg = (char*)pErrBlob->GetBufferPointer();
-			Logging::LogError("Pixel shader failed.");
-			Logging::LogError(errorMsg);
-			return nullptr;
-		}
-
-		return std::make_shared<PixelShader>(*pBlob.Get(), "Source file: " + filename + "\n"+ entryPoint + " " + target);
-	}
-
-	PixelShaderFile::PixelShaderFile(const std::string& filename, const std::string entryPoint, const std::string target) :
-		filename(filename), entryPoint(entryPoint), target(target), fileWatcher(filename)
-	{
-		this->name = "PixelShaderFile";
-		this->info = "Source file: " + filename + "\n" + entryPoint + " " + target;
-
-		Load();
-	}
-
-	void PixelShaderFile::Reload()
-	{
-		if (fileWatcher.Check())
-		{
-			pPixelShader.Reset();
-			Load();
-		}
-	}
-
-	void PixelShaderFile::OnImgui()
-	{
-		if (ImGui::TreeNode(name.c_str()))
-		{
-			ImGui::Text(info.c_str());
-			ImGui::Text(status.c_str());
-			ImGui::Checkbox("Auto update", &autoReload);
-			ImGui::TreePop();
-		}
-	}
-
-	void PixelShaderFile::Load()
-	{
-		status = "";
-
-		HRESULT hr;
-		wrl::ComPtr<ID3DBlob> pBlob;
-		wrl::ComPtr<ID3DBlob> pErrBlob;
-
-		hr = D3DCompileFromFile(Util::ToWString(filename).c_str(), 0, D3D_COMPILE_STANDARD_FILE_INCLUDE, entryPoint.c_str(), target.c_str(), 0, 0, &pBlob, &pErrBlob);
-
-		if (FAILED(hr))
-		{
-			status = "Failed to compile file " + filename;
-			return;
-		}
-
-		hr = DXDevice::GetDevice().CreatePixelShader(
 			pBlob->GetBufferPointer(),
 			pBlob->GetBufferSize(),
 			nullptr,
 			&pPixelShader);
 
+		//E2_ASSERT_HR(hr, "PixelShader CreatePixelShader failed");
 		if (FAILED(hr))
 		{
-			status = "Failed to CreatePixelShader";
+			Logging::LogError("PixelShader CreatePixelShader failed");
 			return;
 		}
-
-		status = "Loaded";
 	}
 
-	///////////////// Geometry shaders /////////////////
-
-
-	GeometryShader::GeometryShader(ID3DBlob& shaderBlob, const std::string info)
+	void GeometryShader::Initialise(const wrl::ComPtr<ID3DBlob>& pBlob)
 	{
-		this->name = "GeometryShader";
-		this->info = info;
+		E2_ASSERT(pBlob, "Blob is null");
+		mName = "GeometryShader";
 
 		HRESULT hr = DXDevice::GetDevice().CreateGeometryShader(
-			shaderBlob.GetBufferPointer(),
-			shaderBlob.GetBufferSize(),
+			pBlob->GetBufferPointer(),
+			pBlob->GetBufferSize(),
 			nullptr,
 			&pGeometryShader);
 
-		E2_ASSERT_HR(hr, "GeometryShader CreateGeometryShader failed");
+		//E2_ASSERT_HR(hr, "GeometryShader CreateGeometryShader failed");
+		if (FAILED(hr))
+		{
+			Logging::LogError("GeometryShader CreateGeometryShader failed");
+			return;
+		}
 	}
 
-	void GeometryShader::Bind()
+	void ComputeShader::Initialise(const wrl::ComPtr<ID3DBlob>& pBlob)
 	{
-		DXDevice::GetContext().GSSetShader(pGeometryShader.Get(), nullptr, 0u);
+		E2_ASSERT(pBlob, "Blob is null");
+		mName = "ComputeShader";
+
+		HRESULT hr = DXDevice::GetDevice().CreateComputeShader(
+			pBlob->GetBufferPointer(),
+			pBlob->GetBufferSize(),
+			nullptr,
+			&pComputeShader);
+
+		//E2_ASSERT_HR(hr, "ComputeShader CreateComputeShader failed");
+		if (FAILED(hr))
+		{
+			Logging::LogError("ComputeShader CreateComputeShader failed");
+			return;
+		}
 	}
-
-	void GeometryShader::Unbind()
-	{
-		DXDevice::GetContext().GSSetShader(nullptr, nullptr, 0u);
-	}
-
-	std::shared_ptr<GeometryShader> GeometryShader::CreateFromSourceFile(const std::string& filename, const std::string entryPoint, const std::string target)
-	{
-		wrl::ComPtr<ID3DBlob> pBlob;
-		wrl::ComPtr<ID3DBlob> pErrBlob;
-
-		HRESULT hr = D3DCompileFromFile(Util::ToWString(filename).c_str(), 0, D3D_COMPILE_STANDARD_FILE_INCLUDE, entryPoint.c_str(), target.c_str(), 0, 0, &pBlob, &pErrBlob);
-
-		if (FAILED(hr)) return nullptr;
-
-		return std::make_shared<GeometryShader>(*pBlob.Get(), "Source file: " + filename + "\n" + entryPoint + " " + target);
-	}
-
 }

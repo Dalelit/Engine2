@@ -26,11 +26,11 @@ void AntSlime::OnUpdate(float dt)
 		texsrv1.Bind();
 		tex2->Unbind();
 		texuav2.Bind();
-		pComputeShader->Bind();
-		pComputeShader->Dispatch();
+		computeShader.Bind();
+		computeShader.Dispatch();
 
-		pComputeShaderAnts->Bind();
-		pComputeShaderAnts->Dispatch();
+		computeShaderAnts.Bind();
+		computeShaderAnts.Dispatch();
 
 		texuav2.Unbind();
 
@@ -41,11 +41,11 @@ void AntSlime::OnUpdate(float dt)
 		texsrv2.Bind();
 		tex1->Unbind();
 		texuav1.Bind();
-		pComputeShader->Bind();
-		pComputeShader->Dispatch();
+		computeShader.Bind();
+		computeShader.Dispatch();
 
-		pComputeShaderAnts->Bind();
-		pComputeShaderAnts->Dispatch();
+		computeShaderAnts.Bind();
+		computeShaderAnts.Dispatch();
 
 		texuav1.Unbind();
 
@@ -101,8 +101,8 @@ void AntSlime::OnImgui()
 		tex2Gizmo.OnImgui();
 		ImGui::TreePop();
 	}
-	pComputeShader->OnImgui();
-	pComputeShaderAnts->OnImgui();
+	computeShader.OnImgui();
+	computeShaderAnts.OnImgui();
 }
 
 void AntSlime::Initialise(int startPattern)
@@ -136,15 +136,13 @@ void AntSlime::Initialise(int startPattern)
 	tex2Gizmo.SetWidthHeight(relH * aspectRatio, relH);
 	tex2Gizmo.SetActive(false);
 
-	pComputeShader = std::make_shared<ComputeShaderFile>("src\\AntSlime\\AntSlime.hlsl");
-	pComputeShader->SetThreadGroupCount(w, h, 1);
-	pComputeShader->SetName("Environment");
-	pComputeShader->AutoUpdate();
+	computeShader.CompileFromFile("src\\AntSlime\\AntSlime.hlsl");
+	computeShader.SetThreadGroupCount(w, h, 1);
+	computeShader.SetName("Environment");
 
-	pComputeShaderAnts = std::make_shared<ComputeShaderFile>("src\\AntSlime\\AntSlime.hlsl", "UpdateAnts");
-	pComputeShaderAnts->SetThreadGroupCount(1024, 1, 1);
-	pComputeShaderAnts->SetName("Ants");
-	pComputeShaderAnts->AutoUpdate();
+	computeShaderAnts.CompileFromFile("src\\AntSlime\\AntSlime.hlsl", "UpdateAnts");
+	computeShaderAnts.SetThreadGroupCount(1024, 1, 1);
+	computeShaderAnts.SetName("Ants");
 
 
 	texsrv1.Initialise(tex1->GetSRV());

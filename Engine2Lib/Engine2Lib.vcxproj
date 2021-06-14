@@ -159,12 +159,12 @@
     <ClInclude Include="src\AssetStore.h" />
     <ClInclude Include="src\Collider.h" />
     <ClInclude Include="src\Components.h" />
-    <ClInclude Include="src\ComputeShader.h" />
     <ClInclude Include="src\ComputeShaderBuffer.h" />
     <ClInclude Include="src\ConstantBuffer2.h" />
     <ClInclude Include="src\DXBuffer.h" />
     <ClInclude Include="src\ECS.h" />
     <ClInclude Include="src\EntityInfo.h" />
+    <ClInclude Include="src\Filewatcher.h" />
     <ClInclude Include="src\Gizmo.h" />
     <ClInclude Include="src\Logging.h" />
     <ClInclude Include="src\Material.h" />
@@ -182,6 +182,7 @@
     <ClInclude Include="src\ScriptComponent.h" />
     <ClInclude Include="src\ScriptComponents\InputControllerScript.h" />
     <ClInclude Include="src\Serialiser.h" />
+    <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\ShaderCache.h" />
     <ClInclude Include="src\ShadowMap.h" />
     <ClInclude Include="src\Skybox.h" />
@@ -214,7 +215,6 @@
     <ClInclude Include="src\Engine2.h" />
     <ClInclude Include="src\VertexBuffer.h" />
     <ClInclude Include="src\pch.h" />
-    <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\submodules\imgui\imconfig.h" />
     <ClInclude Include="src\submodules\imgui\imgui.h" />
     <ClInclude Include="src\submodules\imgui\imgui_impl_dx11.h" />
@@ -235,9 +235,9 @@
     <ClCompile Include="src\AssetManager.cpp" />
     <ClCompile Include="src\Collider.cpp" />
     <ClCompile Include="src\Components.cpp" />
-    <ClCompile Include="src\ComputeShader.cpp" />
     <ClCompile Include="src\Config.cpp" />
     <ClCompile Include="src\EntityInfo.cpp" />
+    <ClCompile Include="src\Filewatcher.cpp" />
     <ClCompile Include="src\Gizmo.cpp" />
     <ClCompile Include="src\InputController.cpp" />
     <ClCompile Include="src\Instrumentation.cpp" />
@@ -258,7 +258,6 @@
     <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\DXImgui.cpp" />
-    <ClCompile Include="src\Events.cpp" />
     <ClCompile Include="src\DXDevice.cpp" />
     <ClCompile Include="src\Engine2.cpp" />
     <ClCompile Include="src\pch.cpp">

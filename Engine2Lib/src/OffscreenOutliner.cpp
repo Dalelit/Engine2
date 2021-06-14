@@ -3,6 +3,9 @@
 
 namespace Engine2
 {
+	VertexShader OffscreenOutliner::vsOutline;
+	PixelShader  OffscreenOutliner::psOutline;
+
 	OffscreenOutliner::OffscreenOutliner() :
 		psOutlineCB(2u)
 	{
@@ -26,7 +29,7 @@ namespace Engine2
 	
 	void OffscreenOutliner::SetForWriteMask()
 	{
-		pVSOutline->Bind(); // used for both
+		vsOutline.Bind(); // used for both
 		vsOutlineCB.data.m128_f32[0] = 1.0f;
 		vsOutlineCB.Bind();
 		DXDevice::GetContext().PSSetShader(nullptr, nullptr, 0);
@@ -41,7 +44,7 @@ namespace Engine2
 		vsOutlineCB.Bind();
 		psOutlineCB.data = outlineColor;
 		psOutlineCB.Bind();
-		pPSOutline->Bind();
+		psOutline.Bind();
 		DXDevice::GetContext().OMSetRenderTargets(1u, offscreen.GetRenderTargetView().GetAddressOf(), pDSVStencil.Get());
 		DXDevice::GetContext().OMSetDepthStencilState(pDSSUseMask.Get(), 0xFF);
 	}
@@ -61,15 +64,20 @@ namespace Engine2
 	void OffscreenOutliner::Initialise()
 	{
 		// shaders for outline
-		std::vector<D3D11_INPUT_ELEMENT_DESC> vsLayout = {
-			{"Position",    0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
-		};
 
-		std::string vsFileName = Config::directories["ShaderCompiledDir"] + "OutlineVS.cso";
-		pVSOutline = VertexShader::CreateFromCompiledFile(vsFileName, vsLayout);
+		if (!vsOutline.IsValid())
+		{
+			std::vector<D3D11_INPUT_ELEMENT_DESC> vsLayout = {
+				{"Position", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
+			};
 
-		std::string psFileName = Config::directories["ShaderCompiledDir"] + "OutlinePS.cso";
-		pPSOutline = PixelShader::CreateFromCompiledFile(psFileName);
+			vsOutline.LoadFromFile(Config::directories["ShaderCompiledDir"] + "OutlineVS.cso", vsLayout);
+		}
+
+		if (!psOutline.IsValid())
+		{
+			psOutline.LoadFromFile(Config::directories["ShaderCompiledDir"] + "OutlinePS.cso");
+		}
 	}
 	
 	void OffscreenOutliner::Configure()

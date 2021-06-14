@@ -96,14 +96,14 @@ namespace Engine2
 		void ReleaseBuffer();
 		void ReleaseDepthBuffer();
 
-		static std::shared_ptr<VertexBuffer> CreateVertexBuffer(float left, float top, float right, float bottom);
+		static void CreateVertexBuffer(float left, float top, float right, float bottom, VertexBuffer& vb);
 
 		// subwindow display of render target
 		struct {
 			bool show = true;
 			float leftTop[2] = { 0.5f, -0.5f };
 			float size = 0.5f;
-			std::shared_ptr<VertexBuffer> pVB;
+			VertexBuffer vb;
 		} subDisplay;
 		void InitialiseSubDisplayVB();
 
@@ -113,7 +113,7 @@ namespace Engine2
 			float leftTop[2] = { 0.5f, 0.0f };
 			float size = 0.5f;
 			bool displayRaw = false;
-			std::shared_ptr<VertexBuffer> pVB;
+			VertexBuffer vb;
 		} subDisplayDepthBuffer;
 		void InitialiseSubDisplayDepthBufferVB();
 
@@ -124,15 +124,15 @@ namespace Engine2
 			bool initialised = false;
 
 			struct {
-				std::shared_ptr<VertexBuffer> pVB;
-				std::shared_ptr<VertexShader> pVS;
+				VertexBuffer vb;
+				VertexShader vs;
 			} ForDrawToBackBuffer;
 
 			struct {
-				std::shared_ptr<VertexShader> pVS;
-				std::shared_ptr<PixelShader>  pPSBuffer;
-				std::shared_ptr<PixelShader>  pPSDepthBuffer;
-				std::shared_ptr<PixelShader>  pPSDepthBufferRaw;
+				VertexShader vs;
+				std::shared_ptr<PixelShader> pPSBuffer;
+				PixelShader  psDepthBuffer;
+				PixelShader  psDepthBufferRaw;
 			} ForDrawToSubDisplay;
 
 		} Common;

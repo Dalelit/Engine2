@@ -37,7 +37,7 @@ namespace Engine2
 			{"Position", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
 		};
 
-		pVSShader = VertexShader::CreateFromSourceFile(Config::directories["EngineShaderSourceDir"] + "PositionShadowVS.hlsl", vsLayout, "main");
+		vsShader.CompileFromFile(Config::directories["EngineShaderSourceDir"] + "PositionShadowVS.hlsl", vsLayout, "main");
 
 		std::vector<D3D11_INPUT_ELEMENT_DESC> vsInstancedLayout = {
 			{"Position", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
@@ -47,7 +47,7 @@ namespace Engine2
 			{"InstanceTransform", 3, DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_INSTANCE_DATA, 1},
 		};
 
-		pVSShaderInstanced = VertexShader::CreateFromSourceFile(Config::directories["EngineShaderSourceDir"] + "PositionShadowVS.hlsl", vsInstancedLayout, "mainInstanced");
+		vsShaderInstanced.CompileFromFile(Config::directories["EngineShaderSourceDir"] + "PositionShadowVS.hlsl", vsInstancedLayout, "mainInstanced");
 	}
 
 	void DirectionalLight::OnImgui()
@@ -60,7 +60,7 @@ namespace Engine2
 		ImGui::DragFloat3("Centre", centre.m128_f32, 0.5f);
 		ImGui::DragFloat3("Position", position.m128_f32, 0.5f);
 		camera.OnImgui();
-		pVSShader->OnImgui();
+		vsShader.OnImgui();
 		shadowMap.OnImgui();
 	}
 
@@ -72,7 +72,7 @@ namespace Engine2
 		device.SetNoFaceCullingRenderState();
 		shadowMap.Clear();
 		shadowMap.SetAsTarget();
-		pVSShader->Bind();
+		vsShader.Bind();
 	}
 
 	void DirectionalLight::ShadowPassEnd()

@@ -42,8 +42,8 @@ namespace Engine2
 		wrl::ComPtr<ID3D11RasterizerState> pRasterizerState = nullptr;
 
 		std::unique_ptr<Texture> texture;
-		std::unique_ptr<VertexShader> vertexShader;
-		std::unique_ptr<PixelShader> pixelShader;
+		VertexShader vertexShader;
+		PixelShader pixelShader;
 		std::unique_ptr<VertexBufferIndex> vertexBuffer;
 
 		SkyboxFileSelector fileSelection;

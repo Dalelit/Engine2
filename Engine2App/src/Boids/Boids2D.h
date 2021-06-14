@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Layer.h"
-#include "ComputeShader.h"
+#include "Shader.h"
 #include "ComputeShaderBuffer.h"
 #include "ConstantBuffer.h"
 #include "Offscreen.h"
@@ -32,18 +32,18 @@ protected:
 	//--------------------------------------------------------
 	void InitialiseGfx();
 
-	Engine2::VertexBufferIndex pVB;
-	std::shared_ptr<Engine2::VertexShaderFile> pVS;
-	std::shared_ptr<Engine2::PixelShaderFile>  pPS;
+	Engine2::VertexBufferIndex vb;
+	Engine2::VertexShader vs;
+	Engine2::PixelShader  ps;
 
-	Engine2::VertexBufferIndex pVBSense;
-	std::shared_ptr<Engine2::VertexShaderFile> pVSSense;
-	std::shared_ptr<Engine2::PixelShaderFile>  pPSSense;
+	Engine2::VertexBufferIndex vbSense;
+	Engine2::VertexShader vsSense;
+	Engine2::PixelShader  psSense;
 
-	Engine2::VertexBuffer pVBSenseLines;
-	std::shared_ptr<Engine2::VertexShaderFile> pVSSenseLines;
-	std::shared_ptr<Engine2::PixelShaderFile>  pPSSenseLines;
-	std::shared_ptr<Engine2::GeometryShader>   pGSSenseLines;
+	Engine2::VertexBuffer   vbSenseLines;
+	Engine2::VertexShader   vsSenseLines;
+	Engine2::PixelShader    psSenseLines;
+	Engine2::GeometryShader gsSenseLines;
 
 	struct VSCBData
 	{
@@ -62,8 +62,8 @@ protected:
 	UINT boidSlot = 1;
 	wrl::ComPtr<ID3D11ShaderResourceView> pBoidVSSRV = nullptr;
 
-	std::shared_ptr<Engine2::ComputeShaderFile> pCSTrails;
-	std::shared_ptr<Engine2::ComputeShaderFile> pCSBoids;
+	Engine2::ComputeShader csTrails;
+	Engine2::ComputeShader csBoids;
 
 	Engine2::ComputeShaderSRV texsrv1;
 	Engine2::ComputeShaderSRV texsrv2;
