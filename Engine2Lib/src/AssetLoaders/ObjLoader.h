@@ -23,10 +23,15 @@ namespace Engine2
 			std::vector<unsigned int> facesV;
 			std::vector<unsigned int> facesVt;
 			std::vector<unsigned int> facesVn;
-			unsigned int vCount = 0, vtCount = 0, vnCount = 0;
 
 			inline bool HasPositionNormal() { return !facesV.empty() && !facesVn.empty(); }
 			inline bool HasPositionNormalTexture() { return !facesV.empty() && !facesVn.empty() && !facesVt.empty(); }
+		};
+
+		struct Model
+		{
+			std::string name;
+			std::map<std::string, Object> objects;
 		};
 
 		class ObjLoader
@@ -35,15 +40,15 @@ namespace Engine2
 			static std::shared_ptr<ObjLoader> Load(std::string filename);
 
 			std::string filename;
+			std::vector<Model> models;
 			std::map<std::string, Material> materials;
-			std::map<std::string, Object> objects;
 			std::vector<DirectX::XMFLOAT3> verticies;
 			std::vector<DirectX::XMFLOAT3> normals;
 			std::vector<DirectX::XMFLOAT2> textureCoords;
 
 			void ScaleVerticies(float scale);
 
-			inline bool IsValid() { return objects.size() > 0 && verticies.size() > 0; }
+			inline bool IsValid() { return models.size() > 0 && verticies.size() > 0; }
 
 		protected:
 			static void LoadObjects(ObjLoader& loader);

@@ -23,4 +23,20 @@ protected:
 	void CreateEmtpyScene();
 	void BuildTestScene();
 	void ClearScene(bool forceClearAsset = false);
+
+	void LoadAsset(const std::string& dirname, const std::string& filename);
+
+	// scene directory navigation
+	struct FileInfo
+	{
+		bool isDirectory;
+		std::string name;
+	};
+	std::vector<FileInfo> currentDirectoryContents;
+	std::string sceneDirectory;
+	std::string currentDirectory;
+	std::string selectedFile;
+
+	void ImGuiSceneDirectoy();
+	void SetWorkingDirectory(const std::string& dir); // expects the sceneDirectory value to be set
 };

@@ -14,7 +14,9 @@ namespace Engine2
 	public:
 		SceneHierarchy() : coordinator(1000) {}
 
-		Entity CreateEntity(const std::string& name = std::string()) { return Entity(NewEntity(name)->id, coordinator); }
+		Entity CreateEntity(const std::string& name = std::string());
+		Entity CreateEntity(Entity& parent, const std::string& name = std::string());
+		
 		Entity GetEntity(EngineECS::EntityId_t id) { return Entity(id, coordinator); }
 
 		EngineECS::Coordinator& GetECSCoordinator() { return coordinator; }
@@ -41,9 +43,12 @@ namespace Engine2
 		SceneNode* selected = nullptr;
 		std::vector<SceneNode> sceneHierarchy;
 
+		SceneNode* FindNode(Entity& entity);
+
 		SceneNode* NewEntity(const std::string& name, SceneNode* parent = nullptr, SceneNode* insertBefore = nullptr);
 		void CloneEntity(SceneNode* parent, SceneNode* node);
 		void DestroyEntity(SceneNode* parent, SceneNode* node);
+		void NewEntityModel(const std::string& assetName, SceneNode* parent = nullptr);
 
 		void UpdateTransformMatrix(SceneNode& node, TransformMatrix& parentMatrix);
 
@@ -55,5 +60,7 @@ namespace Engine2
 		SceneNode* deleteEntityParent = nullptr;
 		SceneNode* cloneEntity = nullptr;
 		SceneNode* cloneEntityParent = nullptr;
+		SceneNode* addModelParent = nullptr;
+		std::string addModelName;
 	};
 }

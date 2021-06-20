@@ -63,6 +63,10 @@ namespace Engine2
 					meshAsset = &ma.value().get();
 					mesh = ma.value().get().Meshes().GetAsset(meshName);
 				}
+				else
+				{
+					E2_LOG_WARNING("Loading mesh renderer could not find mesh asset: " + meshAssetName);
+				}
 			}
 
 			// load material
@@ -72,6 +76,10 @@ namespace Engine2
 				{
 					materialAsset = &ma.value().get();
 					material = ma.value().get().Materials().GetAsset(materialName);
+				}
+				else
+				{
+					E2_LOG_WARNING("Loading mesh renderer could not find material asset: " + materialName);
 				}
 			}
 

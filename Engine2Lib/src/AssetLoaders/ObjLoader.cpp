@@ -47,6 +47,7 @@ namespace Engine2
 			std::string name;
 			std::string currentMat;
 			Object* currentObj = nullptr;
+			Model* currentModel = nullptr;
 
 
 			srcFile >> token;
@@ -64,16 +65,46 @@ namespace Engine2
 				}
 				else if (token == "o")
 				{
-					std::string name;
-					srcFile >> name;
+					auto& model = loader.models.emplace_back();
+					currentModel = &model;
+					srcFile >> model.name;
+					currentObj = nullptr;
+				}
+				else if (token == "usemtl" || token == "g") // if not exported with groups, usemtl can be a new object
+				{
+					std::string objName;
+					std::string mtlName;
+					bool createNewObject = false;
+					
+					// To do: is this a hack?
+					// a new object for "g" or if we get "usemtl" and the currentObj isn't created, or if created isn't empty
+					if (token == "g")
+					{
+						srcFile >> objName;
+						createNewObject = true;
+					}
+					else
+					{
+						srcFile >> mtlName;
+						if (currentObj == nullptr || currentObj->facesV.size() > 0)
+						{
+							createNewObject = true;
+							objName = currentModel->name + "-" + std::to_string(currentModel->objects.size()) + "-" + mtlName;
+						}
+					}
 
-					loader.objects[name] = Object();
-					currentObj = &loader.objects[name];
-					currentObj->name = name;
-					constexpr size_t capacity = 50000;
-					currentObj->facesV.reserve(capacity);
-					currentObj->facesVn.reserve(capacity);
-					currentObj->facesVt.reserve(capacity);
+					if (createNewObject)
+					{
+						currentModel->objects[objName] = Object();
+						currentObj = &currentModel->objects[objName];
+						currentObj->name = objName;
+						constexpr size_t capacity = 50000;
+						currentObj->facesV.reserve(capacity);
+						currentObj->facesVn.reserve(capacity);
+						currentObj->facesVt.reserve(capacity);
+					}
+
+					currentObj->material = mtlName;
 				}
 				else if (token == "v")
 				{
@@ -82,7 +113,6 @@ namespace Engine2
 					srcFile >> v.y;
 					srcFile >> v.z;
 					loader.verticies.push_back(v);
-					currentObj->vCount++;
 				}
 				else if (token == "vt")
 				{
@@ -90,7 +120,6 @@ namespace Engine2
 					srcFile >> vt.x;
 					srcFile >> vt.y;
 					loader.textureCoords.push_back(vt);
-					currentObj->vtCount++;
 				}
 				else if (token == "vn")
 				{
@@ -99,11 +128,6 @@ namespace Engine2
 					srcFile >> vn.y;
 					srcFile >> vn.z;
 					loader.normals.push_back(vn);
-					currentObj->vnCount++;
-				}
-				else if (token == "usemtl")
-				{
-					srcFile >> currentObj->material;
 				}
 				else if (token == "s")
 				{

@@ -72,12 +72,19 @@ namespace Engine2
 		node.Attribute("name", name);
 		node.Attribute("orthographic", orthographic);
 		node.Attribute("aspectRatio", aspectRatio);
-		node.Attribute("fov", fov);
 		node.Attribute("nearZ", nearZ);
 		node.Attribute("farZ", farZ);
 		node.Attribute("aspectRatioLockedToScreen", aspectRatioLockedToScreen);
-		node.Attribute("viewWidth", viewWidth);
-		node.Attribute("viewHeight", viewHeight);
+
+		if (orthographic)
+		{
+			node.Attribute("viewWidth", viewWidth);
+			node.Attribute("viewHeight", viewHeight);
+		}
+		else
+		{
+			node.Attribute("fov", fov);
+		}
 	}
 
 	std::array<DirectX::XMVECTOR, 8> Camera::GetFrustrumPoints() const

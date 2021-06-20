@@ -29,8 +29,7 @@ namespace Engine2
 
 			std::shared_ptr<Material> Clone();
 
-			inline StandardPSData& GetMaterialData() { return psData; }
-			inline void SetMaterialData(const StandardPSData& data) { psData = data; }
+			inline void SetMaterialData(const StandardPSData& data) { psData = data; pixelShaderCB.UpdateBuffer(psData); }
 
 			inline void SetModelData(const TransformMatrix& data) { vertexShaderCB.UpdateBuffer(data.GetTransposed()); }
 

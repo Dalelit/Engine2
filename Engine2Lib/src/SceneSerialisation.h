@@ -15,6 +15,7 @@ namespace Engine2
 	protected:
 		Scene& m_scene;
 
+		void SaveSceneInfo(Serialisation::WriteNode& node);
 		void SaveSceneNode(Serialisation::WriteNode& node, SceneHierarchy::SceneNode& sceneNode);
 		void SaveComponents(Serialisation::WriteNode& node, Entity entity);
 		void SaveAssets(Serialisation::WriteNode& node);

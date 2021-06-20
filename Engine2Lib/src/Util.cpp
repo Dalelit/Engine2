@@ -26,6 +26,13 @@ namespace Engine2
 			return r;
 		}
 
+		std::string CurrentDirectory()
+		{
+			char buffer[1024];
+			GetCurrentDirectoryA(ARRAYSIZE(buffer), buffer);
+			return std::string(buffer);
+		}
+
 		DirectX::XMVECTOR RandomOnUnitSphere()
 		{
 			float xzAng = DirectX::XM_2PI * rng.Next();

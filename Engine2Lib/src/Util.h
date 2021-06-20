@@ -10,6 +10,8 @@ namespace Engine2
 
 		inline bool FileExists(const std::string& filename) { return std::filesystem::exists(filename); }
 
+		std::string CurrentDirectory();
+
 		// check if the 'value' ends with the 'ending'
 		inline bool StringEndsWith(const std::string& value, const std::string& ending)
 		{

@@ -61,10 +61,11 @@ namespace Engine2
 
 		if (FAILED(hr))
 		{
-			Logging::LogError("Failed to load file: " + mFilename);
+			E2_LOG_ERROR("Failed to load file: " + mFilename);
 		}
 		else
 		{
+			E2_LOG_INFO("Loaded file: " + mFilename);
 			Initialise(pBlob);
 		}
 	}
@@ -86,11 +87,12 @@ namespace Engine2
 
 		if (FAILED(hr))
 		{
-			Logging::LogError("Failed to compile file: " + mFilename);
-			if (pErrBlob) Logging::LogError((char*)pErrBlob->GetBufferPointer());
+			E2_LOG_ERROR("Failed to compile file: " + mFilename + " " + mEntryPoint + " " + mTarget);
+			if (pErrBlob) E2_LOG_ERROR((char*)pErrBlob->GetBufferPointer());
 		}
 		else
 		{
+			E2_LOG_INFO("Compiled file: " + mFilename);
 			Initialise(pBlob);
 		}
 	}
@@ -108,8 +110,8 @@ namespace Engine2
 
 		if (FAILED(hr))
 		{
-			Logging::LogError("Failed to compile source string.");
-			if (pErrBlob) Logging::LogError((char*)pErrBlob->GetBufferPointer());
+			E2_LOG_ERROR("Failed to compile source string.");
+			if (pErrBlob) E2_LOG_ERROR((char*)pErrBlob->GetBufferPointer());
 		}
 		else
 		{
@@ -133,7 +135,7 @@ namespace Engine2
 		//E2_ASSERT_HR(hr, "VertexShader CreateVertexShader failed");
 		if (FAILED(hr))
 		{
-			Logging::LogError("VertexShader CreateVertexShader failed");
+			E2_LOG_ERROR("VertexShader CreateVertexShader failed");
 			return;
 		}
 
@@ -147,7 +149,7 @@ namespace Engine2
 		//E2_ASSERT_HR(hr, "VertexShader CreateInputLayout failed");
 		if (FAILED(hr))
 		{
-			Logging::LogError("VertexShader CreateInputLayout failed");
+			E2_LOG_ERROR("VertexShader CreateInputLayout failed");
 			return;
 		}
 	}
@@ -166,7 +168,7 @@ namespace Engine2
 		//E2_ASSERT_HR(hr, "PixelShader CreatePixelShader failed");
 		if (FAILED(hr))
 		{
-			Logging::LogError("PixelShader CreatePixelShader failed");
+			E2_LOG_ERROR("PixelShader CreatePixelShader failed");
 			return;
 		}
 	}
@@ -185,7 +187,7 @@ namespace Engine2
 		//E2_ASSERT_HR(hr, "GeometryShader CreateGeometryShader failed");
 		if (FAILED(hr))
 		{
-			Logging::LogError("GeometryShader CreateGeometryShader failed");
+			E2_LOG_ERROR("GeometryShader CreateGeometryShader failed");
 			return;
 		}
 	}
@@ -204,7 +206,7 @@ namespace Engine2
 		//E2_ASSERT_HR(hr, "ComputeShader CreateComputeShader failed");
 		if (FAILED(hr))
 		{
-			Logging::LogError("ComputeShader CreateComputeShader failed");
+			E2_LOG_ERROR("ComputeShader CreateComputeShader failed");
 			return;
 		}
 	}

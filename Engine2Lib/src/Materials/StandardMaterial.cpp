@@ -35,7 +35,7 @@ namespace Engine2
 			pixelShaderCB.Initialise(psData);
 			pixelShaderCB.SetSlot(1);
 			pixelShader = ShaderCache::GetPixelShader(Config::directories["EngineShaderSourceDir"] + "PositionNormalPS.hlsl");
-			
+
 			//texture = nullptr;
 		}
 

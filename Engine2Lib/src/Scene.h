@@ -29,8 +29,8 @@ namespace Engine2
 		void OnRender(EngineECS::EntityId_t cameraEntity);
 		void OnApplicationEvent(Engine2::ApplicationEvent& event);
 
-		Entity CreateEntity() { return hierarchy.CreateEntity(); }
-		Entity CreateEntity(const std::string& name) { return hierarchy.CreateEntity(name); }
+		Entity CreateEntity(const std::string& name = std::string()) { return hierarchy.CreateEntity(name); }
+		Entity CreateEntity(Entity& parent, const std::string& name = std::string()) { return hierarchy.CreateEntity(parent, name); }
 		Entity GetEntity(EngineECS::EntityId_t id) { return hierarchy.GetEntity(id); }
 
 		Entity CreateSceneCamera(const std::string& name, bool makeMainCamera = false);

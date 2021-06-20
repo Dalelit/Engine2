@@ -12,6 +12,18 @@ using namespace DirectX;
 
 namespace Engine2
 {
+	SceneHierarchy::SceneNode* SceneHierarchy::FindNode(Entity& entity)
+	{
+		SceneNode* ptr = nullptr;
+
+		for (auto iter = sceneHierarchy.begin(); ptr == nullptr && iter != sceneHierarchy.end(); ++iter)
+		{
+			if (iter->id == entity.Id()) ptr = iter.operator->();
+		}
+
+		return ptr;
+	}
+
 	SceneHierarchy::SceneNode* SceneHierarchy::NewEntity(const std::string& name, SceneNode* parent, SceneNode* insertBefore)
 	{
 		EntityId_t id = coordinator.CreateEntity();
@@ -76,6 +88,57 @@ namespace Engine2
 		selected = parent;
 	}
 
+	void SceneHierarchy::NewEntityModel(const std::string& assetName, SceneNode* parent)
+	{
+		E2_LOG_INFO("Add model " + assetName);
+
+		auto assetRef = AssetManager::Manager()[assetName];
+		if (!assetRef)
+		{
+			E2_LOG_WARNING("Asset does not exist to add to scene: " + assetName);
+			return;
+		}
+
+		auto& asset = assetRef.value().get();
+
+		auto meshIter = asset.Meshes().Map().begin();
+		auto meshIterEnd = asset.Meshes().Map().end();
+		auto meshMatIter = asset.MeshsMaterial().Map().begin();
+
+		while (meshIter != meshIterEnd)
+		{
+			E2_LOG_INFO("Mesh: " + meshIter->first + " -> Mat: " + *meshMatIter->second);
+
+			auto pNewNode = NewEntity(meshIter->first, parent);
+
+			auto pmr = coordinator.AddComponent<MeshRenderer>(pNewNode->id);
+
+			pmr->meshAsset = &asset;
+			pmr->mesh = meshIter->second;
+			pmr->materialAsset = &asset;
+			pmr->material = asset.Materials()[*meshMatIter->second];
+
+			meshIter++;
+			meshMatIter++;
+		}
+
+		return;
+	}
+
+	Entity SceneHierarchy::CreateEntity(const std::string& name)
+	{
+		return Entity(NewEntity(name)->id, coordinator);
+	}
+
+	Entity SceneHierarchy::CreateEntity(Entity& parent, const std::string& name)
+	{
+		SceneNode* pParent = FindNode(parent);
+
+		E2_ASSERT(pParent != nullptr, "Failed to find parent scene node so cannot create child entity");
+
+		return Entity(NewEntity(name, pParent)->id, coordinator);
+	}
+
 	void SceneHierarchy::UpdateTransformMatrix()
 	{
 		TransformMatrix matrix(XMMatrixIdentity(), XMMatrixIdentity());
@@ -109,6 +172,7 @@ namespace Engine2
 		deleteEntityParent = nullptr;
 		cloneEntity = nullptr;
 		cloneEntityParent = nullptr;
+		addModelParent = nullptr;
 
 		for (auto& sn : sceneHierarchy) SceneNodeOnImGui(sn);
 
@@ -120,6 +184,8 @@ namespace Engine2
 		if (cloneEntity) CloneEntity(cloneEntityParent, cloneEntity);
 
 		if (ImGui::Button("Add Entity")) NewEntity(std::string());
+
+		if (addModelParent) NewEntityModel(addModelName, addModelParent);
 	}
 
 	void SceneHierarchy::SelectedEntityOnImgui()
@@ -172,6 +238,13 @@ namespace Engine2
 			{
 				cloneEntityParent = onImguiParent;
 				cloneEntity = &node;
+			}
+
+			if (ImGui::BeginMenu("Add Model"))
+			{
+				addModelName = AssetManager::Manager().OnImguiSelectAssetMenu();
+				if (!addModelName.empty()) addModelParent = &node;
+				ImGui::EndMenu();
 			}
 
 			ImGui::EndPopup();

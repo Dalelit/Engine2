@@ -5,6 +5,7 @@
 #include "VertexLayout.h"
 #include "VertexBuffer.h"
 #include "Materials/StandardMaterial.h"
+#include "Logging.h"
 
 namespace Engine2
 {
@@ -12,29 +13,33 @@ namespace Engine2
 
 	bool AssetManager::LoadModel(const std::string& filename)
 	{
-		lastActionResult.clear();
+		E2_LOG_INFO("Loading model " + filename);
+
+		std::string result;
 
 		auto iter = assets.find(filename);
 
 		if (iter == assets.end())
 		{
-			lastActionResult = "New asset";
+			result = "New asset";
 			iter = assets.emplace(filename, filename).first;
 		}
 		else
 		{
-			lastActionResult = "Overridden asset";
+			result = "Overridden asset";
 			iter->second.Clear();
 		}
 
 		if (iter->second.LoadModel(filename))
 		{
-			lastActionResult += " success";
+			result += " success";
+			E2_LOG_INFO(result);
 			return true;
 		}
 		else
 		{
-			lastActionResult += " failed";
+			result += " failed";
+			E2_LOG_WARNING(result);
 			return false;
 		}
 	}
@@ -64,15 +69,18 @@ namespace Engine2
 		{
 			CreatePositionNormalMaterial(*loadedModel);
 
-			for (auto& [name, object] : loadedModel->objects)
+			for (auto& model : loadedModel->models)
 			{
-				if (object.HasPositionNormalTexture())
+				for (auto& [name, object] : model.objects)
 				{
-					CreateMeshAssetPositionNormalTexture(*loadedModel, object);
-				}
-				else if (object.HasPositionNormal())
-				{
-					CreateMeshAssetPositionNormalColor(*loadedModel, object);
+					if (object.HasPositionNormalTexture())
+					{
+						CreateMeshAssetPositionNormalTexture(*loadedModel, object);
+					}
+					else if (object.HasPositionNormal())
+					{
+						CreateMeshAssetPositionNormal(*loadedModel, object);
+					}
 				}
 			}
 		}
@@ -100,9 +108,15 @@ namespace Engine2
 			materials.OnImGui();
 			ImGui::TreePop();
 		}
+		if (ImGui::TreeNode("Mesh to Material"))
+		{
+			for (auto& [k,v] : meshesMaterial.Map()) ImGui::Text("%s   %s", k.c_str(), v->c_str());
+
+			ImGui::TreePop();
+		}
 	}
 
-	void Asset::CreateMeshAssetPositionNormalColor(AssetLoaders::ObjLoader& loader, AssetLoaders::Object& object)
+	void Asset::CreateMeshAssetPositionNormal(AssetLoaders::ObjLoader& loader, AssetLoaders::Object& object)
 	{
 		using Vertex = VertexLayout::PositionNormalColor;
 
@@ -173,6 +187,7 @@ namespace Engine2
 		// create the asset
 		auto m = meshes.CreateAsset(object.name);
 		m->SetName(object.name); // to do: shouldn't need to do this!
+		meshesMaterial.CreateAsset(object.name, object.material); // track the material for the mesh from the source
 		auto vb = std::make_shared<VertexBuffer>();
 		vb->Initialise<Vertex>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, verticies);
 		m->SetDrawable(vb);
@@ -183,12 +198,14 @@ namespace Engine2
 		for (auto& [name, data] : loader.materials)
 		{
 			auto mat = std::make_shared<Materials::StandardMaterial>(name);
-			auto cb = mat->GetMaterialData();
-			cb.ambient = data.Ka;
-			cb.diffuse = data.Kd;
-			cb.emission = data.Ke;
-			cb.specular = data.Ks;
-			cb.specularExponent = data.Ns;
+			//auto& cb = mat->GetMaterialData();
+			Materials::StandardPSData psdata;
+			psdata.ambient = data.Ka;
+			psdata.diffuse = data.Kd;
+			psdata.emission = data.Ke;
+			psdata.specular = data.Ks;
+			psdata.specularExponent = data.Ns;
+			mat->SetMaterialData(psdata);
 
 			materials.StoreAsset(name, mat);
 		}
@@ -196,20 +213,6 @@ namespace Engine2
 
 	void AssetManager::OnImgui()
 	{
-		static std::string selectedFile = "Assets//Models//Primatives.obj";
-		ImGui::Text("File: %s", selectedFile.c_str());
-		if (ImGui::Button("Load file..."))
-		{
-			if (Util::FileSelectionDialogue::LoadDialogue(selectedFile))
-				LoadModel(selectedFile);
-		}
-		if (ImGui::Button("Reload"))
-		{
-			LoadModel(selectedFile);
-		}
-
-		if (!lastActionResult.empty()) ImGui::Text("%s", lastActionResult.c_str());
-
 		if (ImGui::TreeNode("Assets"))
 		{
 			for (auto& [name, asset] : assets)
@@ -283,6 +286,21 @@ namespace Engine2
 				}
 			}
 			ImGui::EndPopup();
+		}
+
+		return result;
+	}
+
+	std::string AssetManager::OnImguiSelectAssetMenu()
+	{
+		std::string result;
+
+		for (auto& [ak, av] : assets)
+		{
+			if (ImGui::MenuItem(ak.c_str()))
+			{
+				result = ak;
+			}
 		}
 
 		return result;

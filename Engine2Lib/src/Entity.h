@@ -12,7 +12,7 @@ namespace Engine2
 
 		Entity& operator=(const Entity& rhs) { id = rhs.id; coordinator = rhs.coordinator; return *this; }
 
-		EngineECS::EntityId_t Id() { return id; }
+		inline EngineECS::EntityId_t Id() { return id; }
 
 		template <typename T, typename... ARGS>
 		T* AddComponent(ARGS... args) { return coordinator->AddComponent<T>(id, args...); }

@@ -24,6 +24,7 @@ namespace Engine2
 
 		inline AssetStore<Mesh>& Meshes() { return meshes; }
 		inline AssetStore<Materials::StandardMaterial>& Materials() { return materials; }
+		inline AssetStore<std::string>& MeshsMaterial() { return meshesMaterial; }
 
 		inline const std::string& GetSource() const { return source; }
 
@@ -35,7 +36,7 @@ namespace Engine2
 		AssetStore<std::string> meshesMaterial;
 		AssetStore<Materials::StandardMaterial> materials;
 
-		void CreateMeshAssetPositionNormalColor(AssetLoaders::ObjLoader& loader, AssetLoaders::Object& object);
+		void CreateMeshAssetPositionNormal(AssetLoaders::ObjLoader& loader, AssetLoaders::Object& object);
 		void CreateMeshAssetPositionNormalTexture(AssetLoaders::ObjLoader& loader, AssetLoaders::Object& object);
 		void CreatePositionNormalMaterial(AssetLoaders::ObjLoader& loader);
 	};
@@ -60,11 +61,12 @@ namespace Engine2
 		void OnImgui();
 
 		void OnImguiSelectMeshPopupOpen();
-
 		std::pair<Asset*, std::shared_ptr<Mesh>> OnImguiSelectMesh();
 
 		void OnImguiSelectMaterialPopupOpen();
 		std::pair < Asset*, std::shared_ptr<Materials::StandardMaterial>> OnImguiSelectMaterial();
+
+		std::string OnImguiSelectAssetMenu();
 
 		void Clear();
 
@@ -74,8 +76,6 @@ namespace Engine2
 		static std::unique_ptr<AssetManager> instance;
 
 		AssetsMap assets;
-
-		std::string lastActionResult;
 
 		std::optional<AssetRef> GetAsset(const std::string& assetName);
 	};

@@ -71,7 +71,8 @@ namespace Engine2
 		{
 			if (loader.Name() == "Entity")
 			{
-				E2_ASSERT(false, "Have not set up to load nested entities yet");
+				auto childEntity = m_scene.CreateEntity(entity);
+				LoadEntity(spaces + 2, loader, childEntity);
 			}
 			else if (loader.Name() == "Scripts")
 			{
@@ -133,7 +134,7 @@ namespace Engine2
 
 		{
 			auto node = out.SaveNode("SceneInformation");
-			node.Comment("To do");
+			SaveSceneInfo(node);
 		}
 
 		{
@@ -145,6 +146,11 @@ namespace Engine2
 		}
 
 		return true;
+	}
+
+	void SceneSerialisation::SaveSceneInfo(Serialisation::WriteNode& node)
+	{
+		node.Comment("To do");
 	}
 
 	void SceneSerialisation::SaveSceneNode(Serialisation::WriteNode& node, SceneHierarchy::SceneNode& sceneNode)

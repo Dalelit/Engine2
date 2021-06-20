@@ -68,28 +68,40 @@ void SceneBuilder::OnApplicationEvent(Engine2::ApplicationEvent& event)
 
 void SceneBuilder::OnImgui()
 {
-	static std::string selectedSceneDir = "";
-	ImGui::Text("File: %s", selectedSceneDir.c_str());
-
 	constexpr const char* sceneFilename = "\\Scene.txt";
 
+	ImGui::Text("Scene dir: %s", sceneDirectory.c_str());
+
 	auto LoadSceneHelper = [&]() {
-		std::string filename = selectedSceneDir + sceneFilename;
+		std::string filename = sceneDirectory + sceneFilename;
+
+		ClearScene(true);
+
 		if (Util::FileExists(filename))
 		{
-			ClearScene(true);
-			SceneSerialisation(scene).LoadScene(selectedSceneDir + sceneFilename);
+			SceneSerialisation(scene).LoadScene(sceneDirectory + sceneFilename);
 		}
 	};
 
+	if (ImGui::Button("Scene Create..."))
+	{
+		if (Util::FileSelectionDialogue::SelectFolderDialogue(sceneDirectory))
+		{
+			SetWorkingDirectory(sceneDirectory);
+			ClearScene();
+			CreateEmtpyScene();
+		}
+	}
+
 	if (ImGui::Button("Scene Open..."))
 	{
-		if (Util::FileSelectionDialogue::SelectFolderDialogue(selectedSceneDir))
+		if (Util::FileSelectionDialogue::SelectFolderDialogue(sceneDirectory))
 		{
+			SetWorkingDirectory(sceneDirectory);
 			LoadSceneHelper();
 		}
 	}
-	if (!selectedSceneDir.empty())
+	if (!sceneDirectory.empty())
 	{
 		ImGui::SameLine();
 		if (ImGui::Button("Scene Reload"))
@@ -100,53 +112,36 @@ void SceneBuilder::OnImgui()
 
 	if (ImGui::Button("Scene Save as..."))
 	{
-		if (Util::FileSelectionDialogue::SelectFolderDialogue(selectedSceneDir))
+		if (Util::FileSelectionDialogue::SelectFolderDialogue(sceneDirectory))
 		{
-			SceneSerialisation(scene).SaveScene(selectedSceneDir + sceneFilename);
+			SetWorkingDirectory(sceneDirectory); // to do: this doesn't move the assets
+			SceneSerialisation(scene).SaveScene(sceneDirectory + sceneFilename);
 		}
 	}
-	if (!selectedSceneDir.empty())
+	if (!sceneDirectory.empty())
 	{
 		ImGui::SameLine();
 		if (ImGui::Button("Scene Save"))
 		{
-			SceneSerialisation(scene).SaveScene(selectedSceneDir + sceneFilename);
+			SceneSerialisation(scene).SaveScene(sceneDirectory + sceneFilename);
 		}
-	}
-
-
-	static std::string selectedFile = "Scenes//testScene.txt";
-	ImGui::Text("File: %s", selectedFile.c_str());
-	if (ImGui::Button("Save as..."))
-	{
-		if (Util::FileSelectionDialogue::SaveDialogue(selectedFile))
-			SceneSerialisation(scene).SaveScene(selectedFile);
-	}
-	if (ImGui::Button("Save"))
-	{
-		SceneSerialisation(scene).SaveScene(selectedFile);
-	}
-	if (ImGui::Button("Load file..."))
-	{
-		if (Util::FileSelectionDialogue::LoadDialogue(selectedFile))
-		{
-			ClearScene();
-			SceneSerialisation(scene).LoadScene(selectedFile);
-		}
-	}
-	if (ImGui::Button("Reload"))
-	{
-		ClearScene();
-		SceneSerialisation(scene).LoadScene(selectedFile);
 	}
 
 	if (ImGui::Button("Clear Scene"))
 	{
 		ClearScene();
+		sceneDirectory = "";
+		SetWorkingDirectory(sceneDirectory);
 		CreateEmtpyScene();
 	}
 	ImGui::SameLine();
 	ImGui::Checkbox("Also clear assets", &onClearIncludeAssets);
+
+	ImGui::Separator();
+	if (!sceneDirectory.empty())
+	{
+		ImGuiSceneDirectoy();
+	}
 
 	scene.OnImgui();
 }
@@ -215,5 +210,86 @@ void SceneBuilder::ClearScene(bool forceClearAsset)
 		ShaderCache::VertexShaders.Clear();
 		ShaderCache::PixelShaders.Clear();
 		TextureLoader::Textures.Clear();
+	}
+}
+
+void SceneBuilder::LoadAsset(const std::string& dirname, const std::string& filename)
+{
+	std::string fullPath = dirname + "\\" + filename;
+	//std::string assetName = filename.string().substr(sceneDirectory.size()+1);
+	
+	AssetManager::Manager().LoadModel(fullPath);
+}
+
+void SceneBuilder::ImGuiSceneDirectoy()
+{
+	// to do: don't check if someone deletes the directory we're in.
+
+	if (ImGui::CollapsingHeader("Scene directory content", ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		if (sceneDirectory != currentDirectory)
+		{
+			if (ImGui::MenuItem(".."))
+			{
+				SetWorkingDirectory(std::filesystem::path(currentDirectory).parent_path().string());
+			}
+		}
+		//else
+		//{
+		//	ImGui::Text(currentDirectory.c_str());
+		//}
+
+		FileInfo* pChangeDirectory = nullptr;
+		for (auto& f : currentDirectoryContents)
+		{
+			bool selected = f.name == selectedFile;
+			if (ImGui::MenuItem(f.name.c_str(), nullptr, &selected))
+			{
+				if (f.isDirectory)
+				{
+					pChangeDirectory = &f;
+				}
+				else
+				{
+					selectedFile = f.name;
+				}
+			}
+		}
+		
+		ImGui::Separator();
+		if (!selectedFile.empty())
+		{
+			ImGui::Text(selectedFile.c_str());
+			ImGui::SameLine();
+			if (ImGui::Button("Action"))
+			{
+				if (Util::StringEndsWith(selectedFile, ".obj"))
+				{
+					LoadAsset(currentDirectory, selectedFile);
+				}
+			}
+		}
+		if (ImGui::Button("Refresh directory")) SetWorkingDirectory(currentDirectory);
+
+		if (pChangeDirectory) SetWorkingDirectory(currentDirectory + pChangeDirectory->name);
+	}
+}
+
+void SceneBuilder::SetWorkingDirectory(const std::string& dir)
+{
+	currentDirectory = dir;
+	currentDirectoryContents.clear();
+	selectedFile.clear();
+
+	if (!dir.empty())
+	{
+		for (auto& f : std::filesystem::directory_iterator(currentDirectory))
+		{
+			auto& info = currentDirectoryContents.emplace_back();
+			info.isDirectory = f.is_directory();
+
+			if (info.isDirectory) info.name = "\\" + f.path().filename().string();
+			else info.name = f.path().filename().string();
+		}
 	}
 }
