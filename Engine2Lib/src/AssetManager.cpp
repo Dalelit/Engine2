@@ -11,7 +11,7 @@ namespace Engine2
 {
 	std::unique_ptr<AssetManager> AssetManager::instance = std::make_unique<AssetManager>();
 
-	bool AssetManager::LoadModel(const std::string& filename)
+	bool AssetManager::LoadModel(const std::string& rootDirectory, const std::string& filename)
 	{
 		E2_LOG_INFO("Loading model " + filename);
 
@@ -30,7 +30,7 @@ namespace Engine2
 			iter->second.Clear();
 		}
 
-		if (iter->second.LoadModel(filename))
+		if (iter->second.LoadModel(rootDirectory, filename))
 		{
 			result += " success";
 			E2_LOG_INFO(result);
@@ -61,9 +61,9 @@ namespace Engine2
 		return result.first->second;
 	}
 
-	bool Asset::LoadModel(const std::string& filename)
+	bool Asset::LoadModel(const std::string& rootDirectory, const std::string& filename)
 	{
-		auto loadedModel = AssetLoaders::ObjLoader::Load(filename);
+		auto loadedModel = AssetLoaders::ObjLoader::Load(rootDirectory, filename);
 
 		if (loadedModel->IsValid())
 		{

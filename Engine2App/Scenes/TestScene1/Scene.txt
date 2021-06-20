@@ -1,6 +1,6 @@
 #  Add timestamp
 Assets
-  Source:D:\repositories\Engine2\Engine2App\Scenes\TestScene1\Primatives.obj
+  Source:Primatives.obj
 SceneInformation
   # To do
 SceneHierarchy
@@ -45,9 +45,9 @@ SceneHierarchy
       centre:0,0,0
       extents:1,1,1
     MeshRenderer
-      meshAsset:D:\repositories\Engine2\Engine2App\Scenes\TestScene1\Primatives.obj
+      meshAsset:Primatives.obj
       mesh:Cube
-      materialAsset:D:\repositories\Engine2\Engine2App\Scenes\TestScene1\Primatives.obj
+      materialAsset:Primatives.obj
       material:DefaultMaterial
   Entity
     EntityInfo
@@ -65,9 +65,9 @@ SceneHierarchy
       centre:0,0,0
       extents:1,1,1
     MeshRenderer
-      meshAsset:D:\repositories\Engine2\Engine2App\Scenes\TestScene1\Primatives.obj
+      meshAsset:Primatives.obj
       mesh:Cube
-      materialAsset:D:\repositories\Engine2\Engine2App\Scenes\TestScene1\Primatives.obj
+      materialAsset:Primatives.obj
       material:DefaultMaterial
   Entity
     EntityInfo
@@ -85,9 +85,9 @@ SceneHierarchy
       centre:0,0,0
       extents:1,1,1
     MeshRenderer
-      meshAsset:D:\repositories\Engine2\Engine2App\Scenes\TestScene1\Primatives.obj
+      meshAsset:Primatives.obj
       mesh:Sphere
-      materialAsset:D:\repositories\Engine2\Engine2App\Scenes\TestScene1\Primatives.obj
+      materialAsset:Primatives.obj
       material:DefaultMaterial
   Entity
     EntityInfo
@@ -130,9 +130,9 @@ SceneHierarchy
       centre:0,0,0
       extents:1,1,1
     MeshRenderer
-      meshAsset:D:\repositories\Engine2\Engine2App\Scenes\TestScene1\Primatives.obj
+      meshAsset:Primatives.obj
       mesh:Cube
-      materialAsset:D:\repositories\Engine2\Engine2App\Scenes\TestScene1\Primatives.obj
+      materialAsset:Primatives.obj
       material:DefaultMaterial
   Entity
     EntityInfo

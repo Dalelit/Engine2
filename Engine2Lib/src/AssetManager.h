@@ -13,10 +13,9 @@ namespace Engine2
 	{
 	public:
 
-		//Asset() = default;
 		Asset(const std::string& source) : source(source) {}
 
-		bool LoadModel(const std::string& filename);
+		bool LoadModel(const std::string& rootDirectory, const std::string& filename);
 
 		void Clear();
 
@@ -52,7 +51,7 @@ namespace Engine2
 		static inline AssetManager& Manager() { return *instance; }
 		static inline std::optional<AssetRef> FindAsset(const std::string& assetName) { return instance->GetAsset(assetName); }
 
-		bool LoadModel(const std::string& filename);
+		bool LoadModel(const std::string& rootDirectory, const std::string& filename);
 
 		std::optional<AssetRef> operator[](const std::string& assetName) { return GetAsset(assetName); }
 

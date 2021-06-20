@@ -9,8 +9,8 @@ namespace Engine2
 	public:
 		SceneSerialisation(Scene& scene) : m_scene(scene) {}
 		
-		bool LoadScene(const std::string& filename);
-		bool SaveScene(const std::string& filename);
+		bool LoadScene(const std::string& directory, const std::string& filename);
+		bool SaveScene(const std::string& directory, const std::string& filename);
 
 	protected:
 		Scene& m_scene;

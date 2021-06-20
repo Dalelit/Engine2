@@ -6,10 +6,11 @@ namespace Engine2
 {
 	namespace AssetLoaders
 	{
-		std::shared_ptr<ObjLoader> ObjLoader::Load(std::string filename)
+		std::shared_ptr<ObjLoader> ObjLoader::Load(const std::string& rootDirectory, const std::string& filename)
 		{
 			auto loader = std::make_shared<ObjLoader>();
 			loader->filename = filename;
+			loader->rootDirectory = rootDirectory;
 
 			constexpr size_t reserveCapacity = 100000;
 			loader->verticies.reserve(reserveCapacity);
@@ -38,7 +39,7 @@ namespace Engine2
 		//
 		void ObjLoader::LoadObjects(ObjLoader& loader)
 		{
-			std::ifstream srcFile(loader.filename);
+			std::ifstream srcFile(loader.rootDirectory + "\\" + loader.filename);
 
 			if (!srcFile.is_open()) return;
 			//E2_ASSERT(srcFile.is_open(), "Falied to open object file");
@@ -172,7 +173,7 @@ namespace Engine2
 
 		void ObjLoader::LoadMaterials(ObjLoader& loader, std::string matfilename)
 		{
-			std::ifstream srcFile(matfilename);
+			std::ifstream srcFile(loader.rootDirectory + "\\" + matfilename);
 			E2_ASSERT(srcFile.is_open(), "Falied to open material file");
 
 			auto& materials = loader.materials;

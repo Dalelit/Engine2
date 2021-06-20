@@ -34,12 +34,16 @@ namespace Engine2
 			std::map<std::string, Object> objects;
 		};
 
+		//
+		// https://en.wikipedia.org/wiki/Wavefront_.obj_file
+		//
 		class ObjLoader
 		{
 		public:
-			static std::shared_ptr<ObjLoader> Load(std::string filename);
+			static std::shared_ptr<ObjLoader> Load(const std::string& rootDirectory, const std::string& filename);
 
 			std::string filename;
+			std::string rootDirectory;
 			std::vector<Model> models;
 			std::map<std::string, Material> materials;
 			std::vector<DirectX::XMFLOAT3> verticies;

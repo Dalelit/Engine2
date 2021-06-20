@@ -1,6 +1,6 @@
 #  Add timestamp
 Assets
-  Source:D:\repositories\Engine2\Engine2App\Scenes\TestScene2\CubeWithRods.obj
+  Source:CubeWithRods.obj
 SceneInformation
   # To do
 SceneHierarchy
@@ -44,9 +44,9 @@ SceneHierarchy
         scale:1,1,1,0
         rotation:0,0,0,0
       MeshRenderer
-        meshAsset:D:\repositories\Engine2\Engine2App\Scenes\TestScene2\CubeWithRods.obj
+        meshAsset:CubeWithRods.obj
         mesh:Cylinder.002-0-PipeMaterial
-        materialAsset:D:\repositories\Engine2\Engine2App\Scenes\TestScene2\CubeWithRods.obj
+        materialAsset:CubeWithRods.obj
         material:PipeMaterial
     Entity
       EntityInfo
@@ -56,9 +56,9 @@ SceneHierarchy
         scale:1,1,1,0
         rotation:0,0,0,0
       MeshRenderer
-        meshAsset:D:\repositories\Engine2\Engine2App\Scenes\TestScene2\CubeWithRods.obj
+        meshAsset:CubeWithRods.obj
         mesh:Cube-0-CubeMaterial
-        materialAsset:D:\repositories\Engine2\Engine2App\Scenes\TestScene2\CubeWithRods.obj
+        materialAsset:CubeWithRods.obj
         material:CubeMaterial
     Entity
       EntityInfo
@@ -68,9 +68,9 @@ SceneHierarchy
         scale:1,1,1,0
         rotation:0,0,0,0
       MeshRenderer
-        meshAsset:D:\repositories\Engine2\Engine2App\Scenes\TestScene2\CubeWithRods.obj
+        meshAsset:CubeWithRods.obj
         mesh:Cylinder-0-PipeMaterial
-        materialAsset:D:\repositories\Engine2\Engine2App\Scenes\TestScene2\CubeWithRods.obj
+        materialAsset:CubeWithRods.obj
         material:PipeMaterial
     Entity
       EntityInfo
@@ -80,9 +80,9 @@ SceneHierarchy
         scale:1,1,1,0
         rotation:0,0,0,0
       MeshRenderer
-        meshAsset:D:\repositories\Engine2\Engine2App\Scenes\TestScene2\CubeWithRods.obj
+        meshAsset:CubeWithRods.obj
         mesh:Cylinder.001-0-PipeMaterial
-        materialAsset:D:\repositories\Engine2\Engine2App\Scenes\TestScene2\CubeWithRods.obj
+        materialAsset:CubeWithRods.obj
         material:PipeMaterial
   Entity
     EntityInfo
@@ -99,9 +99,9 @@ SceneHierarchy
         scale:1,1,1,0
         rotation:0,0,0,0
       MeshRenderer
-        meshAsset:D:\repositories\Engine2\Engine2App\Scenes\TestScene2\CubeWithRods.obj
+        meshAsset:CubeWithRods.obj
         mesh:Cylinder.002-0-PipeMaterial
-        materialAsset:D:\repositories\Engine2\Engine2App\Scenes\TestScene2\CubeWithRods.obj
+        materialAsset:CubeWithRods.obj
         material:PipeMaterial
     Entity
       EntityInfo
@@ -111,9 +111,9 @@ SceneHierarchy
         scale:1,1,1,0
         rotation:0,0,0,0
       MeshRenderer
-        meshAsset:D:\repositories\Engine2\Engine2App\Scenes\TestScene2\CubeWithRods.obj
+        meshAsset:CubeWithRods.obj
         mesh:Cube-0-CubeMaterial
-        materialAsset:D:\repositories\Engine2\Engine2App\Scenes\TestScene2\CubeWithRods.obj
+        materialAsset:CubeWithRods.obj
         material:CubeMaterial
     Entity
       EntityInfo
@@ -123,9 +123,9 @@ SceneHierarchy
         scale:1,1,1,0
         rotation:0,0,0,0
       MeshRenderer
-        meshAsset:D:\repositories\Engine2\Engine2App\Scenes\TestScene2\CubeWithRods.obj
+        meshAsset:CubeWithRods.obj
         mesh:Cylinder-0-PipeMaterial
-        materialAsset:D:\repositories\Engine2\Engine2App\Scenes\TestScene2\CubeWithRods.obj
+        materialAsset:CubeWithRods.obj
         material:PipeMaterial
     Entity
       EntityInfo
@@ -135,7 +135,7 @@ SceneHierarchy
         scale:1,1,1,0
         rotation:0,0,0,0
       MeshRenderer
-        meshAsset:D:\repositories\Engine2\Engine2App\Scenes\TestScene2\CubeWithRods.obj
+        meshAsset:CubeWithRods.obj
         mesh:Cylinder.001-0-PipeMaterial
-        materialAsset:D:\repositories\Engine2\Engine2App\Scenes\TestScene2\CubeWithRods.obj
+        materialAsset:CubeWithRods.obj
         material:PipeMaterial

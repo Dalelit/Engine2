@@ -24,7 +24,7 @@ protected:
 	void BuildTestScene();
 	void ClearScene(bool forceClearAsset = false);
 
-	void LoadAsset(const std::string& dirname, const std::string& filename);
+	void LoadAsset(const std::string& directoyName, const std::string& filename);
 
 	// scene directory navigation
 	struct FileInfo

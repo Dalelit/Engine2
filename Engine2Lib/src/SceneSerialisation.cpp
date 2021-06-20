@@ -16,15 +16,16 @@
 
 namespace Engine2
 {
-	bool SceneSerialisation::LoadScene(const std::string& filename)
+	bool SceneSerialisation::LoadScene(const std::string& directory, const std::string& filename)
 	{
-		if (!Util::FileExists(filename))
+		std::string fullPathFilename = directory + "\\" + filename;
+		if (!Util::FileExists(fullPathFilename))
 		{
-			E2_LOG_WARNING("LoadScene file does not exist: " + filename);
+			E2_LOG_WARNING("LoadScene file does not exist: " + fullPathFilename);
 			return false;
 		}
 			
-		auto loader = Serialisation::LoadSerialiserStream(filename);
+		auto loader = Serialisation::LoadSerialiserStream(fullPathFilename);
 
 		if (!loader.NextLine()) return false;
 
@@ -34,7 +35,7 @@ namespace Engine2
 			{
 				if (loader.Name() == "Source")
 				{
-					AssetManager::Manager().LoadModel(loader.Value());
+					AssetManager::Manager().LoadModel(directory, loader.Value());
 				}
 				else { E2_ASSERT(false, "Expected the source when loading assets"); }
 			}
@@ -121,9 +122,9 @@ namespace Engine2
 		}
 	}
 
-	bool SceneSerialisation::SaveScene(const std::string& filename)
+	bool SceneSerialisation::SaveScene(const std::string& directory, const std::string& filename)
 	{
-		Serialisation::SaveSerialiser out(filename);
+		Serialisation::SaveSerialiser out(directory + "\\" + filename);
 
 		out.Comment(" Add timestamp");
 

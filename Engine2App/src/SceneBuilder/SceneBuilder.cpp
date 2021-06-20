@@ -68,20 +68,9 @@ void SceneBuilder::OnApplicationEvent(Engine2::ApplicationEvent& event)
 
 void SceneBuilder::OnImgui()
 {
-	constexpr const char* sceneFilename = "\\Scene.txt";
+	constexpr const char* sceneFilename = "Scene.txt";
 
 	ImGui::Text("Scene dir: %s", sceneDirectory.c_str());
-
-	auto LoadSceneHelper = [&]() {
-		std::string filename = sceneDirectory + sceneFilename;
-
-		ClearScene(true);
-
-		if (Util::FileExists(filename))
-		{
-			SceneSerialisation(scene).LoadScene(sceneDirectory + sceneFilename);
-		}
-	};
 
 	if (ImGui::Button("Scene Create..."))
 	{
@@ -98,7 +87,8 @@ void SceneBuilder::OnImgui()
 		if (Util::FileSelectionDialogue::SelectFolderDialogue(sceneDirectory))
 		{
 			SetWorkingDirectory(sceneDirectory);
-			LoadSceneHelper();
+			ClearScene(true);
+			SceneSerialisation(scene).LoadScene(sceneDirectory, sceneFilename);
 		}
 	}
 	if (!sceneDirectory.empty())
@@ -106,7 +96,8 @@ void SceneBuilder::OnImgui()
 		ImGui::SameLine();
 		if (ImGui::Button("Scene Reload"))
 		{
-			LoadSceneHelper();
+			ClearScene(true);
+			SceneSerialisation(scene).LoadScene(sceneDirectory, sceneFilename);
 		}
 	}
 
@@ -115,7 +106,7 @@ void SceneBuilder::OnImgui()
 		if (Util::FileSelectionDialogue::SelectFolderDialogue(sceneDirectory))
 		{
 			SetWorkingDirectory(sceneDirectory); // to do: this doesn't move the assets
-			SceneSerialisation(scene).SaveScene(sceneDirectory + sceneFilename);
+			SceneSerialisation(scene).SaveScene(sceneDirectory, sceneFilename);
 		}
 	}
 	if (!sceneDirectory.empty())
@@ -123,7 +114,7 @@ void SceneBuilder::OnImgui()
 		ImGui::SameLine();
 		if (ImGui::Button("Scene Save"))
 		{
-			SceneSerialisation(scene).SaveScene(sceneDirectory + sceneFilename);
+			SceneSerialisation(scene).SaveScene(sceneDirectory, sceneFilename);
 		}
 	}
 
@@ -213,12 +204,12 @@ void SceneBuilder::ClearScene(bool forceClearAsset)
 	}
 }
 
-void SceneBuilder::LoadAsset(const std::string& dirname, const std::string& filename)
+void SceneBuilder::LoadAsset(const std::string& directoyName, const std::string& filename)
 {
-	std::string fullPath = dirname + "\\" + filename;
+	std::string fullPath = directoyName + "\\" + filename;
 	//std::string assetName = filename.string().substr(sceneDirectory.size()+1);
 	
-	AssetManager::Manager().LoadModel(fullPath);
+	AssetManager::Manager().LoadModel(directoyName, fullPath);
 }
 
 void SceneBuilder::ImGuiSceneDirectoy()
