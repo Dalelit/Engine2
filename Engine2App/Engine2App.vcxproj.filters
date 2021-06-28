@@ -7,12 +7,14 @@
     <ClCompile Include="src\Boids\Boids2D.cpp" />
     <ClCompile Include="src\AntSlime\AntSlime.cpp" />
     <ClCompile Include="src\SceneBuilder\SceneBuilder.cpp" />
+    <ClCompile Include="src\SceneBuilder\Skyscape.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h" />
     <ClInclude Include="src\Empty.h" />
     <ClInclude Include="src\Boids\Boids2D.h" />
     <ClInclude Include="src\SceneBuilder\SceneBuilder.h" />
+    <ClInclude Include="src\SceneBuilder\Skyscape.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\Boids\Boids2DCS.hlsl" />
@@ -20,6 +22,7 @@
     <FxCompile Include="src\Boids\Boids2DVS.hlsl" />
     <FxCompile Include="src\Boids\Boids2DGS.hlsl" />
     <FxCompile Include="src\AntSlime\AntSlime.hlsl" />
+    <FxCompile Include="src\SceneBuilder\SkyscapePS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Boids\Boids2D.hlsli" />

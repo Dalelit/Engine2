@@ -31,6 +31,8 @@ namespace Engine2
 
 	Scene::Scene() : vsConstBuffer(0), psConstBuffer(0)
 	{
+		pSkybox = std::make_shared<Skybox>(); // create the defautl skybox
+
 		physics.Initialise();
 
 		pointLightsBuffer.Initialise(10); // To Do: think through what is a good size to initialise this to
@@ -76,7 +78,7 @@ namespace Engine2
 
 		RenderMeshes();
 		RenderParticles();
-		if (skybox.IsActive() && pCamera->IsPerspective()) skybox.BindAndDraw();
+		if (pSkybox->IsActive() && pCamera->IsPerspective()) pSkybox->BindAndDraw();
 
 		if (mainCamera)
 		{
@@ -472,7 +474,7 @@ namespace Engine2
 				sun.OnImgui();
 				ImGui::TreePop();
 			}
-			skybox.OnImgui();
+			pSkybox->OnImgui();
 		}
 		ImGui::End();
 

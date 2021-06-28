@@ -59,7 +59,10 @@ namespace Engine2
 		};
 		PSConstantBuffer<PSSceneData> psConstBuffer;
 
-		Skybox& GetSkybox() { return skybox; }
+		template <typename T>
+		std::shared_ptr<T> SetSkybox() { auto ptr = std::make_shared<T>(); pSkybox = ptr; return ptr; }
+
+		Skybox& GetSkybox() { return *pSkybox; }
 
 		// returns the previous setting if you want to revert
 		inline bool EnableGizmos(bool show = true) { auto current = gizmoEnabled; gizmoEnabled = show; return current; }
@@ -75,7 +78,7 @@ namespace Engine2
 
 		SceneHierarchy hierarchy;
 
-		Skybox skybox;
+		std::shared_ptr<Skybox> pSkybox;
 		DirectionalLight sun;
 		StructuredBufferLocalData<PointLightBufferData> pointLightsBuffer;
 

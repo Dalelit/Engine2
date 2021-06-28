@@ -21,22 +21,22 @@ namespace Engine2
 	public:
 
 		bool Initialise(const std::string& directory, const std::string& fileType = "jpg");
-		bool Initialise(std::vector<std::string>& filenames);
+		bool Initialise(const std::vector<std::string>& filenames = {});
 
 		void Bind();
 		void Draw();
 		inline void BindAndDraw() { Bind(); Draw(); }
-		void Unbind() {}
-		void OnImgui();
+		virtual void OnImgui();
 
 		bool IsActive() { return active; }
-		void SetActive(bool makeActive = true) { active = (makeActive && status == ""); }
+		void SetActive(bool makeActive = true) { active = makeActive; }
+
+		void SetPixelShader(const std::string& filename) { pixelShader.CompileFromFile(filename); }
 
 	protected:
 		bool active = false;
 		unsigned int slot = 0;
 		std::vector<std::string> filelist;
-		std::string status = "Uninitialised";
 
 		wrl::ComPtr<ID3D11DepthStencilState> pDepthStencilState = nullptr;
 		wrl::ComPtr<ID3D11RasterizerState> pRasterizerState = nullptr;
@@ -48,6 +48,6 @@ namespace Engine2
 
 		SkyboxFileSelector fileSelection;
 
-		bool InitialiseTexture(std::vector<std::string>& filenames);
+		bool InitialiseTexture(const std::vector<std::string>& filenames);
 	};
 }

@@ -16,6 +16,7 @@
 #include "Offscreen.h"
 #include "AssetManager.h"
 #include "ShaderCache.h"
+#include "Skyscape.h"
 
 using namespace Engine2;
 using namespace EngineECS;
@@ -26,29 +27,21 @@ SceneBuilder::SceneBuilder() : Layer("SceneBuilder")
 	CreateDefaultAssets();
 	CreateEmtpyScene();
 
-	//BuildTestScene();
+	
+	auto sb = scene.SetSkybox<Skyscape>();
+	sb->Initialise({
+		"Assets\\Skyboxes\\Corona\\corona_ft.png",
+		"Assets\\Skyboxes\\Corona\\corona_bk.png",
+		"Assets\\Skyboxes\\Corona\\corona_up.png",
+		"Assets\\Skyboxes\\Corona\\corona_dn.png",
+		"Assets\\Skyboxes\\Corona\\corona_rt.png",
+		"Assets\\Skyboxes\\Corona\\corona_lf.png",
+		});
+	sb->SetPixelShader("src\\SceneBuilder\\SkyscapePS.hlsl");
+	
+	//scene.GetSkybox().Initialise("Assets\\Skyboxes\\Test");
 
-	scene.GetSkybox().Initialise("Assets\\Skyboxes\\Test");
-	//std::vector<std::string> files = {
-	//	"Assets\\Skyboxes\\Corona\\corona_ft.png",
-	//	"Assets\\Skyboxes\\Corona\\corona_bk.png",
-	//	"Assets\\Skyboxes\\Corona\\corona_up.png",
-	//	"Assets\\Skyboxes\\Corona\\corona_dn.png",
-	//	"Assets\\Skyboxes\\Corona\\corona_rt.png",
-	//	"Assets\\Skyboxes\\Corona\\corona_lf.png",
-	//};
-	//scene.GetSkybox().Initialise(files);
 
-	//{
-	//	auto e = scene.CreateEntity("Offscreen test");
-	//	auto cc = e.AddComponent<Camera>("Offscreen camera test");
-	//	cc->SetAspectRatio(DXDevice::Get().GetAspectRatio());
-	//	e.AddComponent<Gizmo>(Gizmo::Types::Camera);
-	//	auto buffer = e.AddComponent<Offscreen>();
-	//	auto tr = e.GetComponent<Transform>();
-	//	tr->position = { 5.0f, 6.3f, 5.0f, 1.0f };
-	//	tr->LookAt(0.0f, 1.3f, 0.0f);
-	//}
 }
 
 void SceneBuilder::OnUpdate(float dt)

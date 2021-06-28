@@ -5,11 +5,11 @@
 
 namespace Engine2
 {
-	bool Skybox::Initialise(std::vector<std::string>& filenames)
+	bool Skybox::Initialise(const std::vector<std::string>& filenames)
 	{
 		HRESULT hr;
 
-		InitialiseTexture(filenames);
+		if (filenames.size() > 0) InitialiseTexture(filenames);
 
 		// create the depth stencil settings
 
@@ -19,14 +19,22 @@ namespace Engine2
 
 		hr = DXDevice::GetDevice().CreateDepthStencilState(&depthStencilDesc, &pDepthStencilState);
 
-		if (FAILED(hr)) { status = "CreateDepthStencilState failed"; return false; }
+		if (FAILED(hr))
+		{
+			E2_LOG_WARNING("Skybox CreateDepthStencilState failed");
+			return false;
+		}
 
 		// rasterizer state
 		D3D11_RASTERIZER_DESC rsDesc = CD3D11_RASTERIZER_DESC(CD3D11_DEFAULT());
 		rsDesc.CullMode = D3D11_CULL_MODE::D3D11_CULL_FRONT;
 		hr = DXDevice::GetDevice().CreateRasterizerState(&rsDesc, &pRasterizerState);
 
-		if (FAILED(hr)) { status = "CreateRasterizerState failed"; return false; }
+		if (FAILED(hr))
+		{
+			E2_LOG_WARNING("Skybox CreateRasterizerState failed");
+			return false;
+		}
 
 		// create the vertex buffer
 		constexpr float dim = 1.0f;
@@ -54,7 +62,6 @@ namespace Engine2
 		
 		pixelShader.CompileFromFile(Config::directories["EngineShaderSourceDir"] + "SkyboxPS.hlsl");
 
-		status = "";
 		SetActive();
 		return true;
 	}
@@ -73,7 +80,7 @@ namespace Engine2
 
 		return Initialise(filenames);
 	}
-	bool Skybox::InitialiseTexture(std::vector<std::string>& filenames)
+	bool Skybox::InitialiseTexture(const std::vector<std::string>& filenames)
 	{
 		E2_ASSERT(filenames.size() == 6, "Expect 6 filenames for skybox");
 
@@ -82,7 +89,11 @@ namespace Engine2
 		for (int i = 0; i < 6; i++)
 		{
 			surfaces.push_back(SurfaceLoader::LoadSurface(filenames[i]));
-			if (!surfaces.back()) { status = SurfaceLoader::LastResult; return false; }
+			if (!surfaces.back())
+			{
+				E2_LOG_WARNING("Skybox loader failed: " + SurfaceLoader::LastResult);
+				return false;
+			}
 		}
 
 		// create the texture
@@ -120,7 +131,7 @@ namespace Engine2
 	void Skybox::Bind()
 	{
 		// cube texture
-		texture->Bind();
+		if (texture) texture->Bind();
 
 		// pixel shader
 		pixelShader.Bind();
@@ -152,7 +163,6 @@ namespace Engine2
 		if (ImGui::TreeNode("Skybox"))
 		{
 			ImGui::Checkbox("Active", &active);
-			ImGui::Text("Status: %s", status.c_str());
 			if (texture) texture->OnImgui();
 			vertexShader.OnImgui();
 			pixelShader.OnImgui();
@@ -172,7 +182,7 @@ namespace Engine2
 		}
 
 	}
-	
+
 	void SkyboxFileSelector::OnImgui()
 	{
 		if (ImGui::TreeNode("File selector"))
