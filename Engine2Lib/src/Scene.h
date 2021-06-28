@@ -36,6 +36,7 @@ namespace Engine2
 		Entity CreateSceneCamera(const std::string& name, bool makeMainCamera = false);
 		void SetMainSceneCarmera(EngineECS::EntityId_t cameraEntityId) { mainCameraEntity = cameraEntityId; }
 		Camera& GetMainSceneCamera() { return *hierarchy.GetECSCoordinator().GetComponent<Camera>(mainCameraEntity); }
+		Entity GetMainSceneCarmeraEntity() { return Entity(mainCameraEntity, hierarchy.GetECSCoordinator()); }
 
 		void Clear();
 

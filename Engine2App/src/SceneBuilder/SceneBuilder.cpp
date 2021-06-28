@@ -41,7 +41,8 @@ SceneBuilder::SceneBuilder() : Layer("SceneBuilder")
 	
 	//scene.GetSkybox().Initialise("Assets\\Skyboxes\\Test");
 
-
+	auto ce = scene.GetMainSceneCarmeraEntity();
+	ce.GetComponent<Transform>()->SetRotation(XMConvertToRadians(-20.0f), 0.0f, 0.0f);
 }
 
 void SceneBuilder::OnUpdate(float dt)

@@ -37,6 +37,7 @@ namespace Engine2
 		inline float FarPlane() const { return farZ; }
 
 		inline float FieldOfView() const { return fov; }
+		inline void SetFieldOfView(float newfov) { fov = newfov; }
 
 		inline float ViewWidth() const { return viewWidth; }
 		inline float ViewHeight() const { return viewHeight; }
@@ -65,7 +66,7 @@ namespace Engine2
 		std::string name;
 		bool orthographic = false;
 		float aspectRatio = 1.0f;
-		float fov = DirectX::XMConvertToRadians(75.0f);
+		float fov = DirectX::XMConvertToRadians(60.0f);
 		float nearZ = 0.5f;
 		float farZ = 50.0f;
 		bool aspectRatioLockedToScreen = true;
