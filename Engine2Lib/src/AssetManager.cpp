@@ -120,10 +120,13 @@ namespace Engine2
 	{
 		using Vertex = VertexLayout::PositionNormalColor;
 
+		E2_LOG_INFO("CreateMeshAssetPositionNormal " + object.name);
+
 		// create the verticies from the loaded model
 		std::vector<Vertex> verticies;
 
 		E2_ASSERT(object.facesV.size() == object.facesVn.size(), "Loaded model position and normal counts do not align");
+		E2_ASSERT(object.facesV.size() % 3 == 0, "Loaded model verticies are not multiple of 3");
 
 		verticies.reserve(object.facesV.size()); // get the memory size
 
@@ -150,18 +153,21 @@ namespace Engine2
 		meshesMaterial.CreateAsset(object.name, object.material); // track the material for the mesh from the source
 		auto vb = std::make_shared<VertexBuffer>();
 		vb->Initialise<Vertex>(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST, verticies);
-		m->SetDrawable(vb);
+		m->SetVertexBuffer(vb);
 	}
 
 	void Asset::CreateMeshAssetPositionNormalTexture(AssetLoaders::ObjLoader& loader, AssetLoaders::Object& object)
 	{
 		using Vertex = VertexLayout::PositionNormalTexture;
 
+		E2_LOG_INFO("CreateMeshAssetPositionNormalTexture " + object.name);
+
 		// create the verticies from the loaded model
 		std::vector<Vertex> verticies;
 
 		E2_ASSERT(object.facesV.size() == object.facesVn.size(), "Loaded model position and normal counts do not align");
 		E2_ASSERT(object.facesV.size() == object.facesVt.size(), "Loaded model position and textcoord counts do not align");
+		E2_ASSERT(object.facesV.size() % 3 == 0, "Loaded model verticies are not multiple of 3");
 
 		verticies.reserve(object.facesV.size()); // get the memory size
 
@@ -170,18 +176,37 @@ namespace Engine2
 		auto tex = object.facesVt.data();
 		size_t count = object.facesV.size();
 
-		Vertex v;
+		Vertex v1, v2, v3;
 
 		while (count > 0)
 		{
-			v.position = loader.verticies[*pos];
-			v.normal = loader.normals[*nor];
-			v.texcoord = loader.textureCoords[*tex];
-			verticies.push_back(v);
+			v1.position = loader.verticies[*pos];
+			v1.normal = loader.normals[*nor];
+			v1.texcoord = loader.textureCoords[*tex];
 			pos++;
 			nor++;
 			tex++;
 			count--;
+
+			v2.position = loader.verticies[*pos];
+			v2.normal = loader.normals[*nor];
+			v2.texcoord = loader.textureCoords[*tex];
+			pos++;
+			nor++;
+			tex++;
+			count--;
+
+			v3.position = loader.verticies[*pos];
+			v3.normal = loader.normals[*nor];
+			v3.texcoord = loader.textureCoords[*tex];
+			pos++;
+			nor++;
+			tex++;
+			count--;
+
+			verticies.push_back(v1);
+			verticies.push_back(v2);
+			verticies.push_back(v3);
 		}
 
 		// create the asset
@@ -190,7 +215,7 @@ namespace Engine2
 		meshesMaterial.CreateAsset(object.name, object.material); // track the material for the mesh from the source
 		auto vb = std::make_shared<VertexBuffer>();
 		vb->Initialise<Vertex>(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, verticies);
-		m->SetDrawable(vb);
+		m->SetVertexBuffer(vb);
 	}
 
 	void Asset::CreatePositionNormalMaterial(AssetLoaders::ObjLoader& loader)

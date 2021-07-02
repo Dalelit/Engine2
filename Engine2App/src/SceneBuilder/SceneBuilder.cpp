@@ -200,10 +200,7 @@ void SceneBuilder::ClearScene(bool forceClearAsset)
 
 void SceneBuilder::LoadAsset(const std::string& directoyName, const std::string& filename)
 {
-	std::string fullPath = directoyName + "\\" + filename;
-	//std::string assetName = filename.string().substr(sceneDirectory.size()+1);
-	
-	AssetManager::Manager().LoadModel(directoyName, fullPath);
+	AssetManager::Manager().LoadModel(directoyName, filename);
 }
 
 void SceneBuilder::ImGuiSceneDirectoy()

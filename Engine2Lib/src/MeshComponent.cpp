@@ -11,7 +11,7 @@ namespace Engine2
 		GenerateMesh();
 		
 		mesh = std::make_shared<Mesh>("Mesh in mesh component"); // to do: something not so lame for the name
-		mesh->SetDrawable(vertexBuffer);
+		mesh->SetVertexBuffer(vertexBuffer);
 	}
 
 

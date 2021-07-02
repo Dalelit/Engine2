@@ -20,7 +20,7 @@ namespace Engine2
 
 		bool IsValid() { return drawable != nullptr; }
 
-		void SetDrawable(std::shared_ptr<VertexBuffer> vertexBuffer) { drawable = vertexBuffer; }
+		void SetVertexBuffer(std::shared_ptr<VertexBuffer> vertexBuffer) { drawable = vertexBuffer; }
 
 		void SetName(std::string str) { name = str; }
 		const std::string& Name() const { return name; }

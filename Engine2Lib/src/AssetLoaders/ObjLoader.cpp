@@ -8,6 +8,8 @@ namespace Engine2
 	{
 		std::shared_ptr<ObjLoader> ObjLoader::Load(const std::string& rootDirectory, const std::string& filename)
 		{
+			clock_t startTime = clock();
+
 			auto loader = std::make_shared<ObjLoader>();
 			loader->filename = filename;
 			loader->rootDirectory = rootDirectory;
@@ -19,6 +21,9 @@ namespace Engine2
 
 			LoadObjects(*loader);
 			
+			clock_t endTime = clock();
+			E2_LOG_INFO("Load time: " + std::to_string(endTime - startTime) + "ms");
+
 			return loader;
 		}
 
@@ -49,11 +54,14 @@ namespace Engine2
 			std::string currentMat;
 			Object* currentObj = nullptr;
 			Model* currentModel = nullptr;
-
+			long lineCount = 0;
 
 			srcFile >> token;
+
 			while (srcFile.good())
 			{
+				lineCount++;
+
 				if (token == "#")
 				{
 					std::getline(srcFile, token); // do nothing for now
@@ -66,9 +74,8 @@ namespace Engine2
 				}
 				else if (token == "o")
 				{
-					auto& model = loader.models.emplace_back();
-					currentModel = &model;
-					srcFile >> model.name;
+					currentModel = &loader.models.emplace_back();
+					srcFile >> currentModel->name;
 					currentObj = nullptr;
 				}
 				else if (token == "usemtl" || token == "g") // if not exported with groups, usemtl can be a new object
@@ -96,6 +103,12 @@ namespace Engine2
 
 					if (createNewObject)
 					{
+						if (!currentModel) // create the model if it doesn't exist
+						{
+							currentModel = &loader.models.emplace_back();
+							currentModel->name = objName;
+						}
+
 						currentModel->objects[objName] = Object();
 						currentObj = &currentModel->objects[objName];
 						currentObj->name = objName;
@@ -169,6 +182,8 @@ namespace Engine2
 
 				srcFile >> token; // next line
 			}
+			E2_LOG_INFO("Object load line count: " + std::to_string(lineCount));
+
 		}
 
 		void ObjLoader::LoadMaterials(ObjLoader& loader, std::string matfilename)
@@ -182,11 +197,14 @@ namespace Engine2
 			std::string currentMat;
 			DirectX::XMFLOAT3 f3value;
 			float fvalue;
+			long lineCount = 0;
 
 			srcFile >> token;
 
 			while (srcFile.good())
 			{
+				lineCount++;
+
 				if (token == "#")
 				{
 					std::getline(srcFile, token); // do nothing for now
@@ -258,6 +276,8 @@ namespace Engine2
 
 				srcFile >> token; // next line
 			}
+
+			E2_LOG_INFO("Material load line count: " + std::to_string(lineCount));
 		}
 	}
 }
