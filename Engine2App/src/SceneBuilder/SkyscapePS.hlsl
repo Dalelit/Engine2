@@ -85,9 +85,9 @@ float RayMarch(float3 orig, float3 dir, out int index)
 float4 CalcColor(float3 orig, float3 dir, float dist, int index)
 {
     float3 color = planets[index].color;
-
-    float3 normal = normalize((orig + dist * dir) - planets[index].centre);
-    float3 toSun = normalize(sun.centre - planets[index].centre);
+    float3 hitPoint = orig + dist * dir;
+    float3 normal = normalize(hitPoint - planets[index].centre);
+    float3 toSun = normalize(sun.centre - hitPoint);
 
     color *= dot(normal, toSun);
 
@@ -170,8 +170,8 @@ float4 main(float3 posWS : WSPosition) : SV_TARGET
             //pixel = skyColor; // or could sample texture
             pixel = VoronoiStarField2(bearing, angle);
         }
-        pixel = max(pixel, lerp(float4(0.0, 0.0, 0.0, 1.0), horizonColor, pow(fog, skyFogPower))); // take the max value of either the object or the horizon.
-        //pixel = lerp(pixel, horizonColor, pow(fog, skyFogPower)); // take the max value of either the object or the horizon.
+
+        pixel = lerp(pixel, horizonColor, pow(fog, skyFogPower)); // take the max value of either the object or the horizon.
 
     }
     else // ground
