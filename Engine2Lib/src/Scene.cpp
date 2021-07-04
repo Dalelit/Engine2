@@ -85,6 +85,7 @@ namespace Engine2
 			RenderOutlines();
 			if (gizmoEnabled) RenderGizmos();
 			if (gizmoCollidersEnabled) RenderColliders();
+			if (wireframeEnabled) RenderMeshesWireframe();
 		}
 	}
 
@@ -178,6 +179,10 @@ namespace Engine2
 	void Scene::RenderMeshes()
 	{
 		E2_SCENE_TIMING;
+
+		DXDevice::Get().SetDefaultRenderState();
+		DXDevice::Get().SetDefaultDepthStencilState();
+
 		Coordinator& coordinator = hierarchy.GetECSCoordinator();
 		View<MeshRenderer, Transform> entities(coordinator);
 		for (auto e : entities)
@@ -188,6 +193,50 @@ namespace Engine2
 			{
 				mr->material->SetModelData(*coordinator.GetComponent<TransformMatrix>(e));
 				mr->BindAndDraw();
+			}
+		}
+	}
+
+	void RenderMeshesWireframeSceneNodeHelper(const SceneHierarchy::SceneNode& node, Coordinator& coordinator)
+	{
+		const auto mr = coordinator.GetComponent<MeshRenderer>(node.id); // checking if this returns null, rather than called HasComponent
+
+		if (mr && mr->IsValid())
+		{
+			mr->material->SetModelData(*coordinator.GetComponent<TransformMatrix>(node.id));
+			mr->ShadowBindAndDraw();
+		}
+
+		for (auto& child : node.children) RenderMeshesWireframeSceneNodeHelper(child, coordinator);
+	}
+
+	void Scene::RenderMeshesWireframe()
+	{
+		E2_SCENE_TIMING;
+
+		wireframeMat.Bind();
+		DXDevice::Get().SetWireframeRenderState(wireframeBackfaceCull);
+		DXDevice::Get().SetDepthStencilStateDepthDisabled();
+
+		Coordinator& coordinator = hierarchy.GetECSCoordinator();
+
+		if (wireframeSelectedOnly)
+		{
+			auto node = hierarchy.GetSelected();
+			if (node) RenderMeshesWireframeSceneNodeHelper(*node, coordinator); // helper class above
+		}
+		else
+		{
+			View<MeshRenderer, Transform> entities(coordinator);
+			for (auto e : entities)
+			{
+				const auto mr = coordinator.GetComponent<MeshRenderer>(e);
+
+				if (mr->IsValid())
+				{
+					mr->material->SetModelData(*coordinator.GetComponent<TransformMatrix>(e));
+					mr->ShadowBindAndDraw();
+				}
 			}
 		}
 	}
@@ -469,6 +518,16 @@ namespace Engine2
 			ImGui::Separator();
 			ImGui::Checkbox("Show Gizmos", &gizmoEnabled);
 			ImGui::Checkbox("Show Collider Gizmos", &gizmoCollidersEnabled);
+
+			if (ImGui::TreeNode("Wireframe"))
+			{
+				ImGui::Checkbox("Show wireframes", &wireframeEnabled);
+				ImGui::Checkbox("Backface culling", &wireframeBackfaceCull);
+				ImGui::Checkbox("Selected only", &wireframeSelectedOnly);
+				wireframeMat.OnImgui();
+				ImGui::TreePop();
+			}
+
 			if (ImGui::TreeNode("Sun"))
 			{
 				sun.OnImgui();

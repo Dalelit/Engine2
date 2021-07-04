@@ -12,6 +12,14 @@ namespace Engine2
 	class SceneHierarchy
 	{
 	public:
+
+		struct SceneNode {
+			EngineECS::EntityId_t id;
+			std::vector<SceneNode> children;
+
+			SceneNode(EngineECS::EntityId_t id) : id(id) {}
+		};
+
 		SceneHierarchy() : coordinator(1000) {}
 
 		Entity CreateEntity(const std::string& name = std::string());
@@ -26,19 +34,15 @@ namespace Engine2
 		void OnImgui();
 		void SelectedEntityOnImgui();
 
+		inline bool EntitySelected() { return selected != nullptr; }
+		inline const SceneNode* GetSelected() { return selected; }
+
 		void Clear();
 
 		friend SceneSerialisation;
 
 	protected:
 		EngineECS::Coordinator coordinator;
-
-		struct SceneNode {
-			EngineECS::EntityId_t id;
-			std::vector<SceneNode> children;
-
-			SceneNode(EngineECS::EntityId_t id) : id(id) {}
-		};
 
 		SceneNode* selected = nullptr;
 		std::vector<SceneNode> sceneHierarchy;

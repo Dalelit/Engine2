@@ -17,9 +17,10 @@ namespace Engine2
 
 		protected:
 			TransformMatrix vsData;
-			DirectX::XMFLOAT4 psData = {}; // color
+			DirectX::XMFLOAT4 psData = { 0.1f, 0.9f, 0.1f, 1.0f }; // color
 
-			static std::shared_ptr<PixelShader> colorPS;
+			static std::shared_ptr<VertexShader> wireframeVS;
+			static std::shared_ptr<PixelShader>  wireframePS;
 		};
 	}
 }

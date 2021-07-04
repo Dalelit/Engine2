@@ -12,6 +12,7 @@
 #include "Lights.h"
 #include "StructuredBuffer.h"
 #include "Physics.h"
+#include "Materials/WireframeMaterial.h"
 
 namespace Engine2
 {
@@ -92,12 +93,18 @@ namespace Engine2
 		bool gizmoEnabled = true;
 		bool gizmoCollidersEnabled = false;
 
+		bool wireframeEnabled = false;
+		bool wireframeBackfaceCull = true;
+		bool wireframeSelectedOnly = false;
+		Materials::WireframeMaterial wireframeMat;
+
 		Instrumentation::TimerCollection systemTimers;
 
 		void UpdateVSSceneConstBuffer(Camera& camera, Transform& transform);
 		void UpdatePSSceneConstBuffer(Camera& camera, Transform& transform);
 
 		void RenderMeshes();
+		void RenderMeshesWireframe();
 		void RenderParticles();
 		void RenderGizmos();
 		void RenderOutlines();

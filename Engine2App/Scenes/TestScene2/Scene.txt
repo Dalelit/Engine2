@@ -8,9 +8,9 @@ SceneHierarchy
     EntityInfo
       tag:Main
     Transform
-      position:5,5,-5,1
+      position:6.8352,6.01621,-7.16232,1
       scale:1,1,1,0
-      rotation:0.61548,-0.785398,0,0
+      rotation:0.32248,-0.711398,0,0
     Camera
       name:Main
       orthographic:false
@@ -18,7 +18,7 @@ SceneHierarchy
       nearZ:0.5
       farZ:50
       aspectRatioLockedToScreen:true
-      fov:1.309
+      fov:1.0472
     Scripts
       Input Controller
         mouseLook:false
