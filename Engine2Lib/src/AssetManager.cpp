@@ -71,8 +71,12 @@ namespace Engine2
 
 			for (auto& model : loadedModel->models)
 			{
+				auto ma = hierachy.CreateAsset(model.name);
+
 				for (auto& [name, object] : model.objects)
 				{
+					ma->emplace_back(name);
+
 					if (object.HasPositionNormalTexture())
 					{
 						CreateMeshAssetPositionNormalTexture(*loadedModel, object);
@@ -112,6 +116,18 @@ namespace Engine2
 		{
 			for (auto& [k,v] : meshesMaterial.Map()) ImGui::Text("%s   %s", k.c_str(), v->c_str());
 
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Hierarchy"))
+		{
+			for (auto& [k, v] : hierachy.Map())
+			{
+				if (ImGui::TreeNode(k.c_str()))
+				{
+					for (auto& name : *v) ImGui::Text("%s", name.c_str());
+					ImGui::TreePop();
+				}
+			}
 			ImGui::TreePop();
 		}
 	}

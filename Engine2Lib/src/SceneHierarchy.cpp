@@ -12,16 +12,16 @@ using namespace DirectX;
 
 namespace Engine2
 {
-	SceneHierarchy::SceneNode* SceneHierarchy::FindNode(Entity& entity)
+	SceneHierarchy::SceneNode* SceneHierarchy::FindNode(Entity& entity, std::vector<SceneHierarchy::SceneNode>& nodes)
 	{
-		SceneNode* ptr = nullptr;
-
-		for (auto iter = sceneHierarchy.begin(); ptr == nullptr && iter != sceneHierarchy.end(); ++iter)
+		for (auto& node : nodes)
 		{
-			if (iter->id == entity.Id()) ptr = iter.operator->();
-		}
+			if (node.id == entity.Id()) return &node; // found
 
-		return ptr;
+			auto ptr = FindNode(entity, node.children);
+			if (ptr) return ptr; // found in children
+		}
+		return nullptr; // not found
 	}
 
 	SceneHierarchy::SceneNode* SceneHierarchy::NewEntity(const std::string& name, SceneNode* parent, SceneNode* insertBefore)
@@ -101,25 +101,23 @@ namespace Engine2
 
 		auto& asset = assetRef.value().get();
 
-		auto meshIter = asset.Meshes().Map().begin();
-		auto meshIterEnd = asset.Meshes().Map().end();
-		auto meshMatIter = asset.MeshsMaterial().Map().begin();
-
-		while (meshIter != meshIterEnd)
+		for (auto& [name, children] : asset.Hierarchy().Map())
 		{
-			E2_LOG_INFO("Mesh: " + meshIter->first + " -> Mat: " + *meshMatIter->second);
+			E2_LOG_INFO("Model hierachy node: " + name);
 
-			auto pNewNode = NewEntity(meshIter->first, parent);
+			auto pNode = NewEntity(name, parent);
 
-			auto pmr = coordinator.AddComponent<MeshRenderer>(pNewNode->id);
+			for (auto& object : *children)
+			{
+				E2_LOG_INFO(" Child: " + object);
+				auto pChildNode = NewEntity(object, pNode);
 
-			pmr->meshAsset = &asset;
-			pmr->mesh = meshIter->second;
-			pmr->materialAsset = &asset;
-			pmr->material = asset.Materials()[*meshMatIter->second];
-
-			meshIter++;
-			meshMatIter++;
+				auto pmr = coordinator.AddComponent<MeshRenderer>(pChildNode->id);
+				pmr->meshAsset = &asset;
+				pmr->mesh = asset.Meshes()[object];
+				pmr->materialAsset = &asset;
+				pmr->material = asset.Materials()[*asset.MeshsMaterial()[object]];
+			}
 		}
 
 		return;

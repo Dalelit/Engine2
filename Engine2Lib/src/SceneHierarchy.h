@@ -47,7 +47,8 @@ namespace Engine2
 		SceneNode* selected = nullptr;
 		std::vector<SceneNode> sceneHierarchy;
 
-		SceneNode* FindNode(Entity& entity);
+		SceneNode* FindNode(Entity& entity) { return FindNode(entity, sceneHierarchy); }
+		SceneNode* FindNode(Entity& entity, std::vector<SceneNode>& nodes);
 
 		SceneNode* NewEntity(const std::string& name, SceneNode* parent = nullptr, SceneNode* insertBefore = nullptr);
 		void CloneEntity(SceneNode* parent, SceneNode* node);

@@ -24,6 +24,7 @@ namespace Engine2
 		inline AssetStore<Mesh>& Meshes() { return meshes; }
 		inline AssetStore<Materials::StandardMaterial>& Materials() { return materials; }
 		inline AssetStore<std::string>& MeshsMaterial() { return meshesMaterial; }
+		inline AssetStore<std::vector<std::string>>& Hierarchy() { return hierachy; }
 
 		inline const std::string& GetSource() const { return source; }
 
@@ -34,6 +35,7 @@ namespace Engine2
 		AssetStore<Mesh> meshes;
 		AssetStore<std::string> meshesMaterial;
 		AssetStore<Materials::StandardMaterial> materials;
+		AssetStore<std::vector<std::string>> hierachy;
 
 		void CreateMeshAssetPositionNormal(AssetLoaders::ObjLoader& loader, AssetLoaders::Object& object);
 		void CreateMeshAssetPositionNormalTexture(AssetLoaders::ObjLoader& loader, AssetLoaders::Object& object);
