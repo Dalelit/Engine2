@@ -2,14 +2,15 @@
 #include "ConstantBuffer2.h"
 #include "Shader.h"
 #include "Texture.h"
+#include "Transform.h"
 #include "UID.h"
+#include "Serialiser.h"
 
 namespace Engine2
 {
 	class Material
 	{
 	public:
-
 		void Bind() {
 			vertexShaderCB.VSBind();
 			vertexShader->Bind();
@@ -18,9 +19,12 @@ namespace Engine2
 			if (texture) texture->Bind();
 		}
 
+		inline void SetModelData(const TransformMatrix& data) { vertexShaderCB.UpdateBuffer(data.GetTransposed()); }
 		inline void BindVSCB() { vertexShaderCB.VSBind(); }
 
 		virtual void OnImgui() = 0;
+
+		//virtual void Serialise(Serialisation::INode& node) = 0; // to do
 
 		virtual std::shared_ptr<Material> Clone() = 0;
 

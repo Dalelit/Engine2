@@ -24,7 +24,7 @@ namespace Engine2
 
 		std::shared_ptr<Mesh> mesh;
 		Asset* meshAsset = nullptr;
-		std::shared_ptr<Materials::StandardMaterial> material;
+		std::shared_ptr<Material> material;
 		Asset* materialAsset = nullptr;
 
 	protected:

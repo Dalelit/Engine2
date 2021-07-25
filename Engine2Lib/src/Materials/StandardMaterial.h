@@ -1,6 +1,5 @@
 #pragma once
 #include "Material.h"
-#include "Transform.h"
 
 namespace Engine2
 {
@@ -30,8 +29,6 @@ namespace Engine2
 			std::shared_ptr<Material> Clone();
 
 			inline void SetMaterialData(const StandardPSData& data) { psData = data; pixelShaderCB.UpdateBuffer(psData); }
-
-			inline void SetModelData(const TransformMatrix& data) { vertexShaderCB.UpdateBuffer(data.GetTransposed()); }
 
 		protected:
 			StandardPSData psData;

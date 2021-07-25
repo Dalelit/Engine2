@@ -1,5 +1,6 @@
 #  Add timestamp
 Assets
+  Source:Barrel.obj
   Source:CubeWithRods.obj
 SceneInformation
   # To do
@@ -8,9 +9,9 @@ SceneHierarchy
     EntityInfo
       tag:Main
     Transform
-      position:6.8352,6.01621,-7.16232,1
+      position:6.87616,4.60512,-6.41099,1
       scale:1,1,1,0
-      rotation:0.32248,-0.711398,0,0
+      rotation:0.20448,-0.711398,0,0
     Camera
       name:Main
       orthographic:false
@@ -139,3 +140,53 @@ SceneHierarchy
         mesh:Cylinder.001-0-PipeMaterial
         materialAsset:CubeWithRods.obj
         material:PipeMaterial
+  Entity
+    EntityInfo
+      tag:11
+    Transform
+      position:0,0,0,1
+      scale:1,1,1,0
+      rotation:0,0,0,0
+    Entity
+      EntityInfo
+        tag:Barrel_Cylinder.007
+      Transform
+        position:-3.8,0,-1,1
+        scale:1.7,1.7,1.7,0
+        rotation:0,0,0,0
+      Entity
+        EntityInfo
+          tag:Barrel_Cylinder.007-0-Material.003
+        Transform
+          position:0,0,0,1
+          scale:1,1,1,0
+          rotation:0,0,0,0
+        MeshRenderer
+          meshAsset:Barrel.obj
+          mesh:Barrel_Cylinder.007-0-Material.003
+          materialAsset:Barrel.obj
+          material:Material.003
+      Entity
+        EntityInfo
+          tag:Barrel_Cylinder.007-1-Material.002
+        Transform
+          position:0,0,0,1
+          scale:1,1,1,0
+          rotation:0,0,0,0
+        MeshRenderer
+          meshAsset:Barrel.obj
+          mesh:Barrel_Cylinder.007-1-Material.002
+          materialAsset:Barrel.obj
+          material:Material.002
+      Entity
+        EntityInfo
+          tag:Barrel_Cylinder.007-2-Material.004
+        Transform
+          position:0,0,0,1
+          scale:1,1,1,0
+          rotation:0,0,0,0
+        MeshRenderer
+          meshAsset:Barrel.obj
+          mesh:Barrel_Cylinder.007-2-Material.004
+          materialAsset:Barrel.obj
+          material:Material.004

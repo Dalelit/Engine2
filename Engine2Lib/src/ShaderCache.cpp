@@ -41,4 +41,23 @@ namespace Engine2
 
 		return ptr;
 	}
+
+	std::shared_ptr<PixelShader> ShaderCache::GetPixelShader(const std::string& filename, const std::string& entryPoint)
+	{
+		const std::string assetName = filename + " " + entryPoint;
+		// retrieve it if already loaded
+		auto existing = PixelShaders.GetAsset(assetName);
+		if (existing) return existing;
+
+		// create
+		auto ptr = std::make_shared<PixelShader>();
+		ptr->CompileFromFile(filename, entryPoint);
+
+		if (!ptr) return nullptr; // failed to load
+
+		// add to the store
+		PixelShaders.StoreAsset(assetName, ptr);
+
+		return ptr;
+	}
 }

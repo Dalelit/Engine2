@@ -41,9 +41,8 @@ namespace Engine2
 
 		void StandardMaterial::OnImgui()
 		{
-			if (ImGui::TreeNode(this, "Standard Material"))
+			//if (ImGui::TreeNode(this, name.c_str()))
 			{
-				ImGui::Text("%s", name.c_str());
 				if (psData.OnImgui()) pixelShaderCB.UpdateBuffer(psData);
 
 				if (texture) texture->OnImgui();
@@ -51,12 +50,13 @@ namespace Engine2
 
 				if (ImGui::TreeNode("Info"))
 				{
+					ImGui::Text("Standard Material");
 					vertexShader->OnImgui();
 					pixelShader->OnImgui();
 					ImGui::TreePop();
 				}
 
-				ImGui::TreePop();
+				//ImGui::TreePop();
 			}
 		}
 

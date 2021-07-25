@@ -1,12 +1,20 @@
 #include "Common.hlsli"
 #include "PSCB0_Scene.hlsli"
-#include "PSCB1_Material.hlsli"
 #include "PS_Shadow.hlsli"
 #include "PS_Lighting.hlsli"
 
 Texture2D tex : register (t2);
 SamplerState smplr : register (s2);
 
+cbuffer materialConst : register (b1)
+{
+	float3 mat_ambient;
+	float3 mat_diffuse;
+	float3 mat_specular;
+	float  mat_specularExponent;
+	float3 mat_emission;
+	float3 mat_padding;
+};
 
 float4 processPixel(float3 materialColor, float3 posWS, float3 norWS)
 {

@@ -13,7 +13,9 @@ namespace Engine2
 
 		// Retrieve existing, or create and stores, a shader
 		static std::shared_ptr<VertexShader> GetVertexShader(const std::string& filename, VertexShader::VertexShaderLayoutDesc& layout);
+
 		static std::shared_ptr<PixelShader>  GetPixelShader(const std::string& filename);
+		static std::shared_ptr<PixelShader>  GetPixelShader(const std::string& filename, const std::string& entryPoint);
 
 	};
 }

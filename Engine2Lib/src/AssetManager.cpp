@@ -6,6 +6,7 @@
 #include "VertexBuffer.h"
 #include "Materials/StandardMaterial.h"
 #include "Logging.h"
+#include "MaterialsManager.h"
 
 namespace Engine2
 {
@@ -305,12 +306,13 @@ namespace Engine2
 		ImGui::OpenPopup("Material::AssetManager");
 	}
 
-	std::pair <Asset*, std::shared_ptr<Materials::StandardMaterial>> AssetManager::OnImguiSelectMaterial()
+	std::pair <Asset*, std::shared_ptr<Material>> AssetManager::OnImguiSelectMaterial()
 	{
-		std::pair < Asset*, std::shared_ptr<Materials::StandardMaterial>> result(nullptr, nullptr);
+		std::pair < Asset*, std::shared_ptr<Material>> result(nullptr, nullptr);
 
 		if (ImGui::BeginPopup("Material::AssetManager"))
 		{
+			// list asset materials
 			for (auto& [ak, av] : assets)
 			{
 				if (ImGui::BeginMenu(ak.c_str()))
@@ -326,6 +328,21 @@ namespace Engine2
 					ImGui::EndMenu();
 				}
 			}
+
+			// list scene added materials
+			if (ImGui::BeginMenu("Scene materials"))
+			{
+				for (auto& [mk, mv] : MaterialsManager::Manager().Store().Map())
+				{
+					if (ImGui::MenuItem(mk.c_str()))
+					{
+						result.first = nullptr;
+						result.second = *mv;
+					}
+				}
+				ImGui::EndMenu();
+			}
+
 			ImGui::EndPopup();
 		}
 

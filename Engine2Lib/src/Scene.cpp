@@ -17,6 +17,7 @@
 #include "AssetManager.h"
 #include "ShaderCache.h"
 #include "Filewatcher.h"
+#include "MaterialsManager.h"
 
 //#define E2_SCENE_TIMING
 #define E2_SCENE_TIMING    auto timer##_COUNTER__ = systemTimers.ScopeTimer(__FUNCTION__);
@@ -614,6 +615,12 @@ namespace Engine2
 			if (ImGui::TreeNode("Textures"))
 			{
 				TextureLoader::Textures.OnImGui();
+				ImGui::TreePop();
+			}
+
+			if (ImGui::TreeNode("Materials"))
+			{
+				MaterialsManager::Manager().OnImgui();
 				ImGui::TreePop();
 			}
 

@@ -168,6 +168,8 @@
     <ClInclude Include="src\Gizmo.h" />
     <ClInclude Include="src\Logging.h" />
     <ClInclude Include="src\Material.h" />
+    <ClInclude Include="src\MaterialsManager.h" />
+    <ClInclude Include="src\Materials\PBRMaterial.h" />
     <ClInclude Include="src\Materials\StandardMaterial.h" />
     <ClInclude Include="src\Materials\WireframeMaterial.h" />
     <ClInclude Include="src\Mesh.h" />
@@ -187,6 +189,8 @@
     <ClInclude Include="src\ShadowMap.h" />
     <ClInclude Include="src\Skybox.h" />
     <ClInclude Include="src\StructuredBuffer.h" />
+    <ClInclude Include="src\submodules\imgui\imgui_impl_dx11.h" />
+    <ClInclude Include="src\submodules\imgui\imgui_impl_win32.h" />
     <ClInclude Include="src\SurfaceLoader.h" />
     <ClInclude Include="src\TextureGizmo.h" />
     <ClInclude Include="src\TextureLoader.h" />
@@ -217,8 +221,6 @@
     <ClInclude Include="src\pch.h" />
     <ClInclude Include="src\submodules\imgui\imconfig.h" />
     <ClInclude Include="src\submodules\imgui\imgui.h" />
-    <ClInclude Include="src\submodules\imgui\imgui_impl_dx11.h" />
-    <ClInclude Include="src\submodules\imgui\imgui_impl_win32.h" />
     <ClInclude Include="src\submodules\imgui\imgui_internal.h" />
     <ClInclude Include="src\submodules\imgui\imstb_rectpack.h" />
     <ClInclude Include="src\submodules\imgui\imstb_textedit.h" />
@@ -243,6 +245,8 @@
     <ClCompile Include="src\Instrumentation.cpp" />
     <ClCompile Include="src\Lights.cpp" />
     <ClCompile Include="src\Logging.cpp" />
+    <ClCompile Include="src\MaterialsManager.cpp" />
+    <ClCompile Include="src\Materials\PBRMaterial.cpp" />
     <ClCompile Include="src\Materials\StandardMaterial.cpp" />
     <ClCompile Include="src\Materials\WireframeMaterial.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
@@ -290,6 +294,10 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\submodules\imgui\imgui_impl_win32.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\submodules\imgui\imgui_tables.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
@@ -396,6 +404,12 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.1</ShaderModel>
     </FxCompile>
+    <FxCompile Include="Assets\Shaders\PBRPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+    </FxCompile>
     <FxCompile Include="Assets\Shaders\SkyboxPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
@@ -416,7 +430,6 @@
   <ItemGroup>
     <None Include="Assets\Shaders\Common.hlsli" />
     <None Include="Assets\Shaders\PSCB0_Scene.hlsli" />
-    <None Include="Assets\Shaders\PSCB1_Material.hlsli" />
     <None Include="Assets\Shaders\PS_Lighting.hlsli" />
     <None Include="Assets\Shaders\PS_Shadow.hlsli" />
     <None Include="Assets\Shaders\VSCB0_Scene.hlsli" />

@@ -65,7 +65,7 @@ namespace Engine2
 		std::pair<Asset*, std::shared_ptr<Mesh>> OnImguiSelectMesh();
 
 		void OnImguiSelectMaterialPopupOpen();
-		std::pair < Asset*, std::shared_ptr<Materials::StandardMaterial>> OnImguiSelectMaterial();
+		std::pair < Asset*, std::shared_ptr<Material>> OnImguiSelectMaterial();
 
 		std::string OnImguiSelectAssetMenu();
 
