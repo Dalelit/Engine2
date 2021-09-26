@@ -249,6 +249,10 @@ void SceneBuilder::ImGuiSceneDirectoy()
 				{
 					LoadAsset(currentDirectory, selectedFile);
 				}
+				else if (Util::StringEndsWith(selectedFile, ".png"))
+				{
+					TextureLoader::LoadTexture(currentDirectory, selectedFile);
+				}
 			}
 		}
 		if (ImGui::Button("Refresh directory")) SetWorkingDirectory(currentDirectory);

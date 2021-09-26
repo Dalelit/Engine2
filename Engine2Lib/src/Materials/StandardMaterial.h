@@ -27,6 +27,7 @@ namespace Engine2
 			void OnImgui();
 
 			std::shared_ptr<Material> Clone();
+			const char* TypeName() { return "StandardMaterial"; }
 
 			inline void SetMaterialData(const StandardPSData& data) { psData = data; pixelShaderCB.UpdateBuffer(psData); }
 

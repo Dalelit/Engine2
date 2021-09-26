@@ -77,6 +77,8 @@
     <ClInclude Include="src\submodules\imgui\imgui_impl_win32.h" />
     <ClInclude Include="src\Materials\PBRMaterial.h" />
     <ClInclude Include="src\MaterialsManager.h" />
+    <ClInclude Include="src\Materials\LowPolyMaterial.h" />
+    <ClInclude Include="src\TextureSampler.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\pch.cpp" />
@@ -136,6 +138,8 @@
     <ClCompile Include="src\submodules\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="src\Materials\PBRMaterial.cpp" />
     <ClCompile Include="src\MaterialsManager.cpp" />
+    <ClCompile Include="src\Materials\LowPolyMaterial.cpp" />
+    <ClCompile Include="src\TextureSampler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Assets\Shaders\GizmosPS.hlsl" />
@@ -152,6 +156,7 @@
     <FxCompile Include="Assets\Shaders\PositionNormalPS.hlsl" />
     <FxCompile Include="Assets\Shaders\PositionVS.hlsl" />
     <FxCompile Include="Assets\Shaders\PBRPS.hlsl" />
+    <FxCompile Include="Assets\Shaders\LowPolyPS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\VSCB0_Scene.hlsli" />

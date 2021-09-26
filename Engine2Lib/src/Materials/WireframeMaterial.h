@@ -14,6 +14,7 @@ namespace Engine2
 			void OnImgui();
 
 			std::shared_ptr<Material> Clone();
+			const char* TypeName() { return "WireframeMaterial"; }
 
 		protected:
 			TransformMatrix vsData;

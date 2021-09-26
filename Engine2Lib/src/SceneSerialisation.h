@@ -19,6 +19,7 @@ namespace Engine2
 		void SaveSceneNode(Serialisation::WriteNode& node, SceneHierarchy::SceneNode& sceneNode);
 		void SaveComponents(Serialisation::WriteNode& node, Entity entity);
 		void SaveAssets(Serialisation::WriteNode& node);
+		void SaveTextures(Serialisation::WriteNode& node);
 
 		void LoadEntity(int spaces, Serialisation::LoadSerialiserStream& loader, Entity& entity);
 		void GetAttributes(int spaces, Serialisation::LoadSerialiserStream& loader);

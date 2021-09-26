@@ -1,0 +1,66 @@
+#  Add timestamp
+Assets
+  Source:spaceships.obj
+Textures
+  Source:Palette.png
+  Source:atari-256-colour-palette.png
+SceneInformation
+  # To do
+SceneHierarchy
+  Entity
+    EntityInfo
+      tag:Main
+    Transform
+      position:18.456,8.4998,-17.936,1
+      scale:1,1,1,0
+      rotation:0.47848,-0.881398,0,0
+    Camera
+      name:Main
+      orthographic:false
+      aspectRatio:2.0534
+      nearZ:0.5
+      farZ:50
+      aspectRatioLockedToScreen:true
+      fov:1.0472
+    Scripts
+      Input Controller
+        mouseLook:false
+        moveSpeed:1
+        mouseMoveSpeedX:-0.01
+        mouseMoveSpeedY:-0.01
+        mouseScrollSpeed:0.5
+        runMultiplier:3
+        yawSpeed:0.001
+        pitchSpeed:-0.001
+  Entity
+    EntityInfo
+      tag:1
+    Transform
+      position:0,0,0,1
+      scale:1,1,1,0
+      rotation:0,0,0,0
+    OffscreenOutliner
+      outlineScale:1.1
+      outlineColor:0.8,0.8,0.2,0.75
+    Entity
+      EntityInfo
+        tag:Cube_Cube.001
+      Transform
+        position:0,0,0,1
+        scale:1,1,1,0
+        rotation:0,0,0,0
+      Entity
+        EntityInfo
+          tag:Cube_Cube.001_Material.001
+        Transform
+          position:0,0,0,1
+          scale:1,1,1,0
+          rotation:0,0,0,0
+        OffscreenOutliner
+          outlineScale:1
+          outlineColor:0.8,0.8,0.2,0.75
+        MeshRenderer
+          meshAsset:spaceships.obj
+          mesh:Cube_Cube.001_Material.001
+          materialAsset:spaceships.obj
+          material:Material.001

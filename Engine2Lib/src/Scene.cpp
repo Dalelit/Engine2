@@ -334,7 +334,8 @@ namespace Engine2
 			}
 			case Collider::ColliderType::box:
 			{
-				XMVECTOR scale = trans->scale * XMLoadFloat3(&collider->HalfExtents());
+				XMFLOAT3 halfExt = collider->HalfExtents();
+				XMVECTOR scale = trans->scale * XMLoadFloat3(&halfExt);
 				XMMATRIX m = XMMatrixScalingFromVector(scale * 2.0f) * transMatrix->GetRotation() * XMMatrixTranslationFromVector(transMatrix->GetTranslation());
 				gizmoRender.DrawCube(m, GizmoRender::colliderColor);
 				break;

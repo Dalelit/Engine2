@@ -45,16 +45,7 @@ namespace Engine2
 			{
 				if (psData.OnImgui()) pixelShaderCB.UpdateBuffer(psData);
 
-				if (texture) texture->OnImgui();
-				else ImGui::Text("No texture");
-
-				if (ImGui::TreeNode("Info"))
-				{
-					ImGui::Text("Standard Material");
-					vertexShader->OnImgui();
-					pixelShader->OnImgui();
-					ImGui::TreePop();
-				}
+				OnImguiCommon();
 
 				//ImGui::TreePop();
 			}

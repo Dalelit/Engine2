@@ -13,6 +13,7 @@
 #include "ScriptComponent.h"
 #include "Particles.h"
 #include "Gizmo.h"
+#include "TextureLoader.h"
 
 namespace Engine2
 {
@@ -33,10 +34,16 @@ namespace Engine2
 		{
 			while (loader.NextLine() && loader.Spaces() != 0)
 			{
-				if (loader.Name() == "Source")
-				{
-					AssetManager::Manager().LoadModel(directory, loader.Value());
-				}
+				if (loader.Name() == "Source") AssetManager::Manager().LoadModel(directory, loader.Value());
+				else { E2_ASSERT(false, "Expected the source when loading assets"); }
+			}
+		}
+
+		if (loader.Spaces() == 0 && loader.Name() == "Textures")
+		{
+			while (loader.NextLine() && loader.Spaces() != 0)
+			{
+				if (loader.Name() == "Source") TextureLoader::LoadTexture(directory, loader.Value());
 				else { E2_ASSERT(false, "Expected the source when loading assets"); }
 			}
 		}
@@ -134,6 +141,11 @@ namespace Engine2
 		}
 
 		{
+			auto node = out.SaveNode("Textures");
+			SaveTextures(node);
+		}
+
+		{
 			auto node = out.SaveNode("SceneInformation");
 			SaveSceneInfo(node);
 		}
@@ -195,6 +207,14 @@ namespace Engine2
 		for (auto [name, asset] : AssetManager::Manager().GetMap())
 		{
 			node.Attribute("Source", asset.GetSource());
+		}
+	}
+
+	void SceneSerialisation::SaveTextures(Serialisation::WriteNode& node)
+	{
+		for (auto [name, asset] : TextureLoader::Textures.Map())
+		{
+			node.Attribute("Source", asset->GetName());
 		}
 	}
 }

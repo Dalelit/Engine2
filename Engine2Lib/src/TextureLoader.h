@@ -10,11 +10,11 @@ namespace Engine2 {
 		static AssetStore<Texture> Textures;
 
 		// Loads a (or returns the cached) texture.
-		static std::shared_ptr<Texture> LoadTexture(const std::string& filename);
+		static std::shared_ptr<Texture> LoadTexture(const std::string& directory, const std::string& filename);
 
 		static std::string LastResult; // to do: simple first approach to error handling info
 
 	protected:
-		static std::shared_ptr<Texture> CreateTexture(const std::string& filename);
+		static std::shared_ptr<Texture> CreateTexture(const std::string& directory, const std::string& filename);
 	};
 }

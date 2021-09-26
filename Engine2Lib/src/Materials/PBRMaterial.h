@@ -21,11 +21,12 @@ namespace Engine2
 		{
 		public:
 			PBRMaterial(const std::string& name);
-			PBRMaterial() : PBRMaterial("Standard material") {}
+			PBRMaterial() : PBRMaterial("PBR material") {}
 
 			void OnImgui();
 
 			std::shared_ptr<Material> Clone();
+			const char* TypeName() { return "PBRMaterial"; }
 
 			inline void SetMaterialData(const PBRPSData& data) { psData = data; pixelShaderCB.UpdateBuffer(psData); }
 

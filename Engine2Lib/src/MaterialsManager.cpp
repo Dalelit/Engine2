@@ -2,6 +2,7 @@
 #include "MaterialsManager.h"
 #include "Materials/StandardMaterial.h"
 #include "Materials/PBRMaterial.h"
+#include "Materials/LowPolyMaterial.h"
 
 namespace Engine2
 {
@@ -12,7 +13,7 @@ namespace Engine2
 		static char materialName[512] = "";
 
 		ImGui::InputText("Material Name", materialName, sizeof(materialName));
-		if (ImGui::BeginCombo("SelectMaterial", nullptr))
+		if (ImGui::BeginCombo("Create material of type", nullptr))
 		{
 			ImGui::Selectable("");
 			if (ImGui::Selectable("Standard"))
@@ -30,6 +31,15 @@ namespace Engine2
 				if (!name.empty() && !assets.Exists(name))
 				{
 					auto mat = std::make_shared<Materials::PBRMaterial>(name);
+					assets.CreateAsset(name, mat);
+				}
+			}
+			if (ImGui::Selectable("LowPoly"))
+			{
+				std::string name(materialName);
+				if (!name.empty() && !assets.Exists(name))
+				{
+					auto mat = std::make_shared<Materials::LowPolyMaterial>(name);
 					assets.CreateAsset(name, mat);
 				}
 			}

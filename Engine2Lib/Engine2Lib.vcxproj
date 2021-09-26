@@ -169,6 +169,7 @@
     <ClInclude Include="src\Logging.h" />
     <ClInclude Include="src\Material.h" />
     <ClInclude Include="src\MaterialsManager.h" />
+    <ClInclude Include="src\Materials\LowPolyMaterial.h" />
     <ClInclude Include="src\Materials\PBRMaterial.h" />
     <ClInclude Include="src\Materials\StandardMaterial.h" />
     <ClInclude Include="src\Materials\WireframeMaterial.h" />
@@ -194,6 +195,7 @@
     <ClInclude Include="src\SurfaceLoader.h" />
     <ClInclude Include="src\TextureGizmo.h" />
     <ClInclude Include="src\TextureLoader.h" />
+    <ClInclude Include="src\TextureSampler.h" />
     <ClInclude Include="src\Transform.h" />
     <ClInclude Include="src\UID.h" />
     <ClInclude Include="src\UtilFileDialog.h" />
@@ -246,6 +248,7 @@
     <ClCompile Include="src\Lights.cpp" />
     <ClCompile Include="src\Logging.cpp" />
     <ClCompile Include="src\MaterialsManager.cpp" />
+    <ClCompile Include="src\Materials\LowPolyMaterial.cpp" />
     <ClCompile Include="src\Materials\PBRMaterial.cpp" />
     <ClCompile Include="src\Materials\StandardMaterial.cpp" />
     <ClCompile Include="src\Materials\WireframeMaterial.cpp" />
@@ -309,6 +312,7 @@
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\TextureGizmo.cpp" />
     <ClCompile Include="src\TextureLoader.cpp" />
+    <ClCompile Include="src\TextureSampler.cpp" />
     <ClCompile Include="src\Transform.cpp" />
     <ClCompile Include="src\UID.cpp" />
     <ClCompile Include="src\Util.cpp" />
@@ -331,6 +335,12 @@
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)$(Platform)\Shaders\%(Filename).cso</ObjectFileOutput>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Assets\Shaders\LowPolyPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="Assets\Shaders\OutlinePS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>

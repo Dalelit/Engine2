@@ -118,24 +118,24 @@ namespace Engine2
 
 	void Texture::OnImgui()
 	{
-		if (ImGui::TreeNode(name.c_str()))
+		//if (ImGui::TreeNode(name.c_str()))
 		{
+			ImGui::ImageButton(pSRView.Get(), { 100, 100 });
+			if (ImGui::BeginDragDropSource())
+			{
+				ImGui::SetDragDropPayload("TEXTURE", name.c_str(), name.size() + 1);
+				ImGui::Text("Texture");
+				ImGui::EndDragDropSource();
+			}
+
+			if (pSampler) pSampler->OnImgui();
+			else ImGui::Text("No sampler!");
+			
+			ImGui::Text("Name: %s", name.c_str());
 			ImGui::Text("Slot %i", slot);
 			ImGui::Text(info.c_str());
-			ImGui::TreePop();
+
+			//ImGui::TreePop();
 		}
-	}
-
-	TextureSampler::TextureSampler(D3D11_FILTER filter, D3D11_TEXTURE_ADDRESS_MODE addressMode)
-	{
-		D3D11_SAMPLER_DESC sampDesc = {};
-		sampDesc.Filter = filter;
-		sampDesc.AddressU = addressMode;
-		sampDesc.AddressV = addressMode;
-		sampDesc.AddressW = addressMode;
-
-		HRESULT hr = DXDevice::GetDevice().CreateSamplerState(&sampDesc, &pSamplerState);
-
-		E2_ASSERT_HR(hr, "CreateSamplerState failed");
 	}
 }

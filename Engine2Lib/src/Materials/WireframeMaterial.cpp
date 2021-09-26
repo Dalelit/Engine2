@@ -51,6 +51,8 @@ namespace Engine2
 		void WireframeMaterial::OnImgui()
 		{
 			if (ImGui::ColorEdit3("Color", &psData.x)) pixelShaderCB.UpdateBuffer(psData);
+
+			OnImguiCommon();
 		}
 
 		std::shared_ptr<Material> WireframeMaterial::Clone()

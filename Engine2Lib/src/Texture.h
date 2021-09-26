@@ -2,20 +2,10 @@
 #include "pch.h"
 #include "DXDevice.h"
 #include "Surface.h"
+#include "TextureSampler.h"
 
 namespace Engine2
 {
-	class TextureSampler
-	{
-	public:
-		TextureSampler(D3D11_FILTER filter, D3D11_TEXTURE_ADDRESS_MODE addressMode);
-		~TextureSampler() = default;
-
-		Microsoft::WRL::ComPtr<ID3D11SamplerState>& GetSamplerState() { return pSamplerState; }
-
-	protected:
-		Microsoft::WRL::ComPtr<ID3D11SamplerState> pSamplerState = nullptr;
-	};
 
 	class Texture
 	{
@@ -36,6 +26,8 @@ namespace Engine2
 
 		void SetName(const std::string& newName) { name = newName; }
 		void SetSlot(unsigned int newSlot) { slot = newSlot; }
+
+		const std::string& GetName() const { return name; }
 
 		inline Microsoft::WRL::ComPtr<ID3D11Texture2D1> GetBuffer() { return pTexture; }
 		inline Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> GetSRV() { return pSRView; }
